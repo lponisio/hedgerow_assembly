@@ -1,0 +1,90 @@
+\documentclass[12pt]{article}
+\usepackage[top=0.85in, bottom=0.93in, right=0.93in, left=0.93in,
+paperwidth=8.5in, paperheight=11in, nohead]{geometry}
+\geometry{letterpaper}
+\usepackage[pdftex]{graphicx}
+\usepackage{color}
+\usepackage[normalem]{ulem}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{epstopdf}
+\usepackage{setspace}
+\usepackage{mdwlist}
+\usepackage{verbatim}
+\usepackage[numbers]{natbib}
+
+%% make bibliography more compact \setlength{\bibsep}{0in}
+\renewcommand\bibsection{\subsubsection*{\refname}}
+
+\begin{document}
+
+\begin{centering}
+  \large {\bf The assembly of pollinator communities in response to
+    restoration} \\
+\end{centering}
+\vspace{0.15in}
+
+
+\section{Goals}
+\begin{enumerate}
+\item Explore mechanisms underlying the assembly of plant-pollinator
+  communities on on-farm habitat restorations by comparing empirical
+  observations with assembly theory and adaptive foraging
+\item How specialization changes in a pollination network during the
+  pollinator guild assembly (colonization, persistence and extirpation
+  processes over time)
+\end{enumerate}
+
+
+\section{Data prep}
+\begin{enumerate}
+\item starting plant community for each hedgerow summed over the first
+  three years following installment
+\item the number of pollinators at each site in the initial three
+  years, and those added/lost after the initial three years
+\item the mean, minimum and maximum pollinator species degree, summed
+  over years/for each year
+\end{enumerate}
+
+\section{Model}
+\begin{enumerate}
+\item Use the initial network summed over years 1-3 for each hedgerow,
+  randomly add species (equal to the number added in the observed
+  data) and allow the community to assembly using adaptive foraging
+\item  Keep track of
+  \begin{enumerate}
+  \item number of species that go extinct at each hedgerow
+  \item the specialization of each plant and pollinator
+  \end{enumerate}
+\end{enumerate}
+
+\section{Predictions}
+\begin{enumerate}
+\item ``generalist'' pollinators early in succession will become more
+  specialized
+\item ``generalist'' pollinators early in succession will visit a
+  subset of what they originally visited, mainly the originally
+  ``specialist'' plants
+\end{enumerate}
+
+\section{Considerations}
+\begin{enumerate}
+\item some plant species that were planted were never visited by
+  pollinators in the first few years. This is likely because they did
+  not produce many/any flowers/nectar resources
+\item compare observed data to a model with/without adaptive foraging?
+\item all the pollinator species needed (bees, syrphids, wasps
+  etc.?). Not all have been identified to species.
+\item weedy plant species ``added'' to communities by invasion, lost
+  by death
+\end{enumerate}
+
+
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-PDF-mode: t
+%%% End:
+
+
