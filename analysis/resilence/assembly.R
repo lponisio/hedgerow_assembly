@@ -76,16 +76,6 @@ pols <- unique(specs$GenusSpecies[specs$speciesType == "pollinator"])
 cols <- rainbow(length(pols))
 names(cols) <- pols
 
-## plot(NA, ylim=range(specs$degree),
-##      xlim=range(specs$ypr, na.rm=TRUE))
-
-## lapply(pols,
-##        function(x){
-##          this.specs <- specs[specs$GenusSpecies == x,]
-##          points(this.specs$degree ~
-##               this.specs$ypr, col=cols[x])
-##        })
-
 spec.metric <- "proportional.generality"
 
 specs$overall.spec <- traits[,spec.metric][match(specs$GenusSpecies,
