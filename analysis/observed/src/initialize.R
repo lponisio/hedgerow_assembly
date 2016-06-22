@@ -1,0 +1,7 @@
+library(igraph)
+library(bipartite)
+library(lme4)
+source('src/prepNets.R')
+source('src/CalcMetrics.R')
+source('src/misc.R')
+load('../../data/networks/specimens.Rdata')

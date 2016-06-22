@@ -1,0 +1,570 @@
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/resilence')#
+source('src/initialize.R')#
+library(lmerTest)
+head(spec)
+##the purpose of this function is to break up data with many#
+##sites/years and prepare it for network analysis.#
+#
+break.net <- function(spec.dat){#
+  samp2site.spp <- function(site, spp, abund) { #
+    x <- tapply(abund, list(site= site, spp= spp), sum)#
+    x[is.na(x)] <- 0#
+    return(x)#
+  }#
+  ## status <- split(spec.dat, spec.dat$SiteStatus)#
+  sites <- split(spec.dat, spec.dat$Site)#
+  networks <- lapply(sites, function(x){#
+    lapply(split(x, f=x$Year), as.matrix)#
+  })#
+  ## formats data matrices appropriate for network analysis #
+  comms <- rapply(networks, function(y){#
+    samp2site.spp(site=y[,"PlantGenusSpecies"],#
+                  spp=y[,"GenusSpecies"],#
+                  abund=rep(1, nrow(y)))#
+  }, how="replace")#
+  ## puts data together in a list and removes empty matrices#
+  drop.net <- function(z)#
+    z[!sapply(z, FUN=function(q){#
+      any(dim(q) < 3)#
+    })]#
+  adj.mat <- unlist(lapply(comms, drop.net), recursive=FALSE)#
+  return(adj.mat) #
+}
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/resilence')#
+source('src/initialize.R')#
+library(lmerTest)#
+#
+## create pp matrix for each site, year#
+nets <- break.net(spec)
+##the purpose of this function is to break up data with many#
+##sites/years and prepare it for network analysis.#
+#
+break.net <- function(spec.dat){#
+  samp2site.spp <- function(site, spp, abund) { #
+    x <- tapply(abund, list(site= site, spp= spp), sum)#
+    x[is.na(x)] <- 0#
+    return(x)#
+  }#
+  ## status <- split(spec.dat, spec.dat$SiteStatus)#
+  sites <- split(spec.dat, spec.dat$Site)#
+  networks <- lapply(sites, function(x){#
+    lapply(split(x, f=x$Year), as.matrix)#
+  })#
+  ## formats data matrices appropriate for network analysis #
+  comms <- rapply(networks, function(y){#
+    samp2site.spp(site=y[,"PlantGenusSpecies"],#
+                  spp=y[,"GenusSpecies"],#
+                  abund=rep(1, nrow(y)))#
+  }, how="replace")#
+  ## puts data together in a list and removes empty matrices#
+  drop.net <- function(z)#
+    z[!sapply(z, FUN=function(q){#
+      any(dim(q) < 3)#
+    })]#
+  adj.mat <- unlist(lapply(comms, drop.net), recursive=FALSE)#
+  return(adj.mat) #
+}
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/resilence')#
+source('src/initialize.R')#
+library(lmerTest)#
+#
+## create pp matrix for each site, year#
+nets <- break.net(spec)
+source("src/prepNets.R")#
+#
+## create pp matrix for each site, year#
+nets <- break.net(spec)
+names(nets)
+## **********************************************************#
+## robustness#
+## **********************************************************#
+ext <- lapply(nets, second.extinct,#
+              participant="lower",#
+              method="abund")#
+#
+rob <- sapply(ext, robustness)#
+#
+sites <- sapply(strsplit(names(rob), "[.]"), function(x) x[1])#
+years <- sapply(strsplit(names(rob), "[.]"), function(x) x[2])#
+#
+dats <- data.frame(Site= sites,#
+                   Year=years,#
+                   Robustness=rob)#
+rownames(dats) <- NULL#
+#
+dats$SiteStatus <- spec$SiteStatus[match(paste(dats$Site, dats$Year),#
+                           paste(spec$Site, spec$Year))]#
+#
+dats$ypr <- spec$ypr[match(paste(dats$Site, dats$Year),#
+                           paste(spec$Site, spec$Year))]#
+#
+## no change in robustness by site status#
+boxplot(dats$Robustness~dats$SiteStatus)#
+summary(lmer(Robustness~SiteStatus#
+             + (1|Site) + (1|Year),#
+             data=dats))#
+#
+## no effect of ypr on robustness#
+boxplot(dats$Robustness~dats$ypr)#
+summary(lmer(Robustness~ypr#
+             + (1|Site) + (1|Year),#
+             data=dats[!is.na(dats$ypr),]))#
+#
+## **********************************************************#
+## species importance#
+## **********************************************************#
+#
+species.lev <- lapply(nets, function(x){#
+  sl <- specieslevel(x)#
+  sl$'higher level'$tot.int <- colSums(x)#
+  sl$'lower level'$tot.int <- rowSums(x)#
+  return(sl)#
+})#
+#
+specs  <-  mapply(function(a, b)#
+  getSpec(species.lev = a,#
+          names.net = b,#
+          seps="[.]"),#
+  a = species.lev,#
+  b = names(nets),#
+  SIMPLIFY = FALSE)#
+#
+specs <- do.call(rbind, specs)#
+rownames(specs) <- NULL#
+#
+specs$ypr <- spec$ypr[match(paste(specs$Site,#
+                                            specs$assem),#
+                           paste(spec$Site, spec$Year))]#
+#
+plot(specs$d[specs$speciesType == "pollinator"] ~#
+     specs$ypr[specs$speciesType == "pollinator"])#
+#
+pols <- unique(specs$GenusSpecies[specs$speciesType == "pollinator"])#
+cols <- rainbow(length(pols))#
+names(cols) <- pols#
+#
+plot(NA, ylim=range(specs$degree),#
+     xlim=range(specs$ypr, na.rm=TRUE))#
+#
+lapply(pols,#
+       function(x){#
+         this.specs <- specs[specs$GenusSpecies == x,]#
+         points(this.specs$degree ~#
+              this.specs$ypr, col=cols[x])#
+       })#
+#
+specs$d.all <- traits$d[match(specs$GenusSpecies,#
+                                       traits$GenusSpecies)]
+specs$specialization <- "spec"#
+specs$specialization[specs$d.all > 0.3] <- "gen"#
+#
+summary(lmer(d ~ ypr*specialization + (1|Site) + (1|GenusSpecies),#
+             data= specs[specs$speciesType == "pollinator",]))
+summary(lmer(d ~ ypr*specialization + (1|Site) + (1|GenusSpecies),#
+             data= specs[specs$speciesType == "plant",]))
+plot(hist(traits$d))
+specs$specialization <- "spec"#
+specs$specialization[specs$d.all > 0.5] <- "gen"#
+#
+summary(lmer(d ~ ypr*specialization + (1|Site) + (1|GenusSpecies),#
+             data= specs[specs$speciesType == "pollinator",]))
+summary(lmer(d ~ ypr*specialization + (1|Site) + (1|GenusSpecies),#
+             data= specs[specs$speciesType == "plant",]))
+specs$specialization <- "spec"#
+specs$specialization[specs$d.all > 0.1] <- "gen"#
+#
+summary(lmer(d ~ ypr*specialization + (1|Site) + (1|GenusSpecies),#
+             data= specs[specs$speciesType == "pollinator",]))
+specs$specialization <- "spec"#
+specs$specialization[specs$d.all > 0.2] <- "gen"#
+#
+summary(lmer(d ~ ypr*specialization + (1|Site) + (1|GenusSpecies),#
+             data= specs[specs$speciesType == "pollinator",]))
+specs$specialization <- "spec"#
+specs$specialization[specs$d.all > 0.3] <- "gen"#
+#
+summary(lmer(d ~ ypr*specialization + (1|Site) + (1|GenusSpecies),#
+             data= specs[specs$speciesType == "pollinator",]))
+specs$specialization <- "spec"#
+specs$specialization[specs$d.all > 0.2] <- "gen"#
+#
+summary(lmer(d ~ ypr*specialization + (1|Site) + (1|GenusSpecies),#
+             data= specs[specs$speciesType == "pollinator",]))
+summary(lmer(d ~ ypr*specialization + (1|Site) + (1|GenusSpecies),#
+             data= specs[specs$speciesType == "plant",]))
+summary(lmer(d ~ ypr + (1|Site) + (1|GenusSpecies),#
+             data= specs[specs$speciesType == "pollinator",]))
+summary(lmer(d ~ ypr*specialization + (1|Site) + (1|GenusSpecies),#
+             data= specs[specs$speciesType == "pollinator",]))
+hist(traits$d)
+summary(lmer(d ~ ypr + (1|Site) + (1|GenusSpecies),#
+             data= specs[specs$speciesType == "pollinator",]))
+summary(lmer(d ~ ypr*specialization + (1|Site) + (1|GenusSpecies),#
+             data= specs[specs$speciesType == "pollinator",]))
+spec.metric <- "d"#
+#
+specs$overall.spec <- traits[,spec.metric][match(specs$GenusSpecies,#
+                                       traits$GenusSpecies)]
+specs$specialization <- "spec"#
+specs$specialization[specs$overall.spec > 0.2] <- "gen"
+summary(lmer(spec.metric ~ ypr*specialization + (1|Site) + (1|GenusSpecies),#
+             data= specs[specs$speciesType == "pollinator",]))
+colnames(specs)
+spec.metric <- "proportional.generality"#
+#
+specs$overall.spec <- traits[,spec.metric][match(specs$GenusSpecies,#
+                                       traits$GenusSpecies)]#
+#
+specs$specialization <- "spec"#
+specs$specialization[specs$overall.spec > 0.2] <- "gen"#
+#
+summary(lmer(proportional.generality ~ ypr*specialization + (1|Site) + (1|GenusSpecies),#
+             data= specs[specs$speciesType == "pollinator",]))#
+#
+summary(lmer(proportional.generality ~ ypr*specialization + (1|Site) + (1|GenusSpecies),#
+             data= specs[specs$speciesType == "plant",]))
+summary(lmer(proportional.generality ~ ypr#
+             + (1|Site) + (1|GenusSpecies),#
+             data= specs[specs$speciesType == "pollinator",]))
+summary(lmer(proportional.generality ~ ypr +#
+             (1|Site) + (1|GenusSpecies),#
+             data= specs[specs$speciesType == "plant",]))
+summary(lmer(proportional.generality ~ ypr*specialization +#
+             (1|Site) + (1|GenusSpecies),#
+             data= specs[specs$speciesType == "plant",]))
+v
+summary(lmer(d ~ ypr +#
+             (1|Site) + (1|GenusSpecies),#
+             data= specs[specs$speciesType == "plant",]))
+summary(lmer(proportional.generality ~ ypr#
+             + (1|Site) + (1|GenusSpecies),#
+             data= specs[specs$speciesType == "pollinator",]))
+?lmer
+?networklevel
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/observed')#
+source('src/initialize.R')#
+N <- 999#
+#
+## ************************************************************#
+## create site by year neworks and calculate statistics#
+## (in terminal)#
+## ************************************************************#
+## create pp matrix for each site, year#
+nets <- break.net(spec)
+no <- lapply(nets, networklevel, index="niche overlap")
+no
+hload(file='saved/corMets.Rdata')
+load(file='saved/corMets.Rdata')
+head(cor.dats)
+no
+no <- sapply(nets, networklevel, index="niche overlap")
+no
+no <- t(sapply(nets, networklevel, index="niche overlap") <-
+no <- t(sapply(nets, networklevel, index="niche overlap"))
+head(no)
+head(cor.dats)
+cor.dats <- cbind(cor.dats, no[match(rownames(no),#
+                                     paste(cor.dats$Site,#
+                                     cor.dats$Year, sep="."))])
+head(cor.dats)
+colnames(cor.dats)
+no
+head(no)
+nets[[1]]
+head(no)
+load(file='saved/corMets.Rdata')
+cor.dats$niche.overlap.pol <- no$niche.overlap.HL[match(rownames(no),#
+                                     paste(cor.dats$Site,#
+                                     cor.dats$Year, sep="."))])
+cor.dats$niche.overlap.pol <- no$niche.overlap.HL[match(rownames(no),#
+                                     paste(cor.dats$Site,#
+                                     cor.dats$Year, sep="."))]
+no$niche.overlap.H
+cor.dats$niche.overlap.pol <- no[, "niche.overlap.HL"][match(rownames(no),#
+                                     paste(cor.dats$Site,#
+                                     cor.dats$Year, sep="."))]
+head(cor.dats)
+cor.dats$niche.overlap.plants <- no[, "niche.overlap.LL"][match(rownames(no),#
+                                     paste(cor.dats$Site,#
+                                     cor.dats$Year, sep="."))]
+head(cor.dats)
+## niche overlap pollinators#
+baci.no.pol.mod <- lmer(niche.overlap.pol ~ scale(ypr) +#
+                 (1|Site) + (1|Year),#
+                 data=cor.dats[!is.na(cor.dats$ypr),])#
+summary(baci.no.pol.mod)#
+save(baci.no.pol.mod, file='saved/mods/baci_no_pol.Rdata')
+## niche overlap plants#
+baci.no.plant.mod <- lmer(niche.overlap.plant ~ scale(ypr) +#
+                 (1|Site) + (1|Year),#
+                 data=cor.dats[!is.na(cor.dats$ypr),])#
+summary(baci.no.plant.mod)#
+save(baci.no.plant.mod, file='saved/mods/baci_no_plant.Rdata')
+## niche overlap plants#
+baci.no.plant.mod <- lmer(niche.overlap.plants ~ scale(ypr) +#
+                 (1|Site) + (1|Year),#
+                 data=cor.dats[!is.na(cor.dats$ypr),])#
+summary(baci.no.plant.mod)#
+save(baci.no.plant.mod, file='saved/mods/baci_no_plant.Rdata')
+head(no)
+head(nets)
+?vegdist
+?vegdist
+dis.mats <- lapply(nets, vegdist, method="horn")
+lapply(dis.mats, function(x) {quartz() plot(density))
+lapply(dis.mats, function(x) { quartz()
+plot(density(x))}
+}
+lapply(dis.mats, function(x) { quartz()
+plot(density(x))})
+sites <- unique(spec$Sites)
+sites
+head(spec)
+sites <- unique(spec$Site)
+sites
+sites <- unique(sapply(strsplit(names(nets), "[.]"), function(x) x[1]))
+sites
+sites <- sapply(strsplit(names(nets), "[.]"), function(x) x[1])
+sites
+cor.dats$Site
+names(dis.mats)
+lapply(unique(cor.dats$Sites), function(x){#
+  browser()#
+  this.mats <- dis.mats[cor.dats$Site == x]#
+}
+)
+lapply(unique(cor.dats$Sites), function(x){#
+  browser()#
+  this.mats <- dis.mats[cor.dats$Site == x]#
+})
+unique(cor.dats$Sites)
+lapply(unique(cor.dats$Site), function(x){#
+  browser()#
+  this.mats <- dis.mats[cor.dats$Site == x]#
+})
+this.mats <- dis.mats[cor.dats$Site == x]
+this.mats
+names(this.mats)
+unique(cor.dats$Site)
+layout(matrix(1:5, nrow=2))
+layout(matrix(1:6, nrow=2))
+cor.dats$Year
+names(dis.mats)
+names(this.mat)
+names(this.mats)
+cols <- rainbow(length(unique(cor.dats$Year)))
+cols
+?denisty
+?density
+Q
+layout(matrix(1:6, nrow=2))#
+cols <- rainbow(length(unique(cor.dats$Year)))#
+lapply(unique(cor.dats$Site), function(x){#
+  this.mats <- dis.mats[cor.dats$Site == x]#
+  plot(NA, ylim=c(0,10), xlim=(0,1))#
+  for(i in 1:length(this.mats)){#
+    points(density(this.mats[i]), col=cols[i])#
+  }#
+})
+layout(matrix(1:6, nrow=2))#
+cols <- rainbow(length(unique(cor.dats$Year)))#
+lapply(unique(cor.dats$Site), function(x){#
+  this.mats <- dis.mats[cor.dats$Site == x]#
+  plot(NA, ylim=c(0,10), xlim=c(0,1))#
+  for(i in 1:length(this.mats)){#
+    points(density(this.mats[i]), col=cols[i])#
+  }#
+})
+layout(matrix(1:6, nrow=2))#
+cols <- rainbow(length(unique(cor.dats$Year)))#
+lapply(unique(cor.dats$Site), function(x){#
+  this.mats <- dis.mats[cor.dats$Site == x]#
+  plot(NA, ylim=c(0,10), xlim=c(0,1))#
+  for(i in 1:length(this.mats)){#
+    browser()#
+    points(density(this.mats[i]), col=cols[i])#
+  }#
+})
+Q
+layout(matrix(1:6, nrow=2))#
+cols <- rainbow(length(unique(cor.dats$Year)))#
+lapply(unique(cor.dats$Site), function(x){#
+  this.mats <- dis.mats[cor.dats$Site == x]#
+  plot(NA, ylim=c(0,10), xlim=c(0,1))#
+  for(i in 1:length(this.mats)){#
+    browser()#
+    points(density(this.mats[i]), col=cols[i])#
+  }#
+})
+this.mats[1]
+Q
+layout(matrix(1:6, nrow=2))#
+cols <- rainbow(length(unique(cor.dats$Year)))#
+lapply(unique(cor.dats$Site), function(x){#
+  this.mats <- dis.mats[cor.dats$Site == x]#
+  plot(NA, ylim=c(0,10), xlim=c(0,1))#
+  for(i in 1:length(this.mats)){#
+    points(density(this.mats[[i]]), col=cols[i])#
+  }#
+})
+layout(matrix(1:6, nrow=2))#
+cols <- rainbow(length(unique(cor.dats$Year)))#
+lapply(unique(cor.dats$Site), function(x){#
+  this.mats <- dis.mats[cor.dats$Site == x]#
+  plot(NA, ylim=c(0,10), xlim=c(0,1))#
+  for(i in 1:length(this.mats)){#
+    points(density(this.mats[[i]]), col=cols[i], type="l")#
+  }#
+})
+layout(matrix(1:6, nrow=2))#
+cols <- rainbow(length(unique(cor.dats$Year)))#
+lapply(unique(cor.dats$Site), function(x){#
+  this.mats <- dis.mats[cor.dats$Site == x]#
+  plot(NA, ylim=c(0,10), xlim=c(0,1.5),#
+       ylab="Frequency",#
+       xlab="Niche Overlap")#
+  for(i in 1:length(this.mats)){#
+    points(density(this.mats[[i]]), col=cols[i], type="l")#
+  }#
+})
+sort(unique(cor.dats$Year))
+layout(matrix(1:6, nrow=2))#
+cols <- rainbow(length(unique(cor.dats$Year)))#
+lapply(unique(cor.dats$Site), function(x){#
+  this.mats <- dis.mats[cor.dats$Site == x]#
+  plot(NA, ylim=c(0,10), xlim=c(0,1.5),#
+       ylab="Frequency",#
+       xlab="Niche Overlap")#
+  for(i in 1:length(this.mats)){#
+    points(density(this.mats[[i]]), col=cols[i], type="l")#
+  }#
+  plot(NA)#
+  legend("center", col=cols, lwd="1", legend=sort(unique(cor.dats$Year)))#
+})
+dis.mats <- lapply(nets, vegdist, method="horn")#
+#
+layout(matrix(1:6, nrow=2))#
+cols <- rainbow(length(unique(cor.dats$Year)))#
+lapply(unique(cor.dats$Site), function(x){#
+  this.mats <- dis.mats[cor.dats$Site == x]#
+  plot(NA, ylim=c(0,10), xlim=c(0,1.5),#
+       ylab="Frequency",#
+       xlab="Niche Overlap")#
+  for(i in 1:length(this.mats)){#
+    points(density(this.mats[[i]]), col=cols[i], type="l")#
+  }#
+})#
+#
+plot(NA, ylim=c(0,1), xlim=c(0,1), xatx="n", yaxt="n")#
+legend("center", col=cols, lwd="1", legend=sort(unique(cor.dats$Year)))
+dis.mats <- lapply(nets, vegdist, method="horn")#
+#
+layout(matrix(1:6, nrow=2))#
+cols <- rainbow(length(unique(cor.dats$Year)))#
+lapply(unique(cor.dats$Site), function(x){#
+  this.mats <- dis.mats[cor.dats$Site == x]#
+  plot(NA, ylim=c(0,10), xlim=c(0,1.5),#
+       ylab="Frequency",#
+       xlab="Niche Overlap")#
+  for(i in 1:length(this.mats)){#
+    points(density(this.mats[[i]]), col=cols[i], type="l")#
+  }#
+})#
+#
+plot(NA, ylim=c(0,1), xlim=c(0,1), xaxt="n", yaxt="n")#
+legend("center", col=cols, lwd="1", legend=sort(unique(cor.dats$Year)))
+layout(matrix(1:6, nrow=2))#
+cols <- rainbow(length(unique(cor.dats$Year)))#
+lapply(unique(cor.dats$Site), function(x){#
+  this.mats <- dis.mats[cor.dats$Site == x]#
+  plot(NA, ylim=c(0,10), xlim=c(0,1.5),#
+       ylab="Frequency",#
+       xlab="Niche Overlap")#
+  for(i in 1:length(this.mats)){#
+    points(density(this.mats[[i]]), col=cols[i], type="l")#
+  }#
+})#
+#
+plot(NA, ylim=c(0,1), xlim=c(0,1), xaxt="n", yaxt="n")#
+legend("center", col=cols, lwd="1",#
+       legend=sort(unique(cor.dats$Year)),#
+       bty="n")
+dis.mats <- lapply(nets, vegdist, method="chao")#
+#
+layout(matrix(1:6, nrow=2))#
+cols <- rainbow(length(unique(cor.dats$Year)))#
+lapply(unique(cor.dats$Site), function(x){#
+  this.mats <- dis.mats[cor.dats$Site == x]#
+  plot(NA, ylim=c(0,10), xlim=c(0,1.5),#
+       ylab="Frequency",#
+       xlab="Niche Overlap")#
+  for(i in 1:length(this.mats)){#
+    points(density(this.mats[[i]]), col=cols[i], type="l")#
+  }#
+})#
+#
+plot(NA, ylim=c(0,1), xlim=c(0,1), xaxt="n", yaxt="n")#
+legend("center", col=cols, lwd="1",#
+       legend=sort(unique(cor.dats$Year)),#
+       bty="n")
+dis.mats <- lapply(nets, vegdist, method="chao")#
+#
+layout(matrix(1:6, nrow=2))#
+cols <- rainbow(length(unique(cor.dats$Year)))#
+lapply(unique(cor.dats$Site), function(x){#
+  this.mats <- dis.mats[cor.dats$Site == x]#
+  plot(NA, ylim=c(0,10), xlim=c(0,1.5),#
+       ylab="Frequency",#
+       xlab="Niche Overlap")#
+  for(i in 1:length(this.mats)){#
+    points(density(this.mats[[i]]), col=cols[i], type="l", lwd=2)#
+  }#
+})#
+#
+plot(NA, ylim=c(0,1), xlim=c(0,1), xaxt="n", yaxt="n", ylab="", xlab="")#
+legend("center", col=cols, lwd="2",#
+       legend=sort(unique(cor.dats$Year)),#
+       bty="n")
+layout(matrix(1:6, nrow=2))#
+cols <- rainbow(length(unique(cor.dats$Year)))#
+lapply(unique(cor.dats$Site), function(x){#
+  this.mats <- dis.mats[cor.dats$Site == x]#
+  plot(NA, ylim=c(0,10), xlim=c(0,1.5),#
+       ylab="Frequency",#
+       xlab="Niche Overlap",#
+       main= x)#
+  for(i in 1:length(this.mats)){#
+    points(density(this.mats[[i]]), col=cols[i], type="l", lwd=2)#
+  }#
+})#
+#
+plot(NA, ylim=c(0,1), xlim=c(0,1), xaxt="n", yaxt="n", ylab="", xlab="")#
+legend("center", col=cols, lwd="2",#
+       legend=sort(unique(cor.dats$Year)),#
+       bty="n")
+head(nets[[1]])
+dis.mats <- lapply(lapply(nets, t), vegdist, method="chao")
+lapply(nets, t)[[1]]
+dis.mats <- lapply(lapply(nets, t), vegdist, method="chao")#
+#
+layout(matrix(1:6, nrow=2))#
+cols <- rainbow(length(unique(cor.dats$Year)))#
+lapply(unique(cor.dats$Site), function(x){#
+  this.mats <- dis.mats[cor.dats$Site == x]#
+  plot(NA, ylim=c(0,10), xlim=c(0,1.5),#
+       ylab="Frequency",#
+       xlab="Niche Overlap",#
+       main= x)#
+  for(i in 1:length(this.mats)){#
+    points(density(this.mats[[i]]), col=cols[i], type="l", lwd=2)#
+  }#
+})#
+#
+plot(NA, ylim=c(0,1), xlim=c(0,1), xaxt="n", yaxt="n", ylab="", xlab="")#
+legend("center", col=cols, lwd="2",#
+       legend=sort(unique(cor.dats$Year)),#
+       bty="n")
