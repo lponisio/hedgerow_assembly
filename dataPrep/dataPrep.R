@@ -1,3 +1,4 @@
+rm(list=ls())
 setwd('~/Dropbox/hedgerow_assembly/dataPrep')
 load('~/Dropbox/hedgerow/data_sets/traditional/specimens-complete.RData')
 load("/Users/lcp/Dropbox/hedgerow_network/data/veg/veg.Rdata")
@@ -30,10 +31,10 @@ agg.spec <- aggregate(list(abund=spec$GenusSpecies),
                            PlantGenusSpecies=spec$PlantGenusSpecies),
                       length)
 
-nets <- samp2site.spp(agg.spec$PlantGenusSpecies,
+nets.all <- samp2site.spp(agg.spec$PlantGenusSpecies,
                       agg.spec$GenusSpecies, agg.spec$abund)
 
-all.specializations <- specieslevel(nets,
+all.specializations <- specieslevel(nets.all,
                                     index=c("proportional generality",
                                     "d"))
 

@@ -1,5 +1,5 @@
 rm(list=ls())
-setwd('~/Dropbox/hedgerow_assembly/analysis/observed')
+setwd('~/Dropbox/hedgerow_assembly/analysis/assembly')
 source('src/initialize.R')
 N <- 999
 
@@ -9,6 +9,7 @@ N <- 999
 ## ************************************************************
 ## create pp matrix for each site, year
 nets <- break.net(spec)
+save(nets, file='../../data/networks/networks_years.Rdata')
 
 ## ************************************************************
 ## individuals nulls
