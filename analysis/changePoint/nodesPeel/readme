@@ -1,0 +1,32 @@
+Active Discovery of Network Roles
+====================
+
+Requirements
+---------------------
+networkx    :   
+numpy   :   http://www.numpy.org/
+scipy   :   http://scipy.org/
+
+Optional
+-------------
+numexpr     :
+
+
+Before running the code it is recommended that you compile the SVM code:
+>make
+
+Note: the SVM_struct code has been modified and is redistributed with permission by Thorsten Joachims on 5th November 2013.
+
+Running the code
+---------------------------
+This code can be run from the commandline using:
+
+>python activelearn.py networkfile classlabelsfile activelearnsteps
+
+positional arguments:
+  networkfile            Input network file e.g. karate_edges.txt
+  classlabelsfile         Class label file e.g. karate_labels.txt
+  activelearnsteps      the number of active learning rounds (budget)
+
+example input files are included in the release (karate and word network files)
+

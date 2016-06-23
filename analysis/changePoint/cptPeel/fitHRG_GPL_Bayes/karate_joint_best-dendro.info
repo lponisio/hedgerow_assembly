@@ -1,0 +1,14 @@
+---HIERARCHICAL-RANDOM-GRAPH---
+StartTime     : Thu Jun 23 13:33:32 2016
+InputFile     : 
+Directory     : fitHRG_GPL_Bayes/
+---Basic-Graph-Information---
+Nodes         : 31
+Edges         : 75
+---HRG-Information---
+OutputTime    : Thu Jun 23 13:33:35 2016
+NumStepsMCMC  : 850398
+NumPrevBests  : 157
+LogLikelihood : -122.066
+HRG           : karate_joint_best-dendro.hrg
+InfoFile      : karate_joint_best-dendro.info

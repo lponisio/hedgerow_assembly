@@ -1,0 +1,65 @@
+Network Change-point Detection
+====================
+
+Requirements
+---------------------
+dendropy v4.0   :   http://pythonhosted.org/DendroPy/
+numpy   :   http://www.numpy.org/
+scipy   :   http://scipy.org/
+
+
+***NOTE: This version of the code has been updated to run with version 4.0 of dendropy and will not work with earlier versions. Tested on version 4.0.2
+
+
+Before running the code it is recommended that you compile the GHRG code:
+cd fitHRG_GPL_Bayes/
+make
+cd ../consensusHRG_GPL_Bayes/
+make
+
+
+Running the code
+---------------------------
+This code can be run from the commandline using:
+
+>python runNetworkChangePoint.py [-p "path/to/input/files/"] nodenamesfile windowsize networkfilesequence
+
+runNetworkChangePoint.py [-p “lcp/Desktop/release/fitHRG_GPL_Bayes"] nodenamesfile windowsize networkfilesequence
+
+positional arguments:
+  nodenamesfile         Input node names file e.g. names.lut
+  windowsize            Length of sliding window
+  networkfilesequence   Input sequence of network files: e.g. "network1.pairs network2.pairs network3.pairs"
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -p PATH, --path PATH  Path to files (if not in current directory)
+
+Inputs
+-----------
+the names file is a .lut file of the format:
+
+virtual	real
+0	1001
+1	123
+2	95
+
+the network files are .pairs files in edge list format:
+
+1001	123
+1001	95
+1001	999
+
+Note:  the nodes that appear in the .pairs file must be integer-valued and appear in the .lut "real" column.  The "virtual" column must be a list of integers starting from 0. 
+
+Outputs
+-------------
+the output goes in a results.txt file and is the following format:
+
+startwindow1 endwindow1 x x x 
+startwindow2 endwindow2 x x x 
+startwindow3 endwindow3 x x x 
+
+where startwindow and endwindow is the filename of the start and end networks respectively, the "x"'s correspond to the p-values and an change point is detected if this value is above 0.95.  
+
+note that the window slides on by 1 network in the sequence at a time, unless a change point is detected in which case the window slides to the first network after the change point.
