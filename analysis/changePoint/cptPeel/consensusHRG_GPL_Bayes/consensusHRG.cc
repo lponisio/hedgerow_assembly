@@ -195,12 +195,12 @@ bool markovChainMonteCarlo() {
 		}
 		
 		// Write some stuff to standard-out to describe the current state of things.
-		if (t % 16384 == 1) {
-			cout << "[" << t << "]\t" << Likeli << "   \t(" << bestL << ")\t";
-			cout << 100.0*(double)(sample_num)/(double)(num_samples) << " %\t";
-			if (t < thresh or t % 32768 != 1 or !flag_go)	{ cout << "  \n"; }
-			else										{ cout << d->getConsensusSize() << " splits\n"; }
-		}
+		//~ if (t % 16384 == 1) {
+			//~ cout << "[" << t << "]\t" << Likeli << "   \t(" << bestL << ")\t";
+			//~ cout << 100.0*(double)(sample_num)/(double)(num_samples) << " %\t";
+			//~ if (t < thresh or t % 32768 != 1 or !flag_go)	{ cout << "  \n"; }
+			//~ else										{ cout << d->getConsensusSize() << " splits\n"; }
+		//~ }
 		t++;									// Increment time step
 	}
 	

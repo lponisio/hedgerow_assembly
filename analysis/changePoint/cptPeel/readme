@@ -12,10 +12,10 @@ scipy   :   http://scipy.org/
 
 
 Before running the code it is recommended that you compile the GHRG code:
-cd fitHRG_GPL_Bayes/
-make
-cd ../consensusHRG_GPL_Bayes/
-make
+>cd fitHRG_GPL_Bayes/
+>make
+>cd ../consensusHRG_GPL_Bayes/
+>make
 
 
 Running the code
@@ -23,8 +23,6 @@ Running the code
 This code can be run from the commandline using:
 
 >python runNetworkChangePoint.py [-p "path/to/input/files/"] nodenamesfile windowsize networkfilesequence
-
-runNetworkChangePoint.py [-p “lcp/Desktop/release/fitHRG_GPL_Bayes"] nodenamesfile windowsize networkfilesequence
 
 positional arguments:
   nodenamesfile         Input node names file e.g. names.lut

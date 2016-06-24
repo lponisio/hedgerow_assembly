@@ -1,6 +1,0 @@
-K:4
-alpha:0.1
-beta:0.1
-reg:64
-disp:0
-maxiterations:20

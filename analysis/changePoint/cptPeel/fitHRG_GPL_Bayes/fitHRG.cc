@@ -77,6 +77,7 @@ string    num2str(const unsigned int);
 bool		parseCommandLine(int argc, char * argv[]);
 bool		readInputFile();
 void		recordHRG(const int, const int, const double);
+void		writeHRGinfo(const int, const int, const double);
 void		recordNamesLUT();
 
 // ******** Structures and Constants **********************************************************************
@@ -148,6 +149,8 @@ int main(int argc, char * argv[]) {
 			d->makeRandomGraph();
 			d->recordGraphStructure(ioparm.f_pairs);
 		}
+        d->writeDendrogramStructure(ioparm.f_dg);
+        writeHRGinfo(t, out_count, bestL);
 		return 1;
 	} else { return 0; } 
 
@@ -452,11 +455,17 @@ bool readInputFile() {
 
 void recordHRG(const int step, const int count, const double thisL) {
 	
-	time_t t1;
-	
 	// write hrg to file
 	ioparm.f_dg = ioparm.d_dir + ioparm.s_scratch + "_best-dendro.hrg";
 	d->recordDendrogramStructure(ioparm.f_dg);
+
+    return;
+}
+// ********************************************************************************************************
+
+void writeHRGinfo(const int step, const int count, const double thisL) {
+	
+	time_t t1;
 	
 	// write statistics about hrg to file
 	ioparm.f_dg_info = ioparm.d_dir + ioparm.s_scratch + "_best-dendro.info";

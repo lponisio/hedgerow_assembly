@@ -34,6 +34,8 @@
 
 #include <iostream>
 #include <fstream>
+#include <sstream>
+
 #include <stdio.h>
 #include <math.h>
 
@@ -245,6 +247,7 @@ public:
 	graph*		g;									// underlying G (dangerously accessible)
 	graph**		gs;									// underlying G's (dangerously accessible)
 	int			ng;									// number of G's
+    string sBestDendro;              // string record of best dendro
 	
 	dendro(); ~dendro();								// constructor / destructor
 	void			buildDendrogram();						// build dendrogram from g
@@ -253,6 +256,7 @@ public:
 	void			makeRandomGraph();						// make random G from D
 	bool			monteCarloMove(double&, bool&);			// make single MCMC move
 	void			recordDendrogramStructure(const string);	// record D structure to file
+	void			writeDendrogramStructure(const string);	// writes D structure to file
 	void			recordGraphStructure(const string);		// record G structure to file
 	void			refreshLikelihood();					// force refresh of log-likelihood value
 	void			printDendrogram();						// write dendrogram structure to terminal
@@ -1275,21 +1279,56 @@ int dendro::QsortPartition (block* array, int left, int right, int index) {
 // ********************************************************************************************************
 
 void dendro::recordDendrogramStructure(const string out_file) {
-	
-	ofstream fout(out_file.c_str(), ios::trunc);
-	fout << "ng= " << ng << "\n";
+	//~ ss << "Hello, world, " << myInt << niceToSeeYouString;
+    //~ std::string s = ss.str();
+	//~ ofstream fout(out_file.c_str(), ios::trunc);
+	//~ fout << "ng= " << ng << "\n";
+	//~ for (int i=0; i<(n-1); i++) {
+		//~ fout << "[ " << i << " ] ";
+		//~ fout << "L= " << internal[i].L->index << " "; if (internal[i].L->type == DENDRO) { fout << "(D) "; } else { fout << "(G) "; }
+		//~ fout << "R= " << internal[i].R->index << " "; if (internal[i].R->type == DENDRO) { fout << "(D) "; } else { fout << "(G) "; }
+		//~ fout << "p= " << internal[i].p << " ";
+		//~ fout << "e= " << internal[i].e << " ";
+		//~ fout << "n= " << internal[i].n << "\n";
+	//~ }
+	//~ fout.close();
+	//~ ofstream fout(out_file.c_str(), ios::trunc);
+    stringstream ssBestDendro;              // string stream to record of best dendro
+    
+	ssBestDendro << "ng= " << ng << "\n";
 	for (int i=0; i<(n-1); i++) {
-		fout << "[ " << i << " ] ";
-		fout << "L= " << internal[i].L->index << " "; if (internal[i].L->type == DENDRO) { fout << "(D) "; } else { fout << "(G) "; }
-		fout << "R= " << internal[i].R->index << " "; if (internal[i].R->type == DENDRO) { fout << "(D) "; } else { fout << "(G) "; }
-		fout << "p= " << internal[i].p << " ";
-		fout << "e= " << internal[i].e << " ";
-		fout << "n= " << internal[i].n << "\n";
+		ssBestDendro << "[ " << i << " ] ";
+		ssBestDendro << "L= " << internal[i].L->index << " "; if (internal[i].L->type == DENDRO) { ssBestDendro << "(D) "; } else { ssBestDendro << "(G) "; }
+		ssBestDendro << "R= " << internal[i].R->index << " "; if (internal[i].R->type == DENDRO) { ssBestDendro << "(D) "; } else { ssBestDendro << "(G) "; }
+		ssBestDendro << "p= " << internal[i].p << " ";
+		ssBestDendro << "e= " << internal[i].e << " ";
+		ssBestDendro << "n= " << internal[i].n << "\n";
 	}
-	fout.close();
+    sBestDendro=ssBestDendro.str();
+	//~ ssBestDendro.close();
 	
 	return;
 }
+
+// ********************************************************************************************************
+
+void dendro::writeDendrogramStructure(const string out_file) {
+	ofstream fout(out_file.c_str(), ios::trunc);
+    fout << sBestDendro;
+	//~ fout << "ng= " << ng << "\n";
+	//~ for (int i=0; i<(n-1); i++) {
+		//~ fout << "[ " << i << " ] ";
+		//~ fout << "L= " << internal[i].L->index << " "; if (internal[i].L->type == DENDRO) { fout << "(D) "; } else { fout << "(G) "; }
+		//~ fout << "R= " << internal[i].R->index << " "; if (internal[i].R->type == DENDRO) { fout << "(D) "; } else { fout << "(G) "; }
+		//~ fout << "p= " << internal[i].p << " ";
+		//~ fout << "e= " << internal[i].e << " ";
+		//~ fout << "n= " << internal[i].n << "\n";
+	//~ }
+	fout.close();
+	//~ ofstream fout(out_file.c_str(), ios::trunc);	
+	return;
+}
+
 
 // ********************************************************************************************************
 

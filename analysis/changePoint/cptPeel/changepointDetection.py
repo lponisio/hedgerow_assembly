@@ -17,16 +17,19 @@
 
 from sys import stdout
 import dendropy
+from dendropy.calculate import treemeasure
 import numpy as np
 import os
 from scipy.special import gammaln
 from multiprocessing import Pool
 from subprocess import call
 from scipy.stats import norm
+from collections import Counter
+import time
 
 
-def unwrap_self_sampleNullModel(arg, **kwarg):
-    return sampleNullModel(*arg, **kwarg)
+#~ def unwrap_self_sampleNullModel(arg, **kwarg):
+    #~ return sampleNullModel(*arg, **kwarg)
 
 
 class Filenames(object):
@@ -36,46 +39,46 @@ class Filenames(object):
         self.currentNormalNetworks = currentNormalNetworks
         self.namesFile = namesFile
     
+class CountModel(object):
+    def __init__(self):
+        self.alpha = {}
+        self.beta = {}
 
-
-def sampleNullModel(filenames,label):
-    ad = anomalyDetection()
-    ad.importNames(filenames.namesFile)
-    ng=len(filenames.currentNormalNetworks)
-    normal_model = ad.createDendroTreeFromConsensus(filenames.consensusFilename)####
-    edgelist=[]
-    for networkFile in filenames.currentNormalNetworks:###
-        with open(os.path.join(filenames.path,networkFile)) as f:
-            edgelist.extend([edge.split() for edge in f.readlines()])
-    ad.calculatePvals(normal_model,edgelist,ng,setPriors=True)
+#~ def sampleNullModel(filenames,label):
+    #~ ad = anomalyDetection()
+    #~ ad.importNames(filenames.namesFile)
+    #~ ng=len(filenames.currentNormalNetworks)
+    #~ normal_model = ad.createDendroTreeFromConsensus(filenames.consensusFilename)####
+    #~ edgelist=[]
+    #~ for networkFile in filenames.currentNormalNetworks:###
+        #~ with open(os.path.join(filenames.path,networkFile)) as f:
+            #~ edgelist.extend([edge.split() for edge in f.readlines()])
+    #~ ad.calculatePvals(normal_model,edgelist,ng,setPriors=True)
     
-    #generate sample graphs
-    G=[]
-    for gi in xrange(ng):
-        G.append(ad.generateGraph(normal_model))
+    #~ #generate sample graphs
+    #~ G=[]
+    #~ for gi in xrange(ng):
+        #~ G.append(ad.generateGraph(normal_model))
     
-    ad.calculatePvals(normal_model,[edge for g in G for edge in g],ng,setPriors=True)
+    #~ ad.calculatePvals(normal_model,[edge for g in G for edge in g],ng,setPriors=True)
     
-    loglikelihoodR = -np.inf
-    logL_null = sum(ad.calculateLikelihood(normal_model,g) for g in G)
-    #~ logL_null = ad.calculateLikelihood(normal_model,[edge for g in G for edge in g])
-    max_c=-1
-    for c in xrange(1,ng):
-        sample_model_0 = ad.createDendroTreeFromConsensus(filenames.consensusFilename)
-        sample_model_1 = ad.createDendroTreeFromConsensus(filenames.consensusFilename)
-        G_0=[edge for g in G[:c] for edge in g]
-        G_1=[edge for g in G[c:] for edge in g]
-        ad.calculatePvals(sample_model_0,G_0,c,setPriors=True)
-        ad.calculatePvals(sample_model_1,G_1,ng-c,setPriors=True)
-        S_c  =sum(ad.calculateLikelihood(sample_model_0,g) for g in G[:c])
-        #~ S_c  =ad.calculateLikelihood(sample_model_0,G_0)
-        S_c+=sum(ad.calculateLikelihood(sample_model_1,g) for g in G[c:]) - logL_null
-        #~ S_c+=ad.calculateLikelihood(sample_model_1,G_1) - logL_null
-        if S_c > loglikelihoodR:
-            max_c=c
-            loglikelihoodR = S_c
+    #~ loglikelihoodR = -np.inf
+    #~ logL_null = sum(ad.calculateLikelihood(normal_model,g) for g in G)
+    #~ max_c=-1
+    #~ for c in xrange(1,ng):
+        #~ sample_model_0 = ad.createDendroTreeFromConsensus(filenames.consensusFilename)
+        #~ sample_model_1 = ad.createDendroTreeFromConsensus(filenames.consensusFilename)
+        #~ G_0=[edge for g in G[:c] for edge in g]
+        #~ G_1=[edge for g in G[c:] for edge in g]
+        #~ ad.calculatePvals(sample_model_0,G_0,c,setPriors=True)
+        #~ ad.calculatePvals(sample_model_1,G_1,ng-c,setPriors=True)
+        #~ S_c  =sum(ad.calculateLikelihood(sample_model_0,g) for g in G[:c])
+        #~ S_c+=sum(ad.calculateLikelihood(sample_model_1,g) for g in G[c:]) - logL_null
+        #~ if S_c > loglikelihoodR:
+            #~ max_c=c
+            #~ loglikelihoodR = S_c
     
-    return loglikelihoodR
+    #~ return loglikelihoodR
     
 
 class anomalyDetection(object):
@@ -84,6 +87,7 @@ class anomalyDetection(object):
         self.taxon_namespace = None
         self.namesLUT = None
         self.nsamples = 1000
+        #~ self.nsamples = 1
         self.window=None
     
     
@@ -94,6 +98,7 @@ class anomalyDetection(object):
         self.alpha=0.95
         t=0
         normal=True
+        print "start"
         while t<len(networkFileSequence)-window:
             #~ print "test", test,"window at t=", t
             startindx=t
@@ -104,10 +109,17 @@ class anomalyDetection(object):
             for gi in xrange(startindx,endindx):
                 paramStr+=" %s" % (os.path.join(path,networkFileSequence[gi]))
             
-            paramStr+=" > /dev/null"
+            #~ paramStr+=" > /dev/null"
+            outputStr=" > /dev/null"
+            #~ paramStr+=" > log.txt"
             
-            call("./fitHRG_GPL_Bayes/fitHRG -t joint %s" % paramStr, shell=True)
-            call("./consensusHRG_GPL_Bayes/consensusHRG %s -f %s_joint_best-dendro.hrg" % (paramStr,os.path.join(path,networkFileSequence[gi].strip(".pairs"))), shell=True)
+            if not os.path.isfile(os.path.join(path,networkFileSequence[gi].strip(".pairs")+"_joint_best-dendro.hrg")):
+                print "Run: ./fitHRG_GPL_Bayes/fitHRG -t joint %s%s" % (paramStr,outputStr)
+                call("./fitHRG_GPL_Bayes/fitHRG -t joint %s%s" % (paramStr,outputStr), shell=True)
+            
+            if not os.path.isfile(os.path.join(path,networkFileSequence[gi].strip(".pairs")+"_joint_s1-consensus.tree")):
+                print "Run: ./consensusHRG_GPL_Bayes/consensusHRG %s -f %s_joint_best-dendro.hrg" % (paramStr,os.path.join(path,networkFileSequence[gi].strip(".pairs")))
+                call("./consensusHRG_GPL_Bayes/consensusHRG %s -f %s_joint_best-dendro.hrg" % (paramStr,os.path.join(path,networkFileSequence[gi].strip(".pairs"))), shell=True)
             
             #then run null model from ad.
             self.consensusFilename="%s_joint_s1-consensus.tree" % os.path.join(path,networkFileSequence[gi].strip(".pairs"))
@@ -116,9 +128,6 @@ class anomalyDetection(object):
             self.testNetwork(path,self.currentNormalNetworks)
             
             changeDetected = self.calculateP_values()
-            if changeDetected:
-                tau=t+window
-                t+=np.argmax(self.pvals)
             t+=1
             #~ normal =  (t < experimentLength) and not changeDetected
         #~ return tau, r, time.time()-stime
@@ -129,14 +138,6 @@ class anomalyDetection(object):
     def calculateP_values(self):
         stdout.write("\rCalculating p-value..." )
         stdout.flush()
-        #~ with open("approx/null_%s_%i.model" % (self.currentNormalNetworks[-1].strip(".pairs"),method)) as f:
-            #~ null_model = [row.strip() for row in f.readlines()]
-        
-        #~ with open("approx/test_%s_%i.model" % (self.currentNormalNetworks[-1].strip(".pairs"),method)) as f:
-            #~ test_model= [row.strip() for row in f.readlines()]
-        
-        #~ null_model = np.float64(null_model)
-        #~ test_model = np.float64(test_model)
         
         index = np.argmax(self.test_model)
         
@@ -161,9 +162,14 @@ class anomalyDetection(object):
         
         self.pvals=pvals
         if self.window is not None:
-            with open("results%i.txt" % self.window, "a") as f:
+            with open("results_%i.txt" % self.window, "a") as f:
                 f.write("%s %s" % (self.currentNormalNetworks[0].strip(".pairs"),self.currentNormalNetworks[-1].strip(".pairs")))
                 for p in pvals:
+                    f.write(" %f" % p)
+                f.write("\n")
+            with open("LogLs_%i.txt" % self.window, "a") as f:
+                f.write("%s %s" % (self.currentNormalNetworks[0].strip(".pairs"),self.currentNormalNetworks[-1].strip(".pairs")))
+                for p in self.test_model:
                     f.write(" %f" % p)
                 f.write("\n")
         
@@ -178,28 +184,24 @@ class anomalyDetection(object):
         stdout.write("\rTesting networks... " )
         stdout.flush()
         test_loglikeL=0
-        G=[]
-        for networkFile in networkFileSequence:
-            with open(os.path.join(path,networkFile)) as f:
-                G.append([edge.split() for edge in f.readlines()])
+        G=self.edge_count
         
         ng=len(networkFileSequence)
-        loglikelihoodR = np.empty(ng-1)
-        logL_null = sum(self.calculateLikelihood(self.normal_model,g) for g in G)
-        #~ logL_null = self.calculateLikelihood(self.normal_model,[edge for g in G for edge in g])
-        #~ max_c=-1
+        loglikelihoodR = np.zeros(ng-1)
+        logL_null = sum(self.calculateLikelihood(self.normal_model,G,g) for g in xrange(ng))
+        
+        sample_model_0 = CountModel()
+        sample_model_1 = CountModel()
+        
         for c in xrange(1,ng):
-            sample_model_0 = self.createDendroTreeFromConsensus(self.consensusFilename)
-            sample_model_1 = self.createDendroTreeFromConsensus(self.consensusFilename)
-            G_0=[edge for g in G[:c] for edge in g]
-            G_1=[edge for g in G[c:] for edge in g]
-            self.calculatePvals(sample_model_0,G_0,c,setPriors=True)
-            self.calculatePvals(sample_model_1,G_1,ng-c,setPriors=True)
-            S_c  =sum(self.calculateLikelihood(sample_model_0,g) for g in G[:c])
-            #~ S_c  =self.calculateLikelihood(sample_model_0,G_0)
-            S_c+=sum(self.calculateLikelihood(sample_model_1,g) for g in G[c:]) - logL_null
-            #~ S_c+=self.calculateLikelihood(sample_model_1,G_1) - logL_null
+            
+            self.calculatePriors(sample_model_0,G,ng=c,gis=range(c))
+            self.calculatePriors(sample_model_1,G,ng=ng-c,gis=range(c,ng))
+            
+            S_c  =sum(self.calculateLikelihood(sample_model_0,G,g) for g in xrange(c))
+            S_c+=sum(self.calculateLikelihood(sample_model_1,G,g) for g in xrange(c,ng)) - logL_null
             loglikelihoodR[c-1]=S_c
+        
         stdout.write("\tDONE.                     \n" )
         stdout.flush()
         self.test_model=loglikelihoodR
@@ -216,56 +218,25 @@ class anomalyDetection(object):
         
         stdout.write("\tDONE.\n")
         stdout.flush()
-    
-    def createNullBaselineModel(self,sequence):
-        ng=len(sequence)
-        
-        null_mean = np.mean(sequence)
-        null_std = np.std(sequence)
-        #~ print "null", null_std, null_mean
-        
-        loglikelihoods = np.zeros(self.nsamples)-np.inf
-        for i in xrange(self.nsamples):
-            sample = norm.rvs(null_mean,null_std,size=ng)
-            sample_std = sample.std()
-            logL_null = np.sum(norm.logpdf(sample,sample.mean(),sample_std))
-            
-            max_c=-1
-            for c in xrange(1,ng):
-                S_c = np.sum(norm.logpdf(sample[:c],sample[:c].mean(),sample_std))
-                S_c += np.sum(norm.logpdf(sample[c:],sample[c:].mean(),sample_std)) - logL_null
-                if S_c > loglikelihoods[i]:
-                    max_c=c
-                    loglikelihoods[i] = S_c
-        
-        self.null_model = loglikelihoods
-        #~ loglikelihoods = np.append(np.sort(loglikelihoods),np.inf)
-        
-        logL_null = np.sum(norm.logpdf(sequence,null_mean,null_std))
-        
-        test_loglikeL = np.zeros(ng-1)
-        max_c=-1
-        for c in xrange(1,ng):
-            test_loglikeL[c-1] = np.sum(norm.logpdf(sequence[:c],sequence[:c].mean(),null_std))
-            test_loglikeL[c-1] += np.sum(norm.logpdf(sequence[c:],sequence[c:].mean(),null_std)) - logL_null
-        
-        self.test_model = test_loglikeL
-        
         
     
     def createNullModel(self,path):
-        self.normal_model = self.createDendroTreeFromConsensus(self.consensusFilename)
+        self.normal_tree = self.createDendroTreeFromConsensus(self.consensusFilename)
         edgelist=[]
+        G=[]
         for networkFile in self.currentNormalNetworks:
             with open(os.path.join(path,networkFile)) as f:
-                edgelist.extend([edge.split() for edge in f.readlines()])
-        self.calculatePvals(self.normal_model,edgelist,len(self.currentNormalNetworks),setPriors=True)
+                edges=[edge.split() for edge in f.readlines()]
+            edgelist.extend(edges)
+            G.append(edges)
         
+        self.mapDendro(self.normal_tree,G)
+        
+        self.normal_model = CountModel()
+        
+        self.calculatePriors(self.normal_model,self.edge_count,ng=len(G))
         
         filenames = Filenames(self.consensusFilename,path,self.currentNormalNetworks,self.namesFile)
-        
-        with open("nProcessors.txt") as f:
-            nProcessors=int(f.readlines()[0])
         
         stdout.write("\rCreating null distribution... \t0% ")
         stdout.flush()
@@ -273,32 +244,48 @@ class anomalyDetection(object):
         nsamples = self.nsamples
         self.null_model=np.empty(nsamples)
         
-        if nProcessors>1:
-        
-            sampler = Pool(processes=nProcessors)
-            
-            already_done = 0
-            
-            nsamples-=already_done
-            if nsamples>0:
-                loglikelihoods = sampler.imap(unwrap_self_sampleNullModel, zip([filenames]*nsamples, range(nsamples)),chunksize=(nsamples/(nProcessors*10)))
-                #~ loglikelihoods = sampler.imap(unwrap_self_sampleNullModel, [filenames]*nsamples,chunksize=(nsamples/(nProcessors)))
-                
-                for i,loglikelihood in enumerate(loglikelihoods):
-                    stdout.write("\rCreating null distribution... \t%i%% " % ((i+1+already_done)*100/self.nsamples))
-                    stdout.flush()
-                    if loglikelihood is not None:
-                        self.null_model[i]=loglikelihood
-                sampler.close()
-                sampler.join()
-                
-        else:
-            for ni in xrange(nsamples):
-                loglikelihood = unwrap_self_sampleNullModel((filenames,ni))
-                self.null_model[ni]=loglikelihood
+        for ni in xrange(nsamples):
+            stdout.write("\rCreating null distribution... \t%.1f%% " % (ni*100./self.nsamples))
+            stdout.flush()
+            loglikelihood = self.sampleNullModel(filenames,ni)
+            self.null_model[ni]=loglikelihood
         stdout.write("\rCreating null distribution... \tDONE. \n")
         stdout.flush()
+        
     
+    
+    
+    def sampleNullModel(self,filenames,label):
+        ng=len(filenames.currentNormalNetworks)
+        
+        #generate sample graphs
+        G=self.generateGraph(self.normal_model,ng)
+        
+        #infer normal model
+        normal_model = CountModel()
+        self.calculatePriors(normal_model,G,ng=ng)
+        
+        loglikelihoodR = -np.inf
+        logL_null = sum(self.calculateLikelihood(normal_model,G,g) for g in xrange(ng))
+        
+        
+        max_c=-1
+        
+        sample_model_0 = CountModel()
+        sample_model_1 = CountModel()
+        
+        for c in xrange(1,ng):
+            
+            self.calculatePriors(sample_model_0,G,ng=c,gis=range(c))
+            self.calculatePriors(sample_model_1,G,ng=ng-c,gis=range(c,ng))
+            
+            S_c  =sum(self.calculateLikelihood(sample_model_0,G,g) for g in xrange(c))
+            S_c+=sum(self.calculateLikelihood(sample_model_1,G,g) for g in xrange(c,ng)) - logL_null
+            if S_c > loglikelihoodR:
+                max_c=c
+                loglikelihoodR = S_c
+        
+        return loglikelihoodR
     
     
     def createDendroTreeFromConsensus(self,file):
@@ -320,15 +307,43 @@ class anomalyDetection(object):
         for taxon in self.taxon_namespace:
             if not tree.taxon_namespace.has_taxon_label(label=str(taxon)):
                 notin.append(taxon)
-                node = tree.seed_node.new_child(taxon=tree.taxon_namespace.require_taxon(label=str(taxon)))
+                node = tree.seed_node.new_child(taxon=tree.taxon_namespace.require_taxon(label=str(taxon)),edge_length=1)
         
         if len(notin)>0:
             print notin
         
-        #~ tree.reroot_at_node(tree.seed_node)
-        
         return tree
         
+    
+    def mapDendro(self,tree,G):
+        print "MAP"
+        pdm = treemeasure.PatristicDistanceMatrix(tree)
+        
+        tns = tree.taxon_namespace
+        
+        #~ tree.edge_mrca = {}
+        node_map = {}
+        self.edge_count ={}
+        self.mrca_count=Counter([])
+        
+        for i in xrange(self.N):
+            v=self.namesLUTr[str(i)]
+            nodes=pdm._mrca[tns.get_taxon(v)]
+            self.mrca_count += Counter([ancestor for taxon,ancestor in nodes.iteritems()])
+        
+        n_internals=len(self.mrca_count.keys())
+        node_map= dict((node,id) for id,node in enumerate(self.mrca_count.iterkeys()))
+        
+        for node in self.mrca_count.keys():
+            self.mrca_count[node_map[node]] = self.mrca_count.pop(node)
+            self.edge_count[node_map[node]]=np.zeros(len(G))
+        
+        
+        for gi,edgeList in enumerate(G):
+            for edge in edgeList:
+                emrca = pdm.mrca(tns.get_taxon(edge[0]),tns.get_taxon(edge[1]))
+                self.edge_count[node_map[emrca]][gi]+=1.
+        print "DENDRO"
 
 
     def _addnodes(self,tree,parent,consensusTree,index,hrg=False):
@@ -341,33 +356,65 @@ class anomalyDetection(object):
         for leaf in leafGenerator:
             nodeType = leafGenerator.next().strip("()") 
             if nodeType == "D":
-                node = parent.new_child()
+                node = parent.new_child(edge_length=1)
                 self._addnodes(tree,node,consensusTree,int(leaf),hrg)
             else:
-                node = parent.new_child(taxon=tree.taxon_namespace.require_taxon(label=leaf))
+                node = parent.new_child(taxon=tree.taxon_namespace.require_taxon(label=leaf),edge_length=1)
         return parent
     
     
+    def calculatePriors(self,tree,edge_count,ng=1,gis=None):
+        #~ print "calculatePriors"
+        tree.alpha = {}
+        tree.beta = {}
+        
+        if gis is None:
+            for node in self.mrca_count.iterkeys():
+                tree.alpha[node] = 1 + edge_count[node].sum()
+                tree.beta[node] = 1 + self.mrca_count[node]*ng - edge_count[node].sum()
+        else:
+            for node in self.mrca_count.iterkeys():
+                tree.alpha[node] = 1 + edge_count[node][gis].sum()
+                tree.beta[node] = 1 + self.mrca_count[node]*ng - edge_count[node][gis].sum()
+            
+                #~ print asda
+        
+    
     def calculatePvals(self,tree,edgeList=None,ng=1,setPriors=False):
+        st=time.time()
+        #~ print "Pvals"
+        
+        pdm = treemeasure.PatristicDistanceMatrix(tree)
+        
+        tns = tree.taxon_namespace
+        
+        #~ print "Init pvals",len(tree.nodes()),time.time()-st
         for node in tree.nodes():
             if node.is_internal():
                 node.ei=0.0
         
-        if edgeList is not None:
-            for edge in edgeList:
-                tree.mrca(taxon_labels=[edge[0],edge[1]]).ei += 1
+        tree.edge_mrca={}
         
+        if edgeList is not None:
+            #~ print "Calc ei",len(edgeList),time.time()-st
+            for edge in edgeList:
+                emrca = pdm.mrca(tns.get_taxon(edge[0]),tns.get_taxon(edge[1]))
+                emrca.ei += 1
+                tree.edge_mrca[str(edge)] = emrca
+                #~ self.mrca(pdm,tns.get_taxon(edge[0]),tns.get_taxon(edge[1])).ei += 1
+        
+        #~ print "Calc p",len(tree.nodes()),time.time()-st
         for node in tree.nodes():
             if node.is_internal():
                 split_sizes = [len(b.leaf_nodes()) for b in node.child_nodes()]
                 node.ni = np.sum(split_sizes*(np.sum(split_sizes)-split_sizes))        # number of possible links (split_sizes vector times reverse cumsum split_sizes)
-                node.p = (node.ei+1) / (node.ni+2) #Expected value and not actually used
+                #~ node.p = (node.ei+1) / (node.ni+2) #Expected value and not actually used
                 node.alpha = 1  #set priors - NB: these are overwritten for the null model
                 node.beta = 1
                 if setPriors:
                     node.alpha+=node.ei
                     node.beta+=(node.ni*ng-node.ei)
-                    
+        #~ print "Fin",time.time()-st
     
     def importNames(self,namesFile):
         self.namesFile=namesFile
@@ -381,40 +428,36 @@ class anomalyDetection(object):
         self.N = len(self.taxon_namespace)
     
     
-    def calculateLikelihood(self,tree,edgeList,ng=1,disp=False):
+    def calculateLikelihood(self,tree,edge_count,g=0,ng=1,disp=False):
         #~ print "calculating likelihood..."
-        for node in tree.nodes():
-            if node.is_internal():
-                node.ei=0.0
+        L=0.0
         
+        for node in self.mrca_count.iterkeys():
+            dL = gammaln(edge_count[node][g]+tree.alpha[node]) + gammaln(self.mrca_count[node]*ng - edge_count[node][g] + tree.beta[node]) 
+            dL += - gammaln(self.mrca_count[node]*ng +tree.alpha[node] + tree.beta[node])
+            dL += gammaln(tree.alpha[node] + tree.beta[node]) - gammaln(tree.alpha[node]) - gammaln(tree.beta[node])
+            L+=dL
         
-        for edge in edgeList:
-            tree.mrca(taxon_labels=[edge[0],edge[1]]).ei += 1
-        
-        L = 0.0
-        for node in tree.nodes():
-            if node.is_internal():
-                dL = gammaln(node.ei+node.alpha) + gammaln(node.ni*ng - node.ei + node.beta) - gammaln(node.ni*ng + node.alpha + node.beta)
-                dL += gammaln(node.alpha+node.beta) - gammaln(node.alpha) - gammaln(node.beta)
-                L+=dL
-                if disp:
-                    print "a=",node.alpha, "b=",node.beta,"ei=",node.ei,"ni=",node.ni,"LL=",dL
-        if disp:
-            print L
+        #~ print "logL:",L
         return L
+
     
     
-    
-    def generateGraph(self,tree):
+    def generateGraph(self,tree,ng):
+        #~ print "generateGraph"
+        """
+        Generates edge counts - no actual graph needed.
+        """
         np.random.seed()
-        edgeList = []
-        for i in range(self.N):
-            for j in range((i+1),self.N):
-                v=self.namesLUTr[str(i)]
-                u=self.namesLUTr[str(j)]
-                node=tree.mrca(taxon_labels=[v,u])
-                p = np.random.beta(node.alpha,node.beta)
-                if np.random.rand() < p:
-                    edgeList.append([v,u])
-                    edgeList.append([u,v])
-        return edgeList
+        
+        G=[]
+        edge_count = {}
+        for node in self.mrca_count.iterkeys():
+            try:
+                edge_count[node]=np.random.binomial(1,np.random.beta(tree.alpha[node],tree.beta[node],size=(self.mrca_count[node],ng))).sum(0)
+            # deals with single possible edge case
+            except AttributeError:
+                edge_count[node]=np.random.binomial(1,np.random.beta(tree.alpha[node],tree.beta[node]))
+                
+            
+        return edge_count
