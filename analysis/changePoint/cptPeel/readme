@@ -12,10 +12,10 @@ scipy   :   http://scipy.org/
 
 
 Before running the code it is recommended that you compile the GHRG code:
->cd fitHRG_GPL_Bayes/
->make
->cd ../consensusHRG_GPL_Bayes/
->make
+cd fitHRG_GPL_Bayes/
+make
+cd ../consensusHRG_GPL_Bayes/
+make
 
 
 Running the code
