@@ -1,1340 +1,1658 @@
+library(lme4)
+?glmer
+?vegdist
+library(vegan)
+?vegdist
 rm(list=ls())#
 setwd('~/Dropbox/hedgerow_assembly/analysis/resilence')#
 source('src/initialize.R')#
+library(lmerTest)#
+source("src/prepNets.R")#
+extinction.method <- "abund"#
 #
 ## create pp matrix for each site, year#
 nets <- break.net(spec)#
 #
+## **********************************************************#
 ## robustness#
+## **********************************************************#
+## simulation plant extinction#
 #
-ext <- lapply(nets, second.extinct,#
-              participant="lower",#
-              method="degree")#
+simExtinction <- function(nets,#
+                          extinction.method,#
+                          participant="lower"){#
+  ext <- lapply(nets, second.extinct,#
+                participant="lower",#
+                method=extinction.method)#
 #
-rob <- sapply(ext, robustness)#
+  rob <- sapply(ext, robustness)#
+  sites <- sapply(strsplit(names(rob), "[.]"), function(x) x[1])#
+  years <- sapply(strsplit(names(rob), "[.]"), function(x) x[2])#
 #
-sites <- strsplit(names(rob), " ")
-sites
-?strsplit
-sites <- strsplit(names(rob), "[.]")
-sites
-sites <- sapply(strsplit(names(rob), "[.]"), function(x) x[1])
-sites
-years <- sapply(strsplit(names(rob), "[.]"), function(x) x[2])
-year
-years
-dats <- data.frame(sites= sites,#
-                   years=years,#
-                   robustness=rob)
-dats
-head(dates)
-head(dats)
-rownames(dats) <- NULL
-head(dats)
-plot(dats$robustness~dats$years)
-head(spec)
-dats <- data.frame(Site= sites,#
-                   Year=years,#
-                   Robustness=rob)#
-rownames(dats) <- NULL#
+  dats <- data.frame(Site= sites,#
+                     Year=years,#
+                     Robustness=rob)#
+  rownames(dats) <- NULL#
+  dats$SiteStatus <- spec$SiteStatus[match(paste(dats$Site, dats$Year),#
+                                           paste(spec$Site, spec$Year))]#
 #
-dats$ypr <- spec$ypr[match(paste(spec$Site, spec$Year),#
-                           paste(dats$Site, dats$Year,)]
-dats$ypr <- spec$ypr[match(paste(spec$Site, spec$Year),#
-                           paste(dats$Site, dats$Year))]
-dats$ypr <- spec$ypr[match(paste(dats$Site, dats$Year),#
-                           paste(spec$Site, spec$Year))]
-head(dats)
-plot(dats$robustness~dats$ypr)
-plot(dats$Robustness~dats$ypr)
-ext <- lapply(nets, second.extinct,#
-              participant="lower",#
-              method="abund")#
+  dats$ypr <- spec$ypr[match(paste(dats$Site, dats$Year),#
+                             paste(spec$Site, spec$Year))]#
+  return(dats)#
+}                        #
 #
-rob <- sapply(ext, robustness)#
-#
-sites <- sapply(strsplit(names(rob), "[.]"), function(x) x[1])#
-years <- sapply(strsplit(names(rob), "[.]"), function(x) x[2])#
-#
-dats <- data.frame(Site= sites,#
-                   Year=years,#
-                   Robustness=rob)#
-rownames(dats) <- NULL#
-#
-dats$ypr <- spec$ypr[match(paste(dats$Site, dats$Year),#
-                           paste(spec$Site, spec$Year))]#
-#
-plot(dats$Robustness~dats$ypr)
-lmer(dats$Robustness~dats$ypr + (1|dats$Site))
-summary(lmer(dats$Robustness~dats$ypr + (1|dats$Site)))
-library(lmerTest)#
-summary(lmer(dats$Robustness~dats$ypr + (1|dats$Site)))
-summary(lmer(dats$Robustness~dats$ypr + (1|dats$Site) + (1|dats$Year))
-)
-setwd('~/Dropbox/hedgerow_assembly/dataPrep')#
-load('~/Dropbox/hedgerow/data_sets/traditional/specimens-complete.RData')#
-load("/Users/lcp/Dropbox/hedgerow_network/data/veg/veg.Rdata")#
-source('src/misc.R')#
-source('src/prepNets.R')#
-library(bipartite)#
-#
-spec <- dd#
-spec <- spec[spec$NetPan == 'net',]#
-#
-spec <- spec[spec$Family == 'Syrphidae' |#
-             spec$BeeNonbee == 'bee',]#
-#
-## keep only BACI sites#
-BACI.site <- c('Barger', 'Butler', 'Hrdy', 'MullerB', 'Sperandio')#
-spec <-  spec[spec$Site %in% BACI.site,]#
-veg <-  veg[veg$Site %in% BACI.site,]#
-#
-veg$ypr <- spec$ypr[match(paste(veg$Year, veg$Site),#
-                          paste(spec$Year, spec$Site))]#
-#
-## create species column#
-spec$PlantGenusSpecies <-  fix.white.space(paste(spec$PlantGenus,#
-                                                 spec$PlantSpecies))#
-#
-## drop pollinators and plants without identifications#
-spec <-  spec[spec$Species != '',]#
-spec <-  spec[spec$PlantGenusSpecies != '',]#
-#
-save(spec, file='../data/networks/specimens.Rdata')#
-#
-## create a "year" columns grouping years 1-3 post restoration and 4-9#
-spec$assem <- 'early'#
-spec$assem[spec$ypr > 3] <- 'late'#
-#
-veg$assem <- 'early'#
-veg$assem[veg$ypr > 3] <- 'late'#
-#
-veg.sum <- aggregate(list(abundance=veg$NumQuads),#
-                     list(site=veg$Site,#
-                          status=veg$assem,#
-                          species=veg$PlantGenusSpecies),#
-                     sum)#
-#
-## *******************************************************************#
-## create networks#
-networks <- breakNet(spec, 'Site', 'assem')#
-#
-## save networks for each site, timeframe#
-f.path <- '../data/networks'#
-saveDats(networks, names(networks), f.path)#
-save(networks, file=file.path(f.path, 'networks_stages.Rdata'))#
-#
-## *******************************************************************#
-## specialization of each species at each site#
-#
-species.lev <- lapply(networks, function(x){#
-  sl <- specieslevel(x)#
-  sl$'higher level'$tot.int <- colSums(x)#
-  sl$'lower level'$tot.int <- rowSums(x)#
-  return(sl)#
-})#
-#
-specializations  <-  mapply(function(a, b, c, d)#
-  getSpec(species.lev = a,#
-          names.net = b),#
-  a = species.lev,#
-  b = names(networks),#
-  SIMPLIFY = FALSE)#
-#
-specializations <- do.call(rbind, specializations)#
-rownames(specializations) <- NULL#
-#
-f.path <- '../data/degree'#
-save(specializations, file=file.path(f.path, 'specializations.Rdata'))#
-## *******************************************************************#
-## change in visits of by the generalized pollinators#
-#
-hist(specializations$proportional.generality[specializations$speciesType ==#
-                                             "pollinator"],#
-     xlab="Generalization")#
-#
-## plants#
-diff.gens.plants <- getVisitChange(0, 0.2, "proportional.generality",#
-                            "PlantGenusSpecies", "GenusSpecies")#
-#
-diff.spec.plants <- getVisitChange(0.5, 1, "proportional.generality",#
-                            "PlantGenusSpecies", "GenusSpecies")#
-#
-diff.all.plants <- getVisitChange(0, 1, "proportional.generality",#
-                           "PlantGenusSpecies", "GenusSpecies")#
-#
-## pollinators#
-diff.gens.pol <- getVisitChange(0, 0.2, "proportional.generality",#
-                            "GenusSpecies", "PlantGenusSpecies")#
-#
-diff.spec.pol <- getVisitChange(0.5, 1, "proportional.generality",#
-                            "GenusSpecies", "PlantGenusSpecies")#
-#
-diff.all.pol <- getVisitChange(0, 1, "proportional.generality",#
-                           "GenusSpecies", "PlantGenusSpecies")#
-#
-f.path <- '../data/degree'#
-save(diff.gens.plants, diff.spec.plants, diff.all.plants,#
-     file=file.path(f.path, 'PlantVisitDiffs.Rdata'))#
-write.csv(diff.all.plants,#
-          file=file.path(f.path, 'PlantVisitDiffs.csv'), row.names=FALSE)#
-#
-save(diff.gens.pol, diff.spec.pol, diff.all.pol,#
-     file=file.path(f.path, 'PolVisitDiffs.Rdata'))#
-write.csv(diff.all.pol,#
-          file=file.path(f.path, 'PolVisitDiffs.csv'), row.names=FALSE)#
-## *******************************************************************#
-## species lists for each site#
-#
-plants <- getSpecies(networks, rownames)#
-pols <- getSpecies(networks, rownames)#
-#
-f.path <- '../data/species'#
-write.csv(plants, file.path(f.path, 'plants.csv'),#
-          row.names=FALSE)#
-save(plants, file=file.path(f.path, 'plants.Rdata'))#
-#
-write.csv(pols, file.path(f.path, 'pollinators.csv'),#
-          row.names=FALSE)#
-save(pols, file=file.path(f.path, 'pols.Rdata'))#
-#
-## *******************************************************************#
-## species added between early and late stages#
-#
-plant.diffs <- getColExt(plants)#
-pol.diffs <- getColExt(pols)#
-#
-f.path <- '../data/speciesChange'#
-write.csv(plant.diffs, file.path(f.path, 'plants.csv'),#
-          row.names=FALSE)#
-#
-write.csv(pol.diffs, file.path(f.path, 'pollinators.csv'),#
-          row.names=FALSE)#
-#
-## *******************************************************************#
-## total plants at a site#
-f.path <- '../data/species'#
-plants <- plants[,-2]#
-plants <- unique(plants)#
-write.csv(plants, file.path(f.path, 'plants_all.csv'),#
-          row.names=FALSE)#
-#
-## *******************************************************************#
-## pollinator and plant degrees by years post restoration#
-spec$all <- 'all'#
-#
-yr.networks <- breakNet(spec, 'all', 'assem')#
-#
-d.pol <- lapply(yr.networks, colSums)#
-d.plant <- lapply(yr.networks, rowSums)#
-#
-f.path <- '../data/degree'#
-saveDats(d.pol, paste(names(d.pol), 'pollinators', sep="_"), f.path)#
-saveDats(d.plant, paste(names(d.plant), 'plants', sep="_"), f.path)#
-#
-by.year <- data.frame(t(sapply(c(d.plant, d.pol), calcStats)))#
-by.year$group <- rep(c('plants','pollinators'), each=2)#
-by.year$assembly <- rep(c('early', 'late'), 2)#
-#
-write.csv(by.year, file.path(f.path, 'stats_by_yr.csv'))#
-#
-## *******************************************************************#
-## pollinator and plant degrees across all years and sites#
-#
-all.networks <- breakNet(spec, 'all', 'all')#
-#
-d.pol.all <- lapply(all.networks, colSums)#
-d.plant.all <- lapply(all.networks, rowSums)#
-#
-saveDats(d.pol.all, 'across_yrs_pollinators', f.path)#
-saveDats(d.plant.all, 'across_yrs_plants', f.path)#
-#
-all.dats <- data.frame(t(sapply(c(d.plant.all, d.pol.all), calcStats)))#
-all.dats$group <- c('plants','pollinators')#
-#
-write.csv(all.dats, file.path(f.path, 'stats_across_yrs.csv'))#
-#
-## *******************************************************************#
-## characteristics of plant colonists#
-plant.col <- plant.diffs[plant.diffs$class == "colonist",]#
-#
-plant.col$earlyAbund <- veg.sum$abundance[veg.sum$status ==#
-                                          "early"][match(#
-                                           plant.col$species,#
-                                           veg.sum$species)]#
-plant.col$lateAbund <- veg.sum$abundance[veg.sum$status ==#
-                                         "late"][match(#
-                                          plant.col$species,#
-                                          veg.sum$species)]#
-#
-plant.col$degree <- d.plant$all_late[match(plant.col$species,#
-                                           names(d.plant$all_late))]#
-#
-## number of species that interact#
-con.plant <- lapply(yr.networks, getCon, 1)#
-#
-plant.col$partners <- con.plant$all_late[match(plant.col$species,#
-                                               names(con.plant$all_late))]#
-f.path <- '../data/speciesChange'#
-write.csv(plant.col, file.path(f.path, 'plants_char.csv'),#
-          row.names=FALSE)#
-#
-## *******************************************************************#
-## stable network structure#
-networks.by.year <- breakNet(spec, 'Site', 'Year')#
-#
-plant.species <- sapply(networks.by.year, nrow)#
-plant.species <- data.frame(richness=plant.species,#
-                            sites =#
-                              sapply(strsplit(names(plant.species),#
-                                              "_"),#
-                                     function(x) x[1]),#
-                            years =#
-                              sapply(strsplit(names(plant.species),#
-                                              "_"),#
-                                     function(x) x[2]))#
-write.csv(plant.species, file.path(f.path, 'plants_change.csv'),#
-          row.names=FALSE)
+res <- simExtinction(nets, extinction.method)
+save(res, file=file.path(save.path,#
+            sprintf('resilience_%s.pdf', extinction.method)))
 rm(list=ls())#
 setwd('~/Dropbox/hedgerow_assembly/analysis/resilence')#
 source('src/initialize.R')#
+library(lmerTest)#
+source("src/prepNets.R")#
+extinction.method <- "abund"#
 #
 ## create pp matrix for each site, year#
 nets <- break.net(spec)#
 #
+## **********************************************************#
 ## robustness#
+## **********************************************************#
+## simulation plant extinction#
 #
-ext <- lapply(nets, second.extinct,#
-              participant="lower",#
-              method="abund")#
+simExtinction <- function(nets,#
+                          extinction.method,#
+                          participant="lower"){#
+  ext <- lapply(nets, second.extinct,#
+                participant="lower",#
+                method=extinction.method)#
 #
-rob <- sapply(ext, robustness)#
+  rob <- sapply(ext, robustness)#
+  sites <- sapply(strsplit(names(rob), "[.]"), function(x) x[1])#
+  years <- sapply(strsplit(names(rob), "[.]"), function(x) x[2])#
 #
-sites <- sapply(strsplit(names(rob), "[.]"), function(x) x[1])#
-years <- sapply(strsplit(names(rob), "[.]"), function(x) x[2])#
+  dats <- data.frame(Site= sites,#
+                     Year=years,#
+                     Robustness=rob)#
+  rownames(dats) <- NULL#
+  dats$SiteStatus <- spec$SiteStatus[match(paste(dats$Site, dats$Year),#
+                                           paste(spec$Site, spec$Year))]#
 #
-dats <- data.frame(Site= sites,#
-                   Year=years,#
-                   Robustness=rob)#
-rownames(dats) <- NULL#
+  dats$ypr <- spec$ypr[match(paste(dats$Site, dats$Year),#
+                             paste(spec$Site, spec$Year))]#
+  return(dats)#
+}                        #
 #
-dats$ypr <- spec$ypr[match(paste(dats$Site, dats$Year),#
-                           paste(spec$Site, spec$Year))]#
+res <- simExtinction(nets, extinction.method)#
 #
-plot(dats$Robustness~dats$ypr)#
-#
-library(lmerTest)#
-summary(lmer(dats$Robustness~dats$ypr + (1|dats$Site) + (1|dats$Year)))
-setwd('~/Dropbox/hedgerow_assembly/dataPrep')#
-load('~/Dropbox/hedgerow/data_sets/traditional/specimens-complete.RData')#
-load("/Users/lcp/Dropbox/hedgerow_network/data/veg/veg.Rdata")#
-source('src/misc.R')#
-source('src/prepNets.R')#
-library(bipartite)#
-#
-spec <- dd#
-spec <- spec[spec$NetPan == 'net',]#
-#
-## spec <- spec[spec$Family == 'Syrphidae' |#
-##              spec$BeeNonbee == 'bee',]#
-#
-## create species column#
-spec$PlantGenusSpecies <-  fix.white.space(paste(spec$PlantGenus,#
-                                                 spec$PlantSpecies))#
-#
-## drop pollinators and plants without identifications#
-spec <-  spec[spec$Species != '',]#
-spec <-  spec[spec$PlantGenusSpecies != '',]#
-#
-save(spec, file='../data/networks/allSpecimens.Rdata')
+save(res, file=file.path(save.path,#
+            sprintf('resilience_%s.pdf', extinction.method)))
+head(res)
 rm(list=ls())#
 setwd('~/Dropbox/hedgerow_assembly/analysis/resilence')#
 source('src/initialize.R')#
 #
+extinction.method <- "abund"#
+#
 ## create pp matrix for each site, year#
 nets <- break.net(spec)#
 #
+## **********************************************************#
 ## robustness#
+## **********************************************************#
+## simulation plant extinction#
 #
-ext <- lapply(nets, second.extinct,#
-              participant="lower",#
-              method="abund")#
+res <- simExtinction(nets, extinction.method)#
 #
-rob <- sapply(ext, robustness)#
-#
-sites <- sapply(strsplit(names(rob), "[.]"), function(x) x[1])#
-years <- sapply(strsplit(names(rob), "[.]"), function(x) x[2])#
-#
-dats <- data.frame(Site= sites,#
-                   Year=years,#
-                   Robustness=rob)#
-rownames(dats) <- NULL#
-#
-dats$ypr <- spec$ypr[match(paste(dats$Site, dats$Year),#
-                           paste(spec$Site, spec$Year))]#
-#
-plot(dats$Robustness~dats$ypr)#
-#
-library(lmerTest)#
-summary(lmer(dats$Robustness~dats$ypr + (1|dats$Site) + (1|dats$Year)))
-dats$ypr <- spec$SiteStatus[match(paste(dats$Site, dats$Year),#
-                           paste(spec$Site, spec$Year))]#
-#
-plot(dats$Robustness~dats$SiteStatus)#
-#
-library(lmerTest)#
-summary(lmer(dats$Robustness~dats$SiteStatus + (1|dats$Site) + (1|dats$Year)))
-dats$SiteStatus <- spec$SiteStatus[match(paste(dats$Site, dats$Year),#
-                           paste(spec$Site, spec$Year))]
-plot(dats$Robustness~dats$SiteStatus)
-boxplot(dats$Robustness~dats$SiteStatus)
-setwd('~/Dropbox/hedgerow_assembly/dataPrep')#
-load('~/Dropbox/hedgerow/data_sets/traditional/specimens-complete.RData')#
-load("/Users/lcp/Dropbox/hedgerow_network/data/veg/veg.Rdata")#
-source('src/misc.R')#
-source('src/prepNets.R')#
-library(bipartite)#
-#
-spec <- dd#
-spec <- spec[spec$NetPan == 'net',]#
-#
-## spec <- spec[spec$Family == 'Syrphidae' |#
-##              spec$BeeNonbee == 'bee',]#
-#
-## create species column#
-spec$PlantGenusSpecies <-  fix.white.space(paste(spec$PlantGenus,#
-                                                 spec$PlantSpecies))#
-#
-## drop pollinators and plants without identifications#
-spec <-  spec[spec$Species != '',]#
-spec <-  spec[spec$PlantGenusSpecies != '',]#
-#
-to.drop.status <- c("forb", "natural", "restored")#
-spec <- spec#
-#
-save(spec, file='../data/networks/allSpecimens.Rdata')
+save(res, file=file.path(save.path,#
+            sprintf('resilience_%s.pdf', extinction.method)))
 rm(list=ls())#
 setwd('~/Dropbox/hedgerow_assembly/analysis/resilence')#
 source('src/initialize.R')#
 #
+extinction.method <- "abund"#
+#
 ## create pp matrix for each site, year#
 nets <- break.net(spec)#
 #
+## **********************************************************#
 ## robustness#
+## **********************************************************#
+## simulation plant extinction#
 #
-ext <- lapply(nets, second.extinct,#
-              participant="lower",#
-              method="abund")#
+res <- simExtinction(nets, extinction.method, spec)
+head(res)
+save(res, file=file.path(save.path,#
+            sprintf('resilience_%s.pdf', extinction.method)))
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/resilence')#
+source('src/initialize.R')#
 #
-rob <- sapply(ext, robustness)#
+extinction.method <- "abund"#
 #
-sites <- sapply(strsplit(names(rob), "[.]"), function(x) x[1])#
-years <- sapply(strsplit(names(rob), "[.]"), function(x) x[2])#
+## create pp matrix for each site, year#
+nets <- break.net(spec)#
 #
-dats <- data.frame(Site= sites,#
-                   Year=years,#
-                   Robustness=rob)#
-rownames(dats) <- NULL#
+## **********************************************************#
+## robustness#
+## **********************************************************#
+## simulation plant extinction#
 #
-dats$SiteStatus <- spec$SiteStatus[match(paste(dats$Site, dats$Year),#
-                           paste(spec$Site, spec$Year))]#
+res <- simExtinction(nets, extinction.method, spec)#
 #
-boxplot(dats$Robustness~dats$SiteStatus)
-setwd('~/Dropbox/hedgerow_assembly/dataPrep')#
-load('~/Dropbox/hedgerow/data_sets/traditional/specimens-complete.RData')#
-load("/Users/lcp/Dropbox/hedgerow_network/data/veg/veg.Rdata")#
-source('src/misc.R')#
-source('src/prepNets.R')#
-library(bipartite)#
+save(res, file=file.path(save.path,#
+            sprintf('resilience_%s.pdf', extinction.method)))#
 #
-spec <- dd#
-spec <- spec[spec$NetPan == 'net',]#
+## no change in robustness by site status#
+summary(lmer(Robustness ~ SiteStatus#
+             + (1|Site) + (1|Year),#
+             data=res))#
+save(res, file=file.path(save.path,#
+            sprintf('resilience_status_%s.pdf', extinction.method)))#
+## no effect of ypr on robustness#
+summary(lmer(Robustness ~ ypr#
+             + (1|Site) + (1|Year),#
+             data=res[!is.na(res$ypr),]))#
+save(res, file=file.path(save.path,#
+            sprintf('resilience_ypr_%s.pdf', extinction.method)))
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/resilence')#
+source('src/initialize.R')#
 #
-## spec <- spec[spec$Family == 'Syrphidae' |#
-##              spec$BeeNonbee == 'bee',]#
+## either "abund" or "degree"#
+extinction.method <- "degree"#
 #
-## create species column#
-spec$PlantGenusSpecies <-  fix.white.space(paste(spec$PlantGenus,#
-                                                 spec$PlantSpecies))#
+## create pp matrix for each site, year#
+nets <- break.net(spec)#
 #
-## drop pollinators and plants without identifications#
-spec <-  spec[spec$Species != '',]#
-spec <-  spec[spec$PlantGenusSpecies != '',]#
+## **********************************************************#
+## robustness#
+## **********************************************************#
+## simulation plant extinction#
 #
-to.drop.status <- c("forb", "natural", "restored")#
-spec <- spec[!spec$SiteStatus %in% to.drop.status]#
+res <- simExtinction(nets, extinction.method, spec)#
 #
-save(spec, file='../data/networks/allSpecimens.Rdata')
-spec$SiteStatus %in% to.drop.status
-setwd('~/Dropbox/hedgerow_assembly/dataPrep')#
-load('~/Dropbox/hedgerow/data_sets/traditional/specimens-complete.RData')#
-load("/Users/lcp/Dropbox/hedgerow_network/data/veg/veg.Rdata")#
-source('src/misc.R')#
-source('src/prepNets.R')#
-library(bipartite)#
+save(res, file=file.path(save.path,#
+            sprintf('resilience_%s.pdf', extinction.method)))#
 #
-spec <- dd#
-spec <- spec[spec$NetPan == 'net',]#
+## no change in robustness by site status#
+summary(lmer(Robustness ~ SiteStatus#
+             + (1|Site) + (1|Year),#
+             data=res))#
+save(res, file=file.path(save.path,#
+            sprintf('resilience_status_%s.pdf', extinction.method)))#
+## no effect of ypr on robustness#
+summary(lmer(Robustness ~ ypr#
+             + (1|Site) + (1|Year),#
+             data=res[!is.na(res$ypr),]))#
+save(res, file=file.path(save.path,#
+            sprintf('resilience_ypr_%s.pdf', extinction.method)))
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/resilence')#
+source('src/initialize.R')#
 #
-## spec <- spec[spec$Family == 'Syrphidae' |#
-##              spec$BeeNonbee == 'bee',]#
+## either "abund" or "degree"#
+extinction.method <- "degree"#
 #
-## create species column#
-spec$PlantGenusSpecies <-  fix.white.space(paste(spec$PlantGenus,#
-                                                 spec$PlantSpecies))#
+## create pp matrix for each site, year#
+nets <- break.net(spec)#
 #
-## drop pollinators and plants without identifications#
-spec <-  spec[spec$Species != '',]#
-spec <-  spec[spec$PlantGenusSpecies != '',]#
+## **********************************************************#
+## robustness#
+## **********************************************************#
+## simulation plant extinction#
 #
-to.drop.status <- c("forb", "natural", "restored")#
-spec <- spec[!spec$SiteStatus %in% to.drop.status,]#
+res <- simExtinction(nets, extinction.method, spec)#
 #
-save(spec, file='../data/networks/allSpecimens.Rdata')
+save(res, file=file.path(save.path,#
+            sprintf('resilience_%s.Rdata', extinction.method)))#
+#
+## no change in robustness by site status#
+summary(lmer(Robustness ~ SiteStatus#
+             + (1|Site) + (1|Year),#
+             data=res))#
+save(res, file=file.path(save.path,#
+            sprintf('mods/resilience_status_%s.Rdata', extinction.method)))#
+## no effect of ypr on robustness#
+summary(lmer(Robustness ~ ypr#
+             + (1|Site) + (1|Year),#
+             data=res[!is.na(res$ypr),]))#
+save(res, file=file.path(save.path,#
+            sprintf('mods/resilience_ypr_%s.Rdata', extinction.method)))
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/resilence')#
+source('src/initialize.R')#
+#
+## either "abund" or "degree"#
+extinction.method <- "abund"#
+#
+## create pp matrix for each site, year#
+nets <- break.net(spec)#
+#
+## **********************************************************#
+## robustness#
+## **********************************************************#
+## simulation plant extinction#
+#
+res <- simExtinction(nets, extinction.method, spec)#
+#
+save(res, file=file.path(save.path,#
+            sprintf('resilience_%s.Rdata', extinction.method)))#
+#
+## no change in robustness by site status#
+summary(lmer(Robustness ~ SiteStatus#
+             + (1|Site) + (1|Year),#
+             data=res))#
+save(res, file=file.path(save.path,#
+            sprintf('mods/resilience_status_%s.Rdata', extinction.method)))#
+## no effect of ypr on robustness#
+summary(lmer(Robustness ~ ypr#
+             + (1|Site) + (1|Year),#
+             data=res[!is.na(res$ypr),]))#
+save(res, file=file.path(save.path,#
+            sprintf('mods/resilience_ypr_%s.Rdata', extinction.method)))
+rm(list=ls())#
+source('plotting/src/predictIntervals.R')#
+source('plotting/src/CIplotting.R')#
+source('plotting/src/plotPanels.R')#
+source('src/initialize.R')#
+#
+## either "abund" or "degree"#
+extinction.method <- "abund"#
+#
+load(file=file.path(save.path,#
+            sprintf('resilience_%s.Rdata', extinction.method)))
+head(res)
+dd <- expand.grid(ypr=seq(from= min(res$ypr, na.rm=TRUE),#
+                          to= max(res$ypr, na.rm=TRUE),#
+                          length=10))
 v
 rm(list=ls())#
 setwd('~/Dropbox/hedgerow_assembly/analysis/resilence')#
 source('src/initialize.R')#
 #
-## create pp matrix for each site, year#
-nets <- break.net(spec)#
-#
-## robustness#
-#
-ext <- lapply(nets, second.extinct,#
-              participant="lower",#
-              method="abund")#
-#
-rob <- sapply(ext, robustness)#
-#
-sites <- sapply(strsplit(names(rob), "[.]"), function(x) x[1])#
-years <- sapply(strsplit(names(rob), "[.]"), function(x) x[2])#
-#
-dats <- data.frame(Site= sites,#
-                   Year=years,#
-                   Robustness=rob)#
-rownames(dats) <- NULL#
-#
-dats$SiteStatus <- spec$SiteStatus[match(paste(dats$Site, dats$Year),#
-                           paste(spec$Site, spec$Year))]#
-#
-boxplot(dats$Robustness~dats$SiteStatus)
-library(lmerTest)#
-summary(lmer(dats$Robustness~dats$SiteStatus + (1|dats$Site) + (1|dats$Year)))
-boxplot(dats$Robustness~dats$SiteStatus)
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/resilence')#
-source('src/initialize.R')#
-library(lmerTest)#
+## either "abund" or "degree"#
+extinction.method <- "abund"#
 #
 ## create pp matrix for each site, year#
 nets <- break.net(spec)#
 #
+## **********************************************************#
 ## robustness#
+## **********************************************************#
+## simulation plant extinction#
 #
-ext <- lapply(nets, second.extinct,#
-              participant="higher",#
-              method="abund")#
+res <- simExtinction(nets, extinction.method, spec)#
 #
-rob <- sapply(ext, robustness)#
+save(res, file=file.path(save.path,#
+            sprintf('resilience_%s.Rdata', extinction.method)))#
 #
-sites <- sapply(strsplit(names(rob), "[.]"), function(x) x[1])#
-years <- sapply(strsplit(names(rob), "[.]"), function(x) x[2])#
-#
-dats <- data.frame(Site= sites,#
-                   Year=years,#
-                   Robustness=rob)#
-rownames(dats) <- NULL#
-#
-dats$SiteStatus <- spec$SiteStatus[match(paste(dats$Site, dats$Year),#
-                           paste(spec$Site, spec$Year))]#
-#
-dats$ypr <- spec$ypr[match(paste(dats$Site, dats$Year),#
-                           paste(spec$Site, spec$Year))]#
-#
-boxplot(dats$Robustness~dats$SiteStatus)#
-boxplot(dats$Robustness~dats$ypr)
+## no change in robustness by site status#
+mod.status <- lmer(Robustness ~ SiteStatus#
+             + (1|Site) + (1|Year),#
+             data=res)#
+summary(mod.status)#
+save(mod.status, file=file.path(save.path,#
+            sprintf('mods/resilience_status_%s.Rdata', extinction.method)))#
+## no effect of ypr on robustness#
+mod.ypr <- lmer(Robustness ~ ypr#
+             + (1|Site) + (1|Year),#
+             data=res[!is.na(res$ypr),])#
+summary(mod.ypr)#
+save(mod.ypr, file=file.path(save.path,#
+            sprintf('mods/resilience_ypr_%s.Rdata', extinction.method)))
 rm(list=ls())#
 setwd('~/Dropbox/hedgerow_assembly/analysis/resilence')#
 source('src/initialize.R')#
-library(lmerTest)#
+#
+## either "abund" or "degree"#
+extinction.method <- "degree"#
+#
+## create pp matrix for each site, year#
+nets <- break.net(spec)#
+#
+## **********************************************************#
+## robustness#
+## **********************************************************#
+## simulation plant extinction#
+#
+res <- simExtinction(nets, extinction.method, spec)#
+#
+save(res, file=file.path(save.path,#
+            sprintf('resilience_%s.Rdata', extinction.method)))#
+#
+## no change in robustness by site status#
+mod.status <- lmer(Robustness ~ SiteStatus#
+             + (1|Site) + (1|Year),#
+             data=res)#
+summary(mod.status)#
+save(mod.status, file=file.path(save.path,#
+            sprintf('mods/resilience_status_%s.Rdata', extinction.method)))#
+## no effect of ypr on robustness#
+mod.ypr <- lmer(Robustness ~ ypr#
+             + (1|Site) + (1|Year),#
+             data=res[!is.na(res$ypr),])#
+summary(mod.ypr)#
+save(mod.ypr, file=file.path(save.path,#
+            sprintf('mods/resilience_ypr_%s.Rdata', extinction.method)))
+rm(list=ls())#
+source('plotting/src/predictIntervals.R')#
+source('plotting/src/CIplotting.R')#
+source('plotting/src/plotPanels.R')#
+source('src/initialize.R')#
+#
+## either "abund" or "degree"#
+extinction.method <- "abund"#
+#
+load(file=file.path(save.path,#
+            sprintf('resilience_%s.Rdata', extinction.method)))#
+#
+dd <- expand.grid(ypr=seq(from= min(res$ypr, na.rm=TRUE),#
+                          to= max(res$ypr, na.rm=TRUE),#
+                          length=10))#
+#
+## ************************************************************#
+## nodf#
+## ************************************************************#
+load(file=file.path(save.path,#
+            sprintf('mods/resilience_status_%s.Rdata',#
+                    extinction.method)))
+head(res)
+dd.rob <- cbind(dd, Robustness=0)
+dd.rob
+rob.pi <- predict.int(mod= mod.ypr,#
+                        dd=dd.rob,#
+                        y="Robustness",#
+                        family="gaussian")
+## ************************************************************#
+## nodf#
+## ************************************************************#
+load(file=file.path(save.path,#
+            sprintf('mods/resilience_status_%s.Rdata',#
+                    extinction.method)))#
+#
+dd.rob <- cbind(dd, Robustness=0)#
+#
+rob.pi <- predict.int(mod= mod.ypr,#
+                        dd=dd.rob,#
+                        y="Robustness",#
+                        family="gaussian")
+rob.pi <- predict.int(mod= ypr.mod,#
+                        dd=dd.rob,#
+                        y="Robustness",#
+                        family="gaussian")
+ls()
+rm(list=ls())#
+source('plotting/src/predictIntervals.R')#
+source('plotting/src/CIplotting.R')#
+source('plotting/src/plotPanels.R')#
+source('src/initialize.R')#
+#
+## either "abund" or "degree"#
+extinction.method <- "abund"#
+#
+load(file=file.path(save.path,#
+            sprintf('resilience_%s.Rdata', extinction.method)))#
+#
+dd <- expand.grid(ypr=seq(from= min(res$ypr, na.rm=TRUE),#
+                          to= max(res$ypr, na.rm=TRUE),#
+                          length=10))#
+#
+## ************************************************************#
+## nodf#
+## ************************************************************#
+load(file=file.path(save.path,#
+            sprintf('mods/resilience_status_%s.Rdata',#
+                    extinction.method)))#
+#
+dd.rob <- cbind(dd, Robustness=0)#
+#
+rob.pi <- predict.int(mod= ypr.mod,#
+                        dd=dd.rob,#
+                        y="Robustness",#
+                        family="gaussian")
+rob.pi <- predict.int(mod= mod.ypr,#
+                        dd=dd.rob,#
+                        y="Robustness",#
+                        family="gaussian")
+ls()
+## ************************************************************#
+## nodf#
+## ************************************************************#
+load(file=file.path(save.path,#
+            sprintf('mods/resilience_ypr_%s.Rdata',#
+                    extinction.method)))#
+#
+dd.rob <- cbind(dd, Robustness=0)#
+#
+rob.pi <- predict.int(mod= mod.ypr,#
+                        dd=dd.rob,#
+                        y="Robustness",#
+                        family="gaussian")
+rob.pi
+rm(list=ls())#
+source('plotting/src/predictIntervals.R')#
+source('plotting/src/CIplotting.R')#
+source('plotting/src/plotPanels.R')#
+source('src/initialize.R')#
+#
+## either "abund" or "degree"#
+extinction.method <- "abund"#
+#
+load(file=file.path(save.path,#
+            sprintf('resilience_%s.Rdata', extinction.method)))#
+#
+dd <- expand.grid(ypr=seq(from= min(res$ypr, na.rm=TRUE),#
+                          to= max(res$ypr, na.rm=TRUE),#
+                          length=10))#
+#
+## ************************************************************#
+## nodf#
+## ************************************************************#
+load(file=file.path(save.path,#
+            sprintf('mods/resilience_ypr_%s.Rdata',#
+                    extinction.method)))#
+#
+dd.ypr <- cbind(dd, Robustness=0)#
+#
+ypr.pi <- predict.int(mod= mod.ypr,#
+                        dd=dd.rob,#
+                        y="Robustness",#
+                        family="gaussian")#
+#
+plot.predict.ypr(new.dd=ypr.pi,#
+                 ylabel="Robustness",#
+                 dats=res,#
+                 y1="Robustness")
+ypr.pi <- predict.int(mod= mod.ypr,#
+                        dd=dd.ypr,#
+                        y="Robustness",#
+                        family="gaussian")
+rm(list=ls())#
+source('plotting/src/predictIntervals.R')#
+source('plotting/src/CIplotting.R')#
+source('plotting/src/plotPanels.R')#
+source('src/initialize.R')#
+#
+## either "abund" or "degree"#
+extinction.method <- "abund"#
+#
+load(file=file.path(save.path,#
+            sprintf('resilience_%s.Rdata', extinction.method)))#
+#
+dd <- expand.grid(ypr=seq(from= min(res$ypr, na.rm=TRUE),#
+                          to= max(res$ypr, na.rm=TRUE),#
+                          length=10))#
+#
+## ************************************************************#
+## nodf#
+## ************************************************************#
+load(file=file.path(save.path,#
+            sprintf('mods/resilience_ypr_%s.Rdata',#
+                    extinction.method)))#
+#
+dd.ypr <- cbind(dd, Robustness=0)#
+#
+ypr.pi <- predict.int(mod= mod.ypr,#
+                        dd=dd.ypr,#
+                        y="Robustness",#
+                        family="gaussian")#
+#
+plot.predict.ypr(new.dd=ypr.pi,#
+                 ylabel="Robustness",#
+                 dats=res,#
+                 y1="Robustness")
+rm(list=ls())#
+source('plotting/src/predictIntervals.R')#
+source('plotting/src/CIplotting.R')#
+source('plotting/src/plotPanels.R')#
+source('src/initialize.R')#
+#
+## either "abund" or "degree"#
+extinction.method <- "abund"#
+#
+load(file=file.path(save.path,#
+            sprintf('resilience_%s.Rdata', extinction.method)))#
+#
+dd <- expand.grid(ypr=seq(from= min(res$ypr, na.rm=TRUE),#
+                          to= max(res$ypr, na.rm=TRUE),#
+                          length=10))#
+#
+## ************************************************************#
+## nodf#
+## ************************************************************#
+load(file=file.path(save.path,#
+            sprintf('mods/resilience_ypr_%s.Rdata',#
+                    extinction.method)))#
+#
+dd.ypr <- cbind(dd, Robustness=0)#
+#
+ypr.pi <- predict.int(mod= mod.ypr,#
+                        dd=dd.ypr,#
+                        y="Robustness",#
+                        family="gaussian")#
+#
+plot.predict.ypr(new.dd=ypr.pi,#
+                 ylabel="Robustness",#
+                 dats=res,#
+                 y1="Robustness")
+rm(list=ls())#
+source('plotting/src/predictIntervals.R')#
+source('plotting/src/CIplotting.R')#
+source('plotting/src/plotPanels.R')#
+source('src/initialize.R')#
+#
+## either "abund" or "degree"#
+extinction.method <- "abund"#
+#
+load(file=file.path(save.path,#
+            sprintf('resilience_%s.Rdata', extinction.method)))#
+#
+dd <- expand.grid(ypr=seq(from= min(res$ypr, na.rm=TRUE),#
+                          to= max(res$ypr, na.rm=TRUE),#
+                          length=10))#
+#
+## ************************************************************#
+## nodf#
+## ************************************************************#
+load(file=file.path(save.path,#
+            sprintf('mods/resilience_ypr_%s.Rdata',#
+                    extinction.method)))#
+#
+dd.ypr <- cbind(dd, Robustness=0)#
+#
+ypr.pi <- predict.int(mod= mod.ypr,#
+                        dd=dd.ypr,#
+                        y="Robustness",#
+                        family="gaussian")#
+#
+plot.predict.ypr(new.dd=ypr.pi,#
+                 ylabel="Robustness",#
+                 dats=res,#
+                 y1="Robustness")
+rm(list=ls())#
+source('plotting/src/predictIntervals.R')#
+source('plotting/src/CIplotting.R')#
+source('plotting/src/plotPanels.R')#
+source('src/initialize.R')#
+#
+## either "abund" or "degree"#
+extinction.method <- "abund"#
+#
+load(file=file.path(save.path,#
+            sprintf('resilience_%s.Rdata', extinction.method)))#
+#
+dd <- expand.grid(ypr=seq(from= min(res$ypr, na.rm=TRUE),#
+                          to= max(res$ypr, na.rm=TRUE),#
+                          length=10))#
+#
+## ************************************************************#
+## nodf#
+## ************************************************************#
+load(file=file.path(save.path,#
+            sprintf('mods/resilience_ypr_%s.Rdata',#
+                    extinction.method)))#
+#
+dd.ypr <- cbind(dd, Robustness=0)#
+#
+ypr.pi <- predict.int(mod= mod.ypr,#
+                        dd=dd.ypr,#
+                        y="Robustness",#
+                        family="gaussian")#
+#
+plot.predict.ypr(new.dd=ypr.pi,#
+                 ylabel="Robustness",#
+                 dats=res,#
+                 y1="Robustness")
+rm(list=ls())#
+source('plotting/src/predictIntervals.R')#
+source('plotting/src/CIplotting.R')#
+source('plotting/src/plotPanels.R')#
+source('src/initialize.R')#
+#
+## either "abund" or "degree"#
+extinction.method <- "abund"#
+#
+load(file=file.path(save.path,#
+            sprintf('resilience_%s.Rdata', extinction.method)))#
+#
+dd <- expand.grid(ypr=seq(from= min(res$ypr, na.rm=TRUE),#
+                          to= max(res$ypr, na.rm=TRUE),#
+                          length=10))#
+#
+## ************************************************************#
+## nodf#
+## ************************************************************#
+load(file=file.path(save.path,#
+            sprintf('mods/resilience_ypr_%s.Rdata',#
+                    extinction.method)))#
+#
+dd.ypr <- cbind(dd, Robustness=0)#
+#
+ypr.pi <- predict.int(mod= mod.ypr,#
+                        dd=dd.ypr,#
+                        y="Robustness",#
+                        family="gaussian")#
+#
+plot.predict.ypr(new.dd=ypr.pi,#
+                 ylabel="Robustness",#
+                 dats=res,#
+                 y1="Robustness")
+rm(list=ls())#
+source('plotting/src/predictIntervals.R')#
+source('plotting/src/CIplotting.R')#
+source('plotting/src/plotPanels.R')#
+source('src/initialize.R')#
+#
+## either "abund" or "degree"#
+extinction.method <- "abund"#
+#
+load(file=file.path(save.path,#
+            sprintf('resilience_%s.Rdata', extinction.method)))#
+#
+dd <- expand.grid(ypr=seq(from= min(res$ypr, na.rm=TRUE),#
+                          to= max(res$ypr, na.rm=TRUE),#
+                          length=10))#
+#
+## ************************************************************#
+## nodf#
+## ************************************************************#
+load(file=file.path(save.path,#
+            sprintf('mods/resilience_ypr_%s.Rdata',#
+                    extinction.method)))#
+#
+dd.ypr <- cbind(dd, Robustness=0)#
+#
+ypr.pi <- predict.int(mod= mod.ypr,#
+                        dd=dd.ypr,#
+                        y="Robustness",#
+                        family="gaussian")#
+#
+plot.predict.ypr(new.dd=ypr.pi,#
+                 ylabel="Robustness",#
+                 dats=res,#
+                 y1="Robustness")
+rm(list=ls())#
+source('plotting/src/predictIntervals.R')#
+source('plotting/src/CIplotting.R')#
+source('plotting/src/plotPanels.R')#
+source('src/initialize.R')#
+#
+## either "abund" or "degree"#
+extinction.method <- "abund"#
+#
+load(file=file.path(save.path,#
+            sprintf('resilience_%s.Rdata', extinction.method)))#
+#
+dd <- expand.grid(ypr=seq(from= min(res$ypr, na.rm=TRUE),#
+                          to= max(res$ypr, na.rm=TRUE),#
+                          length=10))#
+#
+## ************************************************************#
+## nodf#
+## ************************************************************#
+load(file=file.path(save.path,#
+            sprintf('mods/resilience_ypr_%s.Rdata',#
+                    extinction.method)))#
+#
+dd.ypr <- cbind(dd, Robustness=0)#
+#
+ypr.pi <- predict.int(mod= mod.ypr,#
+                        dd=dd.ypr,#
+                        y="Robustness",#
+                        family="gaussian")#
+#
+plot.predict.ypr(new.dd=ypr.pi,#
+                 ylabel="Robustness",#
+                 dats=res,#
+                 y1="Robustness")
+rm(list=ls())#
+source('plotting/src/predictIntervals.R')#
+source('plotting/src/CIplotting.R')#
+source('plotting/src/plotPanels.R')#
+source('src/initialize.R')#
+#
+## either "abund" or "degree"#
+extinction.method <- "abund"#
+#
+load(file=file.path(save.path,#
+            sprintf('resilience_%s.Rdata', extinction.method)))#
+#
+dd <- expand.grid(ypr=seq(from= min(res$ypr, na.rm=TRUE),#
+                          to= max(res$ypr, na.rm=TRUE),#
+                          length=10))#
+#
+## ************************************************************#
+## nodf#
+## ************************************************************#
+load(file=file.path(save.path,#
+            sprintf('mods/resilience_ypr_%s.Rdata',#
+                    extinction.method)))#
+#
+dd.ypr <- cbind(dd, Robustness=0)#
+#
+ypr.pi <- predict.int(mod= mod.ypr,#
+                        dd=dd.ypr,#
+                        y="Robustness",#
+                        family="gaussian")#
+#
+plot.predict.ypr(new.dd=ypr.pi,#
+                 ylabel="Robustness",#
+                 dats=res,#
+                 y1="Robustness")
+rm(list=ls())#
+source('plotting/src/predictIntervals.R')#
+source('plotting/src/CIplotting.R')#
+source('plotting/src/plotPanels.R')#
+source('src/initialize.R')#
+#
+## either "abund" or "degree"#
+extinction.method <- "abund"#
+#
+load(file=file.path(save.path,#
+            sprintf('resilience_%s.Rdata', extinction.method)))#
+#
+dd <- expand.grid(ypr=seq(from= min(res$ypr, na.rm=TRUE),#
+                          to= max(res$ypr, na.rm=TRUE),#
+                          length=10))#
+#
+## ************************************************************#
+## nodf#
+## ************************************************************#
+load(file=file.path(save.path,#
+            sprintf('mods/resilience_ypr_%s.Rdata',#
+                    extinction.method)))#
+#
+dd.ypr <- cbind(dd, Robustness=0)#
+#
+ypr.pi <- predict.int(mod= mod.ypr,#
+                        dd=dd.ypr,#
+                        y="Robustness",#
+                        family="gaussian")#
+#
+plot.predict.ypr(new.dd=ypr.pi,#
+                 ylabel="Robustness",#
+                 dats=res,#
+                 y1="Robustness")
+rm(list=ls())#
+source('plotting/src/predictIntervals.R')#
+source('plotting/src/CIplotting.R')#
+source('plotting/src/plotPanels.R')#
+source('src/initialize.R')#
+#
+## either "abund" or "degree"#
+extinction.method <- "abund"#
+#
+load(file=file.path(save.path,#
+            sprintf('resilience_%s.Rdata', extinction.method)))#
+#
+dd <- expand.grid(ypr=seq(from= min(res$ypr, na.rm=TRUE),#
+                          to= max(res$ypr, na.rm=TRUE),#
+                          length=10))#
+#
+## ************************************************************#
+## nodf#
+## ************************************************************#
+load(file=file.path(save.path,#
+            sprintf('mods/resilience_ypr_%s.Rdata',#
+                    extinction.method)))#
+#
+dd.ypr <- cbind(dd, Robustness=0)#
+#
+ypr.pi <- predict.int(mod= mod.ypr,#
+                        dd=dd.ypr,#
+                        y="Robustness",#
+                        family="gaussian")#
+#
+plot.predict.ypr(new.dd=ypr.pi,#
+                 ylabel="Robustness",#
+                 dats=res,#
+                 y1="Robustness")
+rm(list=ls())#
+source('plotting/src/predictIntervals.R')#
+source('plotting/src/CIplotting.R')#
+source('plotting/src/plotPanels.R')#
+source('src/initialize.R')#
+#
+## either "abund" or "degree"#
+extinction.method <- "abund"#
+#
+load(file=file.path(save.path,#
+            sprintf('resilience_%s.Rdata', extinction.method)))#
+#
+dd <- expand.grid(ypr=seq(from= min(res$ypr, na.rm=TRUE),#
+                          to= max(res$ypr, na.rm=TRUE),#
+                          length=10))#
+#
+## ************************************************************#
+## nodf#
+## ************************************************************#
+load(file=file.path(save.path,#
+            sprintf('mods/resilience_ypr_%s.Rdata',#
+                    extinction.method)))#
+#
+dd.ypr <- cbind(dd, Robustness=0)#
+#
+ypr.pi <- predict.int(mod= mod.ypr,#
+                        dd=dd.ypr,#
+                        y="Robustness",#
+                        family="gaussian")#
+#
+plot.predict.ypr(new.dd=ypr.pi,#
+                 ylabel="Robustness",#
+                 dats=res,#
+                 y1="Robustness")
+ylabel_ "hello hello"
+ylabel <- "hello hello"
+gsub('[[:space:]]', '_', ylabel)
+rm(list=ls())#
+source('plotting/src/predictIntervals.R')#
+source('plotting/src/CIplotting.R')#
+source('plotting/src/plotPanels.R')#
+source('src/initialize.R')#
+#
+## either "abund" or "degree"#
+extinction.method <- "abund"#
+#
+load(file=file.path(save.path,#
+            sprintf('resilience_%s.Rdata', extinction.method)))#
+#
+dd <- expand.grid(ypr=seq(from= min(res$ypr, na.rm=TRUE),#
+                          to= max(res$ypr, na.rm=TRUE),#
+                          length=10))#
+#
+## ************************************************************#
+## nodf#
+## ************************************************************#
+load(file=file.path(save.path,#
+            sprintf('mods/resilience_ypr_%s.Rdata',#
+                    extinction.method)))#
+#
+dd.ypr <- cbind(dd, Robustness=0)#
+#
+ypr.pi <- predict.int(mod= mod.ypr,#
+                        dd=dd.ypr,#
+                        y="Robustness",#
+                        family="gaussian")#
+#
+plot.predict.ypr(new.dd=ypr.pi,#
+                 ylabel="Robustness",#
+                 dats=res,#
+                 y1="Robustness")
+rm(list=ls())#
+source('plotting/src/predictIntervals.R')#
+source('plotting/src/CIplotting.R')#
+source('plotting/src/plotPanels.R')#
+source('src/initialize.R')#
+#
+## either "abund" or "degree"#
+extinction.method <- "abund"#
+#
+load(file=file.path(save.path,#
+            sprintf('resilience_%s.Rdata', extinction.method)))#
+#
+dd <- expand.grid(ypr=seq(from= min(res$ypr, na.rm=TRUE),#
+                          to= max(res$ypr, na.rm=TRUE),#
+                          length=10))#
+#
+## ************************************************************#
+## nodf#
+## ************************************************************#
+load(file=file.path(save.path,#
+            sprintf('mods/resilience_ypr_%s.Rdata',#
+                    extinction.method)))#
+#
+dd.ypr <- cbind(dd, Robustness=0)#
+#
+ypr.pi <- predict.int(mod= mod.ypr,#
+                        dd=dd.ypr,#
+                        y="Robustness",#
+                        family="gaussian")#
+#
+plot.predict.ypr(new.dd=ypr.pi,#
+                 ylabel="Robustness",#
+                 dats=res,#
+                 y1="Robustness")
+rm(list=ls())#
+source('plotting/src/predictIntervals.R')#
+source('plotting/src/CIplotting.R')#
+source('plotting/src/plotPanels.R')#
+source('src/initialize.R')#
+#
+## either "abund" or "degree"#
+extinction.method <- "degree"#
+#
+load(file=file.path(save.path,#
+            sprintf('resilience_%s.Rdata', extinction.method)))#
+#
+dd <- expand.grid(ypr=seq(from= min(res$ypr, na.rm=TRUE),#
+                          to= max(res$ypr, na.rm=TRUE),#
+                          length=10))#
+#
+## ************************************************************#
+## nodf#
+## ************************************************************#
+load(file=file.path(save.path,#
+            sprintf('mods/resilience_ypr_%s.Rdata',#
+                    extinction.method)))#
+#
+dd.ypr <- cbind(dd, Robustness=0)#
+#
+ypr.pi <- predict.int(mod= mod.ypr,#
+                        dd=dd.ypr,#
+                        y="Robustness",#
+                        family="gaussian")#
+#
+plot.predict.ypr(new.dd=ypr.pi,#
+                 ylabel="Robustness",#
+                 dats=res,#
+                 y1="Robustness")
+rm(list=ls())#
+source('plotting/src/predictIntervals.R')#
+source('plotting/src/CIplotting.R')#
+source('plotting/src/plotPanels.R')#
+source('src/initialize.R')#
+#
+## either "abund" or "degree"#
+extinction.method <- "degree"#
+#
+load(file=file.path(save.path,#
+            sprintf('resilience_%s.Rdata', extinction.method)))#
+#
+dd <- expand.grid(ypr=seq(from= min(res$ypr, na.rm=TRUE),#
+                          to= max(res$ypr, na.rm=TRUE),#
+                          length=10))#
+#
+## ************************************************************#
+## nodf#
+## ************************************************************#
+load(file=file.path(save.path,#
+            sprintf('mods/resilience_ypr_%s.Rdata',#
+                    extinction.method)))#
+#
+dd.ypr <- cbind(dd, Robustness=0)#
+#
+ypr.pi <- predict.int(mod= mod.ypr,#
+                        dd=dd.ypr,#
+                        y="Robustness",#
+                        family="gaussian")#
+#
+plot.predict.ypr(new.dd=ypr.pi,#
+                 ylabel="Robustness",#
+                 dats=res,#
+                 y1="Robustness")
+rm(list=ls())#
+source('plotting/src/predictIntervals.R')#
+source('plotting/src/CIplotting.R')#
+source('plotting/src/plotPanels.R')#
+source('src/initialize.R')#
+#
+## either "abund" or "degree"#
+extinction.method <- "degree"#
+#
+load(file=file.path(save.path,#
+            sprintf('resilience_%s.Rdata', extinction.method)))#
+#
+dd <- expand.grid(ypr=seq(from= min(res$ypr, na.rm=TRUE),#
+                          to= max(res$ypr, na.rm=TRUE),#
+                          length=10))#
+#
+## ************************************************************#
+## nodf#
+## ************************************************************#
+load(file=file.path(save.path,#
+            sprintf('mods/resilience_ypr_%s.Rdata',#
+                    extinction.method)))#
+#
+dd.ypr <- cbind(dd, Robustness=0)#
+#
+ypr.pi <- predict.int(mod= mod.ypr,#
+                        dd=dd.ypr,#
+                        y="Robustness",#
+                        family="gaussian")#
+#
+plot.predict.ypr(new.dd=ypr.pi,#
+                 ylabel="Robustness",#
+                 dats=res,#
+                 y1="Robustness",#
+                 extinction.method=extinction.method)
+rm(list=ls())#
+source('plotting/src/predictIntervals.R')#
+source('plotting/src/CIplotting.R')#
+source('plotting/src/plotPanels.R')#
+source('src/initialize.R')#
+#
+## either "abund" or "degree"#
+extinction.method <- "degree"#
+#
+load(file=file.path(save.path,#
+            sprintf('resilience_%s.Rdata', extinction.method)))#
+#
+dd <- expand.grid(ypr=seq(from= min(res$ypr, na.rm=TRUE),#
+                          to= max(res$ypr, na.rm=TRUE),#
+                          length=10))#
+#
+## ************************************************************#
+## nodf#
+## ************************************************************#
+load(file=file.path(save.path,#
+            sprintf('mods/resilience_ypr_%s.Rdata',#
+                    extinction.method)))#
+#
+dd.ypr <- cbind(dd, Robustness=0)#
+#
+ypr.pi <- predict.int(mod= mod.ypr,#
+                        dd=dd.ypr,#
+                        y="Robustness",#
+                        family="gaussian")#
+#
+plot.predict.ypr(new.dd=ypr.pi,#
+                 ylabel="Robustness",#
+                 dats=res,#
+                 y1="Robustness",#
+                 extinction.method=extinction.method)
+rm(list=ls())#
+source('plotting/src/predictIntervals.R')#
+source('plotting/src/CIplotting.R')#
+source('plotting/src/plotPanels.R')#
+source('src/initialize.R')#
+#
+## either "abund" or "degree"#
+extinction.method <- "abund"#
+#
+load(file=file.path(save.path,#
+            sprintf('resilience_%s.Rdata', extinction.method)))#
+#
+dd <- expand.grid(ypr=seq(from= min(res$ypr, na.rm=TRUE),#
+                          to= max(res$ypr, na.rm=TRUE),#
+                          length=10))#
+#
+## ************************************************************#
+## nodf#
+## ************************************************************#
+load(file=file.path(save.path,#
+            sprintf('mods/resilience_ypr_%s.Rdata',#
+                    extinction.method)))#
+#
+dd.ypr <- cbind(dd, Robustness=0)#
+#
+ypr.pi <- predict.int(mod= mod.ypr,#
+                        dd=dd.ypr,#
+                        y="Robustness",#
+                        family="gaussian")#
+#
+plot.predict.ypr(new.dd=ypr.pi,#
+                 ylabel="Robustness",#
+                 dats=res,#
+                 y1="Robustness",#
+                 extinction.method=extinction.method)
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/resilence')#
+source('src/initialize.R')#
+#
+## either "abund" or "degree"#
+extinction.method <- "degree"#
 #
 ## create pp matrix for each site, year#
 nets <- break.net(spec)
-nes[[1]]
-nets[[1]]
-ext <- lapply(nets, second.extinct,#
-              participant="higher",#
-              method="abund")
-lapply(nets, dim)
-ext <- lapply(nets, second.extinct,#
-              participant="lower",#
-              method="abund")#
+specs <- calcSpec(nets, spec)
+save(specs, file=file.path(save.path, 'specs.Rdata'))
+ys <- c("proportional.generality", "d", "degree")#
 #
-rob <- sapply(ext, robustness)#
-#
-sites <- sapply(strsplit(names(rob), "[.]"), function(x) x[1])#
-years <- sapply(strsplit(names(rob), "[.]"), function(x) x[2])#
-#
-dats <- data.frame(Site= sites,#
-                   Year=years,#
-                   Robustness=rob)#
-rownames(dats) <- NULL#
-#
-dats$SiteStatus <- spec$SiteStatus[match(paste(dats$Site, dats$Year),#
-                           paste(spec$Site, spec$Year))]#
-#
-dats$ypr <- spec$ypr[match(paste(dats$Site, dats$Year),#
-                           paste(spec$Site, spec$Year))]#
-#
-boxplot(dats$Robustness~dats$SiteStatus)#
-#
-summary(lmer(dats$Robustness~dats$SiteStatus#
-             + (1|dats$Site) + (1|dats$Year)))
-boxplot(dats$Robustness~dats$ypr)#
-summary(lmer(dats$Robustness~dats$ypr#
-             + (1|dats$Site) + (1|dats$Year)))
-summary(lmer(Robustness~ypr#
-             + (1|Site) + (1|Year),#
-             data=dats[!is.na(dats$ypr),]))
-species.lev <- lapply(nets, function(x){#
-  sl <- specieslevel(x)#
-  sl$'higher level'$tot.int <- colSums(x)#
-  sl$'lower level'$tot.int <- rowSums(x)#
-  return(sl)#
+## full models#
+formulas <-lapply(ys, function(x) {#
+  as.formula(paste(x, "~",#
+                   paste("ypr"#
+                         "(1|Site)",#
+                          "(1|GenusSpecies)"#
+                         sep="+")))#
 })
-source('../dataPrep/src/prepNets.R')
-source('../../dataPrep/src/prepNets.R')
-specializations  <-  mapply(function(a, b, c, d)#
-  getSpec(species.lev = a,#
-          names.net = b),#
-  a = species.lev,#
-  b = names(networks),#
-  SIMPLIFY = FALSE)
-specializations  <-  mapply(function(a, b, c, d)#
-  getSpec(species.lev = a,#
-          names.net = b),#
-  a = species.lev,#
-  b = names(nets),#
-  SIMPLIFY = FALSE)
-## extreact specialization scores from specieslevel function and#
-## return data frame#
-getSpec <- function(species.lev, names.net){#
-  browser()#
-  n.pp <- sapply(species.lev, nrow)#
-  pp <- unlist(sapply(species.lev, rownames))#
-  names(pp) <- NULL#
-  all.pp <- do.call(rbind, species.lev)#
-  rownames(all.pp) <- NULL#
-  all.pp$GenusSpecies <- pp#
-  all.pp$speciesType <- c(rep("pollinator", n.pp[1]),#
-                          rep("plant", n.pp[2]))#
-  all.pp$Site <- strsplit(names.net, "_")[[1]][1]#
-  all.pp$assem <- strsplit(names.net, "_")[[1]][2]#
-  return(all.pp)#
-}
-specializations  <-  mapply(function(a, b, c, d)#
-  getSpec(species.lev = a,#
-          names.net = b),#
-  a = species.lev,#
-  b = names(nets),#
-  SIMPLIFY = FALSE)
-n.pp <- sapply(species.lev, nrow)
-n.pp
-pp <- unlist(sapply(species.lev, rownames))
-pp
-names(pp) <- NULL#
-  all.pp <- do.call(rbind, species.lev)#
-  rownames(all.pp) <- NULL#
-  all.pp$GenusSpecies <- pp
-all.pp
-all.pp$speciesType <- c(rep("pollinator", n.pp[1]),#
-                          rep("plant", n.pp[2]))#
-  all.pp$Site <- strsplit(names.net, "_")[[1]][1]#
-  all.pp$assem <- strsplit(names.net, "_")[[1]][2]
-all.pp
-Q
-getSpec <- function(species.lev, names.net, seps="_"){#
-  n.pp <- sapply(species.lev, nrow)#
-  pp <- unlist(sapply(species.lev, rownames))#
-  names(pp) <- NULL#
-  all.pp <- do.call(rbind, species.lev)#
-  rownames(all.pp) <- NULL#
-  all.pp$GenusSpecies <- pp#
-  all.pp$speciesType <- c(rep("pollinator", n.pp[1]),#
-                          rep("plant", n.pp[2]))#
-  all.pp$Site <- strsplit(names.net, seps)[[1]][1]#
-  all.pp$assem <- strsplit(names.net, seps)[[1]][2]#
-  return(all.pp)#
-}
-specializations  <-  mapply(function(a, b, c, d)#
-  getSpec(species.lev = a,#
-          names.net = b,#
-          seps="[.]"),#
-  a = species.lev,#
-  b = names(nets),#
-  SIMPLIFY = FALSE)
-names(nets)
-specializations  <-  mapply(function(a, b)#
-  getSpec(species.lev = a,#
-          names.net = b,#
-          seps="[.]"),#
-  a = species.lev,#
-  b = names(nets),#
-  SIMPLIFY = FALSE)
-specializations  <-  mapply(function(a, b)#
-                            browser()#
-  getSpec(species.lev = a,#
-          names.net = b,#
-          seps="[.]"),#
-  a = species.lev,#
-  b = names(nets),#
-  SIMPLIFY = FALSE)
-## extreact specialization scores from specieslevel function and#
-## return data frame#
-getSpec <- function(species.lev, names.net, seps="_"){#
-  browser()#
-  n.pp <- sapply(species.lev, nrow)#
-  pp <- unlist(sapply(species.lev, rownames))#
-  names(pp) <- NULL#
-  all.pp <- do.call(rbind, species.lev)#
-  rownames(all.pp) <- NULL#
-  all.pp$GenusSpecies <- pp#
-  all.pp$speciesType <- c(rep("pollinator", n.pp[1]),#
-                          rep("plant", n.pp[2]))#
-  all.pp$Site <- strsplit(names.net, seps)[[1]][1]#
-  all.pp$assem <- strsplit(names.net, seps)[[1]][2]#
-  return(all.pp)#
-}
-specializations  <-  mapply(function(a, b)#
-  getSpec(species.lev = a,#
-          names.net = b,#
-          seps="[.]"),#
-  a = species.lev,#
-  b = names(nets),#
-  SIMPLIFY = FALSE)
-n.pp <- sapply(species.lev, nrow)#
-  pp <- unlist(sapply(species.lev, rownames))#
-  names(pp) <- NULL#
-  all.pp <- do.call(rbind, species.lev)#
-  rownames(all.pp) <- NULL#
-  all.pp$GenusSpecies <- pp#
-  all.pp$speciesType <- c(rep("pollinator", n.pp[1]),#
-                          rep("plant", n.pp[2]))#
-  all.pp$Site <- strsplit(names.net, seps)[[1]][1]#
-  all.pp$assem <- strsplit(names.net, seps)[[1]][2]
-all.pp
-Q
-specializations  <-  mapply(function(a, b)#
-  getSpec(species.lev = a,#
-          names.net = b,#
-          seps="[.]"),#
-  a = species.lev,#
-  b = names(nets),#
-  SIMPLIFY = FALSE)
-Q
-## extreact specialization scores from specieslevel function and#
-## return data frame#
-getSpec <- function(species.lev, names.net, seps="_"){#
-  n.pp <- sapply(species.lev, nrow)#
-  pp <- unlist(sapply(species.lev, rownames))#
-  names(pp) <- NULL#
-  all.pp <- do.call(rbind, species.lev)#
-  rownames(all.pp) <- NULL#
-  all.pp$GenusSpecies <- pp#
-  all.pp$speciesType <- c(rep("pollinator", n.pp[1]),#
-                          rep("plant", n.pp[2]))#
-  all.pp$Site <- strsplit(names.net, seps)[[1]][1]#
-  all.pp$assem <- strsplit(names.net, seps)[[1]][2]#
-  return(all.pp)#
-}
-v
-specializations  <-  mapply(function(a, b)#
-  getSpec(species.lev = a,#
-          names.net = b,#
-          seps="[.]"),#
-  a = species.lev,#
-  b = names(nets),#
-  SIMPLIFY = FALSE)
-class(species.lev)
-lapply(class(species.lev))
-lapply(species.lev, class)
-sapply(species.lev, class)
-sapply(species.lev, class) == "list"
-all(sapply(species.lev, class) == "list")
-sapply(species.lev, dim)
-sapply(species.lev, length)
-sapply(species.lev, function(x) dim(x[[1]]))
-sapply(species.lev, function(x) dim(x[[1]])) >1
-all(sapply(species.lev, function(x) dim(x[[1]])) >1)
-all(sapply(species.lev, function(x) dim(x[[2]])) >1)
-species.lev <- lapply(nets, function(x){#
-  sl <- specieslevel(x)#
-  sl$'higher level'$tot.int <- colSums(x)#
-  sl$'lower level'$tot.int <- rowSums(x)#
-  return(sl)#
+## full models#
+formulas <-lapply(ys, function(x) {#
+  as.formula(paste(x, "~",#
+                   paste("ypr"#
+                         "(1|Site)",#
+                          "(1|GenusSpecies)"#
+                         sep="+")))#
 })
-lapply(nets, dim)
-sapply(nets, dim)
-specializations  <-  mapply(function(a, b)#
-  getSpec(species.lev = a,#
-          names.net = b,#
-          seps="[.]"),#
-  a = species.lev,#
-  b = names(nets),#
-  SIMPLIFY = FALSE)
-## extreact specialization scores from specieslevel function and#
-## return data frame#
-getSpec <- function(species.lev, names.net, seps="_"){#
-  n.pp <- sapply(species.lev, nrow)#
-  pp <- unlist(sapply(species.lev, rownames))#
-  print(pp)#
-  names(pp) <- NULL#
-  all.pp <- do.call(rbind, species.lev)#
-  rownames(all.pp) <- NULL#
-  all.pp$GenusSpecies <- pp#
-  all.pp$speciesType <- c(rep("pollinator", n.pp[1]),#
-                          rep("plant", n.pp[2]))#
-  all.pp$Site <- strsplit(names.net, seps)[[1]][1]#
-  all.pp$assem <- strsplit(names.net, seps)[[1]][2]#
-  return(all.pp)#
+## full models#
+formulas <-lapply(ys, function(x) {#
+  as.formula(paste(x, "~",#
+                   paste("ypr"#
+                         "(1|Site)",#
+                          "(1|GenusSpecies)",#
+                         sep="+")))#
+})
+formulas <-lapply(ys, function(x) {#
+  as.formula(paste(x, "~",#
+                   paste("ypr",#
+                         "(1|Site)",#
+                          "(1|GenusSpecies)",#
+                         sep="+")))#
+})
+formulars
+formulas
+mod.pols <- lapply(formulas, function(x){#
+  lmer(x, family="Gaussian",#
+       data=specs[specs$speciesType == "pollinator",]#
 }
-## extreact specialization scores from specieslevel function and#
-## return data frame#
-getSpec <- function(species.lev, names.net, seps="_"){#
-  n.pp <- sapply(species.lev, nrow)#
-  pp <- unlist(sapply(species.lev, rownames))#
-  names(pp) <- NULL#
-  all.pp <- do.call(rbind, species.lev)#
-  rownames(all.pp) <- NULL#
-  try(all.pp$GenusSpecies <- pp, silent=TRUE)#
-  all.pp$speciesType <- c(rep("pollinator", n.pp[1]),#
-                          rep("plant", n.pp[2]))#
-  all.pp$Site <- strsplit(names.net, seps)[[1]][1]#
-  all.pp$assem <- strsplit(names.net, seps)[[1]][2]#
-  return(all.pp)#
+mod.pols <- lapply(formulas, function(x){#
+  lmer(x, family="Gaussian",#
+       data=specs[specs$speciesType == "pollinator",])#
 }
-specializations  <-  mapply(function(a, b)#
-  getSpec(species.lev = a,#
-          names.net = b,#
-          seps="[.]"),#
-  a = species.lev,#
-  b = names(nets),#
-  SIMPLIFY = FALSE)
-## extreact specialization scores from specieslevel function and#
-## return data frame#
-getSpec <- function(species.lev, names.net, seps="_"){#
-  n.pp <- sapply(species.lev, nrow)#
-  pp <- unlist(sapply(species.lev, rownames))#
-  names(pp) <- NULL#
-  all.pp <- do.call(rbind, species.lev)#
-  rownames(all.pp) <- NULL#
-  try(all.pp$GenusSpecies <- pp, silent=TRUE)#
-  if(inherits(all.pp, "try-error")) browser()#
-  all.pp$speciesType <- c(rep("pollinator", n.pp[1]),#
-                          rep("plant", n.pp[2]))#
-  all.pp$Site <- strsplit(names.net, seps)[[1]][1]#
-  all.pp$assem <- strsplit(names.net, seps)[[1]][2]#
-  return(all.pp)#
+)
+mod.pols <- lapply(formulas, function(x){#
+  lmer(x,#
+       data=specs[specs$speciesType == "pollinator",])#
 }
-specializations  <-  mapply(function(a, b)#
-  getSpec(species.lev = a,#
-          names.net = b,#
-          seps="[.]"),#
-  a = species.lev,#
-  b = names(nets),#
-  SIMPLIFY = FALSE)
-specializations
-head(specializations)
-## extreact specialization scores from specieslevel function and#
-## return data frame#
-getSpec <- function(species.lev, names.net, seps="_"){#
-  n.pp <- sapply(species.lev, nrow)#
-  pp <- unlist(sapply(species.lev, rownames))#
-  names(pp) <- NULL#
-  all.pp <- do.call(rbind, species.lev)#
-  rownames(all.pp) <- NULL#
-  try(all.pp$GenusSpecies <- pp)#
-  if(inherits(all.pp, "try-error")) browser()#
-  all.pp$speciesType <- c(rep("pollinator", n.pp[1]),#
-                          rep("plant", n.pp[2]))#
-  all.pp$Site <- strsplit(names.net, seps)[[1]][1]#
-  all.pp$assem <- strsplit(names.net, seps)[[1]][2]#
-  return(all.pp)#
-}
-specializations  <-  mapply(function(a, b)#
-  getSpec(species.lev = a,#
-          names.net = b,#
-          seps="[.]"),#
-  a = species.lev,#
-  b = names(nets),#
-  SIMPLIFY = FALSE)
-## extreact specialization scores from specieslevel function and#
-## return data frame#
-getSpec <- function(species.lev, names.net, seps="_"){#
-  n.pp <- sapply(species.lev, nrow)#
-  pp <- unlist(sapply(species.lev, rownames))#
-  names(pp) <- NULL#
-  all.pp <- do.call(rbind, species.lev)#
-  rownames(all.pp) <- NULL#
-  broswer()#
-  try(all.pp$GenusSpecies <- pp)#
-  all.pp$speciesType <- c(rep("pollinator", n.pp[1]),#
-                          rep("plant", n.pp[2]))#
-  all.pp$Site <- strsplit(names.net, seps)[[1]][1]#
-  all.pp$assem <- strsplit(names.net, seps)[[1]][2]#
-  return(all.pp)#
-}
-specializations  <-  mapply(function(a, b)#
-  getSpec(species.lev = a,#
-          names.net = b,#
-          seps="[.]"),#
-  a = species.lev,#
-  b = names(nets),#
-  SIMPLIFY = FALSE)
-## extreact specialization scores from specieslevel function and#
-## return data frame#
-getSpec <- function(species.lev, names.net, seps="_"){#
-  n.pp <- sapply(species.lev, nrow)#
-  pp <- unlist(sapply(species.lev, rownames))#
-  names(pp) <- NULL#
-  all.pp <- do.call(rbind, species.lev)#
-  rownames(all.pp) <- NULL#
-  browser()#
-  try(all.pp$GenusSpecies <- pp)#
-  all.pp$speciesType <- c(rep("pollinator", n.pp[1]),#
-                          rep("plant", n.pp[2]))#
-  all.pp$Site <- strsplit(names.net, seps)[[1]][1]#
-  all.pp$assem <- strsplit(names.net, seps)[[1]][2]#
-  return(all.pp)#
-}
-specializations  <-  mapply(function(a, b)#
-  getSpec(species.lev = a,#
-          names.net = b,#
-          seps="[.]"),#
-  a = species.lev,#
-  b = names(nets),#
-  SIMPLIFY = FALSE)
-all.pp
-pp
-Q
-## extreact specialization scores from specieslevel function and#
-## return data frame#
-getSpec <- function(species.lev, names.net, seps="_"){#
-  n.pp <- sapply(species.lev, nrow)#
-  pp <- unlist(sapply(species.lev, rownames))#
-  names(pp) <- NULL#
-  all.pp <- do.call(rbind, species.lev)#
-  rownames(all.pp) <- NULL#
- if(nrow(all.pp) != length(pp)) browser()#
-  try(all.pp$GenusSpecies <- pp)#
-  all.pp$speciesType <- c(rep("pollinator", n.pp[1]),#
-                          rep("plant", n.pp[2]))#
-  all.pp$Site <- strsplit(names.net, seps)[[1]][1]#
-  all.pp$assem <- strsplit(names.net, seps)[[1]][2]#
-  return(all.pp)#
-}
-specializations  <-  mapply(function(a, b)#
-  getSpec(species.lev = a,#
-          names.net = b,#
-          seps="[.]"),#
-  a = species.lev,#
-  b = names(nets),#
-  SIMPLIFY = FALSE)
-## extreact specialization scores from specieslevel function and#
-## return data frame#
-getSpec <- function(species.lev, names.net, seps="_"){#
-  n.pp <- sapply(species.lev, nrow)#
-  pp <- unlist(sapply(species.lev, rownames))#
-  names(pp) <- NULL#
-  all.pp <- do.call(rbind, species.lev)#
-  rownames(all.pp) <- NULL#
- if(nrow(all.pp) != length(pp)){#
-   browser()#
- }#
-  try(all.pp$GenusSpecies <- pp)#
-  all.pp$speciesType <- c(rep("pollinator", n.pp[1]),#
-                          rep("plant", n.pp[2]))#
-  all.pp$Site <- strsplit(names.net, seps)[[1]][1]#
-  all.pp$assem <- strsplit(names.net, seps)[[1]][2]#
-  return(all.pp)#
-}
-specializations  <-  mapply(function(a, b)#
-  getSpec(species.lev = a,#
-          names.net = b,#
-          seps="[.]"),#
-  a = species.lev,#
-  b = names(nets),#
-  SIMPLIFY = FALSE)
-## extreact specialization scores from specieslevel function and#
-## return data frame#
-getSpec <- function(species.lev, names.net, seps="_"){#
-  n.pp <- sapply(species.lev, nrow)#
-  pp <- unlist(sapply(species.lev, rownames))#
-  names(pp) <- NULL#
-  all.pp <- do.call(rbind, species.lev)#
-  rownames(all.pp) <- NULL#
-  print(nrow(all.pp) != length(pp))#
-  try(all.pp$GenusSpecies <- pp)#
-  all.pp$speciesType <- c(rep("pollinator", n.pp[1]),#
-                          rep("plant", n.pp[2]))#
-  all.pp$Site <- strsplit(names.net, seps)[[1]][1]#
-  all.pp$assem <- strsplit(names.net, seps)[[1]][2]#
-  return(all.pp)#
-}
-specializations  <-  mapply(function(a, b)#
-  getSpec(species.lev = a,#
-          names.net = b,#
-          seps="[.]"),#
-  a = species.lev,#
-  b = names(nets),#
-  SIMPLIFY = FALSE)
-## extreact specialization scores from specieslevel function and#
-## return data frame#
-getSpec <- function(species.lev, names.net, seps="_"){#
-  n.pp <- sapply(species.lev, nrow)#
-  pp <- unlist(sapply(species.lev, rownames))#
-  names(pp) <- NULL#
-  all.pp <- do.call(rbind, species.lev)#
-  rownames(all.pp) <- NULL#
-  print(nrow(all.pp) == length(pp))#
-  try(all.pp$GenusSpecies <- pp)#
-  all.pp$speciesType <- c(rep("pollinator", n.pp[1]),#
-                          rep("plant", n.pp[2]))#
-  all.pp$Site <- strsplit(names.net, seps)[[1]][1]#
-  all.pp$assem <- strsplit(names.net, seps)[[1]][2]#
-  return(all.pp)#
-}
-specializations  <-  mapply(function(a, b)#
-  getSpec(species.lev = a,#
-          names.net = b,#
-          seps="[.]"),#
-  a = species.lev,#
-  b = names(nets),#
-  SIMPLIFY = FALSE)
-## extreact specialization scores from specieslevel function and#
-## return data frame#
-getSpec <- function(species.lev, names.net, seps="_"){#
-  n.pp <- sapply(species.lev, nrow)#
-  pp <- unlist(sapply(species.lev, rownames))#
-  names(pp) <- NULL#
-  all.pp <- do.call(rbind, species.lev)#
-  rownames(all.pp) <- NULL#
-  print(names.net)#
-  try(all.pp$GenusSpecies <- pp)#
-  all.pp$speciesType <- c(rep("pollinator", n.pp[1]),#
-                          rep("plant", n.pp[2]))#
-  all.pp$Site <- strsplit(names.net, seps)[[1]][1]#
-  all.pp$assem <- strsplit(names.net, seps)[[1]][2]#
-  return(all.pp)#
-}
-specializations  <-  mapply(function(a, b)#
-  getSpec(species.lev = a,#
-          names.net = b,#
-          seps="[.]"),#
-  a = species.lev,#
-  b = names(nets),#
-  SIMPLIFY = FALSE)
-nets[["Berm.2015"]]
-species.lev[["Berm.2015"]]
-## extreact specialization scores from specieslevel function and#
-## return data frame#
-getSpec <- function(species.lev, names.net, seps="_"){#
-  if(names.net == "Berm.2015") browser()#
-  n.pp <- sapply(species.lev, nrow)#
-  pp <- unlist(sapply(species.lev, rownames))#
-  names(pp) <- NULL#
-  all.pp <- do.call(rbind, species.lev)#
-  rownames(all.pp) <- NULL#
-  print(names.net)#
-  try(all.pp$GenusSpecies <- pp)#
-  all.pp$speciesType <- c(rep("pollinator", n.pp[1]),#
-                          rep("plant", n.pp[2]))#
-  all.pp$Site <- strsplit(names.net, seps)[[1]][1]#
-  all.pp$assem <- strsplit(names.net, seps)[[1]][2]#
-  return(all.pp)#
-}
-specializations  <-  mapply(function(a, b)#
-  getSpec(species.lev = a,#
-          names.net = b,#
-          seps="[.]"),#
-  a = species.lev,#
-  b = names(nets),#
-  SIMPLIFY = FALSE)
-n.pp <- sapply(species.lev, nrow)
-n.pp
-pp <- unlist(sapply(species.lev, rownames))
-pp
-class(pp)
-c(pp)
-Q
-## extreact specialization scores from specieslevel function and#
-## return data frame#
-getSpec <- function(species.lev, names.net, seps="_"){#
-  ## if(names.net == "Berm.2015") browser()#
-  n.pp <- sapply(species.lev, nrow)#
-  pp <- c(unlist(sapply(species.lev, rownames)))#
-  names(pp) <- NULL#
-  all.pp <- do.call(rbind, species.lev)#
-  rownames(all.pp) <- NULL#
-  print(names.net)#
-  try(all.pp$GenusSpecies <- pp)#
-  all.pp$speciesType <- c(rep("pollinator", n.pp[1]),#
-                          rep("plant", n.pp[2]))#
-  all.pp$Site <- strsplit(names.net, seps)[[1]][1]#
-  all.pp$assem <- strsplit(names.net, seps)[[1]][2]#
-  return(all.pp)#
-}
-specializations  <-  mapply(function(a, b)#
-  getSpec(species.lev = a,#
-          names.net = b,#
-          seps="[.]"),#
-  a = species.lev,#
-  b = names(nets),#
-  SIMPLIFY = FALSE)
-## extreact specialization scores from specieslevel function and#
-## return data frame#
-getSpec <- function(species.lev, names.net, seps="_"){#
-  ## if(names.net == "Berm.2015") browser()#
-  n.pp <- sapply(species.lev, nrow)#
-  pp <- c(unlist(sapply(species.lev, rownames)))#
-  names(pp) <- NULL#
-  all.pp <- do.call(rbind, species.lev)#
-  rownames(all.pp) <- NULL#
-  try(all.pp$GenusSpecies <- pp)#
-  all.pp$speciesType <- c(rep("pollinator", n.pp[1]),#
-                          rep("plant", n.pp[2]))#
-  all.pp$Site <- strsplit(names.net, seps)[[1]][1]#
-  all.pp$assem <- strsplit(names.net, seps)[[1]][2]#
-  return(all.pp)#
-}
-specializations  <-  mapply(function(a, b)#
-  getSpec(species.lev = a,#
-          names.net = b,#
-          seps="[.]"),#
-  a = species.lev,#
-  b = names(nets),#
-  SIMPLIFY = FALSE)
-head(specializations)
-specializations <- do.call(rbind, specializations)#
-rownames(specializations) <- NULL
-head(specializations)
-head(spec)
-specializations$ypr[match(paste(specializations$Site, specializations$Year),#
-                           paste(spec$Site, spec$Year))]
-head(specializations$ypr)
-colnames(specializations)
-specializations$ypr[match(paste(specializations$Site, specializations$assem),#
-                           paste(spec$Site, spec$Year))]
-specializations$assem
-specializations$Site
-specializations$ypr <- spec$ypr[match(paste(specializations$Site,#
-                                            specializations$assem),#
-                           paste(spec$Site, spec$Year))]
-head(specializations)
-plot(specializations$d ~ specializations$ypr)
-plot(specializations$d[speciesType == "pollinator"] ~#
-     specializations$ypr[speciesType == "pollinator"])
-specs  <-  mapply(function(a, b)#
-  getSpec(species.lev = a,#
-          names.net = b,#
-          seps="[.]"),#
-  a = species.lev,#
-  b = names(nets),#
-  SIMPLIFY = FALSE)#
+)
+mod.pols[[1]]
+mod.pols[[2]]
+mod.pols <- lapply(formulas, function(x){#
+  lmer(x,#
+       data=specs[specs$speciesType == "pollinator",])#
+})#
+mod.plants <- lapply(formulas, function(x){#
+  lmer(x,#
+       data=specs[specs$speciesType == "plant",])#
+})#
 #
-specs <- do.call(rbind, specs)#
-rownames(specs) <- NULL#
+names(mod.pols) <- names(mod.plants) <- ys
+mod.pols[["d"]]
+lapply(mod.pols, summary)
+mod.plants
+save(mod.pols, file="saved/mods/spec_pols")#
+save(mod.plants, file="saved/mods/spec_plants")
+save(specs, file=file.path(save.path, 'specs.Rdata'))
+save(mod.pols, file="saved/mods/spec_pols.Rdata")#
+save(mod.plants, file="saved/mods/spec_plants.Rdata")
+## **********************************************************#
+## species importance#
+## **********************************************************#
+xvar <- "ypr"#
 #
-specs$ypr <- spec$ypr[match(paste(specs$Site,#
-                                            specs$assem),#
-                           paste(spec$Site, spec$Year))]
-plot(specs$d[specs$speciesType == "pollinator"] ~#
-     specs$ypr[specs$speciesType == "pollinator"])
-colnames(specs)
-?specieslevel
-plot(specs$proportional.generality[specs$speciesType == "pollinator"] ~#
-     specs$ypr[specs$speciesType == "pollinator"])
-plot(specs$degree[specs$speciesType == "pollinator"] ~#
-     specs$ypr[specs$speciesType == "pollinator"])
-plot(specs$d[specs$speciesType == "pollinator"] ~#
-     specs$ypr[specs$speciesType == "pollinator"])
-unique(specs$GenusSpecies)
-unique(specs$GenusSpecies[specs$speciesType == "pollinator"])
-pols <- unique(specs$GenusSpecies[specs$speciesType == "pollinator"])#
-cols <- rainbow(length(pols))
-cols
-plot(NA, ylim=range(specs$d),#
-     xlim=range(specs$ypr))
-plot(NA, ylim=range(specs$d),#
-     xlim=range(specs$ypr, na.rm=TRUE))
-lapply(pols,#
-       function(x){#
-         this.specs <- specs[specs$GenusSpecies == x]#
-         points(this.specs$d ~#
-              this.specs$ypr, cols=cols[x], type="o")#
-       })
-lapply(pols,#
-       function(x){#
-         this.specs <- specs[specs$GenusSpecies == x,]#
-         points(this.specs$d ~#
-              this.specs$ypr, cols=cols[x], type="o")#
-       })
-lapply(pols,#
-       function(x){#
-         this.specs <- specs[specs$GenusSpecies == x,]#
-         points(this.specs$d ~#
-              this.specs$ypr, col=cols[x], type="o")#
-       })
-pols <- unique(specs$GenusSpecies[specs$speciesType == "pollinator"])#
-cols <- rainbow(length(pols))#
-names(cols) <- pols#
+specs <- calcSpec(nets, spec)#
 #
-plot(NA, ylim=range(specs$d),#
-     xlim=range(specs$ypr, na.rm=TRUE))#
+save(specs, file=file.path(save.path, 'specs.Rdata'))#
 #
-lapply(pols,#
-       function(x){#
-         this.specs <- specs[specs$GenusSpecies == x,]#
-         points(this.specs$d ~#
-              this.specs$ypr, col=cols[x], type="o")#
-       })
-lapply(pols,#
-       function(x){#
-         this.specs <- specs[specs$GenusSpecies == x,]#
-         browser()#
-         points(this.specs$d ~#
-              this.specs$ypr, col=cols[x], type="o")#
-       })
-Q
-lapply(pols,#
-       function(x){#
-         this.specs <- specs[specs$GenusSpecies == x,]#
-         browser()#
-         points(this.specs$d ~#
-              this.specs$ypr, col=cols[x], type="o")#
-       })
-this.specs
-Q
-lapply(pols,#
-       function(x){#
-         this.specs <- specs[specs$GenusSpecies == x,]#
-         this.specs <- aggregate(list(d=this.specs$d),#
-                                 list(ypr=this.specs$ypr,#
-                                      GenusSpecies=this.specs$GenusSpecies),#
-                                 mean, na.rm=TRUE)#
-         points(this.specs$d ~#
-              this.specs$ypr, col=cols[x], type="o")#
-       })
-plot(NA, ylim=range(specs$d),#
-     xlim=range(specs$ypr, na.rm=TRUE))#
+ys <- c("proportional.generality", "d", "degree")#
 #
-lapply(pols,#
-       function(x){#
-         this.specs <- specs[specs$GenusSpecies == x,]#
-         this.specs <- aggregate(list(d=this.specs$d),#
-                                 list(ypr=this.specs$ypr,#
-                                      GenusSpecies=this.specs$GenusSpecies),#
-                                 mean, na.rm=TRUE)#
-         points(this.specs$d ~#
-              this.specs$ypr, col=cols[x], type="o")#
-       })
-lapply(pols,#
-       function(x){#
-         this.specs <- specs[specs$GenusSpecies == x,]#
-         points(this.specs$d ~#
-              this.specs$ypr, col=cols[x])#
-       })
-plot(NA, ylim=range(specs$d),#
-     xlim=range(specs$ypr, na.rm=TRUE))#
+formulas.ypr <-lapply(ys, function(x) {#
+  as.formula(paste(x, "~",#
+                   paste(xvar,#
+                         "(1|Site)",#
+                          "(1|GenusSpecies)",#
+                         sep="+")))#
+})
+## linear models#
+xvar <- "ypr"#
+ys <- c("proportional.generality", "d", "degree")#
+load(file=file.path(save.path, 'specs.Rdata'))#
 #
-lapply(pols,#
-       function(x){#
-         this.specs <- specs[specs$GenusSpecies == x,]#
-         points(this.specs$d ~#
-              this.specs$ypr, col=cols[x])#
-       })
-summary(lmer(d ~ ypr + (1|Site) + (1|GenusSpecies), data= specs))
-summary(lmer(degree ~ ypr + (1|Site) + (1|GenusSpecies), data= specs))
-lapply(pols,#
-       function(x){#
-         this.specs <- specs[specs$GenusSpecies == x,]#
-         points(this.specs$degree ~#
-              this.specs$ypr, col=cols[x])#
-       })
-plot(NA, ylim=range(specs$degree),#
-     xlim=range(specs$ypr, na.rm=TRUE))#
+formulas.ypr <-lapply(ys, function(x) {#
+  as.formula(paste(x, "~",#
+                   paste(xvar,#
+                         "(1|Site)",#
+                          "(1|GenusSpecies)",#
+                         sep="+")))#
+})
+formulas
+mod.pols <- lapply(formulas, function(x){#
+  lmer(x,#
+       data=specs[specs$speciesType == "pollinator",])#
+})#
 #
-lapply(pols,#
-       function(x){#
-         this.specs <- specs[specs$GenusSpecies == x,]#
-         points(this.specs$degree ~#
-              this.specs$ypr, col=cols[x])#
-       })
-hist(spec$d[spec$speciesType == "pollinator"])
-hist(specs$d[spec$speciesType == "pollinator"])
-specs$d[spec$speciesType == "pollinator"]
-hist(specs$d[specs$speciesType == "pollinator"])
-median(specs$d[specs$speciesType == "pollinator"])
-specs$specialization <- "spec"
-specs$specialization[specs$d > 0.2] <- "gen"
+mod.plants <- lapply(formulas, function(x){#
+  lmer(x,#
+       data=specs[specs$speciesType == "plant",])#
+})#
+names(mod.pols) <- names(mod.plants) <- ys#
+lapply(mod.plants, summary)#
+lapply(mod.pols, summary)#
+#
+save(mod.pols, file=file.path(save.path,#
+            sprintf('mods/specs_%s.Rdata', xvar)))#
+#
+save(mod.plantss, file=file.path(save.path,#
+            sprintf('mods/specs_%s.Rdata', xvar)))
+save(mod.plants, file=file.path(save.path,#
+            sprintf('mods/specs_%s.Rdata', xvar)))
+## linear models#
+xvar <- "SiteStatus"#
+ys <- c("proportional.generality", "d", "degree")#
+load(file=file.path(save.path, 'specs.Rdata'))#
+#
+formulas.ypr <-lapply(ys, function(x) {#
+  as.formula(paste(x, "~",#
+                   paste(xvar,#
+                         "(1|Site)",#
+                          "(1|GenusSpecies)",#
+                         sep="+")))#
+})#
+#
+mod.pols <- lapply(formulas, function(x){#
+  lmer(x,#
+       data=specs[specs$speciesType == "pollinator",])#
+})#
+#
+mod.plants <- lapply(formulas, function(x){#
+  lmer(x,#
+       data=specs[specs$speciesType == "plant",])#
+})#
+names(mod.pols) <- names(mod.plants) <- ys#
+lapply(mod.plants, summary)#
+lapply(mod.pols, summary)#
+#
+save(mod.pols, file=file.path(save.path,#
+            sprintf('mods/specs_%s.Rdata', xvar)))#
+#
+save(mod.plants, file=file.path(save.path,#
+            sprintf('mods/specs_%s.Rdata', xvar)))
+## linear models#
+xvar <- "SiteStatus"#
+ys <- c("proportional.generality", "d", "degree")#
+load(file=file.path(save.path, 'specs.Rdata'))#
+#
+formulas.ypr <-lapply(ys, function(x) {#
+  as.formula(paste(x, "~",#
+                   paste(xvar,#
+                         "(1|Site)",#
+                          "(1|GenusSpecies)",#
+                         sep="+")))#
+})#
+#
+mod.pols <- lapply(formulas, function(x){#
+  lmer(x,#
+       data=specs[specs$speciesType == "pollinator",])#
+})#
+#
+mod.plants <- lapply(formulas, function(x){#
+  lmer(x,#
+       data=specs[specs$speciesType == "plant",])#
+})#
+names(mod.pols) <- names(mod.plants) <- ys#
+lapply(mod.plants, summary)#
+lapply(mod.pols, summary)#
+#
+save(mod.pols, file=file.path(save.path,#
+            sprintf('mods/specs_%s.Rdata', xvar)))#
+#
+save(mod.plants, file=file.path(save.path,#
+            sprintf('mods/specs_%s.Rdata', xvar)))
+xvar
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/resilence')#
+source('src/initialize.R')
+xvar <- "SiteStatus"#
+ys <- c("proportional.generality", "d", "degree")#
+load(file=file.path(save.path, 'specs.Rdata'))
+xvar
+formulas <-lapply(ys, function(x) {#
+  as.formula(paste(x, "~",#
+                   paste(xvar,#
+                         "(1|Site)",#
+                          "(1|GenusSpecies)",#
+                         sep="+")))#
+})
+mod.pols <- lapply(formulas, function(x){#
+  lmer(x,#
+       data=specs[specs$speciesType == "pollinator",])#
+})#
+#
+mod.plants <- lapply(formulas, function(x){#
+  lmer(x,#
+       data=specs[specs$speciesType == "plant",])#
+})#
+names(mod.pols) <- names(mod.plants) <- ys#
+lapply(mod.plants, summary)#
+lapply(mod.pols, summary)#
+#
+save(mod.pols, file=file.path(save.path,#
+            sprintf('mods/specs_%s.Rdata', xvar)))#
+#
+save(mod.plants, file=file.path(save.path,#
+            sprintf('mods/specs_%s.Rdata', xvar)))
+## **********************************************************#
+## species importance#
+## **********************************************************#
+specs <- calcSpec(nets, spec)#
+save(specs, file=file.path(save.path, 'specs.Rdata'))
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/resilence')#
+source('src/initialize.R')#
+#
+## either "abund" or "degree"#
+extinction.method <- "degree"#
+#
+## create pp matrix for each site, year#
+nets <- break.net(spec)
+specs <- calcSpec(nets, spec)#
+save(specs, file=file.path(save.path, 'specs.Rdata'))#
+#
+## linear models#
+xvar <- "SiteStatus"#
+ys <- c("proportional.generality", "d", "degree")#
+load(file=file.path(save.path, 'specs.Rdata'))#
+#
+formulas <-lapply(ys, function(x) {#
+  as.formula(paste(x, "~",#
+                   paste(xvar,#
+                         "(1|Site)",#
+                          "(1|GenusSpecies)",#
+                         sep="+")))#
+})#
+#
+mod.pols <- lapply(formulas, function(x){#
+  lmer(x,#
+       data=specs[specs$speciesType == "pollinator",])#
+})#
+#
+mod.plants <- lapply(formulas, function(x){#
+  lmer(x,#
+       data=specs[specs$speciesType == "plant",])#
+})#
+names(mod.pols) <- names(mod.plants) <- ys#
+lapply(mod.plants, summary)#
+lapply(mod.pols, summary)#
+#
+save(mod.pols, file=file.path(save.path,#
+            sprintf('mods/specs_%s.Rdata', xvar)))#
+#
+save(mod.plants, file=file.path(save.path,#
+            sprintf('mods/specs_%s.Rdata', xvar)))
+rm(list=ls())#
+source('plotting/src/predictIntervals.R')#
+source('plotting/src/CIplotting.R')#
+source('plotting/src/plotPanels.R')#
+source('src/initialize.R')
+load(file=file.path(save.path, 'specialization.Rdata'))
+load(file=file.path(save.path, 'specs.Rdata'))
 head(specs)
-summary(lmer(degree ~ ypr + (1|Site) + (1|GenusSpecies),#
-             data= specs[specs$specialization == "gen"]))
-summary(lmer(degree ~ ypr + (1|Site) + (1|GenusSpecies),#
-             data= specs[specs$specialization == "gen",]))
-summary(lmer(d ~ ypr + (1|Site) + (1|GenusSpecies),#
-             data= specs[specs$specialization == "gen",]))
-summary(lmer(d ~ ypr + (1|Site) + (1|GenusSpecies),#
-             data= specs[specs$specialization == "spec",]))
-summary(lmer(d ~ ypr + (1|Site) + (1|GenusSpecies),#
-             data= specs[specs$specialization == "gen" &#
-               specs$speciesType == "pollinator",]))
-summary(lmer(d ~ ypr + (1|Site) + (1|GenusSpecies),#
-             data= specs[specs$specialization == "spec"  &#
-               specs$speciesType == "pollinator",]))
-summary(lmer(d ~ ypr + (1|Site) + (1|GenusSpecies),#
-             data= specs[specs$specialization == "gen" &#
-               specs$speciesType == "plant",]))#
+dd <- expand.grid(ypr=seq(from= min(specs$ypr, na.rm=TRUE),#
+                          to= max(specs$ypr, na.rm=TRUE),#
+                          length=10))
+head(dd)
+## ************************************************************#
+## specialization#
+## ************************************************************#
+load(file=file.path(save.path, 'specs.Rdata'))#
+ys <- c("proportional.generality", "d", "degree")#
+ylabs <- c("Proportional Generality", "Specialization (d')", "Degree")#
 #
-summary(lmer(d ~ ypr + (1|Site) + (1|GenusSpecies),#
-             data= specs[specs$specialization == "spec"  &#
-               specs$speciesType == "plant",]))
-specs$specialization <- "spec"#
-specs$specialization[specs$d > 0.3] <- "gen"#
+dd <- expand.grid(ypr=seq(from= min(specs$ypr, na.rm=TRUE),#
+                          to= max(specs$ypr, na.rm=TRUE),#
+                          length=10))#
 #
-summary(lmer(d ~ ypr + (1|Site) + (1|GenusSpecies),#
-             data= specs[specs$specialization == "gen" &#
-               specs$speciesType == "pollinator",]))#
+for(i in 1:length(ys)){#
+  dd.ypr <- cbind(dd, print(ys[i])=0)#
 #
-summary(lmer(d ~ ypr + (1|Site) + (1|GenusSpecies),#
-             data= specs[specs$specialization == "spec"  &#
-               specs$speciesType == "pollinator",]))
-summary(lmer(d ~ ypr + (1|Site) + (1|GenusSpecies),#
-             data= specs[specs$specialization == "gen" &#
-               specs$speciesType == "plant",]))#
+  ypr.pi <- predict.int(mod= mod.ypr,#
+                        dd=dd.ypr,#
+                        y=ys[i],#
+                        family="gaussian")#
 #
-summary(lmer(d ~ ypr + (1|Site) + (1|GenusSpecies),#
-             data= specs[specs$specialization == "spec"  &#
-               specs$speciesType == "plant",]))
-specs$specialization <- "spec"#
-specs$specialization[specs$d > 0.1] <- "gen"#
+  plot.predict.ypr(new.dd=ypr.pi,#
+                   ylabel=ylabs[i],#
+                   dats=specs,#
+                   y1=ys[i],#
+                   extinction.method=NA)#
+}
+for(i in 1:length(ys)){#
+  dd.ypr <- cbind(dd, 0)#
+  colnames(dd.ypr) <- c("ypr", ys[i])#
 #
-summary(lmer(d ~ ypr + (1|Site) + (1|GenusSpecies),#
-             data= specs[specs$specialization == "gen" &#
-               specs$speciesType == "pollinator",]))#
+  ypr.pi <- predict.int(mod= mod.ypr,#
+                        dd=dd.ypr,#
+                        y=ys[i],#
+                        family="gaussian")#
 #
-summary(lmer(d ~ ypr + (1|Site) + (1|GenusSpecies),#
-             data= specs[specs$specialization == "spec"  &#
-               specs$speciesType == "pollinator",]))
-summary(lmer(d ~ ypr + (1|Site) + (1|GenusSpecies),#
-             data= specs[specs$specialization == "gen" &#
-               specs$speciesType == "plant",]))
-summary(lmer(d ~ ypr + (1|Site) + (1|GenusSpecies),#
-             data= specs[specs$specialization == "spec"  &#
-               specs$speciesType == "plant",]))
-summary(lmer(d ~ ypr*specialization + (1|Site) + (1|GenusSpecies),#
-             data= specs[specs$speciesType == "pollinator",]))
-summary(lmer(d ~ ypr*specialization + (1|Site) + (1|GenusSpecies),#
-             data= specs[specs$speciesType == "pollinator",]))
-?lmer
+  plot.predict.ypr(new.dd=ypr.pi,#
+                   ylabel=ylabs[i],#
+                   dats=specs,#
+                   y1=ys[i],#
+                   extinction.method=NA)#
+}
+## linear models#
+load(file=file.path(save.path, 'specs.Rdata'))#
+## SiteStatus or ypr#
+xvar <- "SiteStatus"#
+#
+## anything outputted by specieslevel#
+ys <- c("proportional.generality", "d", "degree")#
+#
+formulas <-lapply(ys, function(x) {#
+  as.formula(paste(x, "~",#
+                   paste(xvar,#
+                         "(1|Site)",#
+                          "(1|GenusSpecies)",#
+                         sep="+")))#
+})#
+#
+mod.pols <- lapply(formulas, function(x){#
+  lmer(x,#
+       data=specs[specs$speciesType == "pollinator",])#
+})#
+#
+mod.plants <- lapply(formulas, function(x){#
+  lmer(x,#
+       data=specs[specs$speciesType == "plant",])#
+})#
+names(mod.pols) <- names(mod.plants) <- ys#
+lapply(mod.plants, summary)#
+lapply(mod.pols, summary)#
+#
+save(mod.pols, file=file.path(save.path,#
+            sprintf('mods/pols_specs_%s.Rdata', xvar)))#
+#
+save(mod.plants, file=file.path(save.path,#
+            sprintf('mods/plants_specs_%s.Rdata', xvar)))
+## linear models#
+load(file=file.path(save.path, 'specs.Rdata'))#
+## SiteStatus or ypr#
+xvar <- "ypr"#
+#
+## anything outputted by specieslevel#
+ys <- c("proportional.generality", "d", "degree")#
+#
+formulas <-lapply(ys, function(x) {#
+  as.formula(paste(x, "~",#
+                   paste(xvar,#
+                         "(1|Site)",#
+                          "(1|GenusSpecies)",#
+                         sep="+")))#
+})#
+#
+mod.pols <- lapply(formulas, function(x){#
+  lmer(x,#
+       data=specs[specs$speciesType == "pollinator",])#
+})#
+#
+mod.plants <- lapply(formulas, function(x){#
+  lmer(x,#
+       data=specs[specs$speciesType == "plant",])#
+})#
+names(mod.pols) <- names(mod.plants) <- ys#
+lapply(mod.plants, summary)#
+lapply(mod.pols, summary)#
+#
+save(mod.pols, file=file.path(save.path,#
+            sprintf('mods/pols_specs_%s.Rdata', xvar)))#
+#
+save(mod.plants, file=file.path(save.path,#
+            sprintf('mods/plants_specs_%s.Rdata', xvar)))
+pp <- c("plants", "pols")#
+for(j in 1:pp){#
+  load(file=file.path(save.path,#
+         sprintf('mods/%s_specs_ypr_%s.Rdata',#
+                 j)))#
+#
+  for(i in 1:length(ys)){#
+    dd.ypr <- cbind(dd, 0)#
+    colnames(dd.ypr) <- c("ypr", ys[i])#
+#
+    ypr.pi <- predict.int(mod= mod.ypr,#
+                          dd=dd.ypr,#
+                          y=ys[i],#
+                          family="gaussian")#
+#
+    plot.predict.ypr(new.dd=ypr.pi,#
+                     ylabel=ylabs[i],#
+                     dats=specs,#
+                     y1=ys[i],#
+                     extinction.method=j)#
+  }#
+}
+pp <- c("plants", "pols")#
+for(j in pp){#
+  load(file=file.path(save.path,#
+         sprintf('mods/%s_specs_ypr_%s.Rdata',#
+                 j)))#
+#
+  for(i in 1:length(ys)){#
+    dd.ypr <- cbind(dd, 0)#
+    colnames(dd.ypr) <- c("ypr", ys[i])#
+#
+    ypr.pi <- predict.int(mod= mod.ypr,#
+                          dd=dd.ypr,#
+                          y=ys[i],#
+                          family="gaussian")#
+#
+    plot.predict.ypr(new.dd=ypr.pi,#
+                     ylabel=ylabs[i],#
+                     dats=specs,#
+                     y1=ys[i],#
+                     extinction.method=j)#
+  }#
+}
+dd <- expand.grid(ypr=seq(from= min(specs$ypr, na.rm=TRUE),#
+                          to= max(specs$ypr, na.rm=TRUE),#
+                          length=10))#
+#
+pp <- c("plants", "pols")#
+for(j in pp){#
+  load(file=file.path(save.path,#
+         sprintf('mods/%s_specs_ypr.Rdata',#
+                 j)))#
+#
+  for(i in 1:length(ys)){#
+    dd.ypr <- cbind(dd, 0)#
+    colnames(dd.ypr) <- c("ypr", ys[i])#
+#
+    ypr.pi <- predict.int(mod= mod.ypr,#
+                          dd=dd.ypr,#
+                          y=ys[i],#
+                          family="gaussian")#
+#
+    plot.predict.ypr(new.dd=ypr.pi,#
+                     ylabel=ylabs[i],#
+                     dats=specs,#
+                     y1=ys[i],#
+                     extinction.method=j)#
+  }#
+}
+ls()
+j <- "pols"
+paste("mod", j, sep="."),
+paste("mod", j, sep=".")
+pp <- c("plants", "pols")#
+for(j in pp){#
+  load(file=file.path(save.path,#
+         sprintf('mods/%s_specs_ypr.Rdata',#
+                 j)))#
+#
+  for(i in 1:length(ys)){#
+    dd.ypr <- cbind(dd, 0)#
+    colnames(dd.ypr) <- c("ypr", ys[i])#
+#
+    ypr.pi <- predict.int(mod= paste("mod", j, sep="."),#
+                          dd=dd.ypr,#
+                          y=ys[i],#
+                          family="gaussian")#
+#
+    plot.predict.ypr(new.dd=ypr.pi,#
+                     ylabel=ylabs[i],#
+                     dats=specs,#
+                     y1=ys[i],#
+                     extinction.method=j)#
+  }#
+}
+pp <- c("plants", "pols")#
+for(j in pp){#
+  load(file=file.path(save.path,#
+         sprintf('mods/%s_specs_ypr.Rdata',#
+                 j)))#
+#
+  for(i in 1:length(ys)){#
+    browser()#
+    dd.ypr <- cbind(dd, 0)#
+    colnames(dd.ypr) <- c("ypr", ys[i])#
+#
+    ypr.pi <- predict.int(mod= paste("mod", j, sep="."),#
+                          dd=dd.ypr,#
+                          y=ys[i],#
+                          family="gaussian")#
+#
+    plot.predict.ypr(new.dd=ypr.pi,#
+                     ylabel=ylabs[i],#
+                     dats=specs,#
+                     y1=ys[i],#
+                     extinction.method=j)#
+  }#
+}
+dd.ypr <- cbind(dd, 0)
+dd.ypr
+colnames(dd.ypr) <- c("ypr", ys[i])
+dd.ypr
+v
+ypr.pi <- predict.int(mod= paste("mod", j, sep="."),#
+                          dd=dd.ypr,#
+                          y=ys[i],#
+                          family="gaussian")
+head(dd.ypr)
+dd.ypr <- data.frame(cbind(dd, 0))#
+    colnames(dd.ypr) <- c("ypr", ys[i])
+ypr.pi <- predict.int(mod= paste("mod", j, sep="."),#
+                          dd=dd.ypr,#
+                          y=ys[i],#
+                          family="gaussian")
+Q
+length=10))#
+#
+pp <- c("plants", "pols")#
+for(j in pp){#
+  load(file=file.path(save.path,#
+         sprintf('mods/%s_specs_ypr.Rdata',#
+                 j)))#
+#
+  for(i in 1:length(ys)){#
+    browser()#
+    dd.ypr <- data.frame(cbind(dd, 0))#
+    colnames(dd.ypr) <- c("ypr", ys[i])#
+#
+    ypr.pi <- predict.int(mod= paste("mod", j, sep="."),#
+                          dd=dd.ypr,#
+                          y=ys[i],#
+                          family="gaussian")#
+#
+    plot.predict.ypr(new.dd=ypr.pi,#
+                     ylabel=ylabs[i],#
+                     dats=specs,#
+                     y1=ys[i],#
+                     extinction.method=j)#
+  }#
+}
+dd.ypr <- cbind(dd, 0)
+class(dd.ypr)
+colnames(dd.ypr) <- c("ypr", ys[i])
+dd.ypr
+paste("mod", j, sep=".")
+sprintf('mod.%s', j),
+sprintf('mod.%s', j)
+mod.plants
+mods <- list(mod.pol, mod.plants)
+mods <- list(mod.pols, mod.plants)
+mods
+ypr.pi <- predict.int(mod= mods[[j]][[ys]],#
+                          dd=dd.ypr,#
+                          y=ys[i],#
+                          family="gaussian")
+mods[[j]]

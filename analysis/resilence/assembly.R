@@ -1,9 +1,9 @@
 rm(list=ls())
 setwd('~/Dropbox/hedgerow_assembly/analysis/resilence')
 source('src/initialize.R')
-library(lmerTest)
 
-source("src/prepNets.R")
+## either "abund" or "degree"
+extinction.method <- "degree"
 
 ## create pp matrix for each site, year
 nets <- break.net(spec)
@@ -11,83 +11,66 @@ nets <- break.net(spec)
 ## **********************************************************
 ## robustness
 ## **********************************************************
-ext <- lapply(nets, second.extinct,
-              participant="lower",
-              method="abund")
+## simulation plant extinction
 
-rob <- sapply(ext, robustness)
+res <- simExtinction(nets, extinction.method, spec)
 
-sites <- sapply(strsplit(names(rob), "[.]"), function(x) x[1])
-years <- sapply(strsplit(names(rob), "[.]"), function(x) x[2])
-
-dats <- data.frame(Site= sites,
-                   Year=years,
-                   Robustness=rob)
-rownames(dats) <- NULL
-
-dats$SiteStatus <- spec$SiteStatus[match(paste(dats$Site, dats$Year),
-                           paste(spec$Site, spec$Year))]
-
-dats$ypr <- spec$ypr[match(paste(dats$Site, dats$Year),
-                           paste(spec$Site, spec$Year))]
+save(res, file=file.path(save.path,
+            sprintf('resilience_%s.Rdata', extinction.method)))
 
 ## no change in robustness by site status
-boxplot(dats$Robustness~dats$SiteStatus)
-summary(lmer(Robustness~SiteStatus
+mod.status <- lmer(Robustness ~ SiteStatus
              + (1|Site) + (1|Year),
-             data=dats))
+             data=res)
+summary(mod.status)
+save(mod.status, file=file.path(save.path,
+            sprintf('mods/resilience_status_%s.Rdata', extinction.method)))
+
 
 ## no effect of ypr on robustness
-boxplot(dats$Robustness~dats$ypr)
-summary(lmer(Robustness~ypr
+mod.ypr <- lmer(Robustness ~ ypr
              + (1|Site) + (1|Year),
-             data=dats[!is.na(dats$ypr),]))
+             data=res[!is.na(res$ypr),])
+summary(mod.ypr)
+save(mod.ypr, file=file.path(save.path,
+            sprintf('mods/resilience_ypr_%s.Rdata', extinction.method)))
 
 ## **********************************************************
 ## species importance
 ## **********************************************************
+specs <- calcSpec(nets, spec)
+save(specs, file=file.path(save.path, 'specs.Rdata'))
 
-species.lev <- lapply(nets, function(x){
-  sl <- specieslevel(x)
-  sl$'higher level'$tot.int <- colSums(x)
-  sl$'lower level'$tot.int <- rowSums(x)
-  return(sl)
+## linear models
+load(file=file.path(save.path, 'specs.Rdata'))
+## SiteStatus or ypr
+xvar <- "ypr"
+
+## anything outputted by specieslevel
+ys <- c("proportional.generality", "d", "degree")
+
+formulas <-lapply(ys, function(x) {
+  as.formula(paste(x, "~",
+                   paste(xvar,
+                         "(1|Site)",
+                          "(1|GenusSpecies)",
+                         sep="+")))
 })
 
-specs  <-  mapply(function(a, b)
-  getSpec(species.lev = a,
-          names.net = b,
-          seps="[.]"),
-  a = species.lev,
-  b = names(nets),
-  SIMPLIFY = FALSE)
+mod.pols <- lapply(formulas, function(x){
+  lmer(x,
+       data=specs[specs$speciesType == "pollinator",])
+})
 
-specs <- do.call(rbind, specs)
-rownames(specs) <- NULL
+mod.plants <- lapply(formulas, function(x){
+  lmer(x,
+       data=specs[specs$speciesType == "plant",])
+})
+names(mod.pols) <- names(mod.plants) <- ys
 
-specs$ypr <- spec$ypr[match(paste(specs$Site,
-                                            specs$assem),
-                           paste(spec$Site, spec$Year))]
 
-plot(specs$d[specs$speciesType == "pollinator"] ~
-     specs$ypr[specs$speciesType == "pollinator"])
+lapply(mod.plants, summary)
+lapply(mod.pols, summary)
 
-pols <- unique(specs$GenusSpecies[specs$speciesType == "pollinator"])
-cols <- rainbow(length(pols))
-names(cols) <- pols
-
-spec.metric <- "proportional.generality"
-
-specs$overall.spec <- traits[,spec.metric][match(specs$GenusSpecies,
-                                       traits$GenusSpecies)]
-
-specs$specialization <- "spec"
-specs$specialization[specs$overall.spec > 0.2] <- "gen"
-
-summary(lmer(proportional.generality ~ ypr
-             + (1|Site) + (1|GenusSpecies),
-             data= specs[specs$speciesType == "pollinator",]))
-
-summary(lmer(d ~ ypr +
-             (1|Site) + (1|GenusSpecies),
-             data= specs[specs$speciesType == "plant",]))
+save(mod.pols, mod.plants, file=file.path(save.path,
+            sprintf('mods/specs_%s.Rdata', xvar)))
