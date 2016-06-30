@@ -2,7 +2,7 @@
 ## with site status and ypr
 ## takes networks and specimen data  
 
-calcSpec <- function(nets, spec){
+calcSpec <- function(nets, spec, spec.metric, cutoff){
   ## applies specieslevel from bipartite to networks
   species.lev <- lapply(nets, function(x){
     sl <- specieslevel(x)
@@ -32,8 +32,14 @@ calcSpec <- function(nets, spec){
                                             paste(spec$Site,
                                                   spec$Year))]
   specs$SiteStatus <- factor(specs$SiteStatus,
-                             levels= c("control", "maturing", "mature"))
+                             levels= c("control", "maturing",
+                                                  "mature"))
 
+  specs$overall.spec <- traits[,spec.metric][match(specs$GenusSpecies,
+                                                   traits$GenusSpecies)]
+
+  specs$specialization <- "spec"
+  specs$specialization[specs$overall.spec > cutoff] <- "gen"
   
   return(specs)
 }

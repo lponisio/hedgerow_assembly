@@ -38,7 +38,7 @@ save(mod.ypr, file=file.path(save.path,
 ## **********************************************************
 ## species importance
 ## **********************************************************
-specs <- calcSpec(nets, spec)
+specs <- calcSpec(nets, spec, spec.metric = "d", 0.3)
 save(specs, file=file.path(save.path, 'specs.Rdata'))
 
 ## linear models
@@ -47,11 +47,22 @@ load(file=file.path(save.path, 'specs.Rdata'))
 xvar <- "ypr"
 
 ## anything outputted by specieslevel
-ys <- c("proportional.generality", "d", "degree")
+ys <- c("proportional.generality", "d", "degree", "betweenness",
+        "closeness")
+
+## formulas <-lapply(ys, function(x) {
+##   as.formula(paste(x, "~",
+##                    paste(paste(xvar, "specialization", sep="*"), 
+##                          "(1|Site)",
+##                           "(1|GenusSpecies)",
+##                          sep="+")))
+## })
+
+
 
 formulas <-lapply(ys, function(x) {
   as.formula(paste(x, "~",
-                   paste(xvar,
+                   paste(xvar, 
                          "(1|Site)",
                           "(1|GenusSpecies)",
                          sep="+")))
@@ -72,5 +83,5 @@ names(mod.pols) <- names(mod.plants) <- ys
 lapply(mod.plants, summary)
 lapply(mod.pols, summary)
 
-save(mod.pols, mod.plants, file=file.path(save.path,
+save(mod.pols, mod.plants, ys, file=file.path(save.path,
             sprintf('mods/specs_%s.Rdata', xvar)))

@@ -2,6 +2,11 @@ rm(list=ls())
 setwd('~/Dropbox/hedgerow_assembly')
 load('data/networks/networks_years.Rdata')
 load('data/networks/allSpecimens.Rdata')
+f.path <- "analysis/changePoint/cptPeel/baci"
+
+library(igraph)
+library(parallel)
+library(ape)
 
 ## creates matrix of all combinations of plants and pollinators and
 ## fills it 
@@ -34,8 +39,6 @@ mut.adj <- function(x) {
 graphs <- lapply(nets, mut.adj)
 names(graphs) <- gsub("[.]", "_", names(graphs))
 
-f.path <- "analysis/changePoint/cptPeel/baci"
-
 lutfile <- cbind(0:(length(V(graphs[[1]]))-1), 0:(length(V(graphs[[1]]))-1))
                  
 colnames(lutfile) <- c("virtual", "real") 
@@ -47,3 +50,6 @@ for(i in 1:length(graphs)){
                              sprintf("%s.pairs",
                                      names(graphs)[i])))
 }
+
+save(graphs, file=file.path(f.path, "graphs.Rdata"))
+

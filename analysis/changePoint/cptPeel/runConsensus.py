@@ -20,11 +20,11 @@ def runConsensus(networkFileSequence,namesFile,window,path):
         print "Run: ./fitHRG_GPL_Bayes/fitHRG -t joint %s%s" % (paramStr,outputStr)
         call("./fitHRG_GPL_Bayes/fitHRG -t joint %s%s" % (paramStr,outputStr), shell=True)
 
-    if not os.path.isfile(os.path.join(path,networkFileSequence[-1].strip(".pairs")+"_joint_s1-consensus.tree")):
-        if window==1:
-            paramStr=paramStr.split('-f')[0]
-        print "Run: ./consensusHRG_GPL_Bayes/consensusHRG %s -f %s_joint_best-dendro.hrg" % (paramStr,os.path.join(path,networkFileSequence[-1].strip(".pairs")))
-        call("./consensusHRG_GPL_Bayes/consensusHRG %s -f %s_joint_best-dendro.hrg %s" % (paramStr,os.path.join(path,networkFileSequence[-1].strip(".pairs")),outputStr), shell=True)
+    #~ if not os.path.isfile(os.path.join(path,networkFileSequence[-1].strip(".pairs")+"_joint_s1-consensus.tree")):
+    if window==1:
+        paramStr=paramStr.split('-f')[0]
+    print "Run: ./consensusHRG_GPL_Bayes/consensusHRG %s -f %s_joint_best-dendro.hrg" % (paramStr,os.path.join(path,networkFileSequence[-1].strip(".pairs")))
+    call("./consensusHRG_GPL_Bayes/consensusHRG %s -f %s_joint_best-dendro.hrg %s" % (paramStr,os.path.join(path,networkFileSequence[-1].strip(".pairs")),outputStr), shell=True)
 
 
 

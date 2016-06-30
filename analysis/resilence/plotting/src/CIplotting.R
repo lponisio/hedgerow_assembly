@@ -36,10 +36,10 @@ plot.panel <- function(dats,
               rev(new.dd$plo)),
             col=col.fill, border=NA)
   }
-
   plot(NA,
        xlim=range(new.dd[,xs], na.rm=TRUE),
-       ylim=range(c(0, new.dd$phi,  new.dd$plo, range(dats[,y1]),
+       ylim=range(c(0, new.dd$phi,  new.dd$plo, quantile(dats[,y1],
+         na.rm=TRUE)["75%"],
          na.rm=TRUE)),
        xlab="",
        ylab="",
