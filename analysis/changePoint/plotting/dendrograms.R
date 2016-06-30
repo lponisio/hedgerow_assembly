@@ -47,14 +47,15 @@ plotNet <- function(){
   for(j in 1:length(net)){
     g <- net[[j]][plant.sums != 0, pol.sums !=0]
     gs <- graph.incidence(g, weighted=TRUE)
-    cols <- c(rep("tomato", length(rownames(g))),
+    cols <- c(rep("darkolivegreen", length(rownames(g))),
            rep("gold", length(colnames(g))))
     V(gs)$color <- cols
-    importance <-  c(rowSums(g) +0.1, colSums(g) + 0.1)/2
+    importance <-  (c(rowSums(g) +0.1, colSums(g) + 0.1)/sum(g))*20
     v.labs <- names(importance)
     v.labs[importance < 5] = ""
     V(gs)$size <- importance
-    E(gs)$width <- 1+E(gs)$weight/2
+ 
+    E(gs)$width <- (E(gs)$weight/sum(E(gs)$weight))*20
     gs$layout <- layout_in_circle
     plot.igraph(gs, vertex.label="")
                 ## ## vertex.label.cex=importance/10,

@@ -58,8 +58,6 @@ ys <- c("proportional.generality", "d", "degree", "betweenness",
 ##                          sep="+")))
 ## })
 
-
-
 formulas <-lapply(ys, function(x) {
   as.formula(paste(x, "~",
                    paste(xvar, 
