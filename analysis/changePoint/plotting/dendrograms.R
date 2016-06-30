@@ -4,7 +4,7 @@ library(ape)
 library(igraph)
 library(parallel)
 source('../assembly/src/misc.R', chdir = TRUE)
-options(mc.cores=10)
+options(mc.cores=5)
 fig.path <- 'plotting/figures'
 f.path <- "cptPeel/baci"
 load(file=file.path(f.path, "graphs.Rdata"))
@@ -23,12 +23,12 @@ load(file=file.path(f.path, "graphs.Rdata"))
 
 
 
-## community clusters
-clust.gs <- mclapply(graphs, function(g){
-  optcom <- cluster_optimal(g)
-  V(g)$comm <- membership(optcom)
-  return(optcom)
-})
+## ## community clusters
+## clust.gs <- mclapply(graphs, function(g){
+##   optcom <- cluster_optimal(g)
+##   V(g)$comm <- membership(optcom)
+##   return(optcom)
+## })
 
 clust.gs <- mclapply(graphs,  cluster_optimal)
 
@@ -53,11 +53,23 @@ plotNet <- function(){
   }
 }
 
+plotDend<- function(){
+  par(mar=c(0,0.5,0,0))
+  layout(matrix(1:length(hrg), nrow=1))
+  for(j in 1:length(hrg)){
+    plot_dendrogram(hrg[[j]])
+  }
+}
+
 for(i in unique(sites)){
   ihrg <- ihrgs[sites == i]
+  hrg <- hrgs[sites == i]
   pdf.f(plotNet,
         file=file.path(fig.path, sprintf("%s_networks.pdf", i)),
-        width=16, height=4)
+        width=16, height=2)
+  pdf.f(plotDend,
+        file=file.path(fig.path, sprintf("%s_dendrograms.pdf", i)),
+        width=16, height=6)
 
 }
 
