@@ -10,7 +10,7 @@ f.path <- "cptPeel/baci"
 load(file=file.path(f.path, "graphs.Rdata"))
 
 ## hrgs
-## hrgs <- mclapply(graphs, fit_hrg)
+hrgs <- mclapply(graphs, fit_hrg)
 ## hrg.trees <- mapply(function(a, b)
 ##                     consensus_tree(graph = a,
 ##                                    hrg = b,
@@ -19,9 +19,7 @@ load(file=file.path(f.path, "graphs.Rdata"))
 ##                     b = hrgs,
 ##                     SIMPLIFY = FALSE)
 
-## save(hrgs, hrg.trees, file=file.path(f.path, "hrgs.Rdata"))
-
-
+save(hrgs, file=file.path(f.path, "hrgs.Rdata"))
 
 ## ## community clusters
 ## clust.gs <- mclapply(graphs, function(g){
@@ -31,7 +29,6 @@ load(file=file.path(f.path, "graphs.Rdata"))
 ## })
 
 clust.gs <- mclapply(graphs,  cluster_optimal)
-
 
 save(clust.gs, file=file.path(f.path, "clusts.Rdata"))                 
 
@@ -46,10 +43,22 @@ sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])
 
 plotNet <- function(){
   par(mar=c(0,0.5,0,0))
-  layout(matrix(1:length(ihrg), nrow=1))
-  for(j in 1:length(ihrg)){
-    plot(ihrg[[j]], vertex.size=10,
-         edge.arrow.size=0.2, vertex.label="")
+  layout(matrix(1:length(net), nrow=1))
+  for(j in 1:length(net)){
+    g <- net[[j]][plant.sums != 0, pol.sums !=0]
+    gs <- graph.incidence(g, weighted=TRUE)
+    cols <- c(rep("tomato", length(rownames(g))),
+           rep("gold", length(colnames(g))))
+    V(gs)$color <- cols
+    importance <-  c(rowSums(g) +0.1, colSums(g) + 0.1)/2
+    v.labs <- names(importance)
+    v.labs[importance < 5] = ""
+    V(gs)$size <- importance
+    E(gs)$width <- 1+E(gs)$weight/2
+    gs$layout <- layout_in_circle
+    plot.igraph(gs, vertex.label="")
+                ## ## vertex.label.cex=importance/10,
+                ## vertex.label=v.labs)
   }
 }
 
@@ -62,15 +71,25 @@ plotDend<- function(){
 }
 
 for(i in unique(sites)){
-  ihrg <- ihrgs[sites == i]
+  net <- nets[sites == i]
+  arr <- simplify2array(net)
+  all.years <-  apply(arr, c(1,2), sum)
+  plant.sums <- rowSums(all.years)
+  pol.sums <- colSums(all.years)
   hrg <- hrgs[sites == i]
   pdf.f(plotNet,
         file=file.path(fig.path, sprintf("%s_networks.pdf", i)),
-        width=16, height=2)
+        width=18, height=4)
   pdf.f(plotDend,
         file=file.path(fig.path, sprintf("%s_dendrograms.pdf", i)),
         width=16, height=6)
 
+}
+
+out <- list()
+for(i in unique(sites)){
+  this.graph <- graphs[sites == i]
+  out[[i]] <- do.call(this.graph, +)
 }
 
 plotHgr <- function(ihgr){
@@ -83,6 +102,12 @@ plotHgr <- function(ihgr){
        vertex.shape="none", vertex.label.color=vc)
 }
 
+
+ap <- c(rep("P", length(rownames(nets1))),rep("A", length(colnames(nets1))))
+V(g1)$type <- ap
+colrs <- c(rep("tomato", length(rownames(nets1))),
+           rep("gold", length(colnames(nets1))))
+V(g1)$color <- colrs
 
 
 
