@@ -1,7 +1,15 @@
 library(igraph)
 library(bipartite)
 library(lme4)
-source('src/prepNets.R')
+library(lmerTest)
+library(RColorBrewer)
+source('../../dataPrep/src/prepNets.R')
 source('src/CalcMetrics.R')
 source('src/misc.R')
-load('../../data/networks/specimens.Rdata')
+source("src/prepNets.R")
+source("src/resilience.R")
+
+traits <- read.csv("../../data/traits.csv")
+load('../../data/networks/allSpecimens.Rdata')
+
+save.path <- 'saved'
