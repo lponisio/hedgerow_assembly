@@ -27,15 +27,22 @@ colnames(all.pp) <- pols
 nets <- rapply(nets, expandNets, all.mat=all.pp,
                how="replace")
 
-
-graphs <- lapply(nets, graph.incidence, weighted=TRUE)
+graphs <- lapply(nets, graph.incidence, weighted=TRUE, add.names=NA)
 names(graphs) <- gsub("[.]", "_", names(graphs))
+save(graphs, nets, file=file.path(f.path, "graphs_num.Rdata"))
 
-lutfile <- cbind(0:(length(V(graphs[[1]]))-1), 0:(length(V(graphs[[1]]))-1))
-                 
-colnames(lutfile) <- c("virtual", "real") 
-write.table(lutfile,  row.names=FALSE, sep="\t",
-            file=file.path(f.path, "graph-names.lut"))
+sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])
+
+for(i in unique(sites)){
+  g <- graphs[sites == i]
+  verts <- sort(unique(unlist(sapply(g, function(x){
+    V(x)[igraph::degree(x)]
+  }))))
+  out <- data.frame(virtual=0:(length(verts) -1), real=verts)
+  ## colnames(out) <- c("virtual", "real")
+  write.table(out,  row.names=FALSE, sep="\t",
+            file=file.path(f.path, sprintf("%s.lut", i)))
+}
 
 for(i in 1:length(graphs)){
   write.graph(graphs[[i]], file=file.path(f.path,
@@ -43,5 +50,8 @@ for(i in 1:length(graphs)){
                                      names(graphs)[i])))
 }
 
+
+graphs <- lapply(nets, graph.incidence, weighted=TRUE)
+names(graphs) <- gsub("[.]", "_", names(graphs))
 save(graphs, nets, file=file.path(f.path, "graphs.Rdata"))
 

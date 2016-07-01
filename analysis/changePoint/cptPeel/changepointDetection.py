@@ -317,7 +317,7 @@ class anomalyDetection(object):
     
     def mapDendro(self,tree,G):
         print "MAP"
-        pdm = treemeasure.PatrisiticDistanceMatrix(tree)
+        pdm = treemeasure.PatristicDistanceMatrix(tree)
         
         tns = tree.taxon_namespace
         
@@ -384,7 +384,7 @@ class anomalyDetection(object):
         st=time.time()
         #~ print "Pvals"
         
-        pdm = treemeasure.PatrisiticDistanceMatrix(tree)
+        pdm = treemeasure.PatristicDistanceMatrix(tree)
         
         tns = tree.taxon_namespace
         
