@@ -8,6 +8,14 @@ calcSpec <- function(nets, spec, spec.metric, cutoff){
     sl <- specieslevel(x)
     sl$'higher level'$tot.int <- colSums(x)
     sl$'lower level'$tot.int <- rowSums(x)
+    sl$'higher level'$mean.k <- mean(sl$'higher level'$degree)
+    sl$'lower level'$mean.k <- mean(sl$'lower level'$degree)
+    sl$'higher level'$sd.k <- sd(sl$'higher level'$degree)
+    sl$'lower level'$sd.k <- sd(sl$'lower level'$degree)
+    sl$'higher level'$k <- (sl$'higher level'$degree -
+                            sl$'higher level'$mean.k)/sl$'higher level'$sd.k
+    sl$'lower level'$k <- (sl$'lower level'$degree -
+                            sl$'lower level'$mean.k)/sl$'lower level'$sd.k
     return(sl)
   })
 

@@ -6,6 +6,15 @@ source('src/misc.R')
 source('src/prepNets.R')
 library(bipartite)
 
+trait.dir <- '~/Dropbox/hedgerow/data_sets/traditional/functional_traits'
+bee.trait <-
+  read.csv(file.path(trait.dir, 'bee.csv'),
+           row.names=1)
+syr.trait <-
+  read.csv(file.path(trait.dir, 'syr.csv'),
+           row.names=1)
+
+
 spec <- dd
 spec <- spec[spec$NetPan == 'net',]
 
@@ -20,10 +29,6 @@ spec$PlantGenusSpecies <-  fix.white.space(paste(spec$PlantGenus,
 spec <-  spec[spec$Species != '',]
 spec <-  spec[spec$PlantGenusSpecies != '',]
 spec$SiteStatus[spec$SiteStatus == "restored"] <- "maturing"
-
-to.drop.status <- c("forb", "natural")
-spec <- spec[!spec$SiteStatus %in% to.drop.status,]
-save(spec, file='../data/networks/allSpecimens.Rdata')
 
 ## create a giant network to calculate specialization
 agg.spec <- aggregate(list(abund=spec$GenusSpecies),
@@ -44,6 +49,36 @@ traits <- data.frame(GenusSpecies= unlist(sapply(all.specializations,
 rownames(traits) <- NULL
 
 write.csv(traits, file="../data/traits.csv", row.names=FALSE)
+
+to.drop.status <- c("forb", "natural")
+spec <- spec[!spec$SiteStatus %in% to.drop.status,]
+
+spec$d <- traits$d[match(spec$GenusSpecies, traits$GenusSpecies)]
+
+## bee functional traits
+
+spec$Lecty <-
+  bee.trait$Lecty[match(spec$GenusSpecies, rownames(bee.trait))]
+spec$NestLoc <-
+  bee.trait$NestLoc[match(spec$GenusSpecies, rownames(bee.trait))]
+spec$Excavate <-
+  bee.trait$Excavate[match(spec$GenusSpecies, rownames(bee.trait))]
+spec$ITD <-
+  bee.trait$MeanITD[match(spec$GenusSpecies, rownames(bee.trait))]
+spec$Sociality <-
+  bee.trait$Sociality[match(spec$GenusSpecies, rownames(bee.trait))]
+
+## syrphid functional traits
+
+spec$LarvalDiet <- syr.trait$LarvalDiet[match(spec$GenusSpecies,
+                                              rownames(syr.trait))]
+spec$AdultDiet <- syr.trait$AdultDiet[match(spec$GenusSpecies,
+                                            rownames(syr.trait))]
+spec$WingLength <- syr.trait$WingLength[match(spec$GenusSpecies,
+                                              rownames(syr.trait))]
+
+save(spec, file='../data/networks/allSpecimens.Rdata')
+
 
 ## keep only BACI sites
 BACI.site <- c('Barger', 'Butler', 'Hrdy', 'MullerB', 'Sperandio')
@@ -104,9 +139,9 @@ save(specializations, file=file.path(f.path, 'specializations.Rdata'))
 ## *******************************************************************
 ## change in visits of by the generalized pollinators
 
-hist(specializations$proportional.generality[specializations$speciesType ==
-                                             "pollinator"],
-     xlab="Generalization")
+## hist(specializations$proportional.generality[specializations$speciesType ==
+##                                              "pollinator"],
+##      xlab="Generalization")
 
 ## plants
 diff.gens.plants <- getVisitChange(0, 0.2, "proportional.generality",
