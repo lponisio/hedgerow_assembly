@@ -1,7 +1,10 @@
 library(RColorBrewer)
+library(lme4)
+library(lmerTest)
 source('plotting/src/predictIntervals.R')
 source('plotting/src/CIplotting.R')
 source('plotting/src/plotPanels.R')
+source('src/misc.R')
 load(file='saved/corMets.Rdata')
 
 dd <- expand.grid(ypr=seq(from= min(cor.dats$ypr, na.rm=TRUE),
@@ -45,7 +48,28 @@ h2.pi <- predict.int(mod= baci.h2.mod,
                         family="gaussian")
 
 ## ************************************************************
+## niche overlap - Plants
+## ************************************************************
+load(file='saved/mods/baci_no_plant.Rdata')
+
+dd.nop <- cbind(dd, niche.overlap.plants =0)
+
+nop.pi <- predict.int(mod= baci.no.plant.mod,
+                        dd=dd.nop,
+                        y="niche.overlap.plants",
+                        family="gaussian")
+                        
+## ************************************************************
+## niche overlap - Polinators
+## ************************************************************
+load(file='saved/mods/baci_no_pol.Rdata')
+
+dd.nopol <- cbind(dd, niche.overlap.pol =0)
+nopol.pi <- predict.int(mod= baci.no.pol.mod,
+                        dd=dd.nopol,
+                        y="niche.overlap.pol",
+                        family="gaussian")                        
+## ************************************************************
 ## all panels
 ## ************************************************************
 plot.panels()
-

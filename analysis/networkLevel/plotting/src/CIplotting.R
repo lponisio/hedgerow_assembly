@@ -5,7 +5,7 @@ plot.panel <- function(dats,
                        col.lines,
                        col.fill,
                        plotPoints=TRUE,
-                       agg.col,...){
+                       agg.col="Site",...){
   plotting.loop <- function(){
     ys <- aggregate(list(y=dats[,y1]),
                     list(Site=dats[, agg.col],

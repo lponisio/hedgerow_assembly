@@ -255,7 +255,6 @@ dats <- dats[dats$Site == site,]#
 late
 cbind(not.in.late, rep(0, length(not.in.late)
 )
-)
 late <- rbind(late, data.frame(cbind(PlantGenusSpecies=not.in.late,#
                                        visits=rep(0, length(not.in.late))))
 )
@@ -1608,6 +1607,5 @@ log(2/1)
 2/1)
 2/1
 1/1
-1/2
 1/2
 2/1
