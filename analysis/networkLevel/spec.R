@@ -1,5 +1,5 @@
 rm(list=ls())
-setwd('~/Dropbox/hedgerow_assembly/analysis/observed')
+setwd('~/Dropbox/hedgerow_assembly/analysis/networkLevel')
 source('src/initialize.R')
 source('src/diffs.R')
 source('src/misc.R')

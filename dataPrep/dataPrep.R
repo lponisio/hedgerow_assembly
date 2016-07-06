@@ -18,8 +18,8 @@ syr.trait <-
 spec <- dd
 spec <- spec[spec$NetPan == 'net',]
 
-## spec <- spec[spec$Family == 'Syrphidae' |
-##              spec$BeeNonbee == 'bee',]
+spec <- spec[spec$Family == 'Syrphidae' |
+             spec$BeeNonbee == 'bee',]
 
 ## create species column
 spec$PlantGenusSpecies <-  fix.white.space(paste(spec$PlantGenus,
@@ -54,6 +54,22 @@ to.drop.status <- c("forb", "natural")
 spec <- spec[!spec$SiteStatus %in% to.drop.status,]
 
 spec$d <- traits$d[match(spec$GenusSpecies, traits$GenusSpecies)]
+
+## occurence
+load('~/Dropbox/hedgerow/data_sets/matrices/net/bee.syr.RData')
+occ <- apply(mat, c(3,1), function(x){
+  sum(x > 0, na.rm=TRUE)/sum(x >= 0, na.rm=TRUE)
+})
+
+
+findOcc <- function(x){
+  out <- try(occ[x["GenusSpecies"], paste(x["Site"], x["SiteStatusBACI"],
+                                sep=":")], silent=TRUE)
+  if(inherits(out, "try-error")) out <- NA
+  return(out)
+}
+
+spec$occ.date <- apply(spec, 1, findOcc)
 
 ## bee functional traits
 

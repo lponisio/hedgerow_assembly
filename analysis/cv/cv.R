@@ -1,42 +1,51 @@
 rm(list=ls())
-library(lme4)
-library(vegan)
-library(fields)
-library(raster)
-library(lmerTest)
 setwd('~/Dropbox/hedgerow_assembly/analysis/cv')
-source('src/misc.R')
-source('src/cvCalc.R')
-load('../../data/networks/allSpecimens.Rdata')
+source('src/initialize.R')
 
 ## ************************************************************
-## coefficient of variation through time
+## coefficient of variation of abundance through time
 ## ************************************************************
-byDate <- aggregate(list(Abund=spec$GenusSpecies),
-                    list(GenSp= spec$GenusSpecies,
-                         date=spec$Date,
-                         status= spec$SiteStatus,
-                         site=spec$Site), length)
+byYear <- aggregate(list(Abund=spec$GenusSpecies),
+                    list(GenusSpecies= spec$GenusSpecies,
+                         Date=spec$Date,
+                         SiteStatus= spec$SiteStatus,
+                         Site=spec$Site), length)
 
-dprime <- cv.trait(spec, byDate, trait="d",
-                   method= "time")
+dprime <- cv.trait(spec, byYear, trait="d",
+                   method= "time", time.col="Date",
+                   abund.col="Abund")
 
-itd <- cv.trait(spec, byDate, trait="ITD",
-                method= "time")
+itd <- cv.trait(spec, byYear, trait="ITD",
+                method= "time",  time.col="Date",
+                abund.col="Abund")
 
-save(itd, dprime, file="saved/contMods.Rdata")
+## ************************************************************
+## coefficient of variation of degree thingy through time
+## ************************************************************
+
+dprime.k <- cv.trait(spec, specs, trait="d",
+                     method= "time", time.col="assem",
+                     abund.col="k",
+                     cv.function=corCv, zero2na=TRUE)
 
 
-## discrete traits
+dprime.k.sd <- cv.trait(spec, specs, trait="d",
+                     method= "time", time.col="assem",
+                     abund.col="k",
+                     cv.function=sd,  zero2na=TRUE, na.rm=TRUE)
 
-## lecty <-  cv.trait(spec, byDate, trait="Lecty", cont=FALSE,
-##                    method= "time")
-## excavate <-  cv.trait(spec, byDate, trait="Excavate", cont=FALSE,
-##                       method=" time")
-## nest <-  cv.trait(spec, byDate, trait="NestLoc", cont=FALSE,
-##                   method= "time")
-## soc <- cv.trait(spec, byDate, trait="Sociality", cont=FALSE,
-##                   method= "time")
+dprime.closeness <- cv.trait(spec, specs, trait="d",
+                     method= "time", time.col="assem",
+                     abund.col="weighted.closeness",
+                     cv.function=corCv, zero2na=TRUE)
+
+dprime.closeness.sd <- cv.trait(spec, specs, trait="d",
+                     method= "time", time.col="assem",
+                     abund.col="weighted.closeness",
+                     cv.function=sd)
+
+save(itd, dprime, dprime.k.sd, dprime.closeness.sd,
+     file="saved/contMods.Rdata")
 
 
 ## ************************************************************

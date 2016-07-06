@@ -7,7 +7,7 @@ plot.panel <- function(dats,
                        col.lines,
                        col.fill,
                        ylabel,
-                       ag.col="status",
+                       ag.col="SiteStatus",
                        plot.x=TRUE,
                        scaled=TRUE,
                        plot.y=TRUE,
@@ -19,7 +19,7 @@ plot.panel <- function(dats,
       sub.dd <- new.dd[new.dd[,ag.col]==treatments[i],]
       sub.dats <- dats[dats[,ag.col]==treatments[i],]
       ys <- aggregate(list(y=sub.dats[,y1]),
-                      list(sp=sub.dats[, "sp"],
+                      list(sp=sub.dats[, "GenusSpecies"],
                            x=sub.dats[,xs]),
                       mean, na.rm=TRUE)
       ## plots means

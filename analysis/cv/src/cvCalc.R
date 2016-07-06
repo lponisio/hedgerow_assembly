@@ -1,34 +1,48 @@
 ## regresses coefficent of variation against traits
 
+corCv <- function(x){
+  cv(x)*(1 + (1/4*length(x)))
+}
+
 cv.trait <- function(spec.dat,
                      byType,
                      trait,
                      cont=TRUE,
                      method,
-                     status.order=c("control", "maturing", "mature")){
-  byStatus <- split(byType, byType$status)
-  bySite <- lapply(byStatus, function(x) {split(x, x$site)})
+                     time.col,
+                     abund.col,
+                     status.order=c("control", "maturing", "mature"),
+                     cv.function=corCv,
+                     zero2na =FALSE, ...){
+  byStatus <- split(byType, byType$SiteStatus)
+  bySite <- lapply(byStatus, function(x) {split(x, x$Site)})
   bySite <- unlist(bySite, recursive=FALSE)
   prep.cv <- lapply(bySite, function(y) {
-    samp2site.spp(y[,"date"], y[,"GenSp"], y[,"Abund"])
+    samp2site.spp(y[, time.col], y[,"GenusSpecies"], y[, abund.col])
   })
-  coeff.cv <- lapply(prep.cv, function(x){apply(x, 2, cv)})
+  if(zero2na){
+  prep.cv <- lapply(prep.cv, function(x){
+    x[x == 0] <- NA
+    return(x)
+  })
+}
+  coeff.cv <- lapply(prep.cv, function(x){apply(x, 2, cv.function, ...)})
   dats <- data.frame(cv=unlist(coeff.cv))
-  dats$status <-  gsub('\\..*', '', rownames(dats))
-  dats$status <- factor(dats$status, levels=status.order)
-  dats$sp <- unlist(lapply(coeff.cv, names))
-  dats$site <-  sapply(strsplit(rownames(dats), "\\."),
+  dats$SiteStatus <-  gsub('\\..*', '', rownames(dats))
+  dats$SiteStatus <- factor(dats$SiteStatus, levels=status.order)
+  dats$GenusSpecies <- unlist(lapply(coeff.cv, names))
+  dats$Site <-  sapply(strsplit(rownames(dats), "\\."),
                        function(x) x[2])
   rownames(dats) <- NULL
   if(cont){
-    dats$traits.ns <- spec.dat[,trait][match(dats$sp,
+    dats$traits.ns <- spec.dat[,trait][match(dats$GenusSpecies,
                                              spec.dat$GenusSpecies)]
     dats$traits <- scale(dats$traits.ns)
   } else{
-    dats$traits <- spec.dat[,trait][match(dats$sp,
+    dats$traits <- spec.dat[,trait][match(dats$GenusSpecies,
                                           spec.dat$GenusSpecies)]
   }
-  lm.cv <- lmer(cv ~ status*traits + (1|site) + (1|sp),
+  lm.cv <- lmer(cv ~ SiteStatus*traits + (1|Site) + (1|GenusSpecies),
                 data=dats, REML=FALSE)
   return(list(data=dats, lm=lm.cv))
 }

@@ -1,89 +1,79 @@
-mean(rexp(100))
-plot(density(rexp(100)))
-100-(19.2+3.7)
-100+(19.2+3.7)
-(19.2+3.7)
-(19.2-3.7)
-100-22.7
-load("~/Desktop/HedgeWatermelon_List.RData")
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/dataPrep')#
+load('~/Dropbox/hedgerow/data_sets/traditional/specimens-complete.RData')#
+load("/Users/lcp/Dropbox/hedgerow_network/data/veg/veg.Rdata")#
+source('src/misc.R')#
+source('src/prepNets.R')#
+library(bipartite)#
+#
+trait.dir <- '~/Dropbox/hedgerow/data_sets/traditional/functional_traits'#
+bee.trait <-#
+  read.csv(file.path(trait.dir, 'bee.csv'),#
+           row.names=1)#
+syr.trait <-#
+  read.csv(file.path(trait.dir, 'syr.csv'),#
+           row.names=1)#
+spec <- dd#
+spec <- spec[spec$NetPan == 'net',]#
+#
+## spec <- spec[spec$Family == 'Syrphidae' |#
+##              spec$BeeNonbee == 'bee',]#
+#
+## create species column#
+spec$PlantGenusSpecies <-  fix.white.space(paste(spec$PlantGenus,#
+                                                 spec$PlantSpecies))#
+#
+## drop pollinators and plants without identifications#
+spec <-  spec[spec$Species != '',]#
+spec <-  spec[spec$PlantGenusSpecies != '',]#
+spec$SiteStatus[spec$SiteStatus == "restored"] <- "maturing"#
+#
+## create a giant network to calculate specialization#
+agg.spec <- aggregate(list(abund=spec$GenusSpecies),#
+                      list(GenusSpecies=spec$GenusSpecies,#
+                           PlantGenusSpecies=spec$PlantGenusSpecies),#
+                      length)#
+#
+nets.all <- samp2site.spp(agg.spec$PlantGenusSpecies,#
+                      agg.spec$GenusSpecies, agg.spec$abund)
+head(nets.all)
+load('~/Dropbox/hedgerow/data_sets/matrices/net/bee.RData')
 ls()
-list.mel
-100-13
-100-5
-9+4
-9-4
-162/400
-setwd('~/Dropbox/hedgerow_assembly/dataPrep')#
-load('~/Dropbox/hedgerow/data_sets/traditional/specimens-complete.RData')#
-load("/Users/lcp/Dropbox/hedgerow_network/data/veg/veg.Rdata")#
-source('src/misc.R')#
-source('src/prepNets.R')#
-#
-spec <- dd#
-spec <- spec[spec$NetPan == 'net',]#
-#
-## spec <- spec[spec$Family == 'Syrphidae' |#
-##              spec$BeeNonbee == 'bee',]#
-#
-## keep only BACI sites#
-BACI.site <- c('Barger', 'Butler', 'Hrdy', 'MullerB', 'Sperandio')#
-spec <-  spec[spec$Site %in% BACI.site,]#
-veg <-  veg[veg$Site %in% BACI.site,]#
-#
-veg$ypr <- spec$ypr[match(paste(veg$Year, veg$Site),#
-                          paste(spec$Year, spec$Site))]#
-#
-## create species column#
-spec$PlantGenusSpecies <-  fix.white.space(paste(spec$PlantGenus,#
-                                                 spec$PlantSpecies))#
-#
-## drop pollinators and plants without identifications#
-spec <-  spec[spec$Species != '',]#
-spec <-  spec[spec$PlantGenusSpecies != '',]#
-#
-save(spec, file='../data/networks/specimens.Rdata')#
-#
-## create a "year" columns grouping years 1-3 post restoration and 4-9#
-spec$assem <- 'early'#
-spec$assem[spec$ypr > 3] <- 'late'#
-#
-veg$assem <- 'early'#
-veg$assem[veg$ypr > 3] <- 'late'#
-#
-veg.sum <- aggregate(list(abundance=veg$NumQuads),#
-                     list(site=veg$Site,#
-                          status=veg$assem,#
-                          species=veg$PlantGenusSpecies),#
-                     sum)#
-#
-## *******************************************************************#
-## create networks#
-networks <- breakNet(spec, 'Site', 'assem')#
-#
-## save networks for each site, timeframe#
-f.path <- '../data/networks'#
-saveDats(networks, names(networks), f.path)#
-save(spec, file=file.path(f.path, 'networks_stages.Rdata'))#
-#
-## *******************************************************************#
-## specialization of each species at each site#
-species.lev <- lapply(networks, specieslevel)#
-#
-specializations  <-  mapply(function(a, b, c, d)#
-  getSpec(species.lev = a,#
-          names.net = b),#
-  a = species.lev,#
-  b = names(networks),#
-  SIMPLIFY = FALSE)#
-#
-specializations <- do.call(rbind, specializations)#
-rownames(specializations) <- NULL#
-#
-f.path <- '../data/degree'#
-save(specializations, file=file.path(f.path, 'specializations.Rdata'))#
-#
-hist(specializations$normalised.degree[specializations$speciesType ==#
-                                       "pollinator"])
+ehad(dd)
+hed(dd)
+head(dd)
+load('~/Dropbox/hedgerow/data_sets/matrices/net/bee.syr.RData')
+head(dd)
+rm(list=ls())
+load('~/Dropbox/hedgerow/data_sets/matrices/net/bee.syr.RData')
+ls()
+head(mat)
+mat
+dim(mat)
+dimnames(mat)
+apply(mat, c(1,3, mean))
+apply(mat, c(1,3), mean)
+apply(mat, c(1,2), mean)
+apply(mat, c(3,2), mean)
+apply(mat, c(3,2), mean, na.rm=TRUE)
+apply(mat, c(3,1, 2), mean, na.rm=TRUE)
+apply(mat, c(3,1), mean, na.rm=TRUE)
+apply(mat, c(3,1), function(x) length(x > 0)/length(!is.na(x)), na.rm=TRUE)
+apply(mat, c(3,1), function(x) length(x > 0)/length(!is.na(x)))
+apply(mat, c(3,1), function(x) length(x > 0 & !is.na(x))/length(!is.na(x)))
+apply(mat, c(3,1), function(x) length(!is.na(x)))
+apply(mat, c(3,1), mean, na.rm=TRUE)
+apply(mat, c(3,1), count, na.rm=TRUE)
+library(plyr)
+apply(mat, c(3,1), count, na.rm=TRUE)
+apply(mat, c(3,1), count)
+apply(mat, c(3,1), function(x) sum(x > 0))
+apply(mat, c(3,1), function(x) sum(x > 0, na.rm=TRUE))
+apply(mat, c(3,1), function(x) sum(x, na.rm=TRUE))
+apply(mat, c(3,1), function(x) sum(x > 0, na.rm=TRUE))
+apply(mat, c(3,1), function(x) sum(x >= 0, na.rm=TRUE))
+apply(mat, c(3,1), function(x) sum(x > 0, na.rm=TRUE)/sum(x >= 0, na.rm=TRUE))
+rm(list=ls())#
 setwd('~/Dropbox/hedgerow_assembly/dataPrep')#
 load('~/Dropbox/hedgerow/data_sets/traditional/specimens-complete.RData')#
 load("/Users/lcp/Dropbox/hedgerow_network/data/veg/veg.Rdata")#
@@ -91,19 +81,18 @@ source('src/misc.R')#
 source('src/prepNets.R')#
 library(bipartite)#
 #
+trait.dir <- '~/Dropbox/hedgerow/data_sets/traditional/functional_traits'#
+bee.trait <-#
+  read.csv(file.path(trait.dir, 'bee.csv'),#
+           row.names=1)#
+syr.trait <-#
+  read.csv(file.path(trait.dir, 'syr.csv'),#
+           row.names=1)#
 spec <- dd#
 spec <- spec[spec$NetPan == 'net',]#
 #
 ## spec <- spec[spec$Family == 'Syrphidae' |#
 ##              spec$BeeNonbee == 'bee',]#
-#
-## keep only BACI sites#
-BACI.site <- c('Barger', 'Butler', 'Hrdy', 'MullerB', 'Sperandio')#
-spec <-  spec[spec$Site %in% BACI.site,]#
-veg <-  veg[veg$Site %in% BACI.site,]#
-#
-veg$ypr <- spec$ypr[match(paste(veg$Year, veg$Site),#
-                          paste(spec$Year, spec$Site))]#
 #
 ## create species column#
 spec$PlantGenusSpecies <-  fix.white.space(paste(spec$PlantGenus,#
@@ -112,1500 +101,122 @@ spec$PlantGenusSpecies <-  fix.white.space(paste(spec$PlantGenus,#
 ## drop pollinators and plants without identifications#
 spec <-  spec[spec$Species != '',]#
 spec <-  spec[spec$PlantGenusSpecies != '',]#
+spec$SiteStatus[spec$SiteStatus == "restored"] <- "maturing"#
 #
-save(spec, file='../data/networks/specimens.Rdata')#
+## create a giant network to calculate specialization#
+agg.spec <- aggregate(list(abund=spec$GenusSpecies),#
+                      list(GenusSpecies=spec$GenusSpecies,#
+                           PlantGenusSpecies=spec$PlantGenusSpecies),#
+                      length)#
 #
-## create a "year" columns grouping years 1-3 post restoration and 4-9#
-spec$assem <- 'early'#
-spec$assem[spec$ypr > 3] <- 'late'#
+nets.all <- samp2site.spp(agg.spec$PlantGenusSpecies,#
+                      agg.spec$GenusSpecies, agg.spec$abund)#
 #
-veg$assem <- 'early'#
-veg$assem[veg$ypr > 3] <- 'late'#
+all.specializations <- specieslevel(nets.all,#
+                                    index=c("proportional generality",#
+                                    "d"))#
 #
-veg.sum <- aggregate(list(abundance=veg$NumQuads),#
-                     list(site=veg$Site,#
-                          status=veg$assem,#
-                          species=veg$PlantGenusSpecies),#
-                     sum)#
+traits <- data.frame(GenusSpecies= unlist(sapply(all.specializations,#
+                       rownames)),#
+                     do.call(rbind, all.specializations))#
+rownames(traits) <- NULL#
 #
-## *******************************************************************#
-## create networks#
-networks <- breakNet(spec, 'Site', 'assem')#
+write.csv(traits, file="../data/traits.csv", row.names=FALSE)#
 #
-## save networks for each site, timeframe#
-f.path <- '../data/networks'#
-saveDats(networks, names(networks), f.path)#
-save(spec, file=file.path(f.path, 'networks_stages.Rdata'))#
+to.drop.status <- c("forb", "natural")#
+spec <- spec[!spec$SiteStatus %in% to.drop.status,]#
 #
-## *******************************************************************#
-## specialization of each species at each site#
-species.lev <- lapply(networks, specieslevel)#
+spec$d <- traits$d[match(spec$GenusSpecies, traits$GenusSpecies)]#
 #
-specializations  <-  mapply(function(a, b, c, d)#
-  getSpec(species.lev = a,#
-          names.net = b),#
-  a = species.lev,#
-  b = names(networks),#
-  SIMPLIFY = FALSE)#
+## occurence#
+load('~/Dropbox/hedgerow/data_sets/matrices/net/bee.syr.RData')#
+occ <- apply(mat, c(3,1), function(x){#
+  sum(x > 0, na.rm=TRUE)/sum(x >= 0, na.rm=TRUE)#
+})
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/dataPrep')#
+load('~/Dropbox/hedgerow/data_sets/traditional/specimens-complete.RData')#
+load("/Users/lcp/Dropbox/hedgerow_network/data/veg/veg.Rdata")#
+source('src/misc.R')#
+source('src/prepNets.R')#
+library(bipartite)#
 #
-specializations <- do.call(rbind, specializations)#
-rownames(specializations) <- NULL#
+trait.dir <- '~/Dropbox/hedgerow/data_sets/traditional/functional_traits'#
+bee.trait <-#
+  read.csv(file.path(trait.dir, 'bee.csv'),#
+           row.names=1)#
+syr.trait <-#
+  read.csv(file.path(trait.dir, 'syr.csv'),#
+           row.names=1)#
+spec <- dd#
+spec <- spec[spec$NetPan == 'net',]#
 #
-f.path <- '../data/degree'#
-save(specializations, file=file.path(f.path, 'specializations.Rdata'))#
+spec <- spec[spec$Family == 'Syrphidae' |#
+             spec$BeeNonbee == 'bee',]#
 #
-hist(specializations$normalised.degree[specializations$speciesType ==#
-                                       "pollinator"])#
+## create species column#
+spec$PlantGenusSpecies <-  fix.white.space(paste(spec$PlantGenus,#
+                                                 spec$PlantSpecies))#
 #
-gen.pols <- specializations$GenusSpecies[specializations$speciesType ==#
-                                         "pollinator" &#
-                                         specializations$normalised.degree#
-                                         < 0.3]
-hist(specializations$normalised.degree[specializations$speciesType ==#
-                                       "pollinator"], xlab="Generalization")
-gen.pols <- specializations$GenusSpecies[specializations$speciesType ==#
-                                         "pollinator" &#
-                                         specializations$normalised.degree#
-                                         < 0.2]
-gen.pols
+## drop pollinators and plants without identifications#
+spec <-  spec[spec$Species != '',]#
+spec <-  spec[spec$PlantGenusSpecies != '',]#
+spec$SiteStatus[spec$SiteStatus == "restored"] <- "maturing"#
+#
+## create a giant network to calculate specialization#
+agg.spec <- aggregate(list(abund=spec$GenusSpecies),#
+                      list(GenusSpecies=spec$GenusSpecies,#
+                           PlantGenusSpecies=spec$PlantGenusSpecies),#
+                      length)#
+#
+nets.all <- samp2site.spp(agg.spec$PlantGenusSpecies,#
+                      agg.spec$GenusSpecies, agg.spec$abund)#
+#
+all.specializations <- specieslevel(nets.all,#
+                                    index=c("proportional generality",#
+                                    "d"))#
+#
+traits <- data.frame(GenusSpecies= unlist(sapply(all.specializations,#
+                       rownames)),#
+                     do.call(rbind, all.specializations))#
+rownames(traits) <- NULL#
+#
+write.csv(traits, file="../data/traits.csv", row.names=FALSE)#
+#
+to.drop.status <- c("forb", "natural")#
+spec <- spec[!spec$SiteStatus %in% to.drop.status,]#
+#
+spec$d <- traits$d[match(spec$GenusSpecies, traits$GenusSpecies)]#
+#
+## occurence#
+load('~/Dropbox/hedgerow/data_sets/matrices/net/bee.syr.RData')#
+occ <- apply(mat, c(3,1), function(x){#
+  sum(x > 0, na.rm=TRUE)/sum(x >= 0, na.rm=TRUE)#
+})
+occ
+rownames(occ)
+colnames(occ)
+spec$Site
+colnames(occ)
 head(spec)
-gen.spec <- spec[spec$GenusSpecies %in% gen.pols,]
-head(gen.spec)
-agg.gen.spec <- aggregate(gen.spec$PlantGenusSpecies,#
-                          list(assem=gen.spec$assem,#
-                               Site=gen.spec$Site#
-                               PlantGenusSpecies=gen.spec$PlantGenusSpecies),#
-                          length)
-agg.gen.spec <- aggregate(gen.spec$PlantGenusSpecies,#
-                          list(assem=gen.spec$assem,#
-                               Site=gen.spec$Site,#
-                               PlantGenusSpecies=gen.spec$PlantGenusSpecies),#
-                          length)
-agg.gen.spec
-head(agg.gen.spec)
-agg.gen.spec <- aggregate(list(visits=gen.spec$PlantGenusSpecies),#
-                          list(assem=gen.spec$assem,#
-                               Site=gen.spec$Site,#
-                               PlantGenusSpecies=gen.spec$PlantGenusSpecies),#
-                          length)
-head(agg.gen.spec)
-agg.gen.spec
-getDiffVisits <- function(dats, metrics, sp.type){#
+findOcc <- function(x){#
+  mat[x$GenusSpecies, paste(x$Site, x$SiteStatusBACI, sep=":")]#
+}#
+#
+spec$occ.date <- apply(spec, 1, findOcc)
+findOcc <- function(x){#
+  mat[x["GenusSpecies"], paste(x["Site"], x["SiteStatusBACI"], sep=":")]#
+}#
+#
+spec$occ.date <- apply(spec, 1, findOcc)
+findOcc <- function(x){#
+  mat[x[,"GenusSpecies"], paste(x[,"Site"], x[,"SiteStatusBACI"], sep=":")]#
+}#
+#
+spec$occ.date <- apply(spec, 1, findOcc)
+findOcc <- function(x){#
   browser()#
-  early <- dats[dats$assem == "early",]#
-  late <- dats[dats$assem == "late",]#
-  not.shared <- c(early[, sp.type][!early[, sp.type] %in%#
-                                      late[, sp.type]],#
-                  late[, sp.type][!late[, sp.type] %in%#
-                                     early[, sp.type]])#
-  early <- early[!early[, sp.type] %in% not.shared,]#
-  late <- late[!late[, sp.type] %in% not.shared,]#
-  late <- late[match(early[, sp.type], late[, sp.type]),]#
-  diffs <- late[, metrics] - early[, metrics]#
-  colnames(diffs) <- paste("diff", metrics, sep=".")#
-  diffs[, sp.type] <- early[, sp.type]#
-  out <- merge(early, diffs,#
-               by = sp.type, all.x=TRUE)#
-  out <- merge(out, late[,c(sp.type, metrics)],#
-               by = "GenusSpecies", all.x=TRUE)#
-  return(out)#
-}#
-getDiffVisits(agg.gen.spec, "visits", "PlantGenusSpecies")
-early <- dats[dats$assem == "early",]#
-  late <- dats[dats$assem == "late",]
-early
-late
-not.in.early <- early[, sp.type][!early[, sp.type] %in%#
-                                      late[, sp.type]]
-not.in.early
-not.in.late <- late[, sp.type][!late[, sp.type] %in%#
-                                     early[, sp.type]]
-not.in.late
-site <- Barger
-site <- "Barger"
-dats <- dats[dats$Site == site,]
-early <- dats[dats$assem == "early",]#
-  late <- dats[dats$assem == "late",]#
-  not.in.late <- early[, sp.type][!early[, sp.type] %in%#
-                                   late[, sp.type]]#
-#
-  not.in.early <- late[, sp.type][!late[, sp.type] %in%#
-                                   early[, sp.type]]
-not.in.early
-not.in.late
-dats
-early
-early <- dats[, c("PlantGenusSpecies", "visits")][dats$assem == "early"]
-dats[, c("PlantGenusSpecies", "visits")]
-dats <- dats[dats$Site == site,]#
-  early <- dats[, c("PlantGenusSpecies", "visits")][dats$assem == "early"]
-early <- dats[, c("PlantGenusSpecies", "visits")][dats$assem == "early",]
-dats <- dats[dats$Site == site,]#
-  early <- dats[dats$assem == "early", c("PlantGenusSpecies", "visits")]
-early
-late <- dats[dats$assem == "late", c("PlantGenusSpecies", "visits")]
-late
-dats <- dats[dats$Site == site,]#
-  early <- dats[dats$assem == "early", c("PlantGenusSpecies", "visits")]#
-  late <- dats[dats$assem == "late", c("PlantGenusSpecies", "visits")]#
-  not.in.late <- early[, sp.type][!early[, sp.type] %in%#
-                                   late[, sp.type]]#
-#
-  late <- rbind(late, cbind(not.in.late, rep(0, length(not.in.late))))
-late
-cbind(not.in.late, rep(0, length(not.in.late)
-)
-late <- rbind(late, data.frame(cbind(PlantGenusSpecies=not.in.late,#
-                                       visits=rep(0, length(not.in.late))))
-)
-late
-late <- rbind(late, data.frame(cbind(PlantGenusSpecies=not.in.late,#
-                                       visits=rep(0,#
-                                                  length(not.in.late)))))
-not.in.late <- early[, sp.type][!early[, sp.type] %in%#
-                                   late[, sp.type]]#
-  late <- rbind(late, data.frame(cbind(PlantGenusSpecies=not.in.late,#
-                                       visits=rep(0,#
-                                                  length(not.in.late)))))#
-  not.in.early <- late[, sp.type][!late[, sp.type] %in%#
-                                   early[, sp.type]]#
-  early <- rbind(early, data.frame(cbind(PlantGenusSpecies=not.in.early,#
-                                         visits=rep(0,#
-                                                    length(not.in.early)))))
-early
-early <- dats[dats$assem == "early", c("PlantGenusSpecies", "visits")]#
-  late <- dats[dats$assem == "late", c("PlantGenusSpecies", "visits")]
-not.in.late <- early[, sp.type][!early[, sp.type] %in%#
-                                   late[, sp.type]]#
-  late <- rbind(late, data.frame(cbind(PlantGenusSpecies=not.in.late,#
-                                       visits=rep(0,#
-                                                  length(not.in.late)))))#
-  not.in.early <- late[, sp.type][!late[, sp.type] %in%#
-                                   early[, sp.type]]#
-  early <- rbind(early, data.frame(cbind(PlantGenusSpecies=not.in.early,#
-                                         visits=rep(0,#
-                                                    length(not.in.early)))))
-early
-late
-late <- late[match(early[, sp.type], late[, sp.type]),]
-late
-diffs <- late[, metrics] - early[, metrics]
-metrics
-late[, metrics]
-early <- dats[dats$assem == "early", c("PlantGenusSpecies", "visits")]#
-  late <- dats[dats$assem == "late", c("PlantGenusSpecies", "visits")]
-not.in.late <- early[, sp.type][!early[, sp.type] %in%#
-                                   late[, sp.type]]#
-  late <- rbind(late, data.frame(PlantGenusSpecies=not.in.late,#
-                                       visits=rep(0,#
-                                                  length(not.in.late))))#
-  not.in.early <- late[, sp.type][!late[, sp.type] %in%#
-                                   early[, sp.type]]#
-  early <- rbind(early, data.frame((PlantGenusSpecies=not.in.early,#
-                                         visits=rep(0,#
-                                                    length(not.in.early))))
-early <- rbind(early, data.frame(PlantGenusSpecies=not.in.early,#
-                                         visits=rep(0,#
-                                                    length(not.in.early))))
-early
-class(early$visits)
-late <- late[match(early[, sp.type], late[, sp.type]),]#
-  diffs <- late[, metrics] - early[, metrics]
-diffs
-early <- cbind(early, late$visits, diffs)
-early
-colnames(early) <- c("PlantGenusSpeies", "earlyVisits",#
-                       "lateVsiits", "diffVisits")
-early
-Q
-getDiffVisits <- function(site, dats, metrics, sp.type){#
-  dats <- dats[dats$Site == site,]#
-  early <- dats[dats$assem == "early", c("PlantGenusSpecies", "visits")]#
-  late <- dats[dats$assem == "late", c("PlantGenusSpecies", "visits")]#
-#
-  ## add zeros to plant species that were not visited in early/late assem#
-  not.in.late <- early[, sp.type][!early[, sp.type] %in%#
-                                   late[, sp.type]]#
-  late <- rbind(late, data.frame(PlantGenusSpecies=not.in.late,#
-                                       visits=rep(0,#
-                                                  length(not.in.late))))#
-  not.in.early <- late[, sp.type][!late[, sp.type] %in%#
-                                   early[, sp.type]]#
-  early <- rbind(early, data.frame(PlantGenusSpecies=not.in.early,#
-                                         visits=rep(0,#
-                                                    length(not.in.early))))#
-#
-  late <- late[match(early[, sp.type], late[, sp.type]),]#
-  diffs <- late[, metrics] - early[, metrics]#
-  colnames(diffs) <- paste("diff", metrics, sep=".")#
-  diffs[, sp.type] <- early[, sp.type]#
-#
-  early <- cbind(early, late$visits, diffs)#
-  colnames(early) <- c("PlantGenusSpeies", "earlyVisits",#
-                       "lateVsiits", "diffVisits")#
-  return(early)#
+  mat[x[,"GenusSpecies"], paste(x[,"Site"], x[,"SiteStatusBACI"], sep=":")]#
 }#
 #
-visit.diffs <- lapply(unique(agg.gen.spec$Site), getDiffVisits,#
-       dats=agg.gen.spec, metrics="visits",#
-       sp.type="PlantGenusSpecies")
-getDiffVisits <- function(site, dats, metrics, sp.type){#
-  browser()#
-  dats <- dats[dats$Site == site,]#
-  early <- dats[dats$assem == "early", c("PlantGenusSpecies", "visits")]#
-  late <- dats[dats$assem == "late", c("PlantGenusSpecies", "visits")]#
-#
-  ## add zeros to plant species that were not visited in early/late assem#
-  not.in.late <- early[, sp.type][!early[, sp.type] %in%#
-                                   late[, sp.type]]#
-  late <- rbind(late, data.frame(PlantGenusSpecies=not.in.late,#
-                                       visits=rep(0,#
-                                                  length(not.in.late))))#
-  not.in.early <- late[, sp.type][!late[, sp.type] %in%#
-                                   early[, sp.type]]#
-  early <- rbind(early, data.frame(PlantGenusSpecies=not.in.early,#
-                                         visits=rep(0,#
-                                                    length(not.in.early))))#
-#
-  late <- late[match(early[, sp.type], late[, sp.type]),]#
-  diffs <- late[, metrics] - early[, metrics]#
-  colnames(diffs) <- paste("diff", metrics, sep=".")#
-  diffs[, sp.type] <- early[, sp.type]#
-#
-  early <- cbind(early, late$visits, diffs)#
-  colnames(early) <- c("PlantGenusSpeies", "earlyVisits",#
-                       "lateVsiits", "diffVisits")#
-  return(early)#
-}#
-#
-visit.diffs <- lapply(unique(agg.gen.spec$Site), getDiffVisits,#
-       dats=agg.gen.spec, metrics="visits",#
-       sp.type="PlantGenusSpecies")
-dats <- dats[dats$Site == site,]
-head(dats)
-early <- dats[dats$assem == "early", c("PlantGenusSpecies", "visits")]#
-  late <- dats[dats$assem == "late", c("PlantGenusSpecies", "visits")]
-early
-late
-dats
-not.in.late <- early[, sp.type][!early[, sp.type] %in%#
-                                   late[, sp.type]]#
-  late <- rbind(late, data.frame(PlantGenusSpecies=not.in.late,#
-                                       visits=rep(0,#
-                                                  length(not.in.late))))#
-  not.in.early <- late[, sp.type][!late[, sp.type] %in%#
-                                   early[, sp.type]]#
-  early <- rbind(early, data.frame(PlantGenusSpecies=not.in.early,#
-                                         visits=rep(0,#
-                                                    length(not.in.early))))
-early
-late
-late <- late[match(early[, sp.type], late[, sp.type]),]#
-  diffs <- late[, metrics] - early[, metrics]
-late
-diffs
-early <- cbind(early, late$visits, diffs)#
-  colnames(early) <- c("PlantGenusSpeies", "earlyVisits",#
-                       "lateVsiits", "diffVisits")
-early
-Q
-getDiffVisits <- function(site, dats, metrics, sp.type){#
-  dats <- dats[dats$Site == site,]#
-  early <- dats[dats$assem == "early", c("PlantGenusSpecies", "visits")]#
-  late <- dats[dats$assem == "late", c("PlantGenusSpecies", "visits")]#
-#
-  ## add zeros to plant species that were not visited in early/late assem#
-  not.in.late <- early[, sp.type][!early[, sp.type] %in%#
-                                   late[, sp.type]]#
-  late <- rbind(late, data.frame(PlantGenusSpecies=not.in.late,#
-                                       visits=rep(0,#
-                                                  length(not.in.late))))#
-  not.in.early <- late[, sp.type][!late[, sp.type] %in%#
-                                   early[, sp.type]]#
-  early <- rbind(early, data.frame(PlantGenusSpecies=not.in.early,#
-                                         visits=rep(0,#
-                                                    length(not.in.early))))#
-#
-  late <- late[match(early[, sp.type], late[, sp.type]),]#
-  diffs <- late[, metrics] - early[, metrics]#
-  early <- cbind(early, late$visits, diffs)#
-  colnames(early) <- c("PlantGenusSpeies", "earlyVisits",#
-                       "lateVsiits", "diffVisits")#
-  return(early)#
-}#
-#
-visit.diffs <- lapply(unique(agg.gen.spec$Site), getDiffVisits,#
-       dats=agg.gen.spec, metrics="visits",#
-       sp.type="PlantGenusSpecies")
-visit.diffs
-visit.diffs <- sapply(unique(agg.gen.spec$Site), getDiffVisits,#
-       dats=agg.gen.spec, metrics="visits",#
-       sp.type="PlantGenusSpecies")
-visit.diffs
-visit.diffs <- lapply(unique(agg.gen.spec$Site), getDiffVisits,#
-       dats=agg.gen.spec, metrics="visits",#
-       sp.type="PlantGenusSpecies")#
-#
-visit.dffs <- do.call(rbind. visit.diffs)
-visit.dffs <- do.call(rbind, visit.diffs)
-visit.diffs
-visit.diffs <- lapply(unique(agg.gen.spec$Site), getDiffVisits,#
-       dats=agg.gen.spec, metrics="visits",#
-       sp.type="PlantGenusSpecies")#
-#
-visit.dffs <- do.call(rbind, visit.diffs)
-visit.diffs
-visit.diffs <- lapply(unique(agg.gen.spec$Site), getDiffVisits,#
-       dats=agg.gen.spec, metrics="visits",#
-       sp.type="PlantGenusSpecies")#
-#
-visit.diffs <- do.call(rbind, visit.diffs)
-visit.diffs
-head(specializations)
-visit.diff$normalised.degree <-#
-  specializations$normalised.degree[match(#
-    specializations$GenusSpecies,#
-    visit.diffs$PlantGenusSpecies)]
-visit.diffs$normalised.degree <-#
-  specializations$normalised.degree[match(#
-    specializations$GenusSpecies,#
-    visit.diffs$PlantGenusSpecies)]
-visit.diffs$normalised.degree <-#
-  specializations$normalised.degree[match(#
-    visit.diffs$PlantGenusSpecies,#
-    specializations$GenusSpecies)]
-visit.diffs$PlantGenusSpecies
-head(visit.diffs)
-## calculate the difference in the number of vists a plant receives#
-getDiffVisits <- function(site, dats, metrics, sp.type){#
-  dats <- dats[dats$Site == site,]#
-  early <- dats[dats$assem == "early", c("PlantGenusSpecies", "visits")]#
-  late <- dats[dats$assem == "late", c("PlantGenusSpecies", "visits")]#
-#
-  ## add zeros to plant species that were not visited in early/late assem#
-  not.in.late <- early[, sp.type][!early[, sp.type] %in%#
-                                   late[, sp.type]]#
-  late <- rbind(late, data.frame(PlantGenusSpecies=not.in.late,#
-                                       visits=rep(0,#
-                                                  length(not.in.late))))#
-  not.in.early <- late[, sp.type][!late[, sp.type] %in%#
-                                   early[, sp.type]]#
-  early <- rbind(early, data.frame(PlantGenusSpecies=not.in.early,#
-                                         visits=rep(0,#
-                                                    length(not.in.early))))#
-#
-  late <- late[match(early[, sp.type], late[, sp.type]),]#
-  diffs <- late[, metrics] - early[, metrics]#
-  early <- cbind(early, late$visits, diffs)#
-  colnames(early) <- c("PlantGenusSpecies", "earlyVisits",#
-                       "lateVsiits", "diffVisits")#
-  return(early)#
-}
-visit.diffs <- lapply(unique(agg.gen.spec$Site), getDiffVisits,#
-       dats=agg.gen.spec, metrics="visits",#
-       sp.type="PlantGenusSpecies")#
-#
-visit.diffs <- do.call(rbind, visit.diffs)#
-#
-visit.diffs$normalised.degree <-#
-  specializations$normalised.degree[match(#
-    visit.diffs$PlantGenusSpecies,#
-    specializations$GenusSpecies)]
-head(visit.diffs)
-visit.diffs <- cbind(visit.diffs,#
-  normalised.degree = specializations$normalised.degree[match(#
-    visit.diffs$PlantGenusSpecies,#
-    specializations$GenusSpecies)])
-visit.diffs
-head(visit.diffs)
-colnames(specializations)
-visit.diffs <- cbind(visit.diffs,#
-   specializations[match(#
-    visit.diffs$PlantGenusSpecies,#
-    specializations$GenusSpecies),#
-    c("normalized.degree", "d", "proportional.generality" ])
-visit.diffs <- lapply(unique(agg.gen.spec$Site), getDiffVisits,#
-       dats=agg.gen.spec, metrics="visits",#
-       sp.type="PlantGenusSpecies")#
-#
-visit.diffs <- do.call(rbind, visit.diffs)#
-#
-visit.diffs <- cbind(visit.diffs,#
-   specializations[match(#
-    visit.diffs$PlantGenusSpecies,#
-    specializations$GenusSpecies),#
-    c("normalized.degree", "d", "proportional.generality")])
-visit.diffs <- cbind(visit.diffs,#
-                     specializations[, c("normalized.degree",#
-                                         "d",#
-                                         "proportional.generality")][match(#
-    visit.diffs$PlantGenusSpecies,#
-    specializations$GenusSpecies)])
-specializations[, c("normalized.degree",#
-                                         "d",#
-                                         "proportional.generality")]
-visit.diffs <- cbind(visit.diffs,#
-                     specializations[, c("normalised.degree",#
-                                         "d",#
-                                         "proportional.generality")][match(#
-    visit.diffs$PlantGenusSpecies,#
-    specializations$GenusSpecies)])
-specializations[, c("normalised.degree",#
-                                         "d",#
-                                         "proportional.generality")]
-match(#
-    visit.diffs$PlantGenusSpecies,#
-    specializations$GenusSpecies)
-hist(specializations$normalised.degree[specializations$speciesType ==#
-                                       "pollinator"], xlab="Generalization")#
-#
-gen.pols <- specializations$GenusSpecies[specializations$speciesType ==#
-                                         "pollinator" &#
-                                         specializations$normalised.degree#
-                                         < 0.2]#
-gen.spec <- spec[spec$GenusSpecies %in% gen.pols,]#
-#
-agg.gen.spec <- aggregate(list(visits=gen.spec$PlantGenusSpecies),#
-                          list(assem=gen.spec$assem,#
-                               Site=gen.spec$Site,#
-                               PlantGenusSpecies=gen.spec$PlantGenusSpecies),#
-                          length)#
-visit.diffs <- lapply(unique(agg.gen.spec$Site), getDiffVisits,#
-       dats=agg.gen.spec, metrics="visits",#
-       sp.type="PlantGenusSpecies")#
-#
-visit.diffs <- do.call(rbind, visit.diffs)#
-#
-visit.diffs <- cbind(visit.diffs,#
-                     specializations[, c("normalised.degree",#
-                                         "d",#
-                                         "proportional.generality")][match(#
-    visit.diffs$PlantGenusSpecies,#
-    specializations$GenusSpecies)])
-specializations[, c("normalised.degree",#
-                                         "d",#
-                                         "proportional.generality")]
-visit.diffs <- cbind(visit.diffs,#
-                     specializations[, c("normalised.degree",#
-                                         "d",#
-                                         "proportional.generality")][match(#
-    visit.diffs$PlantGenusSpecies,#
-    specializations$GenusSpecies),])
-visit.diffs
-visit.diffs <- lapply(unique(agg.gen.spec$Site), getDiffVisits,#
-       dats=agg.gen.spec, metrics="visits",#
-       sp.type="PlantGenusSpecies")#
-#
-visit.diffs <- do.call(rbind, visit.diffs)#
-#
-visit.diffs <- cbind(visit.diffs,#
-                     specializations[match(#
-    visit.diffs$PlantGenusSpecies,#
-    specializations$GenusSpecies),  c("normalised.degree",#
-                                         "d",#
-                                         "proportional.generality")])
-visit.diffs
-head(visit.diffs)
-f.path <- '../data/degree'#
-save(visit.diffs, file=file.path(f.path, 'PlantvisitDiffs.Rdata'))
-setwd('~/Dropbox/hedgerow_assembly/dataPrep')#
-load('~/Dropbox/hedgerow/data_sets/traditional/specimens-complete.RData')#
-load("/Users/lcp/Dropbox/hedgerow_network/data/veg/veg.Rdata")#
-source('src/misc.R')#
-source('src/prepNets.R')#
-library(bipartite)#
-#
-spec <- dd#
-spec <- spec[spec$NetPan == 'net',]#
-#
-## spec <- spec[spec$Family == 'Syrphidae' |#
-##              spec$BeeNonbee == 'bee',]#
-#
-## keep only BACI sites#
-BACI.site <- c('Barger', 'Butler', 'Hrdy', 'MullerB', 'Sperandio')#
-spec <-  spec[spec$Site %in% BACI.site,]#
-veg <-  veg[veg$Site %in% BACI.site,]#
-#
-veg$ypr <- spec$ypr[match(paste(veg$Year, veg$Site),#
-                          paste(spec$Year, spec$Site))]#
-#
-## create species column#
-spec$PlantGenusSpecies <-  fix.white.space(paste(spec$PlantGenus,#
-                                                 spec$PlantSpecies))#
-#
-## drop pollinators and plants without identifications#
-spec <-  spec[spec$Species != '',]#
-spec <-  spec[spec$PlantGenusSpecies != '',]#
-#
-save(spec, file='../data/networks/specimens.Rdata')#
-#
-## create a "year" columns grouping years 1-3 post restoration and 4-9#
-spec$assem <- 'early'#
-spec$assem[spec$ypr > 3] <- 'late'#
-#
-veg$assem <- 'early'#
-veg$assem[veg$ypr > 3] <- 'late'#
-#
-veg.sum <- aggregate(list(abundance=veg$NumQuads),#
-                     list(site=veg$Site,#
-                          status=veg$assem,#
-                          species=veg$PlantGenusSpecies),#
-                     sum)#
-#
-## *******************************************************************#
-## create networks#
-networks <- breakNet(spec, 'Site', 'assem')#
-#
-## save networks for each site, timeframe#
-f.path <- '../data/networks'#
-saveDats(networks, names(networks), f.path)#
-save(spec, file=file.path(f.path, 'networks_stages.Rdata'))#
-#
-## *******************************************************************#
-## specialization of each species at each site#
-species.lev <- lapply(networks, specieslevel)#
-#
-specializations  <-  mapply(function(a, b, c, d)#
-  getSpec(species.lev = a,#
-          names.net = b),#
-  a = species.lev,#
-  b = names(networks),#
-  SIMPLIFY = FALSE)#
-#
-specializations <- do.call(rbind, specializations)#
-rownames(specializations) <- NULL#
-#
-f.path <- '../data/degree'#
-save(specializations, file=file.path(f.path, 'specializations.Rdata'))#
-## *******************************************************************#
-## chang in visits of by the generalized pollinators#
-#
-hist(specializations$normalised.degree[specializations$speciesType ==#
-                                       "pollinator"], xlab="Generalization")#
-#
-gen.pols <- specializations$GenusSpecies[specializations$speciesType ==#
-                                         "pollinator" &#
-                                         specializations$normalised.degree#
-                                         < 0.2]#
-gen.spec <- spec[spec$GenusSpecies %in% gen.pols,]#
-#
-agg.gen.spec <- aggregate(list(visits=gen.spec$PlantGenusSpecies),#
-                          list(assem=gen.spec$assem,#
-                               Site=gen.spec$Site,#
-                               PlantGenusSpecies=gen.spec$PlantGenusSpecies),#
-                          length)#
-visit.diffs <- lapply(unique(agg.gen.spec$Site), getDiffVisits,#
-       dats=agg.gen.spec, metrics="visits",#
-       sp.type="PlantGenusSpecies")#
-#
-visit.diffs <- do.call(rbind, visit.diffs)#
-#
-visit.diffs <- cbind(visit.diffs,#
-                     specializations[match(#
-    visit.diffs$PlantGenusSpecies,#
-    specializations$GenusSpecies),  c("normalised.degree",#
-                                         "d",#
-                                         "proportional.generality")])#
-#
-f.path <- '../data/degree'#
-save(visit.diffs, file=file.path(f.path, 'PlantvisitDiffs.Rdata'))#
-## *******************************************************************#
-## species lists for each site#
-#
-plants <- getSpecies(networks, rownames)#
-pols <- getSpecies(networks, rownames)#
-#
-f.path <- '../data/species'#
-write.csv(plants, file.path(f.path, 'plants.csv'),#
-          row.names=FALSE)#
-save(plants, file=file.path(f.path, 'plants.Rdata'))#
-#
-write.csv(pols, file.path(f.path, 'pollinators.csv'),#
-          row.names=FALSE)#
-save(pols, file=file.path(f.path, 'pols.Rdata'))#
-#
-## *******************************************************************#
-## species added between early and late stages#
-#
-plant.diffs <- getColExt(plants)#
-pol.diffs <- getColExt(pols)#
-#
-f.path <- '../data/speciesChange'#
-write.csv(plant.diffs, file.path(f.path, 'plants.csv'),#
-          row.names=FALSE)#
-#
-write.csv(pol.diffs, file.path(f.path, 'pollinators.csv'),#
-          row.names=FALSE)#
-#
-## *******************************************************************#
-## total plants at a site#
-f.path <- '../data/species'#
-plants <- plants[,-2]#
-plants <- unique(plants)#
-write.csv(plants, file.path(f.path, 'plants_all.csv'),#
-          row.names=FALSE)#
-#
-## *******************************************************************#
-## pollinator and plant degrees by years post restoration#
-spec$all <- 'all'#
-#
-yr.networks <- breakNet(spec, 'all', 'assem')#
-#
-d.pol <- lapply(yr.networks, colSums)#
-d.plant <- lapply(yr.networks, rowSums)#
-#
-f.path <- '../data/degree'#
-saveDats(d.pol, paste(names(d.pol), 'pollinators', sep="_"), f.path)#
-saveDats(d.plant, paste(names(d.plant), 'plants', sep="_"), f.path)#
-#
-by.year <- data.frame(t(sapply(c(d.plant, d.pol), calcStats)))#
-by.year$group <- rep(c('plants','pollinators'), each=2)#
-by.year$assembly <- rep(c('early', 'late'), 2)#
-#
-write.csv(by.year, file.path(f.path, 'stats_by_yr.csv'))#
-#
-## *******************************************************************#
-## pollinator and plant degrees across all years and sites#
-#
-all.networks <- breakNet(spec, 'all', 'all')#
-#
-d.pol.all <- lapply(all.networks, colSums)#
-d.plant.all <- lapply(all.networks, rowSums)#
-#
-saveDats(d.pol.all, 'across_yrs_pollinators', f.path)#
-saveDats(d.plant.all, 'across_yrs_plants', f.path)#
-#
-all.dats <- data.frame(t(sapply(c(d.plant.all, d.pol.all), calcStats)))#
-all.dats$group <- c('plants','pollinators')#
-#
-write.csv(all.dats, file.path(f.path, 'stats_across_yrs.csv'))#
-#
-## *******************************************************************#
-## characteristics of plant colonists#
-plant.col <- plant.diffs[plant.diffs$class == "colonist",]#
-#
-plant.col$earlyAbund <- veg.sum$abundance[veg.sum$status ==#
-                                          "early"][match(#
-                                           plant.col$species,#
-                                           veg.sum$species)]#
-plant.col$lateAbund <- veg.sum$abundance[veg.sum$status ==#
-                                         "late"][match(#
-                                          plant.col$species,#
-                                          veg.sum$species)]#
-#
-plant.col$degree <- d.plant$all_late[match(plant.col$species,#
-                                           names(d.plant$all_late))]#
-#
-## number of species that interact#
-con.plant <- lapply(yr.networks, getCon, 1)#
-#
-plant.col$partners <- con.plant$all_late[match(plant.col$species,#
-                                               names(con.plant$all_late))]#
-f.path <- '../data/speciesChange'#
-write.csv(plant.col, file.path(f.path, 'plants_char.csv'),#
-          row.names=FALSE)#
-#
-## *******************************************************************#
-## stable network structure#
-networks.by.year <- breakNet(spec, 'Site', 'Year')#
-#
-plant.species <- sapply(networks.by.year, nrow)#
-plant.species <- data.frame(richness=plant.species,#
-                            sites =#
-                              sapply(strsplit(names(plant.species),#
-                                              "_"),#
-                                     function(x) x[1]),#
-                            years =#
-                              sapply(strsplit(names(plant.species),#
-                                              "_"),#
-                                     function(x) x[2]))#
-write.csv(plant.species, file.path(f.path, 'plants_change.csv'),#
-          row.names=FALSE)
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/observed')#
-source('src/initialize.R')#
-source('src/diffs.R')#
-source('src/misc.R')#
-library(lme4)#
-#
-## *******************************************************************#
-## comparison of pollinator generalization#
-## *******************************************************************#
-#
-load('../../data/degree/specializations.Rdata')#
-sites <- unique(specializations$Site)#
-metrics <- colnames(specializations)#
-metrics <- metrics[!metrics %in% c("Site",#
-                                   "assem",#
-                                   "GenusSpecies",#
-                                   "speciesType")]#
-#
-diff.spec <- lapply(sites, function(x){#
-  getDiff(specializations[specializations$Site == x,],#
-          metrics)})#
-#
-diff.spec <- do.call(rbind, diff.spec)#
-#
-res.lms.pol <- lapply(metrics, specMods,#
-                diff.dats = diff.spec[diff.spec$speciesType ==#
-                                      "pollinator",],#
-                type= "pol")#
-#
-res.lms.plant <- lapply(metrics, specMods,#
-                diff.dats = diff.spec[diff.spec$speciesType ==#
-                                      "plant",],#
-                type="plant")#
-names(res.lms.pol) <- names(res.lms.plant) <- metrics#
-#
-res.lms.pol$normalised.degree#
-res.lms.pol$proportional.generality#
-#
-res.lms.plant$normalised.degree#
-res.lms.plant$proportional.generality#
-#
-save(res.lms.pol, res.lms.plant, file="saved/mods/spec.Rdata")#
-save(diff.spec, metrics, file="saved/spec.Rdata")#
-## *******************************************************************#
-## change in the number of visits a plant receives by plant#
-## generalization#
-## *******************************************************************#
-load('../../data/degree/PlantvisitDiffs.Rdata')
-head(vist.diffs)
-head(visit.diffs)
-plot(y=diff.visits, x=normalised.degree, data=visit.diffs)
-plot(y="diffVisits", x="normalised.degree", data=visit.diffs)
-plot(y=visit.diffs$diffVisits, x=visit.diffs$normalised.degree)
-plot(y=visit.diffs$diffVisits, x=visit.diffs$d)
-setwd('~/Dropbox/hedgerow_assembly/dataPrep')#
-load('~/Dropbox/hedgerow/data_sets/traditional/specimens-complete.RData')#
-load("/Users/lcp/Dropbox/hedgerow_network/data/veg/veg.Rdata")#
-source('src/misc.R')#
-source('src/prepNets.R')#
-library(bipartite)#
-#
-spec <- dd#
-spec <- spec[spec$NetPan == 'net',]#
-#
-## spec <- spec[spec$Family == 'Syrphidae' |#
-##              spec$BeeNonbee == 'bee',]#
-#
-## keep only BACI sites#
-BACI.site <- c('Barger', 'Butler', 'Hrdy', 'MullerB', 'Sperandio')#
-spec <-  spec[spec$Site %in% BACI.site,]#
-veg <-  veg[veg$Site %in% BACI.site,]#
-#
-veg$ypr <- spec$ypr[match(paste(veg$Year, veg$Site),#
-                          paste(spec$Year, spec$Site))]#
-#
-## create species column#
-spec$PlantGenusSpecies <-  fix.white.space(paste(spec$PlantGenus,#
-                                                 spec$PlantSpecies))#
-#
-## drop pollinators and plants without identifications#
-spec <-  spec[spec$Species != '',]#
-spec <-  spec[spec$PlantGenusSpecies != '',]#
-#
-save(spec, file='../data/networks/specimens.Rdata')#
-#
-## create a "year" columns grouping years 1-3 post restoration and 4-9#
-spec$assem <- 'early'#
-spec$assem[spec$ypr > 3] <- 'late'#
-#
-veg$assem <- 'early'#
-veg$assem[veg$ypr > 3] <- 'late'#
-#
-veg.sum <- aggregate(list(abundance=veg$NumQuads),#
-                     list(site=veg$Site,#
-                          status=veg$assem,#
-                          species=veg$PlantGenusSpecies),#
-                     sum)#
-#
-## *******************************************************************#
-## create networks#
-networks <- breakNet(spec, 'Site', 'assem')#
-#
-## save networks for each site, timeframe#
-f.path <- '../data/networks'#
-saveDats(networks, names(networks), f.path)#
-save(spec, file=file.path(f.path, 'networks_stages.Rdata'))#
-#
-## *******************************************************************#
-## specialization of each species at each site#
-species.lev <- lapply(networks, specieslevel)#
-#
-specializations  <-  mapply(function(a, b, c, d)#
-  getSpec(species.lev = a,#
-          names.net = b),#
-  a = species.lev,#
-  b = names(networks),#
-  SIMPLIFY = FALSE)#
-#
-specializations <- do.call(rbind, specializations)#
-rownames(specializations) <- NULL#
-#
-f.path <- '../data/degree'#
-save(specializations, file=file.path(f.path, 'specializations.Rdata'))#
-## *******************************************************************#
-## chang in visits of by the generalized pollinators#
-#
-hist(specializations$normalised.degree[specializations$speciesType ==#
-                                       "pollinator"], xlab="Generalization")#
-#
-gen.pols <- specializations$GenusSpecies[specializations$speciesType ==#
-                                         "pollinator" &#
-                                         specializations$normalised.degree#
-                                         < 0.2]#
-gen.spec <- spec[spec$GenusSpecies %in% gen.pols,]#
-#
-agg.gen.spec <- aggregate(list(visits=gen.spec$PlantGenusSpecies),#
-                          list(assem=gen.spec$assem,#
-                               Site=gen.spec$Site,#
-                               PlantGenusSpecies=gen.spec$PlantGenusSpecies),#
-                          length)#
-visit.diffs <- lapply(unique(agg.gen.spec$Site), getDiffVisits,#
-       dats=agg.gen.spec, metrics="visits",#
-       sp.type="PlantGenusSpecies")
-head(specializations)
-visit.diffs <- lapply(unique(agg.gen.spec$Site), getDiffVisits,#
-       dats=agg.gen.spec, metrics="visits",#
-       sp.type="PlantGenusSpecies")#
-#
-visit.diffs <- do.call(rbind, visit.diffs)#
-#
-visit.diffs <- cbind(visit.diffs,#
-                     specializations[match(#
-    visit.diffs$PlantGenusSpecies,#
-    specializations$GenusSpecies[specializations$assem == "early"]),#
-    c("normalised.degree",#
-                                         "d",#
-                                         "proportional.generality")])#
-#
-f.path <- '../data/degree'#
-save(visit.diffs, file=file.path(f.path, 'PlantvisitDiffs.Rdata'))
-specializations$GenusSpecies[specializations$assem == "early"])
-head(visit.diffs)
-head(specializations[specialization$speciesType =="plant"])
-head(specializations[specializations$speciesType =="plant"])
-head(specializations)
-head(specializations[specializations$speciesType =="plant",])
-sort(specializations[specializations$speciesType =="plant",])
-specializations[specializations$speciesType =="plant",]
-specializations[specializations$speciesType =="plant" & specializations$assem == "early",]
-head(visit.diffs)
-specializations[specializations$speciesType =="plant" & specializations$assem == "early" & specializations$GenusSpecies == "Achillea millefolium",]
-diff.visits
-visit.diffs
-head(visit.diffs)
-visit.diffs <- lapply(unique(agg.gen.spec$Site), getDiffVisits,#
-       dats=agg.gen.spec, metrics="visits",#
-       sp.type="PlantGenusSpecies")#
-#
-sites <- rep(names(visit.diffs), each=lapply(nrow(visit.diffs)))
-sites <- rep(names(visit.diffs), each=lapply(visit.diffs, nrow))
-sites <- rep(names(visit.diffs), by=lapply(visit.diffs, nrow))
-sites.
-sites
-visit.diffs <- lapply(unique(agg.gen.spec$Site), getDiffVisits,#
-       dats=agg.gen.spec, metrics="visits",#
-       sp.type="PlantGenusSpecies")#
-#
-sites <- rep(names(visit.diffs), by=lapply(visit.diffs, nrow))
-sites
-sapply(visit.diffs, nrow)
-names(visit.diffs)
-sites <- rep(unique(agg.gen.spec$Site), by=sapply(visit.diffs, nrow))
-sites
-sites <- rep(unique(agg.gen.spec$Site), each=sapply(visit.diffs, nrow))
-sites <- rep(unique(agg.gen.spec$Site), times=sapply(visit.diffs, nrow))
-sites
-sum(sapply(visit.diffs, nrow))
-visit.diffs <- do.call(rbind, visit.diffs)#
-#
-visit.diffs <- cbind(visit.diffs,#
-                     specializations[match(#
-    visit.diffs$PlantGenusSpecies,#
-    specializations$GenusSpecies[specializations$assem == "early"]),#
-    c("normalised.degree",#
-                                         "d",#
-                                         "proportional.generality")])
-visit.diffs$Site <- sites
-f.path <- '../data/degree'#
-save(visit.diffs, file=file.path(f.path, 'PlantvisitDiffs.Rdata'))
-visit.diffs
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/observed')#
-source('src/initialize.R')#
-source('src/diffs.R')#
-source('src/misc.R')#
-library(lme4)
-load('../../data/degree/PlantvisitDiffs.Rdata')#
-plot(y=visit.diffs$diffVisits, x=visit.diffs$normalised.degree)
-plot(y=visit.diffs$diffVisits, x=visit.diffs$d)
-colnames(visit.diffs)
-plot(y=visit.diffs$diffVisits, x=visit.diffs$proportional.generality)
-hist(specializations$normalised.degree[specializations$speciesType ==#
-                                       "pollinator"], xlab="Generalization")#
-#
-gen.pols <- specializations$GenusSpecies[specializations$speciesType ==#
-                                         "pollinator" &#
-                                         specializations$normalised.degree#
-                                         < 0.3]#
-gen.spec <- spec[spec$GenusSpecies %in% gen.pols,]#
-#
-agg.gen.spec <- aggregate(list(visits=gen.spec$PlantGenusSpecies),#
-                          list(assem=gen.spec$assem,#
-                               Site=gen.spec$Site,#
-                               PlantGenusSpecies=gen.spec$PlantGenusSpecies),#
-                          length)#
-visit.diffs <- lapply(unique(agg.gen.spec$Site), getDiffVisits,#
-       dats=agg.gen.spec, metrics="visits",#
-       sp.type="PlantGenusSpecies")#
-#
-sites <- rep(unique(agg.gen.spec$Site), times=sapply(visit.diffs, nrow))#
-#
-visit.diffs <- do.call(rbind, visit.diffs)#
-#
-visit.diffs <- cbind(visit.diffs,#
-                     specializations[match(#
-    visit.diffs$PlantGenusSpecies,#
-    specializations$GenusSpecies[specializations$assem == "early"]),#
-    c("normalised.degree",#
-                                         "d",#
-                                         "proportional.generality")])#
-visit.diffs$Site <- sites#
-#
-f.path <- '../data/degree'#
-save(visit.diffs, file=file.path(f.path, 'PlantvisitDiffs.Rdata'))
-setwd('~/Dropbox/hedgerow_assembly/dataPrep')#
-load('~/Dropbox/hedgerow/data_sets/traditional/specimens-complete.RData')#
-load("/Users/lcp/Dropbox/hedgerow_network/data/veg/veg.Rdata")#
-source('src/misc.R')#
-source('src/prepNets.R')#
-library(bipartite)#
-#
-spec <- dd#
-spec <- spec[spec$NetPan == 'net',]#
-#
-## spec <- spec[spec$Family == 'Syrphidae' |#
-##              spec$BeeNonbee == 'bee',]#
-#
-## keep only BACI sites#
-BACI.site <- c('Barger', 'Butler', 'Hrdy', 'MullerB', 'Sperandio')#
-spec <-  spec[spec$Site %in% BACI.site,]#
-veg <-  veg[veg$Site %in% BACI.site,]#
-#
-veg$ypr <- spec$ypr[match(paste(veg$Year, veg$Site),#
-                          paste(spec$Year, spec$Site))]#
-#
-## create species column#
-spec$PlantGenusSpecies <-  fix.white.space(paste(spec$PlantGenus,#
-                                                 spec$PlantSpecies))#
-#
-## drop pollinators and plants without identifications#
-spec <-  spec[spec$Species != '',]#
-spec <-  spec[spec$PlantGenusSpecies != '',]#
-#
-save(spec, file='../data/networks/specimens.Rdata')#
-#
-## create a "year" columns grouping years 1-3 post restoration and 4-9#
-spec$assem <- 'early'#
-spec$assem[spec$ypr > 3] <- 'late'#
-#
-veg$assem <- 'early'#
-veg$assem[veg$ypr > 3] <- 'late'#
-#
-veg.sum <- aggregate(list(abundance=veg$NumQuads),#
-                     list(site=veg$Site,#
-                          status=veg$assem,#
-                          species=veg$PlantGenusSpecies),#
-                     sum)#
-#
-## *******************************************************************#
-## create networks#
-networks <- breakNet(spec, 'Site', 'assem')#
-#
-## save networks for each site, timeframe#
-f.path <- '../data/networks'#
-saveDats(networks, names(networks), f.path)#
-save(spec, file=file.path(f.path, 'networks_stages.Rdata'))#
-#
-## *******************************************************************#
-## specialization of each species at each site#
-species.lev <- lapply(networks, specieslevel)#
-#
-specializations  <-  mapply(function(a, b, c, d)#
-  getSpec(species.lev = a,#
-          names.net = b),#
-  a = species.lev,#
-  b = names(networks),#
-  SIMPLIFY = FALSE)#
-#
-specializations <- do.call(rbind, specializations)#
-rownames(specializations) <- NULL#
-#
-f.path <- '../data/degree'#
-save(specializations, file=file.path(f.path, 'specializations.Rdata'))#
-## *******************************************************************#
-## chang in visits of by the generalized pollinators#
-#
-hist(specializations$normalised.degree[specializations$speciesType ==#
-                                       "pollinator"], xlab="Generalization")#
-#
-gen.pols <- specializations$GenusSpecies[specializations$speciesType ==#
-                                         "pollinator" &#
-                                         specializations$normalised.degree#
-                                         < 0.3]#
-gen.spec <- spec[spec$GenusSpecies %in% gen.pols,]#
-#
-agg.gen.spec <- aggregate(list(visits=gen.spec$PlantGenusSpecies),#
-                          list(assem=gen.spec$assem,#
-                               Site=gen.spec$Site,#
-                               PlantGenusSpecies=gen.spec$PlantGenusSpecies),#
-                          length)#
-visit.diffs <- lapply(unique(agg.gen.spec$Site), getDiffVisits,#
-       dats=agg.gen.spec, metrics="visits",#
-       sp.type="PlantGenusSpecies")#
-#
-sites <- rep(unique(agg.gen.spec$Site), times=sapply(visit.diffs, nrow))#
-#
-visit.diffs <- do.call(rbind, visit.diffs)#
-#
-visit.diffs <- cbind(visit.diffs,#
-                     specializations[match(#
-    visit.diffs$PlantGenusSpecies,#
-    specializations$GenusSpecies[specializations$assem == "early"]),#
-    c("normalised.degree",#
-                                         "d",#
-                                         "proportional.generality")])#
-visit.diffs$Site <- sites#
-#
-f.path <- '../data/degree'#
-save(visit.diffs, file=file.path(f.path, 'PlantvisitDiffs.Rdata'))#
-## *******************************************************************#
-## species lists for each site#
-#
-plants <- getSpecies(networks, rownames)#
-pols <- getSpecies(networks, rownames)#
-#
-f.path <- '../data/species'#
-write.csv(plants, file.path(f.path, 'plants.csv'),#
-          row.names=FALSE)#
-save(plants, file=file.path(f.path, 'plants.Rdata'))#
-#
-write.csv(pols, file.path(f.path, 'pollinators.csv'),#
-          row.names=FALSE)#
-save(pols, file=file.path(f.path, 'pols.Rdata'))#
-#
-## *******************************************************************#
-## species added between early and late stages#
-#
-plant.diffs <- getColExt(plants)#
-pol.diffs <- getColExt(pols)#
-#
-f.path <- '../data/speciesChange'#
-write.csv(plant.diffs, file.path(f.path, 'plants.csv'),#
-          row.names=FALSE)#
-#
-write.csv(pol.diffs, file.path(f.path, 'pollinators.csv'),#
-          row.names=FALSE)#
-#
-## *******************************************************************#
-## total plants at a site#
-f.path <- '../data/species'#
-plants <- plants[,-2]#
-plants <- unique(plants)#
-write.csv(plants, file.path(f.path, 'plants_all.csv'),#
-          row.names=FALSE)#
-#
-## *******************************************************************#
-## pollinator and plant degrees by years post restoration#
-spec$all <- 'all'#
-#
-yr.networks <- breakNet(spec, 'all', 'assem')#
-#
-d.pol <- lapply(yr.networks, colSums)#
-d.plant <- lapply(yr.networks, rowSums)#
-#
-f.path <- '../data/degree'#
-saveDats(d.pol, paste(names(d.pol), 'pollinators', sep="_"), f.path)#
-saveDats(d.plant, paste(names(d.plant), 'plants', sep="_"), f.path)#
-#
-by.year <- data.frame(t(sapply(c(d.plant, d.pol), calcStats)))#
-by.year$group <- rep(c('plants','pollinators'), each=2)#
-by.year$assembly <- rep(c('early', 'late'), 2)#
-#
-write.csv(by.year, file.path(f.path, 'stats_by_yr.csv'))#
-#
-## *******************************************************************#
-## pollinator and plant degrees across all years and sites#
-#
-all.networks <- breakNet(spec, 'all', 'all')#
-#
-d.pol.all <- lapply(all.networks, colSums)#
-d.plant.all <- lapply(all.networks, rowSums)#
-#
-saveDats(d.pol.all, 'across_yrs_pollinators', f.path)#
-saveDats(d.plant.all, 'across_yrs_plants', f.path)#
-#
-all.dats <- data.frame(t(sapply(c(d.plant.all, d.pol.all), calcStats)))#
-all.dats$group <- c('plants','pollinators')#
-#
-write.csv(all.dats, file.path(f.path, 'stats_across_yrs.csv'))#
-#
-## *******************************************************************#
-## characteristics of plant colonists#
-plant.col <- plant.diffs[plant.diffs$class == "colonist",]#
-#
-plant.col$earlyAbund <- veg.sum$abundance[veg.sum$status ==#
-                                          "early"][match(#
-                                           plant.col$species,#
-                                           veg.sum$species)]#
-plant.col$lateAbund <- veg.sum$abundance[veg.sum$status ==#
-                                         "late"][match(#
-                                          plant.col$species,#
-                                          veg.sum$species)]#
-#
-plant.col$degree <- d.plant$all_late[match(plant.col$species,#
-                                           names(d.plant$all_late))]#
-#
-## number of species that interact#
-con.plant <- lapply(yr.networks, getCon, 1)#
-#
-plant.col$partners <- con.plant$all_late[match(plant.col$species,#
-                                               names(con.plant$all_late))]#
-f.path <- '../data/speciesChange'#
-write.csv(plant.col, file.path(f.path, 'plants_char.csv'),#
-          row.names=FALSE)#
-#
-## *******************************************************************#
-## stable network structure#
-networks.by.year <- breakNet(spec, 'Site', 'Year')#
-#
-plant.species <- sapply(networks.by.year, nrow)#
-plant.species <- data.frame(richness=plant.species,#
-                            sites =#
-                              sapply(strsplit(names(plant.species),#
-                                              "_"),#
-                                     function(x) x[1]),#
-                            years =#
-                              sapply(strsplit(names(plant.species),#
-                                              "_"),#
-                                     function(x) x[2]))#
-write.csv(plant.species, file.path(f.path, 'plants_change.csv'),#
-          row.names=FALSE)
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/observed')#
-source('src/initialize.R')#
-source('src/diffs.R')#
-source('src/misc.R')#
-library(lme4)
-## *******************************************************************#
-## change in the number of visits a plant receives by plant#
-## generalization#
-## *******************************************************************#
-load('../../data/degree/PlantvisitDiffs.Rdata')#
-plot(y=visit.diffs$diffVisits, x=visit.diffs$normalised.degree)
-plot(y=visit.diffs$diffVisits, x=visit.diffs$d)
-plot(y=visit.diffs$diffVisits, x=visit.diffs$proportional.generality)
-plot(y=visit.diffs$diffVisits, x=visit.diffs$d)
-plot(y=visit.diffs$diffVisits, x=visit.diffs$normalised.degree)
-lmer(visit.diffs$diffVisits ~ visit.diffs$normalised.degree +#
-       (1|visit.diffs$Site) + (1|visit.diffs$PlantGenusSpecies)
-)
-visit.diffs
-head(visit.diffs)
-lmer(diffVisits ~ normalised.degree +#
-       (1|Site) + (1|PlantGenusSpecies),#
-     data=visit.diffs)
-summary(lmer(diffVisits ~ normalised.degree +#
-       (1|Site) + (1|PlantGenusSpecies),#
-     data=visit.diffs))
-summary(lmer(diffVisits ~ d +#
-       (1|Site) + (1|PlantGenusSpecies),#
-     data=visit.diffs))
-summary(lmer(diffVisits ~ proportional.generality +#
-       (1|Site) + (1|PlantGenusSpecies),#
-     data=visit.diffs))
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/observed')#
-source('src/initialize.R')#
-source('src/diffs.R')#
-source('src/misc.R')#
-library(lme4)#
-library(lmerTest)
-load('../../data/degree/PlantvisitDiffs.Rdata')
-summary(lmer(diffVisits ~ normalised.degree +#
-       (1|Site) + (1|PlantGenusSpecies),#
-     data=visit.diffs))
-summary(lmer(diffVisits ~ d +#
-       (1|Site) + (1|PlantGenusSpecies),#
-     data=visit.diffs))
-summary(lmer(diffVisits ~ proportional.generality +#
-       (1|Site) + (1|PlantGenusSpecies),#
-     data=visit.diffs))
-?speciesLevel
-librarY9bipartite
-library(bipartite)
-librarY9bipartite
-?speciesLevel
-?specieslevel
-setwd('~/Dropbox/hedgerow_assembly/dataPrep')#
-load('~/Dropbox/hedgerow/data_sets/traditional/specimens-complete.RData')#
-load("/Users/lcp/Dropbox/hedgerow_network/data/veg/veg.Rdata")#
-source('src/misc.R')#
-source('src/prepNets.R')#
-library(bipartite)#
-#
-spec <- dd#
-spec <- spec[spec$NetPan == 'net',]#
-#
-## spec <- spec[spec$Family == 'Syrphidae' |#
-##              spec$BeeNonbee == 'bee',]#
-#
-## keep only BACI sites#
-BACI.site <- c('Barger', 'Butler', 'Hrdy', 'MullerB', 'Sperandio')#
-spec <-  spec[spec$Site %in% BACI.site,]#
-veg <-  veg[veg$Site %in% BACI.site,]#
-#
-veg$ypr <- spec$ypr[match(paste(veg$Year, veg$Site),#
-                          paste(spec$Year, spec$Site))]#
-#
-## create species column#
-spec$PlantGenusSpecies <-  fix.white.space(paste(spec$PlantGenus,#
-                                                 spec$PlantSpecies))#
-#
-## drop pollinators and plants without identifications#
-spec <-  spec[spec$Species != '',]#
-spec <-  spec[spec$PlantGenusSpecies != '',]#
-#
-save(spec, file='../data/networks/specimens.Rdata')#
-#
-## create a "year" columns grouping years 1-3 post restoration and 4-9#
-spec$assem <- 'early'#
-spec$assem[spec$ypr > 3] <- 'late'#
-#
-veg$assem <- 'early'#
-veg$assem[veg$ypr > 3] <- 'late'#
-#
-veg.sum <- aggregate(list(abundance=veg$NumQuads),#
-                     list(site=veg$Site,#
-                          status=veg$assem,#
-                          species=veg$PlantGenusSpecies),#
-                     sum)#
-#
-## *******************************************************************#
-## create networks#
-networks <- breakNet(spec, 'Site', 'assem')#
-#
-## save networks for each site, timeframe#
-f.path <- '../data/networks'#
-saveDats(networks, names(networks), f.path)#
-save(spec, file=file.path(f.path, 'networks_stages.Rdata'))#
-#
-## *******************************************************************#
-## specialization of each species at each site#
-species.lev <- lapply(networks, specieslevel)#
-#
-specializations  <-  mapply(function(a, b, c, d)#
-  getSpec(species.lev = a,#
-          names.net = b),#
-  a = species.lev,#
-  b = names(networks),#
-  SIMPLIFY = FALSE)#
-#
-specializations <- do.call(rbind, specializations)#
-rownames(specializations) <- NULL#
-#
-f.path <- '../data/degree'#
-save(specializations, file=file.path(f.path, 'specializations.Rdata'))
-hist(specializations$proportional.generality[specializations$speciesType ==#
-                                       "pollinator"], xlab="Generalization")
-getVisitChange <- function(cut.off, metric){#
-  gen.pols <- specializations$GenusSpecies[specializations$speciesType ==#
-                                           "pollinator" &#
-                                   specializations[, metric]#
-                                           <= cut.off]#
-  gen.spec <- spec[spec$GenusSpecies %in% gen.pols,]#
-#
-  agg.gen.spec <- aggregate(list(visits=gen.spec$PlantGenusSpecies),#
-                            list(assem=gen.spec$assem,#
-                                 Site=gen.spec$Site,#
-                                 PlantGenusSpecies=gen.spec$PlantGenusSpecies),#
-                            length)#
-  visit.diffs <- lapply(unique(agg.gen.spec$Site), getDiffVisits,#
-                        dats=agg.gen.spec, metrics="visits",#
-                        sp.type="PlantGenusSpecies")#
-#
-  sites <- rep(unique(agg.gen.spec$Site), times=sapply(visit.diffs, nrow))#
-#
-  visit.diffs <- do.call(rbind, visit.diffs)#
-#
-  visit.diffs <- cbind(visit.diffs,#
-                       specializations[match(#
-                         visit.diffs$PlantGenusSpecies,#
-                         specializations$GenusSpecies[specializations$assem == "early"]),#
-                         c("normalised.degree",#
-                           "d",#
-                           "proportional.generality")])#
-  visit.diffs$Site <- sites#
-  return(visit.diffs)#
-}#
-#
-diff.gens <- getVisitChange(0.2, "proportional.generality")
-diff.gens
-head(diff.gens)
-f.path <- '../data/degree'#
-save(diff.gens, file=file.path(f.path, 'PlantvisitDiffs.Rdata'))
-plot(y=diff.gens$diffVisits, x=diff.gens$normalised.degree)#
-#
-plot(y=diff.gens$diffVisits, x=diff.gens$d)#
-#
-plot(y=diff.gens$diffVisits, x=diff.gens$proportional.generality)#
-summary(lmer(diffVisits ~ normalised.degree +#
-       (1|Site) + (1|PlantGenusSpecies),#
-     data=diff.gens))#
-#
-summary(lmer(diffVisits ~ d +#
-       (1|Site) + (1|PlantGenusSpecies),#
-     data=diff.gens))#
-#
-summary(lmer(diffVisits ~ proportional.generality +#
-       (1|Site) + (1|PlantGenusSpecies),#
-     data=diff.gens))
-plot(y=diff.gens$diffVisits, x=diff.gens$d)
-summary(lmer(diffVisits ~ d +#
-       (1|Site) + (1|PlantGenusSpecies),#
-     data=diff.gens))
-plot(y=diff.gens$diffVisits, x=diff.gens$proportional.generality)
-summary(lmer(diffVisits ~ proportional.generality +#
-       (1|Site) + (1|PlantGenusSpecies),#
-     data=diff.gens))
-diff.gens <- getVisitChange(0.1, "proportional.generality")
-plot(y=diff.gens$diffVisits, x=diff.gens$proportional.generality)
-getVisitChange <- function(cut.off, metric, bol){#
-  gen.pols <- specializations$GenusSpecies[specializations$speciesType ==#
-                                           "pollinator" &#
-                                   specializations[, metric]#
-                                           bol cut.off]#
-  gen.spec <- spec[spec$GenusSpecies %in% gen.pols,]#
-#
-  agg.gen.spec <- aggregate(list(visits=gen.spec$PlantGenusSpecies),#
-                            list(assem=gen.spec$assem,#
-                                 Site=gen.spec$Site,#
-                                 PlantGenusSpecies=gen.spec$PlantGenusSpecies),#
-                            length)#
-  visit.diffs <- lapply(unique(agg.gen.spec$Site), getDiffVisits,#
-                        dats=agg.gen.spec, metrics="visits",#
-                        sp.type="PlantGenusSpecies")#
-#
-  sites <- rep(unique(agg.gen.spec$Site), times=sapply(visit.diffs, nrow))#
-#
-  visit.diffs <- do.call(rbind, visit.diffs)#
-#
-  visit.diffs <- cbind(visit.diffs,#
-                       specializations[match(#
-                         visit.diffs$PlantGenusSpecies,#
-                         specializations$GenusSpecies[specializations$assem == "early"]),#
-                         c("normalised.degree",#
-                           "d",#
-                           "proportional.generality")])#
-  visit.diffs$Site <- sites#
-  return(visit.diffs)#
-}
-getVisitChange <- function(cut.off1, cut.off2, metric){#
-  gen.pols <- specializations$GenusSpecies[specializations$speciesType ==#
-                                           "pollinator" &#
-                  specializations[, metric] >= cut.off1] &#
-                  specializations[, metric]  <= cut.off2]#
-gen.spec <- spec[spec$GenusSpecies %in% gen.pols,]#
-#
-agg.gen.spec <- aggregate(list(visits=gen.spec$PlantGenusSpecies),#
-                          list(assem=gen.spec$assem,#
-                               Site=gen.spec$Site,#
-                               PlantGenusSpecies=gen.spec$PlantGenusSpecies),#
-                          length)#
-visit.diffs <- lapply(unique(agg.gen.spec$Site), getDiffVisits,#
-                      dats=agg.gen.spec, metrics="visits",#
-                      sp.type="PlantGenusSpecies")#
-#
-sites <- rep(unique(agg.gen.spec$Site), times=sapply(visit.diffs, nrow))#
-#
-visit.diffs <- do.call(rbind, visit.diffs)#
-#
-visit.diffs <- cbind(visit.diffs,#
-                     specializations[match(#
-                       visit.diffs$PlantGenusSpecies,#
-                       specializations$GenusSpecies[specializations$assem#
-                                                    == "early"]),#
-                       c("normalised.degree",#
-                         "d",#
-                         "proportional.generality")])#
-visit.diffs$Site <- sites#
-return(visit.diffs)#
-}#
-#
-diff.gens <- getVisitChange(0, 0.2, "proportional.generality")
-getVisitChange <- function(cut.off1, cut.off2, metric){#
-  gen.pols <- specializations$GenusSpecies[specializations$speciesType ==#
-                                           "pollinator" &#
-                  specializations[, metric] >= cut.off1 &#
-                  specializations[, metric]  <= cut.off2]#
-gen.spec <- spec[spec$GenusSpecies %in% gen.pols,]#
-#
-agg.gen.spec <- aggregate(list(visits=gen.spec$PlantGenusSpecies),#
-                          list(assem=gen.spec$assem,#
-                               Site=gen.spec$Site,#
-                               PlantGenusSpecies=gen.spec$PlantGenusSpecies),#
-                          length)#
-visit.diffs <- lapply(unique(agg.gen.spec$Site), getDiffVisits,#
-                      dats=agg.gen.spec, metrics="visits",#
-                      sp.type="PlantGenusSpecies")#
-#
-sites <- rep(unique(agg.gen.spec$Site), times=sapply(visit.diffs, nrow))#
-#
-visit.diffs <- do.call(rbind, visit.diffs)#
-#
-visit.diffs <- cbind(visit.diffs,#
-                     specializations[match(#
-                       visit.diffs$PlantGenusSpecies,#
-                       specializations$GenusSpecies[specializations$assem#
-                                                    == "early"]),#
-                       c("normalised.degree",#
-                         "d",#
-                         "proportional.generality")])#
-visit.diffs$Site <- sites#
-return(visit.diffs)#
-}#
-#
-diff.gens <- getVisitChange(0, 0.2, "proportional.generality")
-head(diff.gens)
-hist(specializations$proportional.generality[specializations$speciesType ==#
-                                             "pollinator"],#
-     xlab="Generalization")
-diff.spec <- getVisitChange(0.5, 1, "proportional.generality")
-f.path <- '../data/degree'#
-save(diff.gens, diff.spec, file=file.path(f.path, 'PlantvisitDiffs.Rdata'))
-## specialists#
-plot(y=diff.spec$diffVisits, x=diff.spec$d)#
-#
-plot(y=diff.spec$diffVisits, x=diff.spec$proportional.generality)#
-#
-summary(lmer(diffVisits ~ d +#
-       (1|Site) + (1|PlantGenusSpecies),#
-     data=diff.spec))#
-#
-summary(lmer(diffVisits ~ proportional.generality +#
-       (1|Site) + (1|PlantGenusSpecies),#
-     data=diff.spec))
-plot(y=diff.spec$diffVisits, x=diff.spec$proportional.generality)
-plot(y=diff.spec$diffVisits, x=diff.spec$d)
-summary(lmer(diffVisits ~ proportional.generality +#
-       (1|Site) + (1|PlantGenusSpecies),#
-     data=diff.spec))
-log(1/2)
-log(2/1)
-2/1)
-2/1
-1/1
-1/2
-2/1
+spec$occ.date <- apply(spec, 1, findOcc)

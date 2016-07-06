@@ -1,5 +1,5 @@
 rm(list=ls())
-setwd('~/Dropbox/hedgerow_assembly/analysis/assembly')
+setwd('~/Dropbox/hedgerow_assembly/analysis/networkLevel')
 source('src/initialize.R')
 N <- 999
 

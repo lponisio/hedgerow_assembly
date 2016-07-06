@@ -1,0 +1,2044 @@
+rm(list=ls())#
+library(lme4)#
+library(lmerTest)#
+library(vegan)#
+library(linkcomm)#
+library(picante)#
+setwd('~/Dropbox/hedgerow_network/analysis/intBeta')#
+source('src/misc.R')#
+source('src/phyloIntBeta.R')#
+source('src/predictIntervals.R')#
+source('src/CIplotting.R')#
+load('../../data/spec_network.Rdata')#
+#
+## ## ************************************************************#
+## dengrogram based on shared plant interactions#
+## ************************************************************#
+#
+## pols <- cbind(spec$GenusSpecies, spec$PlantGenusSpecies)#
+## ## unique rows (interactions)#
+## pols <- as.data.frame(unique(pols, MARGIN=1))#
+## colnames(pols) <- c('GenusSpecies', 'PlantGenusSpecies')#
+#
+## clust <- calcDendDis(pols, c('GenusSpecies', 'PlantGenusSpecies'))#
+#
+## ************************************************************#
+## prepare link community in terminal#
+## ************************************************************#
+#
+## edges.com <- cbind(as.character(spec$GenusSpecies),#
+##                   as.character(spec$PlantGenusSpecies))#
+#
+## lc <- getLinkCommunities(edges.com, hcmethod = "average",#
+##                          bipartite=TRUE)#
+## save(lc, file="saved/lc.Rdata")#
+#
+## ************************************************************#
+## turnover of phylo interactions through time#
+## ************************************************************#
+load(file="saved/lc.Rdata")#
+phylo.int <- calcCommDis(spec, "Int", lc, abund.w=TRUE)#
+save(phylo.int, file="saved/phyloInt.Rdata")
+Q
+rm(list=ls())#
+library(lme4)#
+library(lmerTest)#
+library(vegan)#
+library(linkcomm)#
+library(picante)#
+setwd('~/Dropbox/hedgerow_network/analysis/intBeta')#
+source('src/misc.R')#
+source('src/phyloIntBeta.R')#
+source('src/predictIntervals.R')#
+source('src/CIplotting.R')#
+load('../../data/spec_network.Rdata')#
+#
+## ## ************************************************************#
+## dengrogram based on shared plant interactions#
+## ************************************************************#
+#
+## pols <- cbind(spec$GenusSpecies, spec$PlantGenusSpecies)#
+## ## unique rows (interactions)#
+## pols <- as.data.frame(unique(pols, MARGIN=1))#
+## colnames(pols) <- c('GenusSpecies', 'PlantGenusSpecies')#
+#
+## clust <- calcDendDis(pols, c('GenusSpecies', 'PlantGenusSpecies'))#
+#
+## ************************************************************#
+## prepare link community in terminal#
+## ************************************************************#
+#
+## edges.com <- cbind(as.character(spec$GenusSpecies),#
+##                   as.character(spec$PlantGenusSpecies))#
+#
+## lc <- getLinkCommunities(edges.com, hcmethod = "average",#
+##                          bipartite=TRUE)#
+## save(lc, file="saved/lc.Rdata")#
+#
+## ************************************************************#
+## turnover of phylo interactions through time#
+## ************************************************************#
+load(file="saved/lc.Rdata")#
+phylo.int <- calcCommDis(spec, "Int", lc, abund.w=TRUE)#
+save(phylo.int, file="saved/phyloInt.Rdata")
+load(file="saved/phyloInt.Rdata")#
+phylo.int.mod <- lmer(PhyloInt ~ Dist*SiteStatus +#
+                      (1|Site),#
+                      data=phylo.int)
+phylo.int.mod
+summary(phylo.int.mod)
+dd.phylo <- expand.grid(Dist=seq(#
+                          from= min(phylo.int$Dist),#
+                          to= max(phylo.int$Dist),#
+                          length=10),#
+                        SiteStatus=c("control", "maturing", "mature"),#
+                        PhyloInt = 0)#
+#
+phylo.pi <- predict.int(mod= phylo.int.mod,#
+                        dd=dd.phylo,#
+                        y="PhyloInt")#
+#
+plot.predict(new.dd=phylo.pi,#
+                 ylabel="Node turnover",#
+                 dats=phylo.int,#
+                 y1="PhyloInt",#
+                 legend.loc="bottomright")
+rm(list=ls())#
+library(lme4)#
+library(lmerTest)#
+library(vegan)#
+library(linkcomm)#
+library(picante)#
+setwd('~/Dropbox/hedgerow_network/analysis/intBeta')#
+source('src/misc.R')#
+source('src/phyloIntBeta.R')#
+source('src/predictIntervals.R')#
+source('src/CIplotting.R')#
+load('../../data/spec_network.Rdata')#
+#
+## ************************************************************#
+## prepare link community in terminal#
+## ************************************************************#
+#
+## edges.com <- cbind(as.character(spec$GenusSpecies),#
+##                   as.character(spec$PlantGenusSpecies))#
+#
+## lc <- getLinkCommunities(edges.com, hcmethod = "average",#
+##                          bipartite=TRUE)#
+## save(lc, file="saved/lc.Rdata")#
+#
+## ************************************************************#
+## turnover of phylo interactions through time#
+## ************************************************************#
+load(file="saved/lc.Rdata")#
+phylo.int <- calcCommDis(spec, "Int", lc, abund.w=TRUE)#
+save(phylo.int, file="saved/phyloInt.Rdata")
+## linear model of phylo int by years between samples#
+load(file="saved/phyloInt.Rdata")#
+phylo.int.mod <- lmer(PhyloInt ~ Dist*SiteStatus +#
+                      (1|Site),#
+                      data=phylo.int)
+phylo.int.mod
+summary(phylo.into.mod)
+summary(phylo.int.mod)
+## linear model of phylo int by years between samples#
+load(file="saved/phyloInt.Rdata")#
+phylo.int.mod <- lmer(PhyloInt ~ Dist*SiteStatus +#
+                      (1|Site),#
+                      data=phylo.int)#
+#
+dd.phylo <- expand.grid(Dist=seq(#
+                          from= min(phylo.int$Dist),#
+                          to= max(phylo.int$Dist),#
+                          length=10),#
+                        SiteStatus=c("control", "maturing", "mature"),#
+                        PhyloInt = 0)#
+#
+phylo.pi <- predict.int(mod= phylo.int.mod,#
+                        dd=dd.phylo,#
+                        y="PhyloInt")#
+#
+plot.predict(new.dd=phylo.pi,#
+                 ylabel="Node turnover",#
+                 dats=phylo.int,#
+                 y1="PhyloInt",#
+                 legend.loc="bottomright")#
+#
+plot.box(ylabel="Node turnover",#
+                 dats=phylo.int,#
+                 y1="PhyloInt")
+## linear model of phylo int by years between samples#
+load(file="saved/phyloInt.Rdata")#
+phylo.int.mod <- lmer(PhyloInt ~ Dist*SiteStatus +#
+                      (1|Site),#
+                      data=phylo.int)#
+#
+dd.phylo <- expand.grid(Dist=seq(#
+                          from= min(phylo.int$Dist),#
+                          to= max(phylo.int$Dist),#
+                          length=10),#
+                        SiteStatus=c("control", "maturing", "mature"),#
+                        PhyloInt = 0)#
+#
+phylo.pi <- predict.int(mod= phylo.int.mod,#
+                        dd=dd.phylo,#
+                        y="PhyloInt")#
+#
+plot.predict(new.dd=phylo.pi,#
+                 ylabel="Node turnover",#
+                 dats=phylo.int,#
+                 y1="PhyloInt",#
+                 legend.loc="bottomright")#
+#
+plot.box(ylabel="Node turnover",#
+                 dats=phylo.int,#
+                 y1="PhyloInt")
+rm(list=ls())#
+library(lme4)#
+library(lmerTest)#
+library(vegan)#
+library(linkcomm)#
+library(picante)#
+setwd('~/Dropbox/hedgerow_network/analysis/intBeta')#
+source('src/misc.R')#
+source('src/phyloIntBeta.R')#
+source('src/predictIntervals.R')#
+source('src/CIplotting.R')#
+load('../../data/spec_network.Rdata')#
+#
+## ************************************************************#
+## prepare link community in terminal#
+## ************************************************************#
+#
+## edges.com <- cbind(as.character(spec$GenusSpecies),#
+##                   as.character(spec$PlantGenusSpecies))#
+#
+## lc <- getLinkCommunities(edges.com, hcmethod = "average",#
+##                          bipartite=TRUE)#
+## save(lc, file="saved/lc.Rdata")#
+#
+## ************************************************************#
+## turnover of phylo interactions through time#
+## ************************************************************#
+load(file="saved/lc.Rdata")#
+phylo.int <- calcCommDis(spec, "Int", lc, abund.w=TRUE)#
+save(phylo.int, file="saved/phyloInt.Rdata")#
+#
+## linear model of phylo int by years between samples#
+load(file="saved/phyloInt.Rdata")#
+phylo.int.mod <- lmer(PhyloInt ~ Dist*SiteStatus +#
+                      (1|Site),#
+                      data=phylo.int)#
+#
+dd.phylo <- expand.grid(Dist=seq(#
+                          from= min(phylo.int$Dist),#
+                          to= max(phylo.int$Dist),#
+                          length=10),#
+                        SiteStatus=c("control", "maturing", "mature"),#
+                        PhyloInt = 0)#
+#
+phylo.pi <- predict.int(mod= phylo.int.mod,#
+                        dd=dd.phylo,#
+                        y="PhyloInt")#
+#
+plot.predict(new.dd=phylo.pi,#
+                 ylabel="Node turnover",#
+                 dats=phylo.int,#
+                 y1="PhyloInt",#
+                 legend.loc="bottomright")#
+#
+plot.box(ylabel="Node turnover",#
+                 dats=phylo.int,#
+                 y1="PhyloInt")#
+## ## ************************************************************#
+## dengrogram based on shared plant interactions#
+## ************************************************************#
+#
+## pols <- cbind(spec$GenusSpecies, spec$PlantGenusSpecies)#
+## ## unique rows (interactions)#
+## pols <- as.data.frame(unique(pols, MARGIN=1))#
+## colnames(pols) <- c('GenusSpecies', 'PlantGenusSpecies')#
+#
+## clust <- calcDendDis(pols, c('GenusSpecies', 'PlantGenusSpecies'))
+rm(list=ls())#
+library(lme4)#
+library(lmerTest)#
+library(vegan)#
+library(linkcomm)#
+library(picante)#
+setwd('~/Dropbox/hedgerow_network/analysis/intBeta')#
+source('src/misc.R')#
+source('src/phyloIntBeta.R')#
+source('src/predictIntervals.R')#
+source('src/CIplotting.R')#
+load('../../data/spec_network.Rdata')#
+#
+## ************************************************************#
+## prepare link community in terminal#
+## ************************************************************#
+#
+## edges.com <- cbind(as.character(spec$GenusSpecies),#
+##                   as.character(spec$PlantGenusSpecies))#
+#
+## lc <- getLinkCommunities(edges.com, hcmethod = "average",#
+##                          bipartite=TRUE)#
+## save(lc, file="saved/lc.Rdata")#
+#
+## ************************************************************#
+## turnover of phylo interactions through time#
+## ************************************************************#
+load(file="saved/lc.Rdata")#
+phylo.int <- calcCommDis(spec, "Int", lc, abund.w=TRUE)#
+save(phylo.int, file="saved/phyloInt.Rdata")#
+#
+## linear model of phylo int by years between samples#
+load(file="saved/phyloInt.Rdata")#
+phylo.int.mod <- lmer(PhyloInt ~ Dist*SiteStatus +#
+                      (1|Site),#
+                      data=phylo.int)#
+#
+dd.phylo <- expand.grid(Dist=seq(#
+                          from= min(phylo.int$Dist),#
+                          to= max(phylo.int$Dist),#
+                          length=10),#
+                        SiteStatus=c("control", "maturing", "mature"),#
+                        PhyloInt = 0)#
+#
+phylo.pi <- predict.int(mod= phylo.int.mod,#
+                        dd=dd.phylo,#
+                        y="PhyloInt")#
+#
+plot.predict(new.dd=phylo.pi,#
+                 ylabel="Node turnover",#
+                 dats=phylo.int,#
+                 y1="PhyloInt",#
+                 legend.loc="bottomright")#
+#
+plot.box(ylabel="Node turnover",#
+                 dats=phylo.int,#
+                 y1="PhyloInt")#
+## ## ************************************************************#
+## dengrogram based on shared plant interactions#
+## ************************************************************#
+#
+## pols <- cbind(spec$GenusSpecies, spec$PlantGenusSpecies)#
+## ## unique rows (interactions)#
+## pols <- as.data.frame(unique(pols, MARGIN=1))#
+## colnames(pols) <- c('GenusSpecies', 'PlantGenusSpecies')#
+#
+## clust <- calcDendDis(pols, c('GenusSpecies', 'PlantGenusSpecies'))
+rm(list=ls())#
+library(lme4)#
+library(lmerTest)#
+library(vegan)#
+library(linkcomm)#
+library(picante)#
+setwd('~/Dropbox/hedgerow_network/analysis/intBeta')#
+source('src/misc.R')#
+source('src/phyloIntBeta.R')#
+source('src/predictIntervals.R')#
+source('src/CIplotting.R')#
+load('../../data/spec_network.Rdata')
+## linear model of phylo int by years between samples#
+load(file="saved/phyloInt.Rdata")#
+phylo.int.mod <- lmer(PhyloInt ~ Dist*SiteStatus +#
+                      (1|Site),#
+                      data=phylo.int)#
+#
+dd.phylo <- expand.grid(Dist=seq(#
+                          from= min(phylo.int$Dist),#
+                          to= max(phylo.int$Dist),#
+                          length=10),#
+                        SiteStatus=c("control", "maturing", "mature"),#
+                        PhyloInt = 0)#
+#
+phylo.pi <- predict.int(mod= phylo.int.mod,#
+                        dd=dd.phylo,#
+                        y="PhyloInt")#
+#
+plot.predict(new.dd=phylo.pi,#
+                 ylabel="Node turnover",#
+                 dats=phylo.int,#
+                 y1="PhyloInt",#
+                 legend.loc="bottomright")#
+#
+plot.box(ylabel="Node turnover",#
+                 dats=phylo.int,#
+                 y1="PhyloInt")
+## linear model of phylo int by years between samples#
+load(file="saved/phyloInt.Rdata")#
+phylo.int.mod <- lmer(PhyloInt ~ Dist*SiteStatus +#
+                      (1|Site),#
+                      data=phylo.int)#
+#
+dd.phylo <- expand.grid(Dist=seq(#
+                          from= min(phylo.int$Dist),#
+                          to= max(phylo.int$Dist),#
+                          length=10),#
+                        SiteStatus=c("control", "maturing", "mature"),#
+                        PhyloInt = 0)#
+#
+phylo.pi <- predict.int(mod= phylo.int.mod,#
+                        dd=dd.phylo,#
+                        y="PhyloInt")#
+#
+plot.predict(new.dd=phylo.pi,#
+                 ylabel="Node turnover",#
+                 dats=phylo.int,#
+                 y1="PhyloInt",#
+                 legend.loc="bottomright")#
+#
+plot.box(ylabel="Node turnover",#
+                 dats=phylo.int,#
+                 y1="PhyloInt")
+rm(list=ls())#
+library(lme4)#
+library(lmerTest)#
+library(vegan)#
+library(linkcomm)#
+library(picante)#
+setwd('~/Dropbox/hedgerow_network/analysis/intBeta')#
+source('src/misc.R')#
+source('src/phyloIntBeta.R')#
+source('src/predictIntervals.R')#
+source('src/CIplotting.R')#
+load('../../data/spec_network.Rdata')
+## linear model of phylo int by years between samples#
+load(file="saved/phyloInt.Rdata")#
+phylo.int.mod <- lmer(PhyloInt ~ Dist*SiteStatus +#
+                      (1|Site),#
+                      data=phylo.int)#
+#
+dd.phylo <- expand.grid(Dist=seq(#
+                          from= min(phylo.int$Dist),#
+                          to= max(phylo.int$Dist),#
+                          length=10),#
+                        SiteStatus=c("control", "maturing", "mature"),#
+                        PhyloInt = 0)#
+#
+phylo.pi <- predict.int(mod= phylo.int.mod,#
+                        dd=dd.phylo,#
+                        y="PhyloInt")#
+#
+plot.predict(new.dd=phylo.pi,#
+                 ylabel="Node turnover",#
+                 dats=phylo.int,#
+                 y1="PhyloInt",#
+                 legend.loc="bottomright")#
+#
+plot.box(ylabel="Node turnover",#
+                 dats=phylo.int,#
+                 y1="PhyloInt")
+## linear model of phylo int by years between samples#
+load(file="saved/phyloInt.Rdata")#
+phylo.int.mod <- lmer(PhyloInt ~ Dist*SiteStatus +#
+                      (1|Site),#
+                      data=phylo.int)#
+#
+dd.phylo <- expand.grid(Dist=seq(#
+                          from= min(phylo.int$Dist),#
+                          to= max(phylo.int$Dist),#
+                          length=10),#
+                        SiteStatus=c("control", "maturing", "mature"),#
+                        PhyloInt = 0)#
+#
+phylo.pi <- predict.int(mod= phylo.int.mod,#
+                        dd=dd.phylo,#
+                        y="PhyloInt")#
+#
+plot.predict(new.dd=phylo.pi,#
+                 ylabel="Node turnover",#
+                 dats=phylo.int,#
+                 y1="PhyloInt",#
+                 legend.loc="bottomright")#
+#
+plot.box(ylabel="Node turnover",#
+                 dats=phylo.int,#
+                 y1="PhyloInt")
+rm(list=ls())#
+library(lme4)#
+library(lmerTest)#
+library(vegan)#
+library(linkcomm)#
+library(picante)#
+setwd('~/Dropbox/hedgerow_network/analysis/intBeta')#
+source('src/misc.R')#
+source('src/phyloIntBeta.R')#
+source('src/predictIntervals.R')#
+source('src/CIplotting.R')#
+load('../../data/spec_network.Rdata')
+## linear model of phylo int by years between samples#
+load(file="saved/phyloInt.Rdata")#
+phylo.int.mod <- lmer(PhyloInt ~ Dist*SiteStatus +#
+                      (1|Site),#
+                      data=phylo.int)#
+#
+dd.phylo <- expand.grid(Dist=seq(#
+                          from= min(phylo.int$Dist),#
+                          to= max(phylo.int$Dist),#
+                          length=10),#
+                        SiteStatus=c("control", "maturing", "mature"),#
+                        PhyloInt = 0)#
+#
+phylo.pi <- predict.int(mod= phylo.int.mod,#
+                        dd=dd.phylo,#
+                        y="PhyloInt")#
+#
+plot.predict(new.dd=phylo.pi,#
+                 ylabel="Node turnover",#
+                 dats=phylo.int,#
+                 y1="PhyloInt",#
+                 legend.loc="bottomright")#
+#
+plot.box(ylabel="Node turnover",#
+                 dats=phylo.int,#
+                 y1="PhyloInt")
+rm(list=ls())#
+library(lme4)#
+library(lmerTest)#
+library(vegan)#
+library(linkcomm)#
+library(picante)#
+setwd('~/Dropbox/hedgerow_network/analysis/intBeta')#
+source('src/misc.R')#
+source('src/phyloIntBeta.R')#
+source('src/predictIntervals.R')#
+source('src/CIplotting.R')#
+load('../../data/spec_network.Rdata')
+## linear model of phylo int by years between samples#
+load(file="saved/phyloInt.Rdata")#
+phylo.int.mod <- lmer(PhyloInt ~ Dist*SiteStatus +#
+                      (1|Site),#
+                      data=phylo.int)#
+#
+dd.phylo <- expand.grid(Dist=seq(#
+                          from= min(phylo.int$Dist),#
+                          to= max(phylo.int$Dist),#
+                          length=10),#
+                        SiteStatus=c("control", "maturing", "mature"),#
+                        PhyloInt = 0)#
+#
+phylo.pi <- predict.int(mod= phylo.int.mod,#
+                        dd=dd.phylo,#
+                        y="PhyloInt")#
+#
+plot.predict(new.dd=phylo.pi,#
+                 ylabel="Node turnover",#
+                 dats=phylo.int,#
+                 y1="PhyloInt",#
+                 legend.loc="bottomright")#
+#
+plot.box(ylabel="Node turnover",#
+                 dats=phylo.int,#
+                 y1="PhyloInt")
+rm(list=ls())#
+library(lme4)#
+library(lmerTest)#
+library(vegan)#
+library(linkcomm)#
+library(picante)#
+setwd('~/Dropbox/hedgerow_network/analysis/intBeta')#
+source('src/misc.R')#
+source('src/phyloIntBeta.R')#
+source('src/predictIntervals.R')#
+source('src/CIplotting.R')#
+load('../../data/spec_network.Rdata')
+## linear model of phylo int by years between samples#
+load(file="saved/phyloInt.Rdata")#
+phylo.int.mod <- lmer(PhyloInt ~ Dist*SiteStatus +#
+                      (1|Site),#
+                      data=phylo.int)#
+#
+dd.phylo <- expand.grid(Dist=seq(#
+                          from= min(phylo.int$Dist),#
+                          to= max(phylo.int$Dist),#
+                          length=10),#
+                        SiteStatus=c("control", "maturing", "mature"),#
+                        PhyloInt = 0)#
+#
+phylo.pi <- predict.int(mod= phylo.int.mod,#
+                        dd=dd.phylo,#
+                        y="PhyloInt")#
+#
+plot.predict(new.dd=phylo.pi,#
+                 ylabel="Node turnover",#
+                 dats=phylo.int,#
+                 y1="PhyloInt",#
+                 legend.loc="bottomright")#
+#
+plot.box(ylabel="Node turnover",#
+                 dats=phylo.int,#
+                 y1="PhyloInt")
+rm(list=ls())#
+library(lme4)#
+library(lmerTest)#
+library(vegan)#
+library(linkcomm)#
+library(picante)#
+setwd('~/Dropbox/hedgerow_network/analysis/intBeta')#
+source('src/misc.R')#
+source('src/phyloIntBeta.R')#
+source('src/predictIntervals.R')#
+source('src/CIplotting.R')#
+load('../../data/spec_network.Rdata')#
+#
+## ************************************************************#
+## prepare link community in terminal#
+## ************************************************************#
+#
+## edges.com <- cbind(as.character(spec$GenusSpecies),#
+##                   as.character(spec$PlantGenusSpecies))#
+#
+## lc <- getLinkCommunities(edges.com, hcmethod = "average",#
+##                          bipartite=TRUE)#
+## save(lc, file="saved/lc.Rdata")#
+#
+## ************************************************************#
+## turnover of phylo interactions through time#
+## ************************************************************#
+load(file="saved/lc.Rdata")#
+phylo.int <- calcCommDis(spec, "Int", lc, abund.w=TRUE)
+node.num <- cbind(lc$hclust$labels, paste(lc$edgelist[,1],#
+                                            lc$edgelist[,2]))#
+  node.order <- lapply(comm, function(x){#
+    node.num[,1][match(colnames(x), node.num[,2])]#
+  })
+node.num
+node.order
+head(comm)
+comm.int <- mapply(function(a, b)#
+                     assignCols(a,b),#
+                     a=comm,#
+                     b=node.order)
+assignCols <- function(a,b){#
+    colnames(a) <- b#
+    return(a)#
+  }#
+  comm.int <- mapply(function(a, b)#
+                     assignCols(a,b),#
+                     a=comm,#
+                     b=node.order)
+comm.int
+cophenetic(lc$hclust)
+Q
+rm(list=ls())#
+library(lme4)#
+library(lmerTest)#
+library(vegan)#
+library(linkcomm)#
+library(picante)#
+setwd('~/Dropbox/hedgerow_network/analysis/intBeta')#
+source('src/misc.R')#
+source('src/phyloIntBeta.R')#
+source('src/predictIntervals.R')#
+source('src/CIplotting.R')#
+load('../../data/spec_network.Rdata')#
+#
+## ************************************************************#
+## prepare link community in terminal#
+## ************************************************************#
+#
+## edges.com <- cbind(as.character(spec$GenusSpecies),#
+##                   as.character(spec$PlantGenusSpecies))#
+#
+## lc <- getLinkCommunities(edges.com, hcmethod = "average",#
+##                          bipartite=TRUE)#
+## save(lc, file="saved/lc.Rdata")#
+#
+## ************************************************************#
+## turnover of phylo interactions through time#
+## ************************************************************#
+load(file="saved/lc.Rdata")#
+phylo.int <- calcCommDis(spec, "Int", lc, abund.w=TRUE)#
+save(phylo.int, file="saved/phyloInt.Rdata")
+rm(list=ls())#
+library(lme4)#
+library(lmerTest)#
+library(vegan)#
+library(linkcomm)#
+library(picante)#
+setwd('~/Dropbox/hedgerow_network/analysis/intBeta')#
+source('src/misc.R')#
+source('src/phyloIntBeta.R')#
+source('src/predictIntervals.R')#
+source('src/CIplotting.R')#
+load('../../data/spec_network.Rdata')#
+#
+## ************************************************************#
+## prepare link community in terminal#
+## ************************************************************#
+#
+## edges.com <- cbind(as.character(spec$GenusSpecies),#
+##                   as.character(spec$PlantGenusSpecies))#
+#
+## lc <- getLinkCommunities(edges.com, hcmethod = "average",#
+##                          bipartite=TRUE)#
+## save(lc, file="saved/lc.Rdata")#
+#
+## ************************************************************#
+## turnover of phylo interactions through time#
+## ************************************************************#
+load(file="saved/lc.Rdata")#
+phylo.int <- calcCommDis(spec, "Int", lc, abund.w=TRUE)#
+save(phylo.int, file="saved/phyloInt.Rdata")
+phylo.int$phylo.int
+phylo.int$tree.dist
+phylo.int$dist.tree
+head(phylo.int$dist.tree)
+phylo.int$dist.tree[1:10,]
+phylo.int$dist.tree[1:10]
+dim(dist.tree)
+dim(tree.dist)
+dim(phylo.int$dist.tree)
+length(phylo.int$dist.tree)
+phylo.int$comm
+length(phylo.int$comm)
+names(phylo.int$comm)
+hist(colSums(phylo.int$comm))
+hist(colSums(phylo.int$comm[[1]]))
+hist(colSums(phylo.int$comm[[2]]))
+hist(colSums(phylo.int$comm[[3]]))
+hist(colSums(phylo.int$comm[[4]]))
+hist(colSums(phylo.int$comm[[5]]))
+hist(colSums(phylo.int$comm[[6]]))
+hist(colSums(phylo.int$comm[[7]]))
+hist(colSums(phylo.int$comm[[8]]))
+hist(colSums(phylo.int$comm[[9]]))
+int.lives <- lapply(phylo.int$comm, colSums)
+int.lives
+int.lives <- lapply(phylo.int$comm, function(x) sort(colSums(x)))
+int.lives
+plot(NA, ylim=c(0,100, xlim=c(0,100))
+)
+plot(NA, ylim=c(0,100), xlim=c(0,100))
+lapply(int.lives, function(x) plot(denisty(x)))
+lapply(int.lives, function(x) plot(density(x)))
+lapply(int.lives, function(x) points(density(x)), type='l')
+lapply(int.lives, function(x) points(density(x), type='l'))
+plot(NA, ylim=c(0,100), xlim=c(0,100))#
+lapply(int.lives, function(x) points(density(x), type='l'))
+plot(NA, ylim=c(0,10), xlim=c(0,100))#
+lapply(int.lives, function(x) points(density(x), type='l'))
+plot(NA, ylim=c(0,1.5), xlim=c(0,100))#
+lapply(int.lives, function(x) points(density(x), type='l'))
+plot(NA, ylim=c(0,1), xlim=c(0,100))#
+lapply(int.lives, function(x) points(density(x), type='l'))
+plot(NA, ylim=c(0,1), xlim=c(0,100))#
+lapply(int.lives, function(x) points(density(x), type='l'))
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/cv')#
+source("plotting/src/predictIntervals.R")#
+source("plotting/src/CIplotting.R")#
+source('../networkLevel/src/misc.R', chdir = TRUE)#
+load('saved/contMods.Rdata')#
+#
+## ************************************************************#
+## dprime#
+## ************************************************************#
+#
+dd.dprime <- expand.grid(traits=seq(#
+                           from= min(dprime$data$traits),#
+                           to= max(dprime$data$traits),#
+                           length=10),#
+                         status= c("control", "maturing", "mature"),#
+                         cv= 0)#
+#
+dprime.pi <- predict.int(mod= dprime$lm,#
+                        dd=dd.dprime,#
+                        y="cv",#
+                        family="gaussian")#
+#
+plot.predict.div(new.dd=dprime.pi,#
+                 ylabel="Coefficient of variation",#
+                 dats=dprime$data,#
+                 xs="traits",#
+                 y1="cv",#
+                 xlabel="Specialization",#
+                 legend.loc="bottomright",#
+                 height=5,#
+                 width=5,#
+                 x.adj=0.5)#
+#
+## ************************************************************#
+## itd#
+## ************************************************************#
+#
+dd.itd <- expand.grid(traits=seq(#
+                           from= min(itd$data$traits, na.rm=TRUE),#
+                           to= max(itd$data$traits, na.rm=TRUE),#
+                           length=10),#
+                         status= c("control", "maturing", "mature"),#
+                         cv= 0)#
+#
+itd.pi <- predict.int(mod= itd$lm,#
+                        dd=dd.itd,#
+                        y="cv",#
+                        family="gaussian")#
+#
+plot.predict.div(new.dd=itd.pi,#
+                 ylabel="Coefficient of variation",#
+                 dats=itd$data,#
+                 xs="traits",#
+                 y1="cv",#
+                 xlabel="Body size",#
+                 legend.loc="bottomright",#
+                 height=5,#
+                 width=5,#
+                 x.adj=0.5)
+library(igraph)
+g <- graph.ring(10)#
+g <- add.edges(g, c(1,2, 2,3, 1,3))#
+graph.coreness(g)
+plot(g)
+rm(list=ls())#
+library(lme4)#
+library(vegan)#
+library(fields)#
+library(raster)#
+library(lmerTest)#
+setwd('~/Dropbox/hedgerow_assembly/analysis/cv')#
+source('src/misc.R')#
+source('src/cvCalc.R')#
+load('../../data/networks/allSpecimens.Rdata')
+colnames(spec)
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/resilence')#
+source('src/initialize.R')#
+#
+## either "abund" or "degree"#
+extinction.method <- "degree"
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/speciesLevel')#
+source('src/initialize.R')#
+#
+## create pp matrix for each site, year#
+nets <- break.net(spec)#
+#
+## **********************************************************#
+## species importance#
+## **********************************************************#
+specs <- calcSpec(nets, spec, spec.metric = "d", 0.3)#
+save(specs, file=file.path(save.path, 'specs.Rdata'))
+head(specs)
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/speciesLevel')#
+source('src/initialize.R')#
+#
+## create pp matrix for each site, year#
+nets <- break.net(spec)#
+#
+## **********************************************************#
+## species importance#
+## **********************************************************#
+specs <- calcSpec(nets, spec, spec.metric = "d", 0.3)
+species.lev <- lapply(nets, function(x){#
+    sl <- specieslevel(x)#
+    sl$'higher level'$tot.int <- colSums(x)#
+    sl$'lower level'$tot.int <- rowSums(x)#
+    return(sl)#
+  })
+species.level[[1]]
+species.lev[[1]]
+Q
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/speciesLevel')#
+source('src/initialize.R')#
+#
+## create pp matrix for each site, year#
+nets <- break.net(spec)#
+#
+## **********************************************************#
+## species importance#
+## **********************************************************#
+specs <- calcSpec(nets, spec, spec.metric = "d", 0.3)
+head(sl)
+sl$'higher level'$mean.k <- mean(sl$'higher level'$degree)#
+    sl$'lower level'$tot.int <- mean(sl$'lower level'$degree)
+head(sl)
+sl$'higher level'$tot.int <- colSums(x)#
+    sl$'lower level'$tot.int <- rowSums(x)#
+    sl$'higher level'$mean.k <- mean(sl$'higher level'$degree)#
+    sl$'lower level'$mean.k <- mean(sl$'lower level'$degree)#
+    sl$'higher level'$sd.k <- sd(sl$'higher level'$degree)#
+    sl$'lower level'$sd.k <- sd(sl$'lower level'$degree)#
+    sl$'higher level'$k <- (sl$'higher level'$degree -#
+                            sl$'higher level'$mean.k)/sl$'higher level'$sd.k#
+    sl$'lower level'$k <- (sl$'lower level'$degree -#
+                            sl$'lower level'$mean.k)/sl$'lower level'$sd.k
+head(sl)
+Q
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/speciesLevel')#
+source('src/initialize.R')#
+#
+## create pp matrix for each site, year#
+nets <- break.net(spec)#
+#
+## **********************************************************#
+## species importance#
+## **********************************************************#
+specs <- calcSpec(nets, spec, spec.metric = "d", 0.3)#
+save(specs, file=file.path(save.path, 'specs.Rdata'))#
+#
+## linear models#
+load(file=file.path(save.path, 'specs.Rdata'))#
+## SiteStatus or ypr#
+xvar <- "ypr"#
+#
+## anything outputted by specieslevel#
+ys <- c("proportional.generality", "d", "degree", "betweenness",#
+        "closeness")
+head)specs
+head(specs)
+save(specs, file=file.path(save.path, 'specs.Rdata'))
+rm(list=ls())#
+library(lme4)#
+library(vegan)#
+library(fields)#
+library(raster)#
+library(lmerTest)#
+setwd('~/Dropbox/hedgerow_assembly/analysis/cv')#
+source('src/misc.R')#
+source('src/cvCalc.R')#
+load('../../data/networks/allSpecimens.Rdata')#
+#
+## ************************************************************#
+## coefficient of variation through time#
+## ************************************************************#
+byDate <- aggregate(list(Abund=spec$GenusSpecies),#
+                    list(GenusSpecies= spec$GenusSpecies,#
+                         Date=spec$Date,#
+                         SiteStatus= spec$SiteStatus,#
+                         Site=spec$Site), length)#
+#
+dprime <- cv.trait(spec, byDate, trait="d",#
+                   method= "time")#
+#
+itd <- cv.trait(spec, byDate, trait="ITD",#
+                method= "time")#
+#
+save(itd, dprime, file="saved/contMods.Rdata")
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/cv')#
+source("plotting/src/predictIntervals.R")#
+source("plotting/src/CIplotting.R")#
+source('../networkLevel/src/misc.R', chdir = TRUE)#
+load('saved/contMods.Rdata')#
+#
+## ************************************************************#
+## dprime#
+## ************************************************************#
+#
+dd.dprime <- expand.grid(traits=seq(#
+                           from= min(dprime$data$traits),#
+                           to= max(dprime$data$traits),#
+                           length=10),#
+                         SiteStatus= c("control", "maturing", "mature"),#
+                         cv= 0)#
+#
+dprime.pi <- predict.int(mod= dprime$lm,#
+                        dd=dd.dprime,#
+                        y="cv",#
+                        family="gaussian")#
+#
+plot.predict.div(new.dd=dprime.pi,#
+                 ylabel="Coefficient of variation",#
+                 dats=dprime$data,#
+                 xs="traits",#
+                 y1="cv",#
+                 xlabel="Specialization",#
+                 legend.loc="bottomright",#
+                 height=5,#
+                 width=5,#
+                 x.adj=0.5)#
+#
+## ************************************************************#
+## itd#
+## ************************************************************#
+#
+dd.itd <- expand.grid(traits=seq(#
+                           from= min(itd$data$traits, na.rm=TRUE),#
+                           to= max(itd$data$traits, na.rm=TRUE),#
+                           length=10),#
+                         status= c("control", "maturing", "mature"),#
+                         cv= 0)#
+#
+itd.pi <- predict.int(mod= itd$lm,#
+                        dd=dd.itd,#
+                        y="cv",#
+                        family="gaussian")#
+#
+plot.predict.div(new.dd=itd.pi,#
+                 ylabel="Coefficient of variation",#
+                 dats=itd$data,#
+                 xs="traits",#
+                 y1="cv",#
+                 xlabel="Body size",#
+                 legend.loc="bottomright",#
+                 height=5,#
+                 width=5,#
+                 x.adj=0.5)
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/cv')#
+source("plotting/src/predictIntervals.R")#
+source("plotting/src/CIplotting.R")#
+source('../networkLevel/src/misc.R', chdir = TRUE)#
+load('saved/contMods.Rdata')#
+#
+## ************************************************************#
+## dprime#
+## ************************************************************#
+#
+dd.dprime <- expand.grid(traits=seq(#
+                           from= min(dprime$data$traits),#
+                           to= max(dprime$data$traits),#
+                           length=10),#
+                         SiteStatus= c("control", "maturing", "mature"),#
+                         cv= 0)#
+#
+dprime.pi <- predict.int(mod= dprime$lm,#
+                        dd=dd.dprime,#
+                        y="cv",#
+                        family="gaussian")#
+#
+plot.predict.div(new.dd=dprime.pi,#
+                 ylabel="Coefficient of variation",#
+                 dats=dprime$data,#
+                 xs="traits",#
+                 y1="cv",#
+                 xlabel="Specialization",#
+                 legend.loc="bottomright",#
+                 height=5,#
+                 width=5,#
+                 x.adj=0.5)#
+#
+## ************************************************************#
+## itd#
+## ************************************************************#
+#
+dd.itd <- expand.grid(traits=seq(#
+                           from= min(itd$data$traits, na.rm=TRUE),#
+                           to= max(itd$data$traits, na.rm=TRUE),#
+                           length=10),#
+                         SiteStatus= c("control", "maturing", "mature"),#
+                         cv= 0)#
+#
+itd.pi <- predict.int(mod= itd$lm,#
+                        dd=dd.itd,#
+                        y="cv",#
+                        family="gaussian")#
+#
+plot.predict.div(new.dd=itd.pi,#
+                 ylabel="Coefficient of variation",#
+                 dats=itd$data,#
+                 xs="traits",#
+                 y1="cv",#
+                 xlabel="Body size",#
+                 legend.loc="bottomright",#
+                 height=5,#
+                 width=5,#
+                 x.adj=0.5)
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/cv')#
+source("plotting/src/predictIntervals.R")#
+source("plotting/src/CIplotting.R")#
+source('../networkLevel/src/misc.R', chdir = TRUE)#
+load('saved/contMods.Rdata')#
+#
+## ************************************************************#
+## dprime#
+## ************************************************************#
+#
+dd.dprime <- expand.grid(traits=seq(#
+                           from= min(dprime$data$traits),#
+                           to= max(dprime$data$traits),#
+                           length=10),#
+                         SiteStatus= c("control", "maturing", "mature"),#
+                         cv= 0)#
+#
+dprime.pi <- predict.int(mod= dprime$lm,#
+                        dd=dd.dprime,#
+                        y="cv",#
+                        family="gaussian")#
+#
+plot.predict.div(new.dd=dprime.pi,#
+                 ylabel="Coefficient of variation",#
+                 dats=dprime$data,#
+                 xs="traits",#
+                 y1="cv",#
+                 xlabel="Specialization",#
+                 legend.loc="bottomright",#
+                 height=5,#
+                 width=5,#
+                 x.adj=0.5)#
+#
+## ************************************************************#
+## itd#
+## ************************************************************#
+#
+dd.itd <- expand.grid(traits=seq(#
+                           from= min(itd$data$traits, na.rm=TRUE),#
+                           to= max(itd$data$traits, na.rm=TRUE),#
+                           length=10),#
+                         SiteStatus= c("control", "maturing", "mature"),#
+                         cv= 0)#
+#
+itd.pi <- predict.int(mod= itd$lm,#
+                        dd=dd.itd,#
+                        y="cv",#
+                        family="gaussian")#
+#
+plot.predict.div(new.dd=itd.pi,#
+                 ylabel="Coefficient of variation",#
+                 dats=itd$data,#
+                 xs="traits",#
+                 y1="cv",#
+                 xlabel="Body size",#
+                 legend.loc="bottomright",#
+                 height=5,#
+                 width=5,#
+                 x.adj=0.5)
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/cv')#
+source("plotting/src/predictIntervals.R")#
+source("plotting/src/CIplotting.R")#
+source('../networkLevel/src/misc.R', chdir = TRUE)#
+load('saved/contMods.Rdata')#
+#
+## ************************************************************#
+## dprime#
+## ************************************************************#
+#
+dd.dprime <- expand.grid(traits=seq(#
+                           from= min(dprime$data$traits),#
+                           to= max(dprime$data$traits),#
+                           length=10),#
+                         SiteStatus= c("control", "maturing", "mature"),#
+                         cv= 0)#
+#
+dprime.pi <- predict.int(mod= dprime$lm,#
+                        dd=dd.dprime,#
+                        y="cv",#
+                        family="gaussian")#
+#
+plot.predict.div(new.dd=dprime.pi,#
+                 ylabel="Coefficient of variation",#
+                 dats=dprime$data,#
+                 xs="traits",#
+                 y1="cv",#
+                 xlabel="Specialization",#
+                 legend.loc="bottomright",#
+                 height=5,#
+                 width=5,#
+                 x.adj=0.5)#
+#
+## ************************************************************#
+## itd#
+## ************************************************************#
+#
+dd.itd <- expand.grid(traits=seq(#
+                           from= min(itd$data$traits, na.rm=TRUE),#
+                           to= max(itd$data$traits, na.rm=TRUE),#
+                           length=10),#
+                         SiteStatus= c("control", "maturing", "mature"),#
+                         cv= 0)#
+#
+itd.pi <- predict.int(mod= itd$lm,#
+                        dd=dd.itd,#
+                        y="cv",#
+                        family="gaussian")#
+#
+plot.predict.div(new.dd=itd.pi,#
+                 ylabel="Coefficient of variation",#
+                 dats=itd$data,#
+                 xs="traits",#
+                 y1="cv",#
+                 xlabel="Body size",#
+                 legend.loc="bottomright",#
+                 height=5,#
+                 width=5,#
+                 x.adj=0.5)
+rm(list=ls())#
+library(lme4)#
+library(vegan)#
+library(fields)#
+library(raster)#
+library(lmerTest)#
+setwd('~/Dropbox/hedgerow_assembly/analysis/cv')#
+source('src/misc.R')#
+source('src/cvCalc.R')#
+load('../../data/networks/allSpecimens.Rdata')#
+load(file= '../speciesLevel/saved/specs.Rdata'))
+load(file= '../speciesLevel/saved/specs.Rdata')
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/cv')#
+source('src/initialize.R')#
+#
+## ************************************************************#
+## coefficient of variation of abundance through time#
+## ************************************************************#
+byDate <- aggregate(list(Abund=spec$GenusSpecies),#
+                    list(GenusSpecies= spec$GenusSpecies,#
+                         Date=spec$Date,#
+                         SiteStatus= spec$SiteStatus,#
+                         Site=spec$Site), length)#
+#
+dprime <- cv.trait(spec, byDate, trait="d",#
+                   method= "time")#
+#
+itd <- cv.trait(spec, byDate, trait="ITD",#
+                method= "time")#
+#
+save(itd, dprime, file="saved/contMods.Rdata")
+Q
+Q
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/cv')#
+source('src/initialize.R')#
+#
+## ************************************************************#
+## coefficient of variation of abundance through time#
+## ************************************************************#
+byDate <- aggregate(list(Abund=spec$GenusSpecies),#
+                    list(GenusSpecies= spec$GenusSpecies,#
+                         Date=spec$Date,#
+                         SiteStatus= spec$SiteStatus,#
+                         Site=spec$Site), length)#
+#
+dprime <- cv.trait(spec, byDate, trait="d",#
+                   method= "time")#
+#
+itd <- cv.trait(spec, byDate, trait="ITD",#
+                method= "time")#
+#
+save(itd, dprime, file="saved/contMods.Rdata")
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/cv')#
+source('src/initialize.R')#
+#
+## ************************************************************#
+## coefficient of variation of abundance through time#
+## ************************************************************#
+byDate <- aggregate(list(Abund=spec$GenusSpecies),#
+                    list(GenusSpecies= spec$GenusSpecies,#
+                         Date=spec$Date,#
+                         SiteStatus= spec$SiteStatus,#
+                         Site=spec$Site), length)#
+#
+dprime <- cv.trait(spec, byDate, trait="d",#
+                   method= "time", time.col="Date",#
+                   abund.col="Abund")#
+#
+itd <- cv.trait(spec, byDate, trait="ITD",#
+                method= "time",  time.col="Date",#
+                   abund.col="Abund")#
+#
+save(itd, dprime, file="saved/contMods.Rdata")
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/cv')#
+source('src/initialize.R')#
+#
+## ************************************************************#
+## coefficient of variation of abundance through time#
+## ************************************************************#
+byDate <- aggregate(list(Abund=spec$GenusSpecies),#
+                    list(GenusSpecies= spec$GenusSpecies,#
+                         Date=spec$Date,#
+                         SiteStatus= spec$SiteStatus,#
+                         Site=spec$Site), length)#
+#
+dprime <- cv.trait(spec, byDate, trait="d",#
+                   method= "time", time.col="Date",#
+                   abund.col="Abund")#
+#
+itd <- cv.trait(spec, byDate, trait="ITD",#
+                method= "time",  time.col="Date",#
+                   abund.col="Abund")#
+#
+save(itd, dprime, file="saved/contMods.Rdata")
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/cv')#
+source("plotting/src/predictIntervals.R")#
+source("plotting/src/CIplotting.R")#
+source('../networkLevel/src/misc.R', chdir = TRUE)#
+load('saved/contMods.Rdata')#
+#
+## ************************************************************#
+## dprime#
+## ************************************************************#
+#
+dd.dprime <- expand.grid(traits=seq(#
+                           from= min(dprime$data$traits),#
+                           to= max(dprime$data$traits),#
+                           length=10),#
+                         SiteStatus= c("control", "maturing", "mature"),#
+                         cv= 0)#
+#
+dprime.pi <- predict.int(mod= dprime$lm,#
+                        dd=dd.dprime,#
+                        y="cv",#
+                        family="gaussian")#
+#
+plot.predict.div(new.dd=dprime.pi,#
+                 ylabel="Coefficient of variation",#
+                 dats=dprime$data,#
+                 xs="traits",#
+                 y1="cv",#
+                 xlabel="Specialization",#
+                 legend.loc="bottomright",#
+                 height=5,#
+                 width=5,#
+                 x.adj=0.5)#
+#
+## ************************************************************#
+## itd#
+## ************************************************************#
+#
+dd.itd <- expand.grid(traits=seq(#
+                           from= min(itd$data$traits, na.rm=TRUE),#
+                           to= max(itd$data$traits, na.rm=TRUE),#
+                           length=10),#
+                         SiteStatus= c("control", "maturing", "mature"),#
+                         cv= 0)#
+#
+itd.pi <- predict.int(mod= itd$lm,#
+                        dd=dd.itd,#
+                        y="cv",#
+                        family="gaussian")#
+#
+plot.predict.div(new.dd=itd.pi,#
+                 ylabel="Coefficient of variation",#
+                 dats=itd$data,#
+                 xs="traits",#
+                 y1="cv",#
+                 xlabel="Body size",#
+                 legend.loc="bottomright",#
+                 height=5,#
+                 width=5,#
+                 x.adj=0.5)
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/cv')#
+source('src/initialize.R')#
+#
+## ************************************************************#
+## coefficient of variation of abundance through time#
+## ************************************************************#
+byDate <- aggregate(list(Abund=spec$GenusSpecies),#
+                    list(GenusSpecies= spec$GenusSpecies,#
+                         Year=spec$Year,#
+                         SiteStatus= spec$SiteStatus,#
+                         Site=spec$Site), length)#
+#
+dprime <- cv.trait(spec, byDate, trait="d",#
+                   method= "time", time.col="Year",#
+                   abund.col="Abund")#
+#
+itd <- cv.trait(spec, byDate, trait="ITD",#
+                method= "time",  time.col="Year",#
+                   abund.col="Abund")#
+#
+save(itd, dprime, file="saved/contMods.Rdata")
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/cv')#
+source("plotting/src/predictIntervals.R")#
+source("plotting/src/CIplotting.R")#
+source('../networkLevel/src/misc.R', chdir = TRUE)#
+load('saved/contMods.Rdata')#
+#
+## ************************************************************#
+## dprime#
+## ************************************************************#
+#
+dd.dprime <- expand.grid(traits=seq(#
+                           from= min(dprime$data$traits),#
+                           to= max(dprime$data$traits),#
+                           length=10),#
+                         SiteStatus= c("control", "maturing", "mature"),#
+                         cv= 0)#
+#
+dprime.pi <- predict.int(mod= dprime$lm,#
+                        dd=dd.dprime,#
+                        y="cv",#
+                        family="gaussian")#
+#
+plot.predict.div(new.dd=dprime.pi,#
+                 ylabel="Coefficient of variation",#
+                 dats=dprime$data,#
+                 xs="traits",#
+                 y1="cv",#
+                 xlabel="Specialization",#
+                 legend.loc="bottomright",#
+                 height=5,#
+                 width=5,#
+                 x.adj=0.5)#
+#
+## ************************************************************#
+## itd#
+## ************************************************************#
+#
+dd.itd <- expand.grid(traits=seq(#
+                           from= min(itd$data$traits, na.rm=TRUE),#
+                           to= max(itd$data$traits, na.rm=TRUE),#
+                           length=10),#
+                         SiteStatus= c("control", "maturing", "mature"),#
+                         cv= 0)#
+#
+itd.pi <- predict.int(mod= itd$lm,#
+                        dd=dd.itd,#
+                        y="cv",#
+                        family="gaussian")#
+#
+plot.predict.div(new.dd=itd.pi,#
+                 ylabel="Coefficient of variation",#
+                 dats=itd$data,#
+                 xs="traits",#
+                 y1="cv",#
+                 xlabel="Body size",#
+                 legend.loc="bottomright",#
+                 height=5,#
+                 width=5,#
+                 x.adj=0.5)
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/cv')#
+source('src/initialize.R')
+dprime.k <- cv.trait(spec, specs, trait="d",#
+                   method= "time", time.col="Year",#
+                   abund.col="k")
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/cv')#
+source('src/initialize.R')
+dprime.k <- cv.trait(spec, specs, trait="d",#
+                   method= "time", time.col="Year",#
+                   abund.col="k")
+byStatus <- split(byType, byType$SiteStatus)
+bySite <- lapply(byStatus, function(x) {split(x, x$Site)})
+bySite <- unlist(bySite, recursive=FALSE)
+prep.cv <- lapply(bySite, function(y) {#
+    samp2site.spp(y[, time.col], y[,"GenusSpecies"], y[, abund.col])#
+  })
+time.col
+head(specs)
+Q
+dprime.k <- cv.trait(spec, specs, trait="d",#
+                   method= "time", time.col="assem",#
+                   abund.col="k")
+prep.cv <- lapply(bySite, function(y) {#
+    samp2site.spp(y[, time.col], y[,"GenusSpecies"], y[, abund.col])#
+  })
+byStatus <- split(byType, byType$SiteStatus)#
+  bySite <- lapply(byStatus, function(x) {split(x, x$Site)})#
+  bySite <- unlist(bySite, recursive=FALSE)#
+  prep.cv <- lapply(bySite, function(y) {#
+    samp2site.spp(y[, time.col], y[,"GenusSpecies"], y[, abund.col])#
+  })
+prep.cv
+coeff.cv <- lapply(prep.cv, function(x){apply(x, 2, cv)})
+coeff.cv
+dats <- data.frame(cv=unlist(coeff.cv))#
+  dats$SiteStatus <-  gsub('\\..*', '', rownames(dats))#
+  dats$SiteStatus <- factor(dats$SiteStatus, levels=status.order)#
+  dats$GenusSpecies <- unlist(lapply(coeff.cv, names))#
+  dats$Site <-  sapply(strsplit(rownames(dats), "\\."),#
+                       function(x) x[2])#
+  rownames(dats) <- NULL
+head(dats)
+coeff.cv
+gsub('\\..*', '', rownames(dats))
+coeff.cv <- lapply(prep.cv, function(x){apply(x, 2, cv)})#
+  dats <- data.frame(cv=unlist(coeff.cv))
+dats$SiteStatus <-  gsub('\\..*', '', rownames(dats))
+ehad(dats)
+head(dats)
+coeff.cv[[1]]
+prep.cv[[1]]
+coeff.cv <- lapply(prep.cv, function(x){apply(x, 2, cv)})#
+  dats <- data.frame(cv=unlist(coeff.cv))#
+  dats$SiteStatus <-  gsub('\\..*', '', rownames(dats))#
+  dats$SiteStatus <- factor(dats$SiteStatus, levels=status.order)#
+  dats$GenusSpecies <- unlist(lapply(coeff.cv, names))#
+  dats$Site <-  sapply(strsplit(rownames(dats), "\\."),#
+                       function(x) x[2])#
+  rownames(dats) <- NULL
+head(dats)
+dats
+dats[1:20,]
+dats[1:30,]
+?cv
+corCv <- function(x){#
+    cv(x)*(1 + (1/4*length(x)))#
+  }#
+  coeff.cv <- lapply(prep.cv, function(x){apply(x, 2, cv)})#
+  dats <- data.frame(cv=unlist(coeff.cv))#
+  dats$SiteStatus <-  gsub('\\..*', '', rownames(dats))#
+  dats$SiteStatus <- factor(dats$SiteStatus, levels=status.order)#
+  dats$GenusSpecies <- unlist(lapply(coeff.cv, names))#
+  dats$Site <-  sapply(strsplit(rownames(dats), "\\."),#
+                       function(x) x[2])#
+  rownames(dats) <- NULL
+head(dats)
+corCv <- function(x){#
+    cv(x)*(1 + (1/4*length(x)))#
+  }#
+  coeff.cv <- lapply(prep.cv, function(x){apply(x, 2, corCv)})#
+  dats <- data.frame(cv=unlist(coeff.cv))#
+  dats$SiteStatus <-  gsub('\\..*', '', rownames(dats))#
+  dats$SiteStatus <- factor(dats$SiteStatus, levels=status.order)#
+  dats$GenusSpecies <- unlist(lapply(coeff.cv, names))#
+  dats$Site <-  sapply(strsplit(rownames(dats), "\\."),#
+                       function(x) x[2])#
+  rownames(dats) <- NULL
+head(dats)
+dats$traits.ns <- spec.dat[,trait][match(dats$GenusSpecies,#
+                                             spec.dat$GenusSpecies)]#
+    dats$traits <- scale(dats$traits.ns)
+lm.cv <- lmer(cv ~ SiteStatus*traits + (1|Site) + (1|GenusSpecies),#
+                data=dats, REML=FALSE)
+summary(lm.cv)
+Q
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/cv')#
+source('src/initialize.R')#
+#
+## ************************************************************#
+## coefficient of variation of abundance through time#
+## ************************************************************#
+byYear <- aggregate(list(Abund=spec$GenusSpecies),#
+                    list(GenusSpecies= spec$GenusSpecies,#
+                         Year=spec$Year,#
+                         SiteStatus= spec$SiteStatus,#
+                         Site=spec$Site), length)#
+#
+dprime <- cv.trait(spec, byYear, trait="d",#
+                   method= "time", time.col="Year",#
+                   abund.col="Abund")#
+#
+itd <- cv.trait(spec, byYear, trait="ITD",#
+                method= "time",  time.col="Year",#
+                abund.col="Abund")#
+#
+save(itd, dprime, file="saved/contMods.Rdata")#
+#
+## ************************************************************#
+## coefficient of variation of degree thingy through time#
+## ************************************************************#
+#
+dprime.k <- cv.trait(spec, specs, trait="d",#
+                   method= "time", time.col="assem",#
+                   abund.col="k")
+dprime.k$dats
+dprime.k$data
+head(dprime.k$data)
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/cv')#
+source('src/initialize.R')
+dprime.k <- cv.trait(spec, specs, trait="d",#
+                   method= "time", time.col="assem",#
+                   abund.col="k")
+prep.cv[[1]]
+mean(-0.8782753, 0)/sd(-0.8782753, 0)
+sd(c(-0.8782753, 0))/mean(c(-0.8782753, 0))
+sd(c(-1.094082, 0))/mean(c(-1.094082, 0))
+sd(c(-1.094082, 0))
+mean(c(-1.094082, 0))
+sd(c(-0.8782753, 0))
+mean(c(-0.8782753, 0))
+0.7736328/-0.547041
+sd(c(-1.5, 0))/mean(c(-1.5, 0))
+sd(c(1.5, 0))/mean(c(1.5, 0))
+Q
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/cv')#
+source('src/initialize.R')#
+#
+## ************************************************************#
+## coefficient of variation of abundance through time#
+## ************************************************************#
+byYear <- aggregate(list(Abund=spec$GenusSpecies),#
+                    list(GenusSpecies= spec$GenusSpecies,#
+                         Year=spec$Year,#
+                         SiteStatus= spec$SiteStatus,#
+                         Site=spec$Site), length)#
+#
+dprime <- cv.trait(spec, byYear, trait="d",#
+                   method= "time", time.col="Year",#
+                   abund.col="Abund")#
+#
+itd <- cv.trait(spec, byYear, trait="ITD",#
+                method= "time",  time.col="Year",#
+                abund.col="Abund")#
+#
+save(itd, dprime, file="saved/contMods.Rdata")#
+#
+## ************************************************************#
+## coefficient of variation of degree thingy through time#
+## ************************************************************#
+#
+dprime.k <- cv.trait(spec, specs, trait="d",#
+                   method= "time", time.col="assem",#
+                   abund.col="k")
+Q
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/cv')#
+source('src/initialize.R')#
+#
+## ************************************************************#
+## coefficient of variation of abundance through time#
+## ************************************************************#
+byYear <- aggregate(list(Abund=spec$GenusSpecies),#
+                    list(GenusSpecies= spec$GenusSpecies,#
+                         Year=spec$Year,#
+                         SiteStatus= spec$SiteStatus,#
+                         Site=spec$Site), length)#
+#
+dprime <- cv.trait(spec, byYear, trait="d",#
+                   method= "time", time.col="Year",#
+                   abund.col="Abund")#
+#
+itd <- cv.trait(spec, byYear, trait="ITD",#
+                method= "time",  time.col="Year",#
+                abund.col="Abund")#
+#
+save(itd, dprime, file="saved/contMods.Rdata")#
+#
+## ************************************************************#
+## coefficient of variation of degree thingy through time#
+## ************************************************************#
+#
+dprime.k <- cv.trait(spec, specs, trait="d",#
+                   method= "time", time.col="assem",#
+                   abund.col="k")
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/cv')#
+source('src/initialize.R')#
+#
+## ************************************************************#
+## coefficient of variation of abundance through time#
+## ************************************************************#
+byYear <- aggregate(list(Abund=spec$GenusSpecies),#
+                    list(GenusSpecies= spec$GenusSpecies,#
+                         Year=spec$Year,#
+                         SiteStatus= spec$SiteStatus,#
+                         Site=spec$Site), length)#
+#
+dprime <- cv.trait(spec, byYear, trait="d",#
+                   method= "time", time.col="Year",#
+                   abund.col="Abund")#
+#
+itd <- cv.trait(spec, byYear, trait="ITD",#
+                method= "time",  time.col="Year",#
+                abund.col="Abund")#
+#
+save(itd, dprime, file="saved/contMods.Rdata")
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/cv')#
+source('src/initialize.R')#
+#
+## ************************************************************#
+## coefficient of variation of abundance through time#
+## ************************************************************#
+byYear <- aggregate(list(Abund=spec$GenusSpecies),#
+                    list(GenusSpecies= spec$GenusSpecies,#
+                         Year=spec$Year,#
+                         SiteStatus= spec$SiteStatus,#
+                         Site=spec$Site), length)#
+#
+dprime <- cv.trait(spec, byYear, trait="d",#
+                   method= "time", time.col="Year",#
+                   abund.col="Abund")#
+#
+itd <- cv.trait(spec, byYear, trait="ITD",#
+                method= "time",  time.col="Year",#
+                abund.col="Abund")#
+#
+save(itd, dprime, file="saved/contMods.Rdata")
+dprime.k <- cv.trait(spec, specs, trait="d",#
+                     method= "time", time.col="assem",#
+                     abund.col="k",#
+                     cor.function=sd)
+dprime.k <- cv.trait(spec, specs, trait="d",#
+                     method= "time", time.col="assem",#
+                     abund.col="k",#
+                     cv.function=sd)
+dprime$data
+dprime$lm
+summary(dprime$lm)
+head(specs)
+dprime.k <- cv.trait(spec, specs, trait="d",#
+                     method= "time", time.col="assem",#
+                     abund.col="weighted.closeness",#
+                     cv.function=sd)
+dprime.k <- cv.trait(spec, specs, trait="d",#
+                     method= "time", time.col="assem",#
+                     abund.col="k",#
+                     cv.function=sd)#
+dprime.closeness <- cv.trait(spec, specs, trait="d",#
+                     method= "time", time.col="assem",#
+                     abund.col="weighted.closeness",#
+                     cv.function=sd)
+dprime.closeness <- cv.trait(spec, specs, trait="d",#
+                     method= "time", time.col="assem",#
+                     abund.col="weighted.closeness",#
+                     cv.function=sd)
+summary(dprime.closeness$lm)
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/cv')#
+source('src/initialize.R')#
+#
+## ************************************************************#
+## coefficient of variation of abundance through time#
+## ************************************************************#
+byYear <- aggregate(list(Abund=spec$GenusSpecies),#
+                    list(GenusSpecies= spec$GenusSpecies,#
+                         Year=spec$Year,#
+                         SiteStatus= spec$SiteStatus,#
+                         Site=spec$Site), length)#
+#
+dprime <- cv.trait(spec, byYear, trait="d",#
+                   method= "time", time.col="Year",#
+                   abund.col="Abund")#
+#
+itd <- cv.trait(spec, byYear, trait="ITD",#
+                method= "time",  time.col="Year",#
+                abund.col="Abund")#
+#
+## ************************************************************#
+## coefficient of variation of degree thingy through time#
+## ************************************************************#
+#
+dprime.k <- cv.trait(spec, specs, trait="d",#
+                     method= "time", time.col="assem",#
+                     abund.col="k",#
+                     cv.function=sd)#
+dprime.closeness <- cv.trait(spec, specs, trait="d",#
+                     method= "time", time.col="assem",#
+                     abund.col="weighted.closeness",#
+                     cv.function=sd)#
+#
+save(itd, dprime, dprime.k, dprime.closeness,#
+     file="saved/contMods.Rdata")
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/cv')#
+source('src/initialize.R')
+dprime.k <- cv.trait(spec, specs, trait="d",#
+                     method= "time", time.col="assem",#
+                     abund.col="k",#
+                     cv.function=sd)
+prep.cv[[1]]
+prep.cv <- lapply(prep.cv, function(x) x[x == 0] <- NA)
+prep.cv[[1]]
+prep.cv <- lapply(bySite, function(y) {#
+    samp2site.spp(y[, time.col], y[,"GenusSpecies"], y[, abund.col])#
+  })
+prep.cv[[prep.cv==0]]
+prep.cv[[1]][prep.cv==0]
+prep.cv[[1]][prep.cv[[1]]==0]
+prep.cv[[1]][prep.cv[[1]]==0] <- NA
+prep.cv[[1]]
+Q
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/cv')#
+source('src/initialize.R')
+dprime.k <- cv.trait(spec, specs, trait="d",#
+                     method= "time", time.col="assem",#
+                     abund.col="k",#
+                     cv.function=sd)
+x
+x[x == 0]
+x[x == 0] <- NA
+Q
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/cv')#
+source('src/initialize.R')
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/cv')#
+source('src/initialize.R')#
+#
+## ************************************************************#
+## coefficient of variation of abundance through time#
+## ************************************************************#
+byYear <- aggregate(list(Abund=spec$GenusSpecies),#
+                    list(GenusSpecies= spec$GenusSpecies,#
+                         Year=spec$Year,#
+                         SiteStatus= spec$SiteStatus,#
+                         Site=spec$Site), length)#
+#
+dprime <- cv.trait(spec, byYear, trait="d",#
+                   method= "time", time.col="Year",#
+                   abund.col="Abund")#
+#
+itd <- cv.trait(spec, byYear, trait="ITD",#
+                method= "time",  time.col="Year",#
+                abund.col="Abund")
+dprime.k <- cv.trait(spec, specs, trait="d",#
+                     method= "time", time.col="assem",#
+                     abund.col="k",#
+                     cv.function=sd, zero2na=TRUE,#
+                     na.rm=TRUE)
+head(dprime.k$data)
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/cv')#
+source('src/initialize.R')#
+#
+## ************************************************************#
+## coefficient of variation of abundance through time#
+## ************************************************************#
+byYear <- aggregate(list(Abund=spec$GenusSpecies),#
+                    list(GenusSpecies= spec$GenusSpecies,#
+                         Year=spec$Year,#
+                         SiteStatus= spec$SiteStatus,#
+                         Site=spec$Site), length)#
+#
+dprime <- cv.trait(spec, byYear, trait="d",#
+                   method= "time", time.col="Year",#
+                   abund.col="Abund")
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/cv')#
+source('src/initialize.R')#
+#
+## ************************************************************#
+## coefficient of variation of abundance through time#
+## ************************************************************#
+byYear <- aggregate(list(Abund=spec$GenusSpecies),#
+                    list(GenusSpecies= spec$GenusSpecies,#
+                         Year=spec$Year,#
+                         SiteStatus= spec$SiteStatus,#
+                         Site=spec$Site), length)#
+#
+dprime <- cv.trait(spec, byYear, trait="d",#
+                   method= "time", time.col="Year",#
+                   abund.col="Abund")
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/cv')#
+source('src/initialize.R')#
+#
+## ************************************************************#
+## coefficient of variation of abundance through time#
+## ************************************************************#
+byYear <- aggregate(list(Abund=spec$GenusSpecies),#
+                    list(GenusSpecies= spec$GenusSpecies,#
+                         Year=spec$Year,#
+                         SiteStatus= spec$SiteStatus,#
+                         Site=spec$Site), length)#
+#
+dprime <- cv.trait(spec, byYear, trait="d",#
+                   method= "time", time.col="Year",#
+                   abund.col="Abund")#
+#
+itd <- cv.trait(spec, byYear, trait="ITD",#
+                method= "time",  time.col="Year",#
+                abund.col="Abund")#
+#
+## ************************************************************#
+## coefficient of variation of degree thingy through time#
+## ************************************************************#
+#
+dprime.k <- cv.trait(spec, specs, trait="d",#
+                     method= "time", time.col="assem",#
+                     abund.col="k",#
+                     cv.function=sd, zero2na=TRUE, na.rm=TRUE)
+dprime.k$cv
+dprime.k$data$cv
+dprime.k <- cv.trait(spec, specs, trait="d",#
+                     method= "time", time.col="assem",#
+                     abund.col="k",#
+                     cv.function=cvCor, zero2na=TRUE, na.rm=TRUE)
+dprime.k <- cv.trait(spec, specs, trait="d",#
+                     method= "time", time.col="assem",#
+                     abund.col="k",#
+                     cv.function=corCv, zero2na=TRUE, na.rm=TRUE)
+dprime.k <- cv.trait(spec, specs, trait="d",#
+                     method= "time", time.col="assem",#
+                     abund.col="k",#
+                     cv.function=corCv, zero2na=TRUE)
+summary(dprime.k)
+summary(dprime.k$lm)
+dprime.k.sd <- cv.trait(spec, specs, trait="d",#
+                     method= "time", time.col="assem",#
+                     abund.col="k",#
+                     cv.function=sd, zero2na=TRUE, na.rm=TRUE)
+summary(dprime.k.sd$lm)
+dprime.closeness <- cv.trait(spec, specs, trait="d",#
+                     method= "time", time.col="assem",#
+                     abund.col="weighted.closeness",#
+                     cv.function=corCv, zero2na=TRUE)
+summary(dprime.closeness$lm)
+dprime.closeness.sd <- cv.trait(spec, specs, trait="d",#
+                     method= "time", time.col="assem",#
+                     abund.col="weighted.closeness",#
+                     cv.function=sd, zero2na=TRUE, na.rm=TRUE )
+summary(dprime.closeness.sd$lm)
+dprime.closeness.sd <- cv.trait(spec, specs, trait="d",#
+                     method= "time", time.col="assem",#
+                     abund.col="weighted.closeness",#
+                     cv.function=sd)
+summary(dprime.closeness.sd$lm)
+summary(dprime.closeness$lm)
+summary(dprime.closeness.sd$lm)
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/cv')#
+source('src/initialize.R')#
+#
+## ************************************************************#
+## coefficient of variation of abundance through time#
+## ************************************************************#
+byYear <- aggregate(list(Abund=spec$GenusSpecies),#
+                    list(GenusSpecies= spec$GenusSpecies,#
+                         Year=spec$Year,#
+                         SiteStatus= spec$SiteStatus,#
+                         Site=spec$Site), length)#
+#
+dprime <- cv.trait(spec, byYear, trait="d",#
+                   method= "time", time.col="Year",#
+                   abund.col="Abund")#
+#
+itd <- cv.trait(spec, byYear, trait="ITD",#
+                method= "time",  time.col="Year",#
+                abund.col="Abund")#
+#
+## ************************************************************#
+## coefficient of variation of degree thingy through time#
+## ************************************************************#
+#
+dprime.k <- cv.trait(spec, specs, trait="d",#
+                     method= "time", time.col="assem",#
+                     abund.col="k",#
+                     cv.function=corCv, zero2na=TRUE)#
+dprime.k.sd <- cv.trait(spec, specs, trait="d",#
+                     method= "time", time.col="assem",#
+                     abund.col="k",#
+                     cv.function=sd)#
+#
+dprime.closeness <- cv.trait(spec, specs, trait="d",#
+                     method= "time", time.col="assem",#
+                     abund.col="weighted.closeness",#
+                     cv.function=corCv, zero2na=TRUE)#
+#
+dprime.closeness.sd <- cv.trait(spec, specs, trait="d",#
+                     method= "time", time.col="assem",#
+                     abund.col="weighted.closeness",#
+                     cv.function=sd)#
+#
+save(itd, dprime, dprime.k.sd, dprime.closeness.sd,#
+     file="saved/contMods.Rdata")
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/cv')#
+source("plotting/src/predictIntervals.R")#
+source("plotting/src/CIplotting.R")#
+source('../networkLevel/src/misc.R', chdir = TRUE)#
+load('saved/contMods.Rdata')#
+#
+## ************************************************************#
+## dprime abundance#
+## ************************************************************#
+#
+dd.dprime <- expand.grid(traits=seq(#
+                           from= min(dprime$data$traits),#
+                           to= max(dprime$data$traits),#
+                           length=10),#
+                         SiteStatus= c("control", "maturing", "mature"),#
+                         cv= 0)#
+#
+dprime.pi <- predict.int(mod= dprime$lm,#
+                        dd=dd.dprime,#
+                        y="cv",#
+                        family="gaussian")#
+#
+plot.predict.div(new.dd=dprime.pi,#
+                 ylabel="Coefficient of variation",#
+                 dats=dprime$data,#
+                 xs="traits",#
+                 y1="cv",#
+                 xlabel="Specialization",#
+                 legend.loc="bottomright",#
+                 height=5,#
+                 width=5,#
+                 x.adj=0.5)#
+## ************************************************************#
+## dprime abundance#
+## ************************************************************#
+#
+dprime.pi <- predict.int(mod= dprime.k.sd$lm,#
+                        dd=dd.dprime,#
+                        y="cv",#
+                        family="gaussian")
+dprime.pi
+plot.predict.div(new.dd=dprime.pi,#
+                 ylabel="Standard deviation of network position",#
+                 dats=dprime$data,#
+                 xs="traits",#
+                 y1="cv",#
+                 xlabel="Specialization",#
+                 legend.loc="bottomright",#
+                 height=5,#
+                 width=5,#
+                 x.adj=0.5)
+plot.predict.div(new.dd=dprime.pi,#
+                 ylabel="Network position variability",#
+                 dats=dprime$data,#
+                 xs="traits",#
+                 y1="cv",#
+                 xlabel="Specialization",#
+                 legend.loc="bottomright",#
+                 height=5,#
+                 width=5,#
+                 x.adj=0.5)
+plot.predict.div(new.dd=dprime.pi,#
+                 ylabel="Network position variability",#
+                 dats=dprime$data,#
+                 xs="traits",#
+                 y1="cv",#
+                 xlabel="Specialization",#
+                 legend.loc="topright",#
+                 height=5,#
+                 width=5,#
+                 x.adj=0.5)
+plot.predict.div(new.dd=dprime.pi,#
+                 ylabel="Network position variability",#
+                 dats=dprime.k.sd$data,#
+                 xs="traits",#
+                 y1="cv",#
+                 xlabel="Specialization",#
+                 legend.loc="topright",#
+                 height=5,#
+                 width=5,#
+                 x.adj=0.5)
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/cv')#
+source('src/initialize.R')#
+#
+## ************************************************************#
+## coefficient of variation of abundance through time#
+## ************************************************************#
+byYear <- aggregate(list(Abund=spec$GenusSpecies),#
+                    list(GenusSpecies= spec$GenusSpecies,#
+                         Year=spec$Year,#
+                         SiteStatus= spec$SiteStatus,#
+                         Site=spec$Site), length)#
+#
+dprime <- cv.trait(spec, byYear, trait="d",#
+                   method= "time", time.col="Year",#
+                   abund.col="Abund")#
+#
+itd <- cv.trait(spec, byYear, trait="ITD",#
+                method= "time",  time.col="Year",#
+                abund.col="Abund")#
+#
+## ************************************************************#
+## coefficient of variation of degree thingy through time#
+## ************************************************************#
+#
+dprime.k <- cv.trait(spec, specs, trait="d",#
+                     method= "time", time.col="assem",#
+                     abund.col="k",#
+                     cv.function=corCv, zero2na=TRUE)
+summary(dprime.k$lm)
+dprime.k.sd <- cv.trait(spec, specs, trait="d",#
+                     method= "time", time.col="assem",#
+                     abund.col="k",#
+                     cv.function=sd,  zero2na=TRUE, na.rm=TRUE)
+summary(dprime.k.sd$lm)
+dprime.closeness <- cv.trait(spec, specs, trait="d",#
+                     method= "time", time.col="assem",#
+                     abund.col="weighted.closeness",#
+                     cv.function=corCv, zero2na=TRUE)
+summary(dprime.closeness$lm)

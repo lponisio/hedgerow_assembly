@@ -3,7 +3,7 @@
 
 break.net <- function(spec.dat){
   samp2site.spp <- function(site, spp, abund) { 
-    x <- tapply(abund, list(site= site, spp= spp), sum)
+    x <- tapply(abund, list(site= site, spp= spp), mean)
     x[is.na(x)] <- 0
     return(x)
   }

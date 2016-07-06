@@ -6,14 +6,14 @@ source('../networkLevel/src/misc.R', chdir = TRUE)
 load('saved/contMods.Rdata')
 
 ## ************************************************************
-## dprime
+## dprime abundance
 ## ************************************************************
 
 dd.dprime <- expand.grid(traits=seq(
                            from= min(dprime$data$traits),
                            to= max(dprime$data$traits),
                            length=10),
-                         status= c("control", "maturing", "mature"),
+                         SiteStatus= c("control", "maturing", "mature"),
                          cv= 0)
 
 dprime.pi <- predict.int(mod= dprime$lm,
@@ -32,15 +32,36 @@ plot.predict.div(new.dd=dprime.pi,
                  width=5,
                  x.adj=0.5)
 
+
 ## ************************************************************
-## itd
+## dprime abundance
+## ************************************************************
+
+dprime.pi <- predict.int(mod= dprime.k.sd$lm,
+                        dd=dd.dprime,
+                        y="cv",
+                        family="gaussian")
+
+plot.predict.div(new.dd=dprime.pi,
+                 ylabel="Network position variability",
+                 dats=dprime.k.sd$data,
+                 xs="traits",
+                 y1="cv",
+                 xlabel="Specialization",
+                 legend.loc="topright",
+                 height=5,
+                 width=5,
+                 x.adj=0.5)
+
+## ************************************************************
+## itd abundance
 ## ************************************************************
 
 dd.itd <- expand.grid(traits=seq(
                            from= min(itd$data$traits, na.rm=TRUE),
                            to= max(itd$data$traits, na.rm=TRUE),
                            length=10),
-                         status= c("control", "maturing", "mature"),
+                         SiteStatus= c("control", "maturing", "mature"),
                          cv= 0)
 
 itd.pi <- predict.int(mod= itd$lm,
