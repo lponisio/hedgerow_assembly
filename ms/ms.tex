@@ -1,0 +1,125 @@
+\documentclass[12pt]{article}
+\usepackage[pdftex]{graphicx}
+\usepackage[numbers]{natbib}
+% \usepackage{natbib}
+\usepackage{color}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{verbatim}
+\usepackage{mathpazo}
+\usepackage{setspace}
+\usepackage{multirow}
+\usepackage{fullpage}
+\usepackage{lscape}
+\usepackage{array}
+\usepackage{paralist}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{longtable}
+\usepackage{times}
+\usepackage{textcomp}
+\usepackage{xr}
+\usepackage{etoolbox}
+\usepackage{filecontents}
+\usepackage{url}
+\externaldocument{SI}
+
+\makeatletter
+\def\@biblabel#1{#1.\\}
+\makeatother
+
+\bibliographystyle{gcb}
+
+\parindent=2em
+\setlength{\parskip}{1ex}
+
+\RequirePackage{lineno}
+
+
+\def\title{The assembly of plant-pollinator networks}
+
+\def\author{Lauren C.\ Ponisio$^{1}$, Marilia P.\ Gaiarsa$^2$
+  and Asher Mullokandov$^3$}
+
+\def\runninghead{Temporal network assembly}
+
+\def\affiliation{
+  \begin{enumerate}
+  \item Department of Environmental Science, Policy, and Management\\
+    University of California, Berkeley\\
+    130 Mulford Hall\\
+    Berkeley, California, USA\\
+    94720\\
+  \item Departamento de Ecologia\\
+    Universidade de Sao Paulo\\
+    Sao Paulo, SP, Brazil\\
+    05508-900\\
+  \item Department of Physics\\
+    Boston University\\
+    Boston, MA, USA\\
+    02215\\
+  \end{enumerate}
+}
+
+\newcommand{\mstitlepage}{
+  \paragraph{Running head:} \textsc{\runninghead}
+  % \parindent=0pt
+  \begin{center}%
+    {\LARGE \title \par}%
+    \vskip 3em%
+    {\large
+      \lineskip .75em%
+      \begin{tabular}[t]{c}%
+        \author
+      \end{tabular}\par}%
+    \vskip 1.5em%
+  \end{center}\par
+  \affiliation
+}
+\clearpage
+
+\begin{document}
+
+\mstitlepage
+\doublespacing
+\linenumbers
+\clearpage
+
+\begin{abstract}
+  The structure of networks is related to ability of communities to
+  maintain function in the face of species extinction. Understanding
+  network structure and how it relates to network disassembly,
+  therefore, is a priority for system-level conservation biology.  We
+  explore the assembly of plant-pollinator communities on native plant
+  restorations in the Central Valley of California. The assembling
+  communities are paired with unrestored field margins (controls) and
+  mature (non-assembling) hedgerows. We determine whether there are
+  change points in the assembly of the communities where the network
+  undergoes significant reorganization. We are also ask how are the
+  individual species changing their interaction patterns? What does
+  this mean for the topology/resilience of the network? We also
+  attempted to adapt a financial model to mutualistic networks. Our
+  biggest difficulty with this approach was to translate the price
+  term to mutualistic systems. We explored a range of approaches, such
+  as number of visits a species performs. However, it seems that
+  financial systems cannot be easily translated to mutualistic
+  systems. In addition, we used a Changing Point Detection Algorithm
+  to assess weather the different communities went through a critical
+  reorganization on their interaction patterns. We were able to
+  identify some changing points in the communities, and also to
+  explore some general patterns commonly used to describe ecological
+  networks. For example, on the network level, networks become
+  increasingly modular and less nested, whereas on the species level,
+  species become more specialized, as resources become more reliable.
+\end{abstract}
+
+Keywords: pollinators, community assembly, networks, changing points,
+temporal networks
+ \clearpage
+
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-PDF-mode: t
+%%% End:
