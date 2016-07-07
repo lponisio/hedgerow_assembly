@@ -1,0 +1,54 @@
+\documentclass[12pt]{article}
+\usepackage[top=0.85in, bottom=0.93in, right=0.93in, left=0.93in,
+paperwidth=8.5in, paperheight=11in, nohead]{geometry}
+\geometry{letterpaper}
+\usepackage[pdftex]{graphicx}
+\usepackage{color}
+\usepackage[normalem]{ulem}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{epstopdf}
+\usepackage{setspace}
+\usepackage{mdwlist}
+\usepackage{verbatim}
+\usepackage[numbers]{natbib}
+
+%% make bibliography more compact \setlength{\bibsep}{0in}
+\renewcommand\bibsection{\subsubsection*{\refname}}
+
+\begin{document}
+
+\begin{centering}
+  \large {\bf The assembly of plant-pollinator communities in response
+    to restoration} \\
+\end{centering}
+\vspace{0.15in}
+
+\section{Questions}
+\begin{enumerate}
+\item Do the maturing hedgerows undergo a change point during
+  assembly? Is that change point associated with drought? Do the
+  ``controls'', unrestored and mature hedgerows undergo a change point
+  in responce to drought similar to the maturing hedgerows?
+\item Even if the network isn't shifting drastically, are the roles of
+  species changing? Assess whether (and how) species roles/importance
+  are changing through time, as community matures.
+\item Are the maturing hedgerows getting more resilient through
+  time? Examine the resilience of the maturing communities through time,
+  as well as the different site types
+\item can we predict the fate of pollinator species to ``exctinction''
+  of their plants in response to drought? Simulate the extinction of
+  plants affected by drought, and see if the predict extinct
+  pollinator species that are
+\end{enumerate}
+
+
+
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-PDF-mode: t
+%%% End:
+
+
