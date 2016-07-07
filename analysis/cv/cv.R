@@ -12,39 +12,48 @@ byYear <- aggregate(list(Abund=spec$GenusSpecies),
                          Site=spec$Site), length)
 
 dprime <- cv.trait(spec, byYear, trait="d",
-                   method= "time", time.col="Date",
+                   method= "time",
+                   time.col="Date",
                    abund.col="Abund")
 
 itd <- cv.trait(spec, byYear, trait="ITD",
-                method= "time",  time.col="Date",
+                method= "time",
+                time.col="Date",
                 abund.col="Abund")
 
 ## ************************************************************
 ## coefficient of variation of degree thingy through time
 ## ************************************************************
 
-dprime.k <- cv.trait(spec, specs, trait="d",
+dprime.k.sd <- cv.trait(spec,
+                        specs[specs$speciesType =="pollinator",],
+                        trait="d",
+                        method= "time", time.col="assem",
+                        abund.col="k",
+                        cv.function=sd,
+                        zero2na=TRUE, standard.cv=FALSE,
+                        na.rm=TRUE)
+
+dprime.closeness.sd <- cv.trait(spec,
+                                specs[specs$speciesType =="pollinator",],
+                                trait="d",
+                                method= "time", time.col="assem",
+                                abund.col="weighted.closeness",
+                                cv.function=sd, zero2na=TRUE,
+                                standard.cv=FALSE,
+                                na.rm=TRUE)
+
+occ.k.sd <- cv.trait(spec,
+                     specs[specs$speciesType =="pollinator",],
+                     trait="occ.date",
                      method= "time", time.col="assem",
                      abund.col="k",
-                     cv.function=corCv, zero2na=TRUE)
+                     cv.function=sd, zero2na=TRUE, standard.cv=FALSE,
+                     na.rm=TRUE)
 
 
-dprime.k.sd <- cv.trait(spec, specs, trait="d",
-                     method= "time", time.col="assem",
-                     abund.col="k",
-                     cv.function=sd,  zero2na=TRUE, na.rm=TRUE)
 
-dprime.closeness <- cv.trait(spec, specs, trait="d",
-                     method= "time", time.col="assem",
-                     abund.col="weighted.closeness",
-                     cv.function=corCv, zero2na=TRUE)
-
-dprime.closeness.sd <- cv.trait(spec, specs, trait="d",
-                     method= "time", time.col="assem",
-                     abund.col="weighted.closeness",
-                     cv.function=sd)
-
-save(itd, dprime, dprime.k.sd, dprime.closeness.sd,
+save(itd, dprime, dprime.k.sd, dprime.closeness.sd, occ.k.sd,
      file="saved/contMods.Rdata")
 
 

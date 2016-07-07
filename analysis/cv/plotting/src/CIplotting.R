@@ -56,7 +56,7 @@ plot.panel <- function(dats,
   }
   plot(NA,
        xlim=range(dats[, xs], na.rm=TRUE),
-       ylim=range(c(new.dd$phi,  new.dd$plo, na.rm=TRUE)),
+       ylim=range(c(new.dd$phi,  new.dd$plo), na.rm=TRUE),
        xlab="",
        ylab="",
        xaxt="n",
@@ -96,7 +96,8 @@ plot.predict.div <- function(new.dd,
   plot.ci <- function(){
     col.lines <-  brewer.pal(3, "Dark2")[c(2, 1, 3)]
     col.fill <- add.alpha(col.lines, alpha=0.2)
-    treatments <- c("control", "maturing", "mature")
+    ## treatments <- c("control", "maturing", "mature")
+    treatments <- c("control")
     names(col.lines) <- names(col.fill) <- treatments
     layout(matrix(1, ncol=1))
     par(oma=c(6, 5, 2, 1),
@@ -108,10 +109,10 @@ plot.predict.div <- function(new.dd,
                ylabel,
                scaled=scaled)
     mtext(xlabel, 1, line=3.5, cex=1.5, adj=x.adj)
-    legend(legend.loc,
-           legend=c("Unrestored", "Maturing", "Mature"),
-           col=col.lines,
-           pch=16, bty="n", cex=1)
+    ## legend(legend.loc,
+    ##        legend=c("Unrestored", "Maturing", "Mature"),
+    ##        col=col.lines,
+    ##        pch=16, bty="n", cex=1)
   }
   path <- 'figures'
   pdf.f(plot.ci, file=file.path(path,

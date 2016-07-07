@@ -13,7 +13,8 @@ cv.trait <- function(spec.dat,
                      abund.col,
                      status.order=c("control", "maturing", "mature"),
                      cv.function=corCv,
-                     zero2na =FALSE, ...){
+                     zero2na =FALSE,
+                     standard.cv=TRUE,...){
   byStatus <- split(byType, byType$SiteStatus)
   bySite <- lapply(byStatus, function(x) {split(x, x$Site)})
   bySite <- unlist(bySite, recursive=FALSE)
@@ -21,13 +22,16 @@ cv.trait <- function(spec.dat,
     samp2site.spp(y[, time.col], y[,"GenusSpecies"], y[, abund.col])
   })
   if(zero2na){
-  prep.cv <- lapply(prep.cv, function(x){
-    x[x == 0] <- NA
-    return(x)
-  })
-}
+    prep.cv <- lapply(prep.cv, function(x){
+      x[x == 0] <- NA
+      return(x)
+    })
+  }
   coeff.cv <- lapply(prep.cv, function(x){apply(x, 2, cv.function, ...)})
   dats <- data.frame(cv=unlist(coeff.cv))
+  if(standard.cv){
+    dats$cv <- dats$cv/100
+  }
   dats$SiteStatus <-  gsub('\\..*', '', rownames(dats))
   dats$SiteStatus <- factor(dats$SiteStatus, levels=status.order)
   dats$GenusSpecies <- unlist(lapply(coeff.cv, names))
@@ -43,7 +47,7 @@ cv.trait <- function(spec.dat,
                                           spec.dat$GenusSpecies)]
   }
   lm.cv <- lmer(cv ~ SiteStatus*traits + (1|Site) + (1|GenusSpecies),
-                data=dats, REML=FALSE)
+                data=dats[!is.na(dats$cv),])
   return(list(data=dats, lm=lm.cv))
 }
 
