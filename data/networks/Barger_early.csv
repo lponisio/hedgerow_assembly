@@ -1,15 +1,15 @@
 "","Agapostemon texanus","Allograpta obliqua","Anthophora urbana","Ashmeadiella aridula astragali","Bombus melanopygus","Ceratina acantha","Ceratina dallatorreana","Ceriana tridens","Diadasia enavata","Eristalis arbustorum","Eucera frater albopilosa","Eupeodes fumipennis","Eupeodes volucris","Halictus ligatus","Halictus tripartitus","Helophilus latifrons","Lasioglossum (Dialictus) diversopunctatum","Lasioglossum (Dialictus) incompletum","Lasioglossum (Dialictus) megastictum","Lasioglossum (Dialictus) tegulare group","Megachile gentilis","Megachile onobrychidis","Megachile rotundata","Melissodes agilis","Melissodes lupina","Melissodes robustior","Melissodes tepida timberlakei","Paragus haemorrhous","Scaeva pyrastri","Sphaerophoria contigua","Sphaerophoria pyrrhina","Sphaerophoria sulphuripes","Syritta flaviventris","Syritta pipiens","Syrphus opinator","Toxomerus marginatus","Triepeolus sp. EM","Triepeolus sp. FM","Triepeolus sp. nr. lestes"
 "Ambrosia sp.",0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-"Asclepias fascicularis",0,0,0,0,0,0,0,0,1,0,0,0,0,3,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+"Asclepias fascicularis",0,0,0,0,0,0,0,0,1,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 "Baccharis salicifolia",0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-"Brassica sp.",0,0,0,1,0,1,0,0,0,0,0,1,0,9,4,0,6,11,0,1,0,0,0,0,1,0,0,2,0,0,0,1,0,1,0,3,0,0,0
-"Carduus pycnocephalus",0,0,0,0,1,1,0,0,0,0,1,2,1,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,1,0,0,0,0
+"Brassica sp.",0,0,0,1,0,1,0,0,0,0,0,1,0,1,1,0,1,1,0,1,0,0,0,0,1,0,0,1,0,0,0,1,0,1,0,1,0,0,0
+"Carduus pycnocephalus",0,0,0,0,1,1,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,1,0,0,0,0
 "Ceanothus sp.",0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0
-"Centaurea solstitialis",0,0,1,0,0,0,0,0,3,0,0,0,0,7,0,0,0,1,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,2,0,0,0
-"Convolvulus arvensis",1,0,0,0,0,1,3,0,2,0,0,1,0,0,3,0,0,21,1,1,0,0,0,0,0,0,1,1,0,0,0,1,1,0,0,4,0,1,0
+"Centaurea solstitialis",0,0,1,0,0,0,0,0,1,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0
+"Convolvulus arvensis",1,0,0,0,0,1,1,0,1,0,0,1,0,0,1,0,0,1,1,1,0,0,0,0,0,0,1,1,0,0,0,1,1,0,0,1,0,1,0
 "Eschscholzia californica",0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-"Lactuca serriola",0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,3,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0
-"Lepidium latifolium",0,2,0,0,0,0,0,1,0,4,0,0,0,13,7,1,4,26,0,6,0,1,0,0,0,0,2,11,0,1,2,0,1,3,0,54,0,0,0
-"Marrubium vulgare",0,0,1,0,0,2,0,0,0,0,0,0,0,1,0,0,0,3,0,0,1,0,1,1,1,2,0,1,0,0,0,0,0,0,0,0,2,0,1
-"Raphanus raphanistrum",0,0,0,0,0,0,0,0,0,0,0,1,0,0,2,0,0,3,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-"Silybum marianum",2,0,0,0,0,2,0,0,0,0,0,0,0,5,1,0,0,6,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0
+"Lactuca serriola",0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0
+"Lepidium latifolium",0,1,0,0,0,0,0,1,0,1,0,0,0,1,1,1,1,1,0,1,0,1,0,0,0,0,1,1,0,1,1,0,1,1,0,1,0,0,0
+"Marrubium vulgare",0,0,1,0,0,1,0,0,0,0,0,0,0,1,0,0,0,1,0,0,1,0,1,1,1,1,0,1,0,0,0,0,0,0,0,0,1,0,1
+"Raphanus raphanistrum",0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+"Silybum marianum",1,0,0,0,0,1,0,0,0,0,0,0,0,1,1,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0

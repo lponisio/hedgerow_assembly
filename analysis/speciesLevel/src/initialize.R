@@ -6,7 +6,6 @@ library(RColorBrewer)
 source('../../dataPrep/src/prepNets.R')
 source('src/CalcMetrics.R')
 source('src/misc.R')
-source("src/prepNets.R")
 source("src/specialization.R")
 
 traits <- read.csv("../../data/traits.csv")

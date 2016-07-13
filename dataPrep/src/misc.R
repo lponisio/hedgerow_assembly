@@ -2,8 +2,8 @@
 ## This functions takes site-species-abundance data and creates a
 ## matrix where the sites are columns and the rows are species.
 
-samp2site.spp <- function(site, spp, abund) {
-  x <- tapply(abund, list(site = site, spp = spp), sum)
+samp2site.spp <- function(site, spp, abund, FUN=mean) {
+  x <- tapply(abund, list(site = site, spp = spp), FUN)
   x[is.na(x)] <- 0
   return(x)
 }

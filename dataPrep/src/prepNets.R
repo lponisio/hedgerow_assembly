@@ -6,15 +6,15 @@ getDiffVisits <- function(site, dats, metrics, sp.type){
 
   ## add zeros to plant species that were not visited in early/late assem
   not.in.late <- early[, "types"][!early[, "types"] %in%
-                                   late[, "types"]]
+                                  late[, "types"]]
   late <- rbind(late, data.frame(types=not.in.late,
-                                       visits=rep(0,
-                                                  length(not.in.late))))
+                                 visits=rep(0,
+                                   length(not.in.late))))
   not.in.early <- late[, "types"][!late[, "types"] %in%
-                                   early[, "types"]]
+                                  early[, "types"]]
   early <- rbind(early, data.frame(types=not.in.early,
-                                         visits=rep(0,
-                                                    length(not.in.early))))
+                                   visits=rep(0,
+                                     length(not.in.early))))
 
   late <- late[match(early[, "types"], late[, "types"]),]
   diffs <- late[, metrics] - early[, metrics]
@@ -67,15 +67,20 @@ getVisitChange <- function(cut.off1, cut.off2, metric, type, type2){
   return(visit.diffs)
 }
 
+
+
+
 ## the purpose of this function is to break up data with many
 ## sites/years and prepare it for network analysis.
 
+dropNet <- function(z){
+  z[!sapply(z, FUN=function(q){
+    any(dim(q) < 3)
+  })]
+}
+
 breakNet <- function(spec.dat, site, year){
   ## puts data together in a list and removes empty matrices
-  dropNet <- function(z)
-    z[!sapply(z, FUN=function(q){
-      any(dim(q) < 3)
-    })]
   sites <- split(spec.dat, spec.dat[,site])
   networks <- lapply(sites, function(x){
     lapply(split(x, f=x[,year]), as.matrix)
@@ -87,8 +92,10 @@ breakNet <- function(spec.dat, site, year){
                   abund=rep(1, nrow(y)))
   }, how="replace")
   adj.mat <- unlist(lapply(comms, dropNet), recursive=FALSE)
-  names(adj.mat) <- sub("\\.", "_", names(adj.mat),
-                           perl=TRUE)
+  if(year == "assem"){
+    names(adj.mat) <- sub("\\.", "_", names(adj.mat),
+                          perl=TRUE)
+  }
   return(adj.mat)
 }
 
@@ -97,11 +104,11 @@ getSpecies <- function(networks, FUN){
   species.site <- lapply(networks, FUN)
   site.plant <- rep(names(species.site), lapply(species.site, length))
   species <- data.frame(species=do.call(c, species.site),
-                       siteStatus=site.plant,
-                       site= sapply(strsplit(site.plant, "_"), function(x)
-                         x[1]),
-                       status= sapply(strsplit(site.plant, "_"), function(x)
-                           x[2]))
+                        siteStatus=site.plant,
+                        site= sapply(strsplit(site.plant, "_"), function(x)
+                          x[1]),
+                        status= sapply(strsplit(site.plant, "_"), function(x)
+                          x[2]))
   return(species)
 }
 
@@ -109,10 +116,10 @@ getSpecies <- function(networks, FUN){
 ## saves each element of a list with corresponding name
 saveDats <- function(x, y, f.path){
   mapply(function(a, b)
-    write.csv(a, file=file.path(f.path,
-                                sprintf("%s.csv", b))),
-    a=x, b=y,
-    SIMPLIFY=FALSE)
+         write.csv(a, file=file.path(f.path,
+                        sprintf("%s.csv", b))),
+         a=x, b=y,
+         SIMPLIFY=FALSE)
 }
 
 
@@ -149,7 +156,7 @@ getColExt <- function(dats){
     species <- c(colonists, ext)
     return(data.frame(species=species,
                       class=c(rep("colonist", length(colonists)),
-                              rep("extinction", length(ext))),
+                        rep("extinction", length(ext))),
                       site=rep(x, length(species))))
   })
   out <- do.call(rbind, out)

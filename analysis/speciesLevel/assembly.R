@@ -1,9 +1,7 @@
 rm(list=ls())
 setwd('~/Dropbox/hedgerow_assembly/analysis/speciesLevel')
 source('src/initialize.R')
-
-## create pp matrix for each site, year
-nets <- break.net(spec)
+load('../../data/networks/all_networks_years.Rdata')
 
 ## **********************************************************
 ## species importance

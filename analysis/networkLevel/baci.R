@@ -1,15 +1,8 @@
 rm(list=ls())
 setwd('~/Dropbox/hedgerow_assembly/analysis/networkLevel')
 source('src/initialize.R')
+load('../../data/networks/baci_networks_years.Rdata')
 N <- 999
-
-## ************************************************************
-## create site by year neworks and calculate statistics
-## (in terminal)
-## ************************************************************
-## create pp matrix for each site, year
-nets <- break.net(spec)
-save(nets, file='../../data/networks/networks_years.Rdata')
 
 ## ************************************************************
 ## individuals nulls

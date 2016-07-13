@@ -1,10 +1,6 @@
 rm(list=ls())
 setwd('~/Dropbox/hedgerow_assembly/analysis/networkLevel')
 source('src/initialize.R')
-source('src/diffs.R')
-source('src/misc.R')
-library(lme4)
-library(lmerTest)
 
 ## *******************************************************************
 ## comparison of pollinator generalization

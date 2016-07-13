@@ -14,10 +14,12 @@ syr.trait <-
   read.csv(file.path(trait.dir, 'syr.csv'),
            row.names=1)
 
-
 spec <- dd
+
+## subset to net specimens
 spec <- spec[spec$NetPan == 'net',]
 
+## subset to just bees and syrphids
 spec <- spec[spec$Family == 'Syrphidae' |
              spec$BeeNonbee == 'bee',]
 
@@ -37,7 +39,7 @@ agg.spec <- aggregate(list(abund=spec$GenusSpecies),
                       length)
 
 nets.all <- samp2site.spp(agg.spec$PlantGenusSpecies,
-                      agg.spec$GenusSpecies, agg.spec$abund)
+                      agg.spec$GenusSpecies, agg.spec$abund, FUN=sum)
 
 all.specializations <- specieslevel(nets.all,
                                     index=c("proportional generality",
@@ -50,9 +52,13 @@ rownames(traits) <- NULL
 
 write.csv(traits, file="../data/traits.csv", row.names=FALSE)
 
+
+## drop forb and natural sites 
 to.drop.status <- c("forb", "natural")
 spec <- spec[!spec$SiteStatus %in% to.drop.status,]
 
+## add various traits
+## specialization
 spec$d <- traits$d[match(spec$GenusSpecies, traits$GenusSpecies)]
 
 ## occurence
@@ -95,7 +101,21 @@ spec$WingLength <- syr.trait$WingLength[match(spec$GenusSpecies,
 
 save(spec, file='../data/networks/allSpecimens.Rdata')
 
+site.years <- aggregate(Year~ Site, data=spec,
+                        function(x) length(unique(x)))
 
+sites.to.keep <- site.years$Site[site.years$Year >= 5]
+
+## *******************************************************************
+## create networks
+## all sites with > 5 years
+nets <- breakNet(spec[spec$Site %in% sites.to.keep,], 'Site', 'Year')
+
+## save networks for each site, timeframe
+f.path <- '../data/networks'
+save(nets, file=file.path(f.path, 'all_networks_years.Rdata'))
+
+## *******************************************************************
 ## keep only BACI sites
 BACI.site <- c('Barger', 'Butler', 'Hrdy', 'MullerB', 'Sperandio')
 spec <-  spec[spec$Site %in% BACI.site,]
@@ -121,12 +141,17 @@ veg.sum <- aggregate(list(abundance=veg$NumQuads),
 
 ## *******************************************************************
 ## create networks
+
+## by early/late assembly 
 networks <- breakNet(spec, 'Site', 'assem')
 
 ## save networks for each site, timeframe
-f.path <- '../data/networks'
 saveDats(networks, names(networks), f.path)
 save(networks, file=file.path(f.path, 'networks_stages.Rdata'))
+
+## for each year
+nets <- breakNet(spec, 'Site', 'Year')
+save(nets, file=file.path(f.path, 'baci_networks_years.Rdata'))
 
 ## *******************************************************************
 ## specialization of each species at each site

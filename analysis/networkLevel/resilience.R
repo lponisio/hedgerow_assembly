@@ -1,12 +1,10 @@
 rm(list=ls())
 setwd('~/Dropbox/hedgerow_assembly/analysis/networkLevel')
 source('src/initialize.R')
+load('../../data/networks/all_networks_years.Rdata')
 
 ## either "abund" or "degree"
 extinction.method <- "degree"
-
-## create pp matrix for each site, year
-nets <- break.net(spec)
 
 ## **********************************************************
 ## robustness
