@@ -50,8 +50,6 @@ traits <- data.frame(GenusSpecies= unlist(sapply(all.specializations,
                      do.call(rbind, all.specializations))
 rownames(traits) <- NULL
 
-write.csv(traits, file="../data/traits.csv", row.names=FALSE)
-
 
 ## drop forb and natural sites 
 to.drop.status <- c("forb", "natural")
@@ -76,6 +74,8 @@ findOcc <- function(x){
 }
 
 spec$occ.date <- apply(spec, 1, findOcc)
+traits$occ.date <- spec$occ.date[match(traits$GenusSpecies,
+                                       spec$GenusSpecies)]
 
 ## bee functional traits
 
@@ -100,6 +100,8 @@ spec$WingLength <- syr.trait$WingLength[match(spec$GenusSpecies,
                                               rownames(syr.trait))]
 
 save(spec, file='../data/networks/allSpecimens.Rdata')
+write.csv(traits, file="../data/traits.csv", row.names=FALSE)
+
 
 site.years <- aggregate(Year~ Site, data=spec,
                         function(x) length(unique(x)))
