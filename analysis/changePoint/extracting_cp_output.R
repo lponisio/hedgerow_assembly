@@ -1,4 +1,4 @@
-srm(list=ls())
+rm(list=ls())
 library(reshape)
 setwd("~/Dropbox/hedgerow_assembly/analysis/changePoint/cptPeel")
 
