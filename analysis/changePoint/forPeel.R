@@ -27,6 +27,8 @@ colnames(all.pp) <- pols
 nets <- rapply(nets, expandNets, all.mat=all.pp,
                how="replace")
 
+save(nets, file="data/networks/expanded_networks.Rdata")
+
 graphs <- lapply(nets, graph.incidence, weighted=TRUE, add.names=NA)
 names(graphs) <- gsub("[.]", "_", names(graphs))
 save(graphs, nets, file=file.path(f.path, "graphs_num.Rdata"))

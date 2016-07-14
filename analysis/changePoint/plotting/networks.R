@@ -2,7 +2,6 @@ rm(list=ls())
 setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')
 library(ape)
 library(igraph)
-library(parallel)
 source('../networkLevel/src/misc.R')
 source('plotting/src/communities.R', chdir = TRUE)
 

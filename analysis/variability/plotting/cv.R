@@ -1,6 +1,6 @@
 rm(list=ls())
 library(RColorBrewer)
-setwd('~/Dropbox/hedgerow_assembly/analysis/cv')
+setwd('~/Dropbox/hedgerow_assembly/analysis/variability')
 source("plotting/src/predictIntervals.R")
 source("plotting/src/CIplotting.R")
 source('../networkLevel/src/misc.R', chdir = TRUE)
