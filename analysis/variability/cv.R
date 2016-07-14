@@ -57,10 +57,10 @@ save(itd, dprime, dprime.k.sd, dprime.closeness.sd, occ.k.sd,
      file="saved/contMods.Rdata")
 
 occ.k.sd$data$spec <-
-  dprime$data$traits[match(occ.k.sd$data$GenusSpecies,
+  dprime$data$traits.ns[match(occ.k.sd$data$GenusSpecies,
                            dprime$data$GenusSpecies)]
                            
-plot(occ.k.sd$data$traits ~ occ.k.sd$data$spec)
+plot(occ.k.sd$data$traits.ns ~ occ.k.sd$data$spec)
 ## ************************************************************
 ## coefficient of variation through space
 ## ************************************************************

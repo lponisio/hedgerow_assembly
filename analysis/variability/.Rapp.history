@@ -1,992 +1,7 @@
 rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-library(ape)#
-library(igraph)#
-library(parallel)#
-source('../networkLevel/src/misc.R')#
-options(mc.cores=5)#
-fig.path <- 'plotting/figures'#
-f.path <- "cptPeel/baci"#
-load(file=file.path(f.path, "graphs.Rdata"))#
-#
-temp <- list.files(f.path, pattern="*.gml")#
-tree.graphs <-  lapply(temp, function(x){#
-  read.graph(file.path(f.path, x), format="gml")#
-})#
-#
-#### plotting#
-#
-sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
-sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
-#
-plotNet <- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(net), nrow=1))#
-  for(j in 1:length(net)){#
-    g <- net[[j]][plant.sums != 0, pol.sums !=0]#
-    gs <- graph.incidence(g, weighted=TRUE)#
-    cols <- c(rep("darkolivegreen", length(rownames(g))),#
-           rep("gold", length(colnames(g))))#
-    V(gs)$color <- cols#
-    importance <-  (c(rowSums(g) +0.1, colSums(g) + 0.1)/sum(g))*20#
-    v.labs <- names(importance)#
-    v.labs[importance < 5] = ""#
-    V(gs)$size <- importance#
-    E(gs)$width <- (E(gs)$weight/sum(E(gs)$weight))*20#
-    gs$layout <- layout_in_circle#
-    plot.igraph(gs, vertex.label="")#
-                ## ## vertex.label.cex=importance/10,#
-                ## vertex.label=v.labs)#
-  }#
-}#
-plotDend <- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(this.tree), nrow=1))#
-  for(j in 1:length(this.tree)){#
-    comm.tree <- this.tree[[j]]#
-    l <- layout_with_fr(comm.tree)#
-    ceb <- cluster_edge_betweenness(comm.tree)#
-    plot(ceb, comm.tree, vertex.label="",#
-         edge.width=0.4,#
-         vertex.size=4,#
-         edge.arrow.mode=0,#
-         layout=l) #
-  }#
-}#
-for(i in unique(sites)){#
-  net <- nets[sites == i]#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  this.tree <- tree.graphs[sites.trees == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-   pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_communities.pdf", i)),#
-        width=10, height=4)#
-  ## hrg <- hrgs[sites == i]#
-  ## pdf.f(plotDend,#
-  ##       file=file.path(fig.path, sprintf("%s_dendrograms.pdf", i)),#
-  ##       width=16, height=6)#
-#
-}#
-## out <- list()#
-## for(i in unique(sites)){#
-##   this.graph <- graphs[sites == i]#
-##   out[[i]] <- do.call(this.graph, +)#
-## }#
-#
-## plotHgr <- function(ihgr){#
-##   vn <- sub("Actor ", "", V(ihrg)$name)#
-##   colbar <- rainbow(length(optcom))#
-##   vc <- ifelse(is.na(V(ihrg)$prob), colbar[V(karate)$comm], "darkblue")#
-##   V(ihrg)$label <- ifelse(is.na(V(ihrg)$prob), vn, round(V(ihrg)$prob, 2))#
-##   par(mar=c(0,0.5,0,0))#
-##   plot(ihrg, vertex.size=10, edge.arrow.size=0.2,#
-##        vertex.shape="none", vertex.label.color=vc)#
-## }#
-## ap <- c(rep("P", length(rownames(nets1))),rep("A", length(colnames(nets1))))#
-## V(g1)$type <- ap#
-## colrs <- c(rep("tomato", length(rownames(nets1))),#
-##            rep("gold", length(colnames(nets1))))#
-## V(g1)$color <- colrs#
-## tree.hrg <- lapply(hrgs, hrg_tree)#
-#
-## dendro.hrg <- lapply(hrgs, hrg.dendrogram)#
-#
-## ihrgs <- lapply(hrgs, as.igraph)#
-#
-##  dendPlot(hrgs[[1]])#
-## ## hrgs#
-## hrgs <- mclapply(graphs, fit_hrg)#
-## ## hrg.trees <- mapply(function(a, b)#
-## ##                     consensus_tree(graph = a,#
-## ##                                    hrg = b,#
-## ##                                    num.samples = 10000),#
-## ##                     a =graphs,#
-## ##                     b = hrgs,#
-## ##                     SIMPLIFY = FALSE)#
-#
-## save(hrgs, file=file.path(f.path, "hrgs.Rdata"))#
-#
-## ## ## community clusters#
-## ## clust.gs <- mclapply(graphs, function(g){#
-## ##   optcom <- cluster_optimal(g)#
-## ##   V(g)$comm <- membership(optcom)#
-## ##   return(optcom)#
-## ## })#
-#
-## clust.gs <- mclapply(graphs,  cluster_optimal)#
-#
-## save(clust.gs, file=file.path(f.path, "clusts.Rdata"))                 #
-#
-## ihrgs <- lapply(hrgs, as.igraph)#
-## plotDend<- function(){#
-##   par(mar=c(0,0.5,0,0))#
-##   layout(matrix(1:length(hrg), nrow=1))#
-##   for(j in 1:length(hrg)){#
-##     plot_dendrogram(hrg[[j]])#
-##   }#
-## }
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-library(ape)#
-library(igraph)#
-library(parallel)#
-source('../networkLevel/src/misc.R')#
-source('plotting/src/communities.R', chdir = TRUE)#
-#
-fig.path <- 'plotting/figures'#
-f.path <- "cptPeel/baci"#
-load(file=file.path(f.path, "graphs.Rdata"))#
-#
-temp <- list.files(f.path, pattern="*.gml")#
-tree.graphs <-  lapply(temp, function(x){#
-  read.graph(file.path(f.path, x), format="gml")#
-})#
-#
-#### plotting#
-#
-sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
-sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
-#
-for(i in unique(sites)){#
-  net <- nets[sites == i]#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  this.tree <- tree.graphs[sites.trees == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-   pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_communities.pdf", i)),#
-        width=10, height=4)#
-}#
-## out <- list()#
-## for(i in unique(sites)){#
-##   this.graph <- graphs[sites == i]#
-##   out[[i]] <- do.call(this.graph, +)#
-## }#
-#
-## plotHgr <- function(ihgr){#
-##   vn <- sub("Actor ", "", V(ihrg)$name)#
-##   colbar <- rainbow(length(optcom))#
-##   vc <- ifelse(is.na(V(ihrg)$prob), colbar[V(karate)$comm], "darkblue")#
-##   V(ihrg)$label <- ifelse(is.na(V(ihrg)$prob), vn, round(V(ihrg)$prob, 2))#
-##   par(mar=c(0,0.5,0,0))#
-##   plot(ihrg, vertex.size=10, edge.arrow.size=0.2,#
-##        vertex.shape="none", vertex.label.color=vc)#
-## }#
-## ap <- c(rep("P", length(rownames(nets1))),rep("A", length(colnames(nets1))))#
-## V(g1)$type <- ap#
-## colrs <- c(rep("tomato", length(rownames(nets1))),#
-##            rep("gold", length(colnames(nets1))))#
-## V(g1)$color <- colrs#
-## tree.hrg <- lapply(hrgs, hrg_tree)#
-#
-## dendro.hrg <- lapply(hrgs, hrg.dendrogram)#
-#
-## ihrgs <- lapply(hrgs, as.igraph)#
-#
-##  dendPlot(hrgs[[1]])#
-## ## hrgs#
-## hrgs <- mclapply(graphs, fit_hrg)#
-## ## hrg.trees <- mapply(function(a, b)#
-## ##                     consensus_tree(graph = a,#
-## ##                                    hrg = b,#
-## ##                                    num.samples = 10000),#
-## ##                     a =graphs,#
-## ##                     b = hrgs,#
-## ##                     SIMPLIFY = FALSE)#
-#
-## save(hrgs, file=file.path(f.path, "hrgs.Rdata"))#
-#
-## ## ## community clusters#
-## ## clust.gs <- mclapply(graphs, function(g){#
-## ##   optcom <- cluster_optimal(g)#
-## ##   V(g)$comm <- membership(optcom)#
-## ##   return(optcom)#
-## ## })#
-#
-## clust.gs <- mclapply(graphs,  cluster_optimal)#
-#
-## save(clust.gs, file=file.path(f.path, "clusts.Rdata"))                 #
-#
-## ihrgs <- lapply(hrgs, as.igraph)#
-## plotDend<- function(){#
-##   par(mar=c(0,0.5,0,0))#
-##   layout(matrix(1:length(hrg), nrow=1))#
-##   for(j in 1:length(hrg)){#
-##     plot_dendrogram(hrg[[j]])#
-##   }#
-## }
-names(tree.graphs)
-tree.graphs
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-library(ape)#
-library(igraph)#
-library(parallel)#
-source('../networkLevel/src/misc.R')#
-source('plotting/src/communities.R', chdir = TRUE)#
-#
-fig.path <- 'plotting/figures'#
-f.path <- "cptPeel/baci"#
-load(file=file.path(f.path, "graphs.Rdata"))#
-#
-temp <- list.files(f.path, pattern="*.gml")#
-tree.graphs <-  lapply(temp, function(x){#
-  read.graph(file.path(f.path, x), format="gml")#
-})
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-library(ape)#
-library(igraph)#
-library(parallel)#
-source('../networkLevel/src/misc.R')#
-source('plotting/src/communities.R', chdir = TRUE)#
-#
-fig.path <- 'plotting/figures'#
-f.path <- "cptPeel/baci"#
-load(file=file.path(f.path, "graphs.Rdata"))#
-#
-temp <- list.files(f.path, pattern="*.gml")#
-tree.graphs <-  lapply(temp, function(x){#
-  read.graph(file.path(f.path, x), format="gml")#
-})
-names(tree.graphs)
-tree.graphs
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-library(ape)#
-library(igraph)#
-library(parallel)#
-source('../networkLevel/src/misc.R')#
-source('plotting/src/communities.R', chdir = TRUE)#
-#
-fig.path <- 'plotting/figures'#
-f.path <- "cptPeel/baci"#
-load(file=file.path(f.path, "graphs.Rdata"))#
-#
-temp <- list.files(f.path, pattern="*.gml")#
-tree.graphs <-  lapply(temp, function(x){#
-  read.graph(file.path(f.path, x), format="gml")#
-})#
-#
-#### plotting#
-#
-sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
-sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
-#
-for(i in unique(sites)){#
-  net <- nets[sites == i]#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  this.tree <- tree.graphs[sites.trees == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-   ## pdf.f(plotDend,#
-   ##      file=file.path(fig.path, sprintf("%s_communities.pdf", i)),#
-   ##      width=10, height=4)#
-}#
-## out <- list()#
-## for(i in unique(sites)){#
-##   this.graph <- graphs[sites == i]#
-##   out[[i]] <- do.call(this.graph, +)#
-## }#
-#
-## plotHgr <- function(ihgr){#
-##   vn <- sub("Actor ", "", V(ihrg)$name)#
-##   colbar <- rainbow(length(optcom))#
-##   vc <- ifelse(is.na(V(ihrg)$prob), colbar[V(karate)$comm], "darkblue")#
-##   V(ihrg)$label <- ifelse(is.na(V(ihrg)$prob), vn, round(V(ihrg)$prob, 2))#
-##   par(mar=c(0,0.5,0,0))#
-##   plot(ihrg, vertex.size=10, edge.arrow.size=0.2,#
-##        vertex.shape="none", vertex.label.color=vc)#
-## }#
-## ap <- c(rep("P", length(rownames(nets1))),rep("A", length(colnames(nets1))))#
-## V(g1)$type <- ap#
-## colrs <- c(rep("tomato", length(rownames(nets1))),#
-##            rep("gold", length(colnames(nets1))))#
-## V(g1)$color <- colrs#
-## tree.hrg <- lapply(hrgs, hrg_tree)#
-#
-## dendro.hrg <- lapply(hrgs, hrg.dendrogram)#
-#
-## ihrgs <- lapply(hrgs, as.igraph)#
-#
-##  dendPlot(hrgs[[1]])#
-## ## hrgs#
-## hrgs <- mclapply(graphs, fit_hrg)#
-## ## hrg.trees <- mapply(function(a, b)#
-## ##                     consensus_tree(graph = a,#
-## ##                                    hrg = b,#
-## ##                                    num.samples = 10000),#
-## ##                     a =graphs,#
-## ##                     b = hrgs,#
-## ##                     SIMPLIFY = FALSE)#
-#
-## save(hrgs, file=file.path(f.path, "hrgs.Rdata"))#
-#
-## ## ## community clusters#
-## ## clust.gs <- mclapply(graphs, function(g){#
-## ##   optcom <- cluster_optimal(g)#
-## ##   V(g)$comm <- membership(optcom)#
-## ##   return(optcom)#
-## ## })#
-#
-## clust.gs <- mclapply(graphs,  cluster_optimal)#
-#
-## save(clust.gs, file=file.path(f.path, "clusts.Rdata"))                 #
-#
-## ihrgs <- lapply(hrgs, as.igraph)#
-## plotDend<- function(){#
-##   par(mar=c(0,0.5,0,0))#
-##   layout(matrix(1:length(hrg), nrow=1))#
-##   for(j in 1:length(hrg)){#
-##     plot_dendrogram(hrg[[j]])#
-##   }#
-## }
-for(i in unique(sites)){#
-  net <- nets[sites == i]#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  this.tree <- tree.graphs[sites.trees == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-   pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_communities.pdf", i)),#
-        width=10, height=4)#
-}
-site.trees
-sites.treess
-sites.trees
-for(i in unique(sites.trees)){#
-  net <- nets[sites == i]#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  this.tree <- tree.graphs[sites.trees == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-   pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_communities.pdf", i)),#
-        width=10, height=4)#
-}
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-library(ape)#
-library(igraph)#
-library(parallel)#
-source('../networkLevel/src/misc.R')#
-source('plotting/src/communities.R', chdir = TRUE)#
-#
-fig.path <- 'plotting/figures'#
-f.path <- "cptPeel/baci"#
-load(file=file.path(f.path, "graphs.Rdata"))#
-#
-temp <- list.files(f.path, pattern="*.gml")#
-tree.graphs <-  lapply(temp, function(x){#
-  read.graph(file.path(f.path, x), format="gml")#
-})#
-#
-#### plotting#
-#
-sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
-sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
-all.poss.yrs <- 2006:2015
-all.poss.yrs
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-library(ape)#
-library(igraph)#
-library(parallel)#
-source('../networkLevel/src/misc.R')#
-source('plotting/src/communities.R', chdir = TRUE)#
-#
-fig.path <- 'plotting/figures'#
-f.path <- "cptPeel/baci"#
-load(file=file.path(f.path, "graphs.Rdata"))#
-#
-temp <- list.files(f.path, pattern="*.gml")#
-tree.graphs <-  lapply(temp, function(x){#
-  read.graph(file.path(f.path, x), format="gml")#
-})#
-#
-#### plotting#
-#
-sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
-sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
-all.poss.yrs <- 2006:2015#
-#
-for(i in unique(sites.trees)){#
-  net <- nets[sites == i]#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  this.tree <- tree.graphs[sites.trees == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_communities.pdf", i)),#
-        width=10, height=4)#
-}
-layout(matrix(1:length(all.poss.yrs), nrow=1))
-quartz()
-layout(matrix(1:length(all.poss.yrs), nrow=1))
-net
-length(net)
-length(all.poss.yrs)
-names(net)
-Q
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-library(ape)#
-library(igraph)#
-library(parallel)#
-source('../networkLevel/src/misc.R')#
-source('plotting/src/communities.R', chdir = TRUE)#
-#
-fig.path <- 'plotting/figures'#
-f.path <- "cptPeel/baci"#
-load(file=file.path(f.path, "graphs.Rdata"))#
-#
-temp <- list.files(f.path, pattern="*.gml")#
-tree.graphs <-  lapply(temp, function(x){#
-  read.graph(file.path(f.path, x), format="gml")#
-})#
-#
-#### plotting#
-#
-sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
-sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
-all.poss.yrs <- 2006:2015#
-#
-for(i in unique(sites.trees)){#
-  net <- nets[sites == i]#
-  yrs <- sapply(strsplit(names(net), "[.]"), function(x) x[2])#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  this.tree <- tree.graphs[sites.trees == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_communities.pdf", i)),#
-        width=10, height=4)#
-}
-yrs
-j
-Q
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-library(ape)#
-library(igraph)#
-library(parallel)#
-source('../networkLevel/src/misc.R')#
-source('plotting/src/communities.R', chdir = TRUE)#
-#
-fig.path <- 'plotting/figures'#
-f.path <- "cptPeel/baci"#
-load(file=file.path(f.path, "graphs.Rdata"))#
-#
-temp <- list.files(f.path, pattern="*.gml")#
-tree.graphs <-  lapply(temp, function(x){#
-  read.graph(file.path(f.path, x), format="gml")#
-})#
-#
-#### plotting#
-#
-sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
-sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
-all.poss.yrs <- 2006:2015#
-#
-for(i in unique(sites.trees)){#
-  net <- nets[sites == i]#
-  yrs <- sapply(strsplit(names(net), "[.]"), function(x) x[2])#
-  names(nets) <- yrs#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  this.tree <- tree.graphs[sites.trees == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_communities.pdf", i)),#
-        width=10, height=4)#
-}
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-library(ape)#
-library(igraph)#
-library(parallel)#
-source('../networkLevel/src/misc.R')#
-source('plotting/src/communities.R', chdir = TRUE)#
-#
-fig.path <- 'plotting/figures'#
-f.path <- "cptPeel/baci"#
-load(file=file.path(f.path, "graphs.Rdata"))#
-#
-temp <- list.files(f.path, pattern="*.gml")#
-tree.graphs <-  lapply(temp, function(x){#
-  read.graph(file.path(f.path, x), format="gml")#
-})#
-#
-#### plotting#
-#
-sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
-sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
-all.poss.yrs <- 2006:2015#
-#
-for(i in unique(sites.trees)){#
-  net <- nets[sites == i]#
-  yrs <- sapply(strsplit(names(net), "[.]"), function(x) x[2])#
-  names(nets) <- yrs#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  this.tree <- tree.graphs[sites.trees == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_communities.pdf", i)),#
-        width=10, height=4)#
-}
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-library(ape)#
-library(igraph)#
-library(parallel)#
-source('../networkLevel/src/misc.R')#
-source('plotting/src/communities.R', chdir = TRUE)#
-#
-fig.path <- 'plotting/figures'#
-f.path <- "cptPeel/baci"#
-load(file=file.path(f.path, "graphs.Rdata"))#
-#
-temp <- list.files(f.path, pattern="*.gml")#
-tree.graphs <-  lapply(temp, function(x){#
-  read.graph(file.path(f.path, x), format="gml")#
-})#
-#
-#### plotting#
-#
-sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
-sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
-all.poss.yrs <- 2006:2015#
-#
-for(i in unique(sites.trees)){#
-  net <- nets[sites == i]#
-  yrs <- sapply(strsplit(names(net), "[.]"), function(x) x[2])#
-  names(nets) <- yrs#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  this.tree <- tree.graphs[sites.trees == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_communities.pdf", i)),#
-        width=10, height=4)#
-}
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-library(ape)#
-library(igraph)#
-library(parallel)#
-source('../networkLevel/src/misc.R')#
-source('plotting/src/communities.R', chdir = TRUE)#
-#
-fig.path <- 'plotting/figures'#
-f.path <- "cptPeel/baci"#
-load(file=file.path(f.path, "graphs.Rdata"))#
-#
-temp <- list.files(f.path, pattern="*.gml")#
-tree.graphs <-  lapply(temp, function(x){#
-  read.graph(file.path(f.path, x), format="gml")#
-})#
-#
-#### plotting#
-#
-sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
-sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
-all.poss.yrs <- 2006:2015#
-#
-for(i in unique(sites.trees)){#
-  net <- nets[sites == i]#
-  yrs <- sapply(strsplit(names(net), "[.]"), function(x) x[2])#
-  names(nets) <- yrs#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  this.tree <- tree.graphs[sites.trees == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_communities.pdf", i)),#
-        width=10, height=4)#
-}
-j
-net[[j]]
-names(net)
-Q
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-library(ape)#
-library(igraph)#
-library(parallel)#
-source('../networkLevel/src/misc.R')#
-source('plotting/src/communities.R', chdir = TRUE)#
-#
-fig.path <- 'plotting/figures'#
-f.path <- "cptPeel/baci"#
-load(file=file.path(f.path, "graphs.Rdata"))#
-#
-temp <- list.files(f.path, pattern="*.gml")#
-tree.graphs <-  lapply(temp, function(x){#
-  read.graph(file.path(f.path, x), format="gml")#
-})#
-#
-#### plotting#
-#
-sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
-sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
-all.poss.yrs <- 2006:2015#
-#
-for(i in unique(sites.trees)){#
-  net <- nets[sites == i]#
-  yrs <- sapply(strsplit(names(net), "[.]"), function(x) x[2])#
-  names(nets) <- yrs#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  this.tree <- tree.graphs[sites.trees == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_communities.pdf", i)),#
-        width=10, height=4)#
-}
-names(nets)
-names(net)
-Q
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-library(ape)#
-library(igraph)#
-library(parallel)#
-source('../networkLevel/src/misc.R')#
-source('plotting/src/communities.R', chdir = TRUE)#
-#
-fig.path <- 'plotting/figures'#
-f.path <- "cptPeel/baci"#
-load(file=file.path(f.path, "graphs.Rdata"))#
-#
-temp <- list.files(f.path, pattern="*.gml")#
-tree.graphs <-  lapply(temp, function(x){#
-  read.graph(file.path(f.path, x), format="gml")#
-})#
-#
-#### plotting#
-#
-sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
-sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
-all.poss.yrs <- 2006:2015#
-#
-for(i in unique(sites.trees)){#
-  net <- nets[sites == i]#
-  yrs <- sapply(strsplit(names(net), "[.]"), function(x) x[2])#
-  names(net) <- yrs#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  this.tree <- tree.graphs[sites.trees == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_communities.pdf", i)),#
-        width=10, height=4)#
-}
-net[[j]]
-names(net)
-net[[j]]
-j
-net[j]
-net
-names(nets)
-names(net)
-net[["2007"]]
-net[[as.character(j)]]
-Q
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-library(ape)#
-library(igraph)#
-library(parallel)#
-source('../networkLevel/src/misc.R')#
-source('plotting/src/communities.R', chdir = TRUE)#
-#
-fig.path <- 'plotting/figures'#
-f.path <- "cptPeel/baci"#
-load(file=file.path(f.path, "graphs.Rdata"))#
-#
-temp <- list.files(f.path, pattern="*.gml")#
-tree.graphs <-  lapply(temp, function(x){#
-  read.graph(file.path(f.path, x), format="gml")#
-})#
-#
-#### plotting#
-#
-sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
-sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
-all.poss.yrs <- 2006:2015#
-#
-for(i in unique(sites.trees)){#
-  net <- nets[sites == i]#
-  yrs <- sapply(strsplit(names(net), "[.]"), function(x) x[2])#
-  names(net) <- yrs#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  this.tree <- tree.graphs[sites.trees == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_communities.pdf", i)),#
-        width=10, height=4)#
-}
-warnings()
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-library(ape)#
-library(igraph)#
-library(parallel)#
-source('../networkLevel/src/misc.R')#
-source('plotting/src/communities.R', chdir = TRUE)#
-#
-fig.path <- 'plotting/figures'#
-f.path <- "cptPeel/baci"#
-load(file=file.path(f.path, "graphs.Rdata"))#
-#
-temp <- list.files(f.path, pattern="*.gml")#
-tree.graphs <-  lapply(temp, function(x){#
-  read.graph(file.path(f.path, x), format="gml")#
-})#
-#
-#### plotting#
-#
-sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
-sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
-all.poss.yrs <- 2006:2015#
-#
-for(i in unique(sites.trees)){#
-  net <- nets[sites == i]#
-  yrs <- sapply(strsplit(names(net), "[.]"), function(x) x[2])#
-  names(net) <- yrs#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  this.tree <- tree.graphs[sites.trees == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_communities.pdf", i)),#
-        width=10, height=4)#
-}
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-library(ape)#
-library(igraph)#
-library(parallel)#
-source('../networkLevel/src/misc.R')#
-source('plotting/src/communities.R', chdir = TRUE)#
-#
-fig.path <- 'plotting/figures'#
-f.path <- "cptPeel/baci"#
-load(file=file.path(f.path, "graphs.Rdata"))#
-#
-temp <- list.files(f.path, pattern="*.gml")#
-tree.graphs <-  lapply(temp, function(x){#
-  read.graph(file.path(f.path, x), format="gml")#
-})#
-#
-#### plotting#
-#
-sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
-sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
-all.poss.yrs <- 2006:2015#
-#
-for(i in unique(sites.trees)){#
-  net <- nets[sites == i]#
-  yrs <- sapply(strsplit(names(net), "[.]"), function(x) x[2])#
-  names(net) <- yrs#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  this.tree <- tree.graphs[sites.trees == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_communities.pdf", i)),#
-        width=10, height=4)#
-}
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-library(ape)#
-library(igraph)#
-library(parallel)#
-source('../networkLevel/src/misc.R')#
-source('plotting/src/communities.R', chdir = TRUE)#
-#
-fig.path <- 'plotting/figures'#
-f.path <- "cptPeel/baci"#
-load(file=file.path(f.path, "graphs.Rdata"))#
-#
-temp <- list.files(f.path, pattern="*.gml")#
-tree.graphs <-  lapply(temp, function(x){#
-  read.graph(file.path(f.path, x), format="gml")#
-})#
-#
-#### plotting#
-#
-sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
-sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
-all.poss.yrs <- 2006:2015#
-#
-for(i in unique(sites)){#
-  net <- nets[sites == i]#
-  yrs <- sapply(strsplit(names(net), "[.]"), function(x) x[2])#
-  names(net) <- yrs#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  this.tree <- tree.graphs[sites.trees == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  ## pdf.f(plotDend,#
-  ##       file=file.path(fig.path, sprintf("%s_communities.pdf", i)),#
-  ##       width=10, height=4)#
-}#
-## out <- list()#
-## for(i in unique(sites)){#
-##   this.graph <- graphs[sites == i]#
-##   out[[i]] <- do.call(this.graph, +)#
-## }#
-#
-## plotHgr <- function(ihgr){#
-##   vn <- sub("Actor ", "", V(ihrg)$name)#
-##   colbar <- rainbow(length(optcom))#
-##   vc <- ifelse(is.na(V(ihrg)$prob), colbar[V(karate)$comm], "darkblue")#
-##   V(ihrg)$label <- ifelse(is.na(V(ihrg)$prob), vn, round(V(ihrg)$prob, 2))#
-##   par(mar=c(0,0.5,0,0))#
-##   plot(ihrg, vertex.size=10, edge.arrow.size=0.2,#
-##        vertex.shape="none", vertex.label.color=vc)#
-## }#
-## ap <- c(rep("P", length(rownames(nets1))),rep("A", length(colnames(nets1))))#
-## V(g1)$type <- ap#
-## colrs <- c(rep("tomato", length(rownames(nets1))),#
-##            rep("gold", length(colnames(nets1))))#
-## V(g1)$color <- colrs#
-## tree.hrg <- lapply(hrgs, hrg_tree)#
-#
-## dendro.hrg <- lapply(hrgs, hrg.dendrogram)#
-#
-## ihrgs <- lapply(hrgs, as.igraph)#
-#
-##  dendPlot(hrgs[[1]])#
-## ## hrgs#
-## hrgs <- mclapply(graphs, fit_hrg)#
-## ## hrg.trees <- mapply(function(a, b)#
-## ##                     consensus_tree(graph = a,#
-## ##                                    hrg = b,#
-## ##                                    num.samples = 10000),#
-## ##                     a =graphs,#
-## ##                     b = hrgs,#
-## ##                     SIMPLIFY = FALSE)#
-#
-## save(hrgs, file=file.path(f.path, "hrgs.Rdata"))#
-#
-## ## ## community clusters#
-## ## clust.gs <- mclapply(graphs, function(g){#
-## ##   optcom <- cluster_optimal(g)#
-## ##   V(g)$comm <- membership(optcom)#
-## ##   return(optcom)#
-## ## })#
-#
-## clust.gs <- mclapply(graphs,  cluster_optimal)#
-#
-## save(clust.gs, file=file.path(f.path, "clusts.Rdata"))                 #
-#
-## ihrgs <- lapply(hrgs, as.igraph)#
-## plotDend<- function(){#
-##   par(mar=c(0,0.5,0,0))#
-##   layout(matrix(1:length(hrg), nrow=1))#
-##   for(j in 1:length(hrg)){#
-##     plot_dendrogram(hrg[[j]])#
-##   }#
-## }
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
-source('src/initialize.R')
-ls()
-head(specs)
-ls()
-load('../../data/networks/all_networks_years.Rdata')
-head(nets)
-names(nets)
-sites <- sapply(strsplit(names(nets), "[.]"), function(x) x[1])
-sites
-test.1 <- lapply(unique(sites), function(x){#
-  browser()#
-  these.nets <- nets[sites == x]#
-}
-)
-these.nets <- nets[sites == x]
-names(these.nets)
-arr <- simplify2array(these.nets)
-dim(arr)
-these.nets
-load('~/Dropbox/hedgerow_assembly/analysis/changePoint/cptPeel/baci/graphs.Rdata')
-Q
-rm(list=ls())#
 setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
 source('src/initialize.R')#
+library(bipartite)#
 #
 ## ************************************************************#
 ## #
@@ -996,128 +11,2072 @@ source('src/initialize.R')#
 ## year matrix, 2) calculate the dissimilarity of interaction partners#
 ## between years 3) extract dispersion values for each species, site#
 #
-load('../../changePoint/cptPeel/baci/graphs.Rdata')#
+load('../../data/networks/expanded_networks.Rdata')#
 #
-sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
+sites <- sapply(strsplit(names(nets), "[.]"), function(x) x[1])#
 #
-test.1 <- lapply(unique(sites), function(x){#
-  browser()#
-  these.nets <- graphs[sites == x]#
-  arr <- simplify2array(these.nets)#
-})
-load('../changePoint/cptPeel/baci/graphs.Rdata')
-sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])
-sites
-test.1 <- lapply(unique(sites), function(x){#
-  browser()#
-  these.nets <- graphs[sites == x]#
-  arr <- simplify2array(these.nets)#
-})
-these.nets <- graphs[sites == x]
-these.nets
-arr <- simplify2array(these.nets)
-dim(arr)
-Q
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly')#
-load('data/networks/all_networks_years.Rdata')#
-load('data/networks/allSpecimens.Rdata')#
-f.path <- "analysis/changePoint/cptPeel/baci"#
-#
-library(igraph)#
-library(parallel)#
-library(ape)#
-#
-## creates matrix of all combinations of plants and pollinators and#
-## fills it #
-expandNets <- function(sub.mat, all.mat){#
-  all.mat[match(rownames(sub.mat), rownames(all.mat)),#
-          match(colnames(sub.mat), colnames(all.mat))] <- sub.mat#
-  return(all.mat)#
-}#
-#
-pols <- unique(spec$GenusSpecies)#
-plants <- unique(spec$PlantGenusSpecies)#
-#
-all.pp <- matrix(0, nrow=length(plants),#
-                 ncol=length(pols))#
-rownames(all.pp) <- plants#
-colnames(all.pp) <- pols#
-#
-nets <- rapply(nets, expandNets, all.mat=all.pp,#
-               how="replace")#
-#
-save(nets, file="data/networks/expanded_networks.Rdata")
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
-source('src/initialize.R')#
-#
-## ************************************************************#
-## #
-## ************************************************************#
-#
-## for each species at each site, 1) create a interaction partner by#
-## year matrix, 2) calculate the dissimilarity of interaction partners#
-## between years 3) extract dispersion values for each species, site#
-#
-load('../data/networks/expanded_networks.Rdata')
-load('../../data/networks/expanded_networks.Rdata')
-sites <- sapply(strsplit(names(nets), "_"), function(x) x[1])
-sites
-sites <- sapply(strsplit(names(nets), "[.]"), function(x) x[1])
-sites
-test.1 <- lapply(unique(sites), function(x){#
-  browser()#
-  these.nets <- nets[sites == x]#
-  arr <- simplify2array(these.nets)#
-})
-these.nets <- nets[sites == x]
-names(thes.nets)
-names(these.nets)
-arr <- simplify2array(these.nets)
-dim(arr)
-arr[1,2,]
-dimnames(arr)
-arr[1,2,]
-arr[1,,]
-arr[,1,]
-arr[,1,]
-?vegdist
-pol.dis <- apply(arr, 2, vegdist, "chao")
-warnings
-warnings()
-pol.dis[[1]]
-pol.dis
-pol.dis <- apply(arr, 2, function(y){#
-    vegdist(empty(y), method="chao")#
-  }
-)
-library(bipartite)
-pol.dis <- apply(arr, 2, function(y){#
-    vegdist(empty(y), method="chao")#
-  })
-pol.dis[[1]]
-pol.dis <- apply(arr, c(1,3), function(y){#
-    vegdist(empty(y), method="chao")#
-  })
-pol.dis <- apply(arr, 1, function(y){#
-    vegdist(empty(y), method="chao")#
-  })
-pol.dis
-pol.dis <- apply(arr, 3, function(y){#
-    vegdist(empty(y), method="chao")#
-  })
-pol.dis
-pol.dis <- apply(arr, c(1,2), function(y){#
-    vegdist(empty(y), method="chao")#
-  })
-Q
 test.1 <- lapply(unique(sites), function(x){#
   these.nets <- nets[sites == x]#
   arr <- simplify2array(these.nets)#
-  pol.dis <- apply(arr, 1, function(y){#
-    browser()#
-    vegdist(empty(y), method="chao")#
+  browser()#
+  plant.dis <- apply(arr, 1, function(y){#
+    vegdist(empty(t(y)), method="chao")#
   })#
 })
-y
+Q
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
+source('src/initialize.R')#
+library(bipartite)#
+#
+## ************************************************************#
+## #
+## ************************************************************#
+#
+## for each species at each site, 1) create a interaction partner by#
+## year matrix, 2) calculate the dissimilarity of interaction partners#
+## between years 3) extract dispersion values for each species, site#
+#
+load('../../data/networks/expanded_networks.Rdata')#
+#
+sites <- sapply(strsplit(names(nets), "[.]"), function(x) x[1])#
+#
+test.1 <- lapply(unique(sites), function(x){#
+  these.nets <- nets[sites == x]#
+  arr <- simplify2array(these.nets)#
+  browser()#
+  plant.dis <- apply(arr, 1, function(y){#
+    vegdist(empty(t(y)), method="chao")#
+  })#
+})
+plant.dis <- apply(arr, 1, function(y){#
+    vegdist(empty(t(y)), method="chao")#
+  })
+plant.dis[[1]]
+plant.dis[[2]]
+names(plant.dis)
+pol.dis <- apply(arr, 2, function(y){#
+    vegdist(empty(t(y)), method="chao")#
+  })
+pol.dis[[1]]
+names(pol.dis)
+?betadisper
+plant.disper <- lapply(plant.dis, betadisper)
+plant.disper <- lapply(plant.dis, betadisper, group="1")
+?betadisper
+dim(arr)
+plant.disper <- lapply(plant.dis, betadisper,#
+                         group=rep(1, dim(arr)[3]))
+dim(arr)[3]
+?betadisper
+plant.dis[[1]]
+plant.dis[[2]]
+plant.disper <- lapply(plant.dis, function(z){#
+    betadisper(z, group=rep(1, nrow(z)))#
+  })
+nrow(plant.dis[[1]])
+nrow(plant.dis[[1]][[1]])
+nrow(plant.dis[[1]])
+plant.dis[[1]]
+dim(plant.dis[[1]])
+methods(plant.dis[[1]])
+?class(plant.dis[[1]])
+class(plant.dis[[1]])
+?vegdist
+plant.disper <- lapply(plant.dis, function(z){#
+    betadisper(z, group=rep(1, nrow(as.matrix(z))))#
+  })
+plant.disper <- lapply(plant.dis, function(z){#
+    betadisper(z, group=rep("1", nrow(as.matrix(z))))#
+  })
+Q
+test.1 <- lapply(unique(sites), function(x){#
+  these.nets <- nets[sites == x]#
+  arr <- simplify2array(these.nets)#
+  plant.dis <- apply(arr, 1, function(y){#
+    vegdist(empty(t(y)), method="chao")#
+  })#
+  plant.disper <- lapply(plant.dis, function(z){#
+    out <- try(betadisper(z, group=rep("1", nrow(as.matrix(z)))))#
+    if(inherits(out, "try-error")) browser()#
+  })#
+  pol.dis <- apply(arr, 2, function(y){#
+    vegdist(empty(t(y)), method="chao")#
+  })#
+})
+z
+class(z)
+dim(as.matrix(z))
+Q
+test.1 <- lapply(unique(sites), function(x){#
+  these.nets <- nets[sites == x]#
+  arr <- simplify2array(these.nets)#
+  plant.dis <- apply(arr, 1, function(y){#
+    vegdist(empty(t(y)), method="chao")#
+  })#
+  browser()#
+  plant.dis <- plant.dis[sapply(plant.dis, function(q){#
+    all(dim(as.matrix(q)) > 2]#
+  })]#
+  plant.disper <- lapply(plant.dis, function(z){#
+    out <- try(betadisper(z, group=rep("1", nrow(as.matrix(z)))))#
+    if(inherits(out, "try-error")) browser()#
+  })#
+  pol.dis <- apply(arr, 2, function(y){#
+    vegdist(empty(t(y)), method="chao")#
+  })#
+})
+test.1 <- lapply(unique(sites), function(x){#
+  these.nets <- nets[sites == x]#
+  arr <- simplify2array(these.nets)#
+  plant.dis <- apply(arr, 1, function(y){#
+    vegdist(empty(t(y)), method="chao")#
+  })#
+  browser()#
+  plant.dis <- plant.dis[sapply(plant.dis, function(q){#
+    all(dim(as.matrix(q)) > 2])#
+  })]#
+  plant.disper <- lapply(plant.dis, function(z){#
+    out <- try(betadisper(z, group=rep("1", nrow(as.matrix(z)))))#
+    if(inherits(out, "try-error")) browser()#
+  })#
+  pol.dis <- apply(arr, 2, function(y){#
+    vegdist(empty(t(y)), method="chao")#
+  })#
+})
+test.1 <- lapply(unique(sites), function(x){#
+  these.nets <- nets[sites == x]#
+  arr <- simplify2array(these.nets)#
+  plant.dis <- apply(arr, 1, function(y){#
+    vegdist(empty(t(y)), method="chao")#
+  })#
+  browser()#
+  plant.dis <- plant.dis[sapply(plant.dis, function(q){#
+    all(dim(as.matrix(q)) > 2)#
+  })]#
+  plant.disper <- lapply(plant.dis, function(z){#
+    out <- try(betadisper(z, group=rep("1", nrow(as.matrix(z)))))#
+    if(inherits(out, "try-error")) browser()#
+  })#
+  pol.dis <- apply(arr, 2, function(y){#
+    vegdist(empty(t(y)), method="chao")#
+  })#
+})
+plant.dis <- plant.dis[sapply(plant.dis, function(q){#
+    all(dim(as.matrix(q)) > 2)#
+  })]
+plant.dis[[1]]
+plant.dis[[2]]
+plant.dis[[3]]
+names(plant.dis)
+plant.dis <- apply(arr, 1, function(y){#
+    vegdist(empty(t(y)), method="chao")#
+  })
+length(plant.dis)
+plant.disper <- lapply(plant.dis, function(z){#
+    out <- try(betadisper(z, group=rep("1", nrow(as.matrix(z)))))#
+    if(inherits(out, "try-error")) browser()#
+  })
+plant.dis <- plant.dis[sapply(plant.dis, function(q){#
+    all(dim(as.matrix(q)) > 2)#
+  })]#
+  plant.disper <- lapply(plant.dis, function(z){#
+    out <- try(betadisper(z, group=rep("1", nrow(as.matrix(z)))))#
+    if(inherits(out, "try-error")) browser()#
+  })
+Q
+test.1 <- lapply(unique(sites), function(x){#
+  these.nets <- nets[sites == x]#
+  arr <- simplify2array(these.nets)#
+  brower()#
+  plants <- calcDis(arr, 1)#
+})#
+calcDis <- function(arr, ind){#
+  pp.dis <- apply(arr, ind, function(y){#
+    vegdist(empty(t(y)), method="chao")#
+  })#
+  pp.dis <- pp.dis[sapply(pp.dis, function(q){#
+    all(dim(as.matrix(q)) > 2)#
+  })]#
+  pp.disper <- lapply(pp.dis, function(z){#
+    betadisper(z, group=rep("1", nrow(as.matrix(z))))#
+  })#
+  return(pp.disper)#
+}
+test.1 <- lapply(unique(sites), function(x){#
+  these.nets <- nets[sites == x]#
+  arr <- simplify2array(these.nets)#
+  browser()#
+  plants <- calcDis(arr, 1)#
+})#
+calcDis <- function(arr, ind){#
+  pp.dis <- apply(arr, ind, function(y){#
+    vegdist(empty(t(y)), method="chao")#
+  })#
+  pp.dis <- pp.dis[sapply(pp.dis, function(q){#
+    all(dim(as.matrix(q)) > 2)#
+  })]#
+  pp.disper <- lapply(pp.dis, function(z){#
+    betadisper(z, group=rep("1", nrow(as.matrix(z))))#
+  })#
+  return(pp.disper)#
+}
+Q
+calcDis <- function(arr, ind){#
+  pp.dis <- apply(arr, ind, function(y){#
+    vegdist(empty(t(y)), method="chao")#
+  })#
+  pp.dis <- pp.dis[sapply(pp.dis, function(q){#
+    all(dim(as.matrix(q)) > 2)#
+  })]#
+  pp.disper <- lapply(pp.dis, function(z){#
+    betadisper(z, group=rep("1", nrow(as.matrix(z))))#
+  })#
+  return(pp.disper)#
+}#
+#
+test.1 <- lapply(unique(sites), function(x){#
+  these.nets <- nets[sites == x]#
+  arr <- simplify2array(these.nets)#
+  browser()#
+  plants <- calcDis(arr, 1)#
+})
+Q
+calcDis <- function(arr, ind){#
+  pp.dis <- apply(arr, ind, function(y){#
+    vegdist(empty(t(y)), method="chao")#
+  })#
+  pp.dis <- pp.dis[sapply(pp.dis, function(q){#
+    all(dim(as.matrix(q)) > 2)#
+  })]#
+  pp.disper <- lapply(pp.dis, function(z){#
+    betadisper(z, group=rep("1", nrow(as.matrix(z))))#
+  })#
+  return(pp.disper)#
+}#
+#
+test.1 <- lapply(unique(sites), function(x){#
+  these.nets <- nets[sites == x]#
+  arr <- simplify2array(these.nets)#
+  browser()#
+  plants <- calcDis(arr, 1)#
+})
+plants <- calcDis(arr, 1)
+plants[[1]]
+plants[[2]]
+names(plants[[1]])
+plants[[1]]$distances
+Q
+calcDis <- function(arr, ind){#
+  pp.dis <- apply(arr, ind, function(y){#
+    vegdist(empty(t(y)), method="chao")#
+  })#
+  pp.dis <- pp.dis[sapply(pp.dis, function(q){#
+    all(dim(as.matrix(q)) > 2)#
+  })]#
+  pp.disper <- lapply(pp.dis, function(z){#
+    betadisper(z, group=rep("1", nrow(as.matrix(z))))#
+  })#
+  return(pp.disper$distances)#
+}#
+#
+test.1 <- lapply(unique(sites), function(x){#
+  these.nets <- nets[sites == x]#
+  arr <- simplify2array(these.nets)#
+  browser()#
+  plants <- calcDis(arr, 1)#
+})
+plants <- calcDis(arr, 1)
+plants[[1]]
+plants
+Q
+calcDis <- function(arr, ind){#
+  pp.dis <- apply(arr, ind, function(y){#
+    vegdist(empty(t(y)), method="chao")#
+  })#
+  pp.dis <- pp.dis[sapply(pp.dis, function(q){#
+    all(dim(as.matrix(q)) > 2)#
+  })]#
+  pp.disper <- lapply(pp.dis, function(z){#
+    betadisper(z, group=rep("1", nrow(as.matrix(z))))$distances#
+  })#
+  return(pp.disper)#
+}#
+#
+test.1 <- lapply(unique(sites), function(x){#
+  these.nets <- nets[sites == x]#
+  arr <- simplify2array(these.nets)#
+  browser()#
+  plants <- calcDis(arr, 1)#
+})
+plants <- calcDis(arr, 1)
+plants[[1]]
+names(plants)
+rep(names(plants), sapply(plants, length))
+out.dist <- data.frame(GenusSpecies=#
+                         rep(names(plants), sapply(plants, length)),#
+                         Dist=unlist(plants),#
+                         Site= x)
+out.dist
+out.dist <- data.frame(GenusSpecies=#
+                         rep(names(plants), sapply(plants, length)),#
+                         Dist=unlist(plants),#
+                         Site= x,#
+                         Year =  sapply(strsplit(names(plants), "[.]"),#
+                           function(x) x[2]))
+sapply(strsplit(names(plants), "[.]"),#
+                           function(x) x[2])
+names(plants)
+(sapply(plants, names))
+unlist(sapply(plants, names))
+out.dist <- data.frame(GenusSpecies=#
+                         rep(names(plants), sapply(plants, length)),#
+                         Dist=unlist(plants),#
+                         Site= x,#
+                         Year =  sapply(strsplit(#
+                           unlist(sapply(plants, names)), "[.]"),#
+                           function(x) x[2]))
+out.dist
+Q
+calcDisper <- function(arr, ind){#
+  pp.dis <- apply(arr, ind, function(y){#
+    vegdist(empty(t(y)), method="chao")#
+  })#
+  pp.dis <- pp.dis[sapply(pp.dis, function(q){#
+    all(dim(as.matrix(q)) > 2)#
+  })]#
+  pp.disper <- lapply(pp.dis, function(z){#
+    betadisper(z, group=rep("1", nrow(as.matrix(z))))$distances#
+  })#
+  return(pp.disper)#
+}#
+#
+calcDis <- function(x, ind){#
+  these.nets <- nets[sites == x]#
+  arr <- simplify2array(these.nets)#
+  plants <- calcDisper(arr, 1)#
+  out.dist <- data.frame(GenusSpecies=#
+                         rep(names(plants), sapply(plants, length)),#
+                         Dist=unlist(plants),#
+                         Site= x,#
+                         Year =  sapply(strsplit(#
+                           unlist(sapply(plants, names)), "[.]"),#
+                           function(x) x[2]))#
+  rownames(out.dist) <- NULL#
+  return(out.dist)#
+}#
+test.1 <- lapply(unique(sites), calcDis, ind=1)
+calcDisper <- function(arr, ind){#
+  pp.dis <- apply(arr, ind, function(y){#
+    vegdist(empty(t(y)), method="chao")#
+  })#
+  pp.dis <- pp.dis[sapply(pp.dis, function(q){#
+    all(dim(as.matrix(q)) > 2)#
+  })]#
+  pp.disper <- lapply(pp.dis, function(z){#
+    betadisper(z, group=rep("1", nrow(as.matrix(z))))$distances#
+  })#
+  return(pp.disper)#
+}#
+#
+calcDis <- function(x, ind){#
+  these.nets <- nets[sites == x]#
+  arr <- simplify2array(these.nets)#
+  pp <- calcDisper(arr, ind)#
+  out.dist <- data.frame(GenusSpecies=#
+                         rep(names(pp), sapply(pp, length)),#
+                         Dist=unlist(pp),#
+                         Site= x,#
+                         Year =  sapply(strsplit(#
+                           unlist(sapply(pp, names)), "[.]"),#
+                           function(x) x[2]))#
+  rownames(out.dist) <- NULL#
+  return(out.dist)#
+}#
+plants <- lapply(unique(sites), calcDis, ind=1)
+plants[[1]]
+plants <- sapply(unique(sites), calcDis, ind=1)
+plants
+plants <- lapply(unique(sites), calcDis, ind=1)#
+plants <- do.call(rbind, plants)
+pols <- lapply(unique(sites), calcDis, ind=2)#
+pols <- do.call(rbind, pols)
+calcDisper <- function(arr, ind){#
+  pp.dis <- apply(arr, ind, function(y){#
+    vegdist(empty(t(y)), method="chao")#
+  })#
+  pp.dis <- pp.dis[sapply(pp.dis, function(q){#
+    all(dim(as.matrix(q)) > 2)#
+  })]#
+  pp.disper <- lapply(pp.dis, function(z){#
+    betadisper(z, group=rep("1", nrow(as.matrix(z))))$distances#
+  })#
+  return(pp.disper)#
+}#
+#
+calcDis <- function(x, ind, nets){#
+  these.nets <- nets[sites == x]#
+  arr <- simplify2array(these.nets)#
+  pp <- calcDisper(arr, ind)#
+  out.dist <- data.frame(GenusSpecies=#
+                         rep(names(pp), sapply(pp, length)),#
+                         Dist=unlist(pp),#
+                         Site= x,#
+                         Year =  sapply(strsplit(#
+                           unlist(sapply(pp, names)), "[.]"),#
+                           function(x) x[2]))#
+  rownames(out.dist) <- NULL#
+  return(out.dist)#
+}#
+plants <- lapply(unique(sites), calcDis, ind=1, nets)#
+plants <- do.call(rbind, plants)
+calcDisper <- function(arr, ind){#
+  pp.dis <- apply(arr, ind, function(y){#
+    vegdist(empty(t(y)), method="chao")#
+  })#
+  pp.dis <- pp.dis[sapply(pp.dis, function(q){#
+    all(dim(as.matrix(q)) > 2)#
+  })]#
+  pp.disper <- lapply(pp.dis, function(z){#
+    betadisper(z, group=rep("1", nrow(as.matrix(z))))$distances#
+  })#
+  return(pp.disper)#
+}#
+#
+calcDis <- function(site, ind, nets){#
+  these.nets <- nets[sites == site]#
+  arr <- simplify2array(these.nets)#
+  pp <- calcDisper(arr, ind)#
+  out.dist <- data.frame(GenusSpecies=#
+                         rep(names(pp), sapply(pp, length)),#
+                         Dist=unlist(pp),#
+                         Site= site,#
+                         Year =  sapply(strsplit(#
+                           unlist(sapply(pp, names)), "[.]"),#
+                           function(x) x[2]))#
+  rownames(out.dist) <- NULL#
+  return(out.dist)#
+}#
+plants <- lapply(unique(sites), calcDis, ind=1, nets)#
+plants <- do.call(rbind, plants)
+plants
+calcDis <- function(site, ind, nets){#
+  browser()#
+  these.nets <- nets[sites == site]#
+  arr <- simplify2array(these.nets)#
+  pp <- calcDisper(arr, ind)#
+  out.dist <- data.frame(GenusSpecies=#
+                         rep(names(pp), sapply(pp, length)),#
+                         Dist=unlist(pp),#
+                         Site= site,#
+                         Year =  sapply(strsplit(#
+                           unlist(sapply(pp, names)), "[.]"),#
+                           function(x) x[2]))#
+  rownames(out.dist) <- NULL#
+  return(out.dist)#
+}
+pols <- lapply(unique(sites), calcDis, ind=2, nets)
+these.nets <- nets[sites == site]
+names(these.nets)
+arr <- simplify2array(these.nets)
+dim(arr)
+dimnames(arr)
+pp <- calcDisper(arr, ind)
+pp
+out.dist <- data.frame(GenusSpecies=#
+                         rep(names(pp), sapply(pp, length)),#
+                         Dist=unlist(pp),#
+                         Site= site,#
+                         Year =  sapply(strsplit(#
+                           unlist(sapply(pp, names)), "[.]"),#
+                           function(x) x[2]))
+out.dist
+Q
+calcDis <- function(site, ind, nets){#
+  these.nets <- nets[sites == site]#
+  arr <- simplify2array(these.nets)#
+  pp <- try(calcDisper(arr, ind))#
+  if(inherits(pp, "try-error")) browser()#
+  out.dist <- data.frame(GenusSpecies=#
+                         rep(names(pp), sapply(pp, length)),#
+                         Dist=unlist(pp),#
+                         Site= site,#
+                         Year =  sapply(strsplit(#
+                           unlist(sapply(pp, names)), "[.]"),#
+                           function(x) x[2]))#
+  rownames(out.dist) <- NULL#
+  return(out.dist)#
+}
+pols <- lapply(unique(sites), calcDis, ind=2, nets)
+arr
+dim(arr)
+pp.dis
+pp.dis <- apply(arr, ind, function(y){#
+    vegdist(empty(t(y)), method="chao")#
+  })
+pp.dis
+pp.dis <- pp.dis[sapply(pp.dis, function(q){#
+    all(dim(as.matrix(q)) > 2)#
+  })]
+pp.dis
+Q
+calcDisper <- function(arr, ind){#
+  pp.dis <- apply(arr, ind, function(y){#
+    vegdist(empty(t(y)), method="chao")#
+  })#
+  pp.dis <- pp.dis[sapply(pp.dis, function(q){#
+    all(dim(as.matrix(q)) > 3)#
+  })]#
+  pp.disper <- lapply(pp.dis, function(z){#
+    betadisper(z, group=rep("1", nrow(as.matrix(z))))$distances#
+  })#
+  return(pp.disper)#
+}#
+#
+calcDis <- function(site, ind, nets){#
+  these.nets <- nets[sites == site]#
+  arr <- simplify2array(these.nets)#
+  pp <- try(calcDisper(arr, ind))#
+  if(inherits(pp, "try-error")) browser()#
+  out.dist <- data.frame(GenusSpecies=#
+                         rep(names(pp), sapply(pp, length)),#
+                         Dist=unlist(pp),#
+                         Site= site,#
+                         Year =  sapply(strsplit(#
+                           unlist(sapply(pp, names)), "[.]"),#
+                           function(x) x[2]))#
+  rownames(out.dist) <- NULL#
+  return(out.dist)#
+}#
+plants <- lapply(unique(sites), calcDis, ind=1, nets)#
+plants <- do.call(rbind, plants)#
+#
+pols <- lapply(unique(sites), calcDis, ind=2, nets)#
+pols <- do.call(rbind, pols)
+calcDisper <- function(arr, ind){#
+  pp.dis <- apply(arr, ind, function(y){#
+    vegdist(empty(t(y)), method="chao")#
+  })#
+  pp.dis <- pp.dis[sapply(pp.dis, function(q){#
+    all(dim(as.matrix(q)) > 3)#
+  })]#
+  if(!is.finite(length(pp.dis))) browser()#
+  pp.disper <- lapply(pp.dis, function(z){#
+    betadisper(z, group=rep("1", nrow(as.matrix(z))))$distances#
+  })#
+  return(pp.disper)#
+}#
+#
+calcDis <- function(site, ind, nets){#
+  these.nets <- nets[sites == site]#
+  arr <- simplify2array(these.nets)#
+  pp <- calcDisper(arr, ind)#
+  if(inherits(pp, "try-error")) browser()#
+  out.dist <- data.frame(GenusSpecies=#
+                         rep(names(pp), sapply(pp, length)),#
+                         Dist=unlist(pp),#
+                         Site= site,#
+                         Year =  sapply(strsplit(#
+                           unlist(sapply(pp, names)), "[.]"),#
+                           function(x) x[2]))#
+  rownames(out.dist) <- NULL#
+  return(out.dist)#
+}#
+plants <- lapply(unique(sites), calcDis, ind=1, nets)#
+plants <- do.call(rbind, plants)#
+#
+pols <- lapply(unique(sites), calcDis, ind=2, nets)#
+pols <- do.call(rbind, pols)
+calcDisper <- function(arr, ind){#
+  pp.dis <- apply(arr, ind, function(y){#
+    vegdist(empty(t(y)), method="chao")#
+  })#
+  pp.dis <- pp.dis[sapply(pp.dis, function(q){#
+    all(dim(as.matrix(q)) > 3)#
+  })]#
+  print(length(pp))#
+  pp.disper <- lapply(pp.dis, function(z){#
+    betadisper(z, group=rep("1", nrow(as.matrix(z))))$distances#
+  })#
+  return(pp.disper)#
+}#
+#
+calcDis <- function(site, ind, nets){#
+  these.nets <- nets[sites == site]#
+  arr <- simplify2array(these.nets)#
+  pp <- calcDisper(arr, ind)#
+  if(inherits(pp, "try-error")) browser()#
+  out.dist <- data.frame(GenusSpecies=#
+                         rep(names(pp), sapply(pp, length)),#
+                         Dist=unlist(pp),#
+                         Site= site,#
+                         Year =  sapply(strsplit(#
+                           unlist(sapply(pp, names)), "[.]"),#
+                           function(x) x[2]))#
+  rownames(out.dist) <- NULL#
+  return(out.dist)#
+}#
+plants <- lapply(unique(sites), calcDis, ind=1, nets)
+calcDisper <- function(arr, ind){#
+  pp.dis <- apply(arr, ind, function(y){#
+    vegdist(empty(t(y)), method="chao")#
+  })#
+  pp.dis <- pp.dis[sapply(pp.dis, function(q){#
+    all(dim(as.matrix(q)) > 3)#
+  })]#
+  print(length(pp.dis))#
+  pp.disper <- lapply(pp.dis, function(z){#
+    betadisper(z, group=rep("1", nrow(as.matrix(z))))$distances#
+  })#
+  return(pp.disper)#
+}#
+#
+calcDis <- function(site, ind, nets){#
+  these.nets <- nets[sites == site]#
+  arr <- simplify2array(these.nets)#
+  pp <- calcDisper(arr, ind)#
+  if(inherits(pp, "try-error")) browser()#
+  out.dist <- data.frame(GenusSpecies=#
+                         rep(names(pp), sapply(pp, length)),#
+                         Dist=unlist(pp),#
+                         Site= site,#
+                         Year =  sapply(strsplit(#
+                           unlist(sapply(pp, names)), "[.]"),#
+                           function(x) x[2]))#
+  rownames(out.dist) <- NULL#
+  return(out.dist)#
+}#
+plants <- lapply(unique(sites), calcDis, ind=1, nets)
+calcDisper <- function(arr, ind){#
+  pp.dis <- apply(arr, ind, function(y){#
+    vegdist(empty(t(y)), method="chao")#
+  })#
+  pp.dis <- pp.dis[sapply(pp.dis, function(q){#
+    all(dim(as.matrix(q)) > 3)#
+  })]#
+  if(length(pp.dis) == 0){#
+    return(NA)#
+  } else{#
+    pp.disper <- lapply(pp.dis, function(z){#
+      betadisper(z, group=rep("1", nrow(as.matrix(z))))$distances#
+    })#
+    return(pp.disper)#
+  }#
+}#
+#
+calcDis <- function(site, ind, nets){#
+  these.nets <- nets[sites == site]#
+  arr <- simplify2array(these.nets)#
+  pp <- calcDisper(arr, ind)#
+  if(is.na(pp)){#
+    return(NA)#
+  }else{#
+    out.dist <- data.frame(GenusSpecies=#
+                           rep(names(pp), sapply(pp, length)),#
+                           Dist=unlist(pp),#
+                           Site= site,#
+                           Year =  sapply(strsplit(#
+                             unlist(sapply(pp, names)), "[.]"),#
+                             function(x) x[2]))#
+    rownames(out.dist) <- NULL#
+    return(out.dist)#
+  }#
+}#
+plants <- lapply(unique(sites), calcDis, ind=1, nets)
+warnings()
+calcDis <- function(site, ind, nets){#
+  these.nets <- nets[sites == site]#
+  arr <- simplify2array(these.nets)#
+  pp <- calcDisper(arr, ind)#
+  if(all(is.na(pp))){#
+    return(NA)#
+  }else{#
+    out.dist <- data.frame(GenusSpecies=#
+                           rep(names(pp), sapply(pp, length)),#
+                           Dist=unlist(pp),#
+                           Site= site,#
+                           Year =  sapply(strsplit(#
+                             unlist(sapply(pp, names)), "[.]"),#
+                             function(x) x[2]))#
+    rownames(out.dist) <- NULL#
+    return(out.dist)#
+  }#
+}#
+plants <- lapply(unique(sites), calcDis, ind=1, nets)
+plants
+lapply(plants, is.na)
+lapply(plants, function(x) all(is.na(x)))
+plants <- plants[!sapply(plants, function(x) all(is.na(x)))]
+plants
+plants <- do.call(rbind, plants)
+pols <- lapply(unique(sites), calcDis, ind=2, nets)#
+pols <- pols[!sapply(pols, function(x) all(is.na(x)))]#
+pols <- do.call(rbind, pols)
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
+source('src/initialize.R')#
+library(bipartite)#
+#
+## ************************************************************#
+## #
+## ************************************************************#
+#
+## for each species at each site, 1) create a interaction partner by#
+## year matrix, 2) calculate the dissimilarity of interaction partners#
+## between years 3) extract dispersion values for each species, site#
+#
+load('../../data/networks/expanded_networks.Rdata')#
+#
+sites <- sapply(strsplit(names(nets), "[.]"), function(x) x[1])#
+calcDisper <- function(arr, ind){#
+  pp.dis <- apply(arr, ind, function(y){#
+    vegdist(empty(t(y)), method="chao")#
+  })#
+  pp.dis <- pp.dis[sapply(pp.dis, function(q){#
+    all(dim(as.matrix(q)) > 3)#
+  })]#
+  if(length(pp.dis) == 0){#
+    return(NA)#
+  } else{#
+    pp.disper <- lapply(pp.dis, function(z){#
+      out <- try(betadisper(z, group=rep("1", nrow(as.matrix(z)))))#
+      if(inherits(out, "try-error")) browser()#
+      return(out$distances)#
+    })#
+    return(pp.disper)#
+  }#
+}#
+#
+calcDis <- function(site, ind, nets){#
+  these.nets <- nets[sites == site]#
+  arr <- simplify2array(these.nets)#
+  pp <- calcDisper(arr, ind)#
+  if(all(is.na(pp))){#
+    return(NA)#
+  }else{#
+    out.dist <- data.frame(GenusSpecies=#
+                           rep(names(pp), sapply(pp, length)),#
+                           Dist=unlist(pp),#
+                           Site= site,#
+                           Year =  sapply(strsplit(#
+                             unlist(sapply(pp, names)), "[.]"),#
+                             function(x) x[2]))#
+    rownames(out.dist) <- NULL#
+    return(out.dist)#
+  }#
+}#
+plants <- lapply(unique(sites), calcDis, ind=1, nets)#
+plants <- plants[!sapply(plants, function(x) all(is.na(x)))]#
+plants <- do.call(rbind, plants)
+pols <- lapply(unique(sites), calcDis, ind=2, nets)
+z
+all(as.matrix(z)) == 0
+all(as.matrix(z) == 0)
+Q
+calcDisper <- function(arr, ind){#
+  pp.dis <- apply(arr, ind, function(y){#
+    vegdist(empty(t(y)), method="chao")#
+  })#
+  pp.dis <- pp.dis[sapply(pp.dis, function(q){#
+    all(dim(as.matrix(q)) > 3)#
+  })]#
+  if(length(pp.dis) == 0){#
+    return(NA)#
+  } else{#
+    pp.disper <- lapply(pp.dis, function(z){#
+      if(all(as.matrix(z) == 0)){#
+        return(NA)#
+      }else{#
+        out <- try(betadisper(z, group=rep("1", nrow(as.matrix(z)))))#
+        if(inherits(out, "try-error")) browser()#
+        return(out$distances)#
+      }#
+    })#
+    return(pp.disper)#
+  }#
+}#
+#
+calcDis <- function(site, ind, nets){#
+  these.nets <- nets[sites == site]#
+  arr <- simplify2array(these.nets)#
+  pp <- calcDisper(arr, ind)#
+  if(all(is.na(pp))){#
+    return(NA)#
+  }else{#
+    out.dist <- data.frame(GenusSpecies=#
+                           rep(names(pp), sapply(pp, length)),#
+                           Dist=unlist(pp),#
+                           Site= site,#
+                           Year =  sapply(strsplit(#
+                             unlist(sapply(pp, names)), "[.]"),#
+                             function(x) x[2]))#
+    rownames(out.dist) <- NULL#
+    return(out.dist)#
+  }#
+}#
+plants <- lapply(unique(sites), calcDis, ind=1, nets)#
+plants <- plants[!sapply(plants, function(x) all(is.na(x)))]#
+plants <- do.call(rbind, plants)#
+pols <- lapply(unique(sites), calcDis, ind=2, nets)#
+pols <- pols[!sapply(pols, function(x) all(is.na(x)))]#
+pols <- do.call(rbind, pols)
+v
+calcDis <- function(site, ind, nets){#
+  these.nets <- nets[sites == site]#
+  arr <- simplify2array(these.nets)#
+  pp <- calcDisper(arr, ind)#
+  if(all(is.na(pp) == 0)){#
+    return(NA)#
+  }else{#
+    out.dist <- data.frame(GenusSpecies=#
+                           rep(names(pp), sapply(pp, length)),#
+                           Dist=unlist(pp),#
+                           Site= site,#
+                           Year =  sapply(strsplit(#
+                             unlist(sapply(pp, names)), "[.]"),#
+                             function(x) x[2]))#
+    rownames(out.dist) <- NULL#
+    return(out.dist)#
+  }#
+}#
+plants <- lapply(unique(sites), calcDis, ind=1, nets)#
+plants <- plants[!sapply(plants, function(x) all(is.na(x)))]#
+plants <- do.call(rbind, plants)#
+pols <- lapply(unique(sites), calcDis, ind=2, nets)#
+pols <- pols[!sapply(pols, function(x) all(is.na(x)))]#
+pols <- do.call(rbind, pols)
+calcDisper <- function(arr, ind){#
+  pp.dis <- apply(arr, ind, function(y){#
+    vegdist(empty(t(y)), method="chao")#
+  })#
+  pp.dis <- pp.dis[sapply(pp.dis, function(q){#
+    all(dim(as.matrix(q)) > 3)#
+  })]#
+  if(length(pp.dis) == 0){#
+    return(NA)#
+  } else{#
+    pp.disper <- lapply(pp.dis, function(z){#
+      if(all(as.matrix(z) == 0)){#
+        return(NA)#
+      }else{#
+        out <- try(betadisper(z, group=rep("1", nrow(as.matrix(z)))))#
+        if(inherits(out, "try-error")) browser()#
+        return(out$distances)#
+      }#
+    })#
+    return(pp.disper)#
+  }#
+}#
+#
+calcDis <- function(site, ind, nets){#
+  these.nets <- nets[sites == site]#
+  arr <- simplify2array(these.nets)#
+  pp <- calcDisper(arr, ind)#
+  if(all(is.na(pp))){#
+    return(NA)#
+  }else{#
+    out.dist <- data.frame(GenusSpecies=#
+                           rep(names(pp), sapply(pp, length)),#
+                           Dist=unlist(pp),#
+                           Site= site,#
+                           Year =  sapply(strsplit(#
+                             unlist(sapply(pp, names)), "[.]"),#
+                             function(x) x[2]))#
+    rownames(out.dist) <- NULL#
+    return(out.dist)#
+  }#
+}#
+plants <- lapply(unique(sites), calcDis, ind=1, nets)
+plants <- plants[!sapply(plants, function(x) all(is.na(x)))]#
+plants <- do.call(rbind, plants)
+pols <- lapply(unique(sites), calcDis, ind=2, nets)#
+pols <- pols[!sapply(pols, function(x) all(is.na(x)))]#
+pols <- do.call(rbind, pols)
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
+source('src/initialize.R')#
+library(bipartite)#
+#
+## ************************************************************#
+## #
+## ************************************************************#
+#
+## for each species at each site, 1) create a interaction partner by#
+## year matrix, 2) calculate the dissimilarity of interaction partners#
+## between years 3) extract dispersion values for each species, site#
+#
+load('../../data/networks/expanded_networks.Rdata')#
+#
+sites <- sapply(strsplit(names(nets), "[.]"), function(x) x[1])#
+calcDisper <- function(arr, ind){#
+  pp.dis <- apply(arr, ind, function(y){#
+    vegdist(empty(t(y)), method="chao")#
+  })#
+  pp.dis <- pp.dis[sapply(pp.dis, function(q){#
+    all(dim(as.matrix(q)) > 3)#
+  })]#
+  if(length(pp.dis) == 0){#
+    return(NA)#
+  } else{#
+    pp.disper <- lapply(pp.dis, function(z){#
+      if(all(as.matrix(z) == 0)){#
+        return(NA)#
+      }else{#
+        out <- try(betadisper(z, group=rep("1", nrow(as.matrix(z)))))#
+        if(inherits(out, "try-error")) browser()#
+        return(out$distances)#
+      }#
+    })#
+    return(pp.disper)#
+  }#
+}#
+#
+calcDis <- function(site, ind, nets){#
+  these.nets <- nets[sites == site]#
+  arr <- simplify2array(these.nets)#
+  pp <- calcDisper(arr, ind)#
+  if(all(is.na(pp))){#
+    return(NA)#
+  }else{#
+    out.dist <- try(data.frame(GenusSpecies=#
+                           rep(names(pp), sapply(pp, length)),#
+                           Dist=unlist(pp),#
+                           Site= site,#
+                           Year =  sapply(strsplit(#
+                             unlist(sapply(pp, names)), "[.]"),#
+                             function(x) x[2])))#
+    if(inherits(out.dist, "try-error")) browser()#
+    rownames(out.dist) <- NULL#
+    return(out.dist)#
+  }#
+}#
+plants <- lapply(unique(sites), calcDis, ind=1, nets)#
+plants <- plants[!sapply(plants, function(x) all(is.na(x)))]#
+plants <- do.call(rbind, plants)
+pols <- lapply(unique(sites), calcDis, ind=2, nets)
+pp
+rep(names(pp), sapply(pp, length))
+unlist(pp)
+sapply(pp, names)
+Q
+calcDisper <- function(arr, ind){#
+  pp.dis <- apply(arr, ind, function(y){#
+    vegdist(empty(t(y)), method="chao")#
+  })#
+  pp.dis <- pp.dis[sapply(pp.dis, function(q){#
+    all(dim(as.matrix(q)) > 3)#
+  })]#
+  if(length(pp.dis) == 0){#
+    return(NA)#
+  } else{#
+    pp.disper <- lapply(pp.dis, function(z){#
+      ## if(all(as.matrix(z) == 0)){#
+      ##   return(NA)#
+      ## }else{#
+        out <- try(betadisper(z, group=rep("1", nrow(as.matrix(z)))))#
+        if(inherits(out, "try-error")) out$distances <- NA#
+        return(out$distances)#
+    })#
+    return(pp.disper)#
+  }#
+}#
+#
+calcDis <- function(site, ind, nets){#
+  these.nets <- nets[sites == site]#
+  arr <- simplify2array(these.nets)#
+  pp <- calcDisper(arr, ind)#
+  if(all(is.na(pp))){#
+    return(NA)#
+  }else{#
+    out.dist <- try(data.frame(GenusSpecies=#
+                           rep(names(pp), sapply(pp, length)),#
+                           Dist=unlist(pp),#
+                           Site= site,#
+                           Year =  sapply(strsplit(#
+                             unlist(sapply(pp, names)), "[.]"),#
+                             function(x) x[2])))#
+    if(inherits(out.dist, "try-error")) browser()#
+    rownames(out.dist) <- NULL#
+    return(out.dist)#
+  }#
+}#
+plants <- lapply(unique(sites), calcDis, ind=1, nets)#
+plants <- plants[!sapply(plants, function(x) all(is.na(x)))]#
+plants <- do.call(rbind, plants)#
+pols <- lapply(unique(sites), calcDis, ind=2, nets)
+sapply(pp, names)
+sapply(strsplit(#
+                             unlist(sapply(pp, names)), "[.]"),#
+                             function(x) x[2])
+Q
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
+source('src/initialize.R')#
+library(bipartite)#
+#
+## ************************************************************#
+## #
+## ************************************************************#
+#
+## for each species at each site, 1) create a interaction partner by#
+## year matrix, 2) calculate the dissimilarity of interaction partners#
+## between years 3) extract dispersion values for each species, site#
+#
+load('../../data/networks/expanded_networks.Rdata')#
+#
+sites <- sapply(strsplit(names(nets), "[.]"), function(x) x[1])#
+calcDisper <- function(arr, ind){#
+  pp.dis <- apply(arr, ind, function(y){#
+    vegdist(empty(t(y)), method="chao")#
+  })#
+  pp.dis <- pp.dis[sapply(pp.dis, function(q){#
+    all(dim(as.matrix(q)) > 3)#
+  })]#
+  if(length(pp.dis) == 0){#
+    return(NA)#
+  } else{#
+    pp.disper <- lapply(pp.dis, function(z){#
+      ## if(all(as.matrix(z) == 0)){#
+      ##   return(NA)#
+      ## }else{#
+        out <- try(betadisper(z, group=rep("1", nrow(as.matrix(z))))$distances)#
+        if(inherits(out, "try-error")) out <- NA#
+        return(out$distances)#
+    })#
+    return(pp.disper)#
+  }#
+}#
+#
+calcDis <- function(site, ind, nets){#
+  these.nets <- nets[sites == site]#
+  arr <- simplify2array(these.nets)#
+  pp <- calcDisper(arr, ind)#
+  if(all(is.na(pp))){#
+    return(NA)#
+  }else{#
+    out.dist <- try(data.frame(GenusSpecies=#
+                           rep(names(pp), sapply(pp, length)),#
+                           Dist=unlist(pp),#
+                           Site= site,#
+                           Year =  sapply(strsplit(#
+                             unlist(sapply(pp, names)), "[.]"),#
+                             function(x) x[2])))#
+    if(inherits(out.dist, "try-error")) browser()#
+    rownames(out.dist) <- NULL#
+    return(out.dist)#
+  }#
+}#
+plants <- lapply(unique(sites), calcDis, ind=1, nets)#
+plants <- plants[!sapply(plants, function(x) all(is.na(x)))]#
+plants <- do.call(rbind, plants)#
+pols <- lapply(unique(sites), calcDis, ind=2, nets)
+calcDisper <- function(arr, ind){#
+  pp.dis <- apply(arr, ind, function(y){#
+    vegdist(empty(t(y)), method="chao")#
+  })#
+  pp.dis <- pp.dis[sapply(pp.dis, function(q){#
+    all(dim(as.matrix(q)) > 3)#
+  })]#
+  if(length(pp.dis) == 0){#
+    return(NA)#
+  } else{#
+    pp.disper <- lapply(pp.dis, function(z){#
+      ## if(all(as.matrix(z) == 0)){#
+      ##   return(NA)#
+      ## }else{#
+        out <- try(betadisper(z, group=rep("1", nrow(as.matrix(z))))$distances)#
+        if(inherits(out, "try-error")) out <- NA#
+        return(out)#
+    })#
+    return(pp.disper)#
+  }#
+}#
+#
+calcDis <- function(site, ind, nets){#
+  these.nets <- nets[sites == site]#
+  arr <- simplify2array(these.nets)#
+  pp <- calcDisper(arr, ind)#
+  if(all(is.na(pp))){#
+    return(NA)#
+  }else{#
+    out.dist <- try(data.frame(GenusSpecies=#
+                           rep(names(pp), sapply(pp, length)),#
+                           Dist=unlist(pp),#
+                           Site= site,#
+                           Year =  sapply(strsplit(#
+                             unlist(sapply(pp, names)), "[.]"),#
+                             function(x) x[2])))#
+    if(inherits(out.dist, "try-error")) browser()#
+    rownames(out.dist) <- NULL#
+    return(out.dist)#
+  }#
+}#
+plants <- lapply(unique(sites), calcDis, ind=1, nets)#
+plants <- plants[!sapply(plants, function(x) all(is.na(x)))]#
+plants <- do.call(rbind, plants)
+pols <- lapply(unique(sites), calcDis, ind=2, nets)
+sapply(pp, names)
+Q
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
+source('src/initialize.R')#
+library(bipartite)#
+#
+## ************************************************************#
+## #
+## ************************************************************#
+#
+## for each species at each site, 1) create a interaction partner by#
+## year matrix, 2) calculate the dissimilarity of interaction partners#
+## between years 3) extract dispersion values for each species, site#
+#
+load('../../data/networks/expanded_networks.Rdata')#
+#
+sites <- sapply(strsplit(names(nets), "[.]"), function(x) x[1])#
+calcDisper <- function(arr, ind){#
+  pp.dis <- apply(arr, ind, function(y){#
+    vegdist(empty(t(y)), method="chao")#
+  })#
+  pp.dis <- pp.dis[sapply(pp.dis, function(q){#
+    all(dim(as.matrix(q)) > 3)#
+  })]#
+  if(length(pp.dis) == 0){#
+    return(NA)#
+  } else{#
+    pp.disper <- lapply(pp.dis, function(z){#
+      ## if(all(as.matrix(z) == 0)){#
+      ##   return(NA)#
+      ## }else{#
+        out <- try(betadisper(z, group=rep("1", nrow(as.matrix(z))))$distances)#
+        if(inherits(out, "try-error")){#
+          out <- NA#
+          names(out) <- "NA.NA"#
+        }#
+        return(out)#
+    })#
+    return(pp.disper)#
+  }#
+}#
+#
+calcDis <- function(site, ind, nets){#
+  these.nets <- nets[sites == site]#
+  arr <- simplify2array(these.nets)#
+  pp <- calcDisper(arr, ind)#
+  if(all(is.na(pp))){#
+    return(NA)#
+  }else{#
+    out.dist <- try(data.frame(GenusSpecies=#
+                           rep(names(pp), sapply(pp, length)),#
+                           Dist=unlist(pp),#
+                           Site= site,#
+                           Year =  sapply(strsplit(#
+                             unlist(sapply(pp, names)), "[.]"),#
+                             function(x) x[2])))#
+    if(inherits(out.dist, "try-error")) browser()#
+    rownames(out.dist) <- NULL#
+    return(out.dist)#
+  }#
+}#
+plants <- lapply(unique(sites), calcDis, ind=1, nets)#
+plants <- plants[!sapply(plants, function(x) all(is.na(x)))]#
+plants <- do.call(rbind, plants)
+pols <- lapply(unique(sites), calcDis, ind=2, nets)
+pols <- pols[!sapply(pols, function(x) all(is.na(x)))]
+pols <- do.call(rbind, pols)
+pols
+head(specs)
+plants$k <- specs$k[match(specs$GenusSpecies, plants$GenusSpecies)]
+plants$k <- specs$k[match(plants$GenusSpecies, specs$GenusSpecies)]
+plants$k <- specs$k[match(plants$GenusSpecies, specs$GenusSpecies)]
+pols$k <- specs$k[match(pols$GenusSpecies, specs$GenusSpecies)]
+getDis <- function(sites, ind, nets, specs){#
+  plants <- lapply(unique(sites), calcDis, ind=1, nets)#
+  plants <- plants[!sapply(plants, function(x) all(is.na(x)))]#
+  plants <- do.call(rbind, plants)#
+  plants$k <- specs$k[match(plants$GenusSpecies, specs$GenusSpecies)]#
+  plant$core <- "core"#
+  plants$core[plants$k < 1] <- "peripheral"#
+  return(plants)#
+}#
+#
+getDis(sites, 1, nets, specs)
+getDis <- function(sites, ind, nets, specs){#
+  plants <- lapply(unique(sites), calcDis, ind=1, nets)#
+  plants <- plants[!sapply(plants, function(x) all(is.na(x)))]#
+  plants <- do.call(rbind, plants)#
+  plants$k <- specs$k[match(plants$GenusSpecies, specs$GenusSpecies)]#
+  plants$core <- "core"#
+  plants$core[plants$k < 1] <- "peripheral"#
+  return(plants)#
+}#
+#
+plants <- getDis(sites, 1, nets, specs)
+getDis <- function(sites, ind, nets, specs){#
+  pp <- lapply(unique(sites), calcDis, ind=1, nets)#
+  pp <- pp[!sapply(pp, function(x) all(is.na(x)))]#
+  pp <- do.call(rbind, pp)#
+  pp$k <- specs$k[match(pp$GenusSpecies, specs$GenusSpecies)]#
+  pp$core <- "core"#
+  pp$core[pp$k < 1] <- "peripheral"#
+  return(pp)#
+}#
+#
+plants <- getDis(sites, 1, nets, specs)#
+pols <- getDis(sites, 2, nets, specs)
+head(pols)
+head(plants)
+getDis <- function(sites, ind, nets, specs){#
+  pp <- lapply(unique(sites), calcDis, ind=ind, nets)#
+  pp <- pp[!sapply(pp, function(x) all(is.na(x)))]#
+  pp <- do.call(rbind, pp)#
+  pp$k <- specs$k[match(pp$GenusSpecies, specs$GenusSpecies)]#
+  pp$core <- "core"#
+  pp$core[pp$k < 1] <- "peripheral"#
+  return(pp)#
+}#
+#
+plants <- getDis(sites, 1, nets, specs)#
+pols <- getDis(sites, 2, nets, specs)
+head(pols)
+mod.pols <- lmer(Dist~k + (1|Site) + (1|Species))
+mod.pols <- lmer(Dist~k + (1|Site) + (1|Species),#
+                 data=pols)
+mod.pols <- lmer(Dist~k + (1|Site) + (1|GenusSpecies),#
+                 data=pols)
+mod.pols
+summary(mod.pols)
+mod.plants <- lmer(Dist~k + (1|Site) + (1|GenusSpecies),#
+                 data=plants)
+summary(mod.plants)
+mod.pols.cat <- lmer(Dist~core + (1|Site) + (1|GenusSpecies),#
+                 data=pols)
+summary(mod.pols.cat)
+mod.pols <- lmer(Dist~k + (1|Site) + (1|GenusSpecies),#
+                 data=pols)#
+mod.pols.cat <- lmer(Dist~core + (1|Site) + (1|GenusSpecies),#
+                 data=pols)#
+summary(mod.pols)#
+summary(mod.pols.cat)#
+mod.plants <- lmer(Dist~k + (1|Site) + (1|GenusSpecies),#
+                 data=plants)#
+mod.plants.cat <- lmer(Dist~core + (1|Site) + (1|GenusSpecies),#
+                 data=plants)#
+summary(mod.plants)#
+summary(mod.plants.cat)
+boxplot(Dist~core,#
+                 data=pols)
+boxplot(Dist~core,#
+                 data=plants)
+summary(mod.plants)
+plot(Dist~k,#
+                 data=plants)
+plot(Dist~k,#
+                 data=pols)
+plot(Dist~k,#
+                 data=plants)
+specs.agg <- aggregate(k ~ GenusSpecies, data=specs, mean)
+specs.agg
+specs.agg <- aggregate(k ~ GenusSpecies, data=specs, mean)#
+plants <- getDis(sites, 1, nets, specs.agg)#
+pols <- getDis(sites, 2, nets, specs.agg)#
+#
+mod.pols <- lmer(Dist~k + (1|Site) + (1|GenusSpecies),#
+                 data=pols)#
+mod.pols.cat <- lmer(Dist~core + (1|Site) + (1|GenusSpecies),#
+                 data=pols)#
+summary(mod.pols)#
+summary(mod.pols.cat)
+boxplot(Dist~core,#
+                 data=pols)
+boxplot(Dist~core,#
+                 data=plants)
+mod.plants <- lmer(Dist~k + (1|Site) + (1|GenusSpecies),#
+                 data=plants)#
+mod.plants.cat <- lmer(Dist~core + (1|Site) + (1|GenusSpecies),#
+                 data=plants)#
+summary(mod.plants)#
+summary(mod.plants.cat)
+dim(specs)
+dim(specs.agg)
+colnames(specs)
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
+source('src/initialize.R')#
+library(bipartite)#
+#
+## ************************************************************#
+## #
+## ************************************************************#
+#
+## for each species at each site, 1) create a interaction partner by#
+## year matrix, 2) calculate the dissimilarity of interaction partners#
+## between years 3) extract dispersion values for each species, site#
+#
+load('../../data/networks/expanded_networks.Rdata')#
+#
+sites <- sapply(strsplit(names(nets), "[.]"), function(x) x[1])#
+calcDisper <- function(arr, ind){#
+  pp.dis <- apply(arr, ind, function(y){#
+    vegdist(empty(t(y)), method="chao")#
+  })#
+  pp.dis <- pp.dis[sapply(pp.dis, function(q){#
+    all(dim(as.matrix(q)) > 3)#
+  })]#
+  if(length(pp.dis) == 0){#
+    return(NA)#
+  } else{#
+    pp.disper <- lapply(pp.dis, function(z){#
+      ## if(all(as.matrix(z) == 0)){#
+      ##   return(NA)#
+      ## }else{#
+      out <- try(betadisper(z, group=rep("1", nrow(as.matrix(z))))$distances)#
+      if(inherits(out, "try-error")){#
+        out <- NA#
+        names(out) <- "NA.NA"#
+      }#
+      return(out)#
+    })#
+    return(pp.disper)#
+  }#
+}#
+#
+calcDis <- function(site, ind, nets){#
+  these.nets <- nets[sites == site]#
+  arr <- simplify2array(these.nets)#
+  pp <- calcDisper(arr, ind)#
+  if(all(is.na(pp))){#
+    return(NA)#
+  }else{#
+    out.dist <- try(data.frame(GenusSpecies=#
+                               rep(names(pp), sapply(pp, length)),#
+                               Dist=unlist(pp),#
+                               Site= site,#
+                               Year =  sapply(strsplit(#
+                                 unlist(sapply(pp, names)), "[.]"),#
+                                 function(x) x[2])))#
+    if(inherits(out.dist, "try-error")) browser()#
+    rownames(out.dist) <- NULL#
+    return(out.dist)#
+  }#
+}#
+getDis <- function(sites, ind, nets, specs.agg, specs){#
+  pp <- lapply(unique(sites), calcDis, ind=ind, nets)#
+  pp <- pp[!sapply(pp, function(x) all(is.na(x)))]#
+  pp <- do.call(rbind, pp)#
+  pp$k <- specs.agg$k[match(pp$GenusSpecies, specs.agg$GenusSpecies)]#
+  pp$d <- specs.d[match(pp$GenusSpecies, specs.d$GenusSpecies)]#
+  pp$core <- "core"#
+  pp$core[pp$k < 1] <- "peripheral"#
+  return(pp)#
+}
+specs.agg <- aggregate(k  ~ GenusSpecies, data=specs, mean)#
+plants <- getDis(sites, 1, nets, specs.agg)#
+pols <- getDis(sites, 2, nets, specs.agg)#
+#
+mod.pols <- lmer(Dist~k + (1|Site) + (1|GenusSpecies),#
+                 data=pols)#
+mod.pols.cat <- lmer(Dist~core + (1|Site) + (1|GenusSpecies),#
+                     data=pols)#
+#
+mod.pols.d <- lmer(Dist~d + (1|Site) + (1|GenusSpecies),#
+                 data=pols)#
+summary(mod.pols)#
+summary(mod.pols.cat)#
+summary(mod.pols.d)
+getDis <- function(sites, ind, nets, specs.agg, specs){#
+  pp <- lapply(unique(sites), calcDis, ind=ind, nets)#
+  pp <- pp[!sapply(pp, function(x) all(is.na(x)))]#
+  pp <- do.call(rbind, pp)#
+  pp$k <- specs.agg$k[match(pp$GenusSpecies, specs.agg$GenusSpecies)]#
+  pp$d <- specs$d[match(pp$GenusSpecies, specs$GenusSpecies)]#
+  pp$core <- "core"#
+  pp$core[pp$k < 1] <- "peripheral"#
+  return(pp)#
+}#
+#
+specs.agg <- aggregate(k  ~ GenusSpecies, data=specs, mean)#
+plants <- getDis(sites, 1, nets, specs.agg)#
+pols <- getDis(sites, 2, nets, specs.agg)#
+#
+mod.pols <- lmer(Dist~k + (1|Site) + (1|GenusSpecies),#
+                 data=pols)#
+mod.pols.cat <- lmer(Dist~core + (1|Site) + (1|GenusSpecies),#
+                     data=pols)#
+#
+mod.pols.d <- lmer(Dist~d + (1|Site) + (1|GenusSpecies),#
+                 data=pols)#
+summary(mod.pols)#
+summary(mod.pols.cat)#
+summary(mod.pols.d)
+specs.agg <- aggregate(k  ~ GenusSpecies, data=specs, mean)#
+plants <- getDis(sites, 1, nets, specs.agg, specs)#
+pols <- getDis(sites, 2, nets, specs.agg, specs)#
+#
+mod.pols <- lmer(Dist~k + (1|Site) + (1|GenusSpecies),#
+                 data=pols)#
+mod.pols.cat <- lmer(Dist~core + (1|Site) + (1|GenusSpecies),#
+                     data=pols)#
+#
+mod.pols.d <- lmer(Dist~d + (1|Site) + (1|GenusSpecies),#
+                 data=pols)#
+summary(mod.pols)#
+summary(mod.pols.cat)#
+summary(mod.pols.d)
+mod.plants <- lmer(Dist~k + (1|Site) + (1|GenusSpecies),#
+                   data=plants)#
+mod.plants.cat <- lmer(Dist~core + (1|Site) + (1|GenusSpecies),#
+                       data=plants)#
+mod.plants.d <- lmer(Dist~d + (1|Site) + (1|GenusSpecies),#
+                 data=plants)#
+summary(mod.plants)#
+summary(mod.plants.cat)
+summary(mod.plants.d)
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
+source('src/initialize.R')#
+library(bipartite)#
+source('src/calcDis.R')#
+#
+## ************************************************************#
+## #
+## ************************************************************#
+#
+## for each species at each site, 1) create a interaction partner by#
+## year matrix, 2) calculate the dissimilarity of interaction partners#
+## between years 3) extract dispersion values for each species, site#
+#
+load('../../data/networks/expanded_networks.Rdata')#
+#
+sites <- sapply(strsplit(names(nets), "[.]"), function(x) x[1])#
+#
+specs.agg <- aggregate(k  ~ GenusSpecies, data=specs, mean)#
+plants <- getDis(sites, 1, nets, specs.agg, specs)#
+pols <- getDis(sites, 2, nets, specs.agg, specs)#
+#
+mod.pols <- lmer(Dist~k + (1|Site) + (1|GenusSpecies),#
+                 data=pols)#
+mod.pols.cat <- lmer(Dist~core + (1|Site) + (1|GenusSpecies),#
+                     data=pols)#
+mod.pols.d <- lmer(Dist~d + (1|Site) + (1|GenusSpecies),#
+                 data=pols)#
+summary(mod.pols)#
+summary(mod.pols.cat)#
+summary(mod.pols.d)#
+mod.plants <- lmer(Dist~k + (1|Site) + (1|GenusSpecies),#
+                   data=plants)#
+mod.plants.cat <- lmer(Dist~core + (1|Site) + (1|GenusSpecies),#
+                       data=plants)#
+mod.plants.d <- lmer(Dist~d + (1|Site) + (1|GenusSpecies),#
+                 data=plants)#
+summary(mod.plants)#
+summary(mod.plants.cat)#
+summary(mod.plants.d)
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
+source('src/initialize.R')#
+library(bipartite)#
+source('src/calcDis.R')#
+#
+## ************************************************************#
+## #
+## ************************************************************#
+#
+## for each species at each site, 1) create a interaction partner by#
+## year matrix, 2) calculate the dissimilarity of interaction partners#
+## between years 3) extract dispersion values for each species, site#
+#
+load('../../data/networks/expanded_networks.Rdata')#
+#
+sites <- sapply(strsplit(names(nets), "[.]"), function(x) x[1])#
+#
+specs.agg <- aggregate(k  ~ GenusSpecies, data=specs, mean)#
+plants <- getDis(sites, 1, nets, specs.agg, specs)#
+pols <- getDis(sites, 2, nets, specs.agg, specs)#
+#
+mod.pols <- lmer(Dist~k + (1|Site) + (1|GenusSpecies),#
+                 data=pols)#
+mod.pols.cat <- lmer(Dist~core + (1|Site) + (1|GenusSpecies),#
+                     data=pols)#
+mod.pols.d <- lmer(Dist~d + (1|Site) + (1|GenusSpecies),#
+                 data=pols)#
+summary(mod.pols)#
+summary(mod.pols.cat)#
+summary(mod.pols.d)#
+mod.plants <- lmer(Dist~k + (1|Site) + (1|GenusSpecies),#
+                   data=plants)#
+mod.plants.cat <- lmer(Dist~core + (1|Site) + (1|GenusSpecies),#
+                       data=plants)#
+mod.plants.d <- lmer(Dist~d + (1|Site) + (1|GenusSpecies),#
+                 data=plants)#
+summary(mod.plants)#
+summary(mod.plants.cat)#
+summary(mod.plants.d)
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
+source('src/initialize.R')#
+library(bipartite)#
+source('src/calcDis.R')#
+#
+## ************************************************************#
+## #
+## ************************************************************#
+#
+## for each species at each site, 1) create a interaction partner by#
+## year matrix, 2) calculate the dissimilarity of interaction partners#
+## between years 3) extract dispersion values for each species, site#
+#
+load('../../data/networks/expanded_networks.Rdata')#
+#
+sites <- sapply(strsplit(names(nets), "[.]"), function(x) x[1])#
+#
+specs.agg <- aggregate(k  ~ GenusSpecies, data=specs, mean)#
+plants <- getDis(sites, 1, nets, specs.agg, specs)#
+pols <- getDis(sites, 2, nets, specs.agg, specs)#
+#
+mod.pols <- lmer(Dist~k + (1|Site) + (1|GenusSpecies),#
+                 data=pols)#
+mod.pols.cat <- lmer(Dist~core + (1|Site) + (1|GenusSpecies),#
+                     data=pols)#
+mod.pols.d <- lmer(Dist~d + (1|Site) + (1|GenusSpecies),#
+                 data=pols)#
+summary(mod.pols)#
+summary(mod.pols.cat)#
+summary(mod.pols.d)#
+mod.plants <- lmer(Dist~k + (1|Site) + (1|GenusSpecies),#
+                   data=plants)#
+mod.plants.cat <- lmer(Dist~core + (1|Site) + (1|GenusSpecies),#
+                       data=plants)#
+mod.plants.d <- lmer(Dist~d + (1|Site) + (1|GenusSpecies),#
+                 data=plants)#
+summary(mod.plants)#
+summary(mod.plants.cat)#
+summary(mod.plants.d)
+colnames(specs)
+head(spec)
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/dataPrep')#
+load('~/Dropbox/hedgerow/data_sets/traditional/specimens-complete.RData')#
+load("/Users/lcp/Dropbox/hedgerow_network/data/veg/veg.Rdata")#
+source('src/misc.R')#
+source('src/prepNets.R')#
+library(bipartite)#
+#
+trait.dir <- '~/Dropbox/hedgerow/data_sets/traditional/functional_traits'#
+bee.trait <-#
+  read.csv(file.path(trait.dir, 'bee.csv'),#
+           row.names=1)#
+syr.trait <-#
+  read.csv(file.path(trait.dir, 'syr.csv'),#
+           row.names=1)#
+#
+spec <- dd#
+#
+## subset to net specimens#
+spec <- spec[spec$NetPan == 'net',]#
+#
+## subset to just bees and syrphids#
+spec <- spec[spec$Family == 'Syrphidae' |#
+             spec$BeeNonbee == 'bee',]#
+#
+## create species column#
+spec$PlantGenusSpecies <-  fix.white.space(paste(spec$PlantGenus,#
+                                                 spec$PlantSpecies))#
+#
+## drop pollinators and plants without identifications#
+spec <-  spec[spec$Species != '',]#
+spec <-  spec[spec$PlantGenusSpecies != '',]#
+spec$SiteStatus[spec$SiteStatus == "restored"] <- "maturing"#
+#
+## create a giant network to calculate specialization#
+agg.spec <- aggregate(list(abund=spec$GenusSpecies),#
+                      list(GenusSpecies=spec$GenusSpecies,#
+                           PlantGenusSpecies=spec$PlantGenusSpecies),#
+                      length)#
+#
+nets.all <- samp2site.spp(agg.spec$PlantGenusSpecies,#
+                      agg.spec$GenusSpecies, agg.spec$abund, FUN=sum)#
+#
+all.specializations <- specieslevel(nets.all,#
+                                    index=c("proportional generality",#
+                                    "d"))#
+#
+traits <- data.frame(GenusSpecies= unlist(sapply(all.specializations,#
+                       rownames)),#
+                     do.call(rbind, all.specializations))#
+rownames(traits) <- NULL
+head(traits)
+## drop forb and natural sites #
+to.drop.status <- c("forb", "natural")#
+spec <- spec[!spec$SiteStatus %in% to.drop.status,]#
+#
+## add various traits#
+## specialization#
+spec$d <- traits$d[match(spec$GenusSpecies, traits$GenusSpecies)]#
+#
+## occurence#
+load('~/Dropbox/hedgerow/data_sets/matrices/net/bee.syr.RData')#
+occ <- apply(mat, c(3,1), function(x){#
+  sum(x > 0, na.rm=TRUE)/sum(x >= 0, na.rm=TRUE)#
+})#
+findOcc <- function(x){#
+  out <- try(occ[x["GenusSpecies"], paste(x["Site"], x["SiteStatusBACI"],#
+                                sep=":")], silent=TRUE)#
+  if(inherits(out, "try-error")) out <- NA#
+  return(out)#
+}#
+#
+spec$occ.date <- apply(spec, 1, findOcc)
+head(spec)
+traits$occ.date <- spec$occ.date[match(traits$GenusSpecies,#
+                                       spec$GenusSpecies)]
+head(traits)
+traits$GenusSpecies
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/dataPrep')#
+load('~/Dropbox/hedgerow/data_sets/traditional/specimens-complete.RData')#
+load("/Users/lcp/Dropbox/hedgerow_network/data/veg/veg.Rdata")#
+source('src/misc.R')#
+source('src/prepNets.R')#
+library(bipartite)#
+#
+trait.dir <- '~/Dropbox/hedgerow/data_sets/traditional/functional_traits'#
+bee.trait <-#
+  read.csv(file.path(trait.dir, 'bee.csv'),#
+           row.names=1)#
+syr.trait <-#
+  read.csv(file.path(trait.dir, 'syr.csv'),#
+           row.names=1)#
+#
+spec <- dd#
+#
+## subset to net specimens#
+spec <- spec[spec$NetPan == 'net',]#
+#
+## subset to just bees and syrphids#
+spec <- spec[spec$Family == 'Syrphidae' |#
+             spec$BeeNonbee == 'bee',]#
+#
+## create species column#
+spec$PlantGenusSpecies <-  fix.white.space(paste(spec$PlantGenus,#
+                                                 spec$PlantSpecies))#
+#
+## drop pollinators and plants without identifications#
+spec <-  spec[spec$Species != '',]#
+spec <-  spec[spec$PlantGenusSpecies != '',]#
+spec$SiteStatus[spec$SiteStatus == "restored"] <- "maturing"#
+#
+## create a giant network to calculate specialization#
+agg.spec <- aggregate(list(abund=spec$GenusSpecies),#
+                      list(GenusSpecies=spec$GenusSpecies,#
+                           PlantGenusSpecies=spec$PlantGenusSpecies),#
+                      length)#
+#
+nets.all <- samp2site.spp(agg.spec$PlantGenusSpecies,#
+                      agg.spec$GenusSpecies, agg.spec$abund, FUN=sum)#
+#
+all.specializations <- specieslevel(nets.all,#
+                                    index=c("proportional generality",#
+                                    "d"))#
+#
+traits <- data.frame(GenusSpecies= unlist(sapply(all.specializations,#
+                       rownames)),#
+                     do.call(rbind, all.specializations))#
+rownames(traits) <- NULL#
+## drop forb and natural sites #
+to.drop.status <- c("forb", "natural")#
+spec <- spec[!spec$SiteStatus %in% to.drop.status,]#
+#
+## add various traits#
+## specialization#
+spec$d <- traits$d[match(spec$GenusSpecies, traits$GenusSpecies)]#
+#
+## occurence#
+load('~/Dropbox/hedgerow/data_sets/matrices/net/bee.syr.RData')#
+occ <- apply(mat, c(3,1), function(x){#
+  sum(x > 0, na.rm=TRUE)/sum(x >= 0, na.rm=TRUE)#
+})#
+findOcc <- function(x){#
+  out <- try(occ[x["GenusSpecies"], paste(x["Site"], x["SiteStatusBACI"],#
+                                sep=":")], silent=TRUE)#
+  if(inherits(out, "try-error")) out <- NA#
+  return(out)#
+}#
+#
+spec$occ.date <- apply(spec, 1, findOcc)#
+traits$occ.date <- spec$occ.date[match(traits$GenusSpecies,#
+                                       spec$GenusSpecies)]#
+#
+## bee functional traits#
+#
+spec$Lecty <-#
+  bee.trait$Lecty[match(spec$GenusSpecies, rownames(bee.trait))]#
+spec$NestLoc <-#
+  bee.trait$NestLoc[match(spec$GenusSpecies, rownames(bee.trait))]#
+spec$Excavate <-#
+  bee.trait$Excavate[match(spec$GenusSpecies, rownames(bee.trait))]#
+spec$ITD <-#
+  bee.trait$MeanITD[match(spec$GenusSpecies, rownames(bee.trait))]#
+spec$Sociality <-#
+  bee.trait$Sociality[match(spec$GenusSpecies, rownames(bee.trait))]#
+#
+## syrphid functional traits#
+#
+spec$LarvalDiet <- syr.trait$LarvalDiet[match(spec$GenusSpecies,#
+                                              rownames(syr.trait))]#
+spec$AdultDiet <- syr.trait$AdultDiet[match(spec$GenusSpecies,#
+                                            rownames(syr.trait))]#
+spec$WingLength <- syr.trait$WingLength[match(spec$GenusSpecies,#
+                                              rownames(syr.trait))]#
+#
+save(spec, file='../data/networks/allSpecimens.Rdata')#
+write.csv(traits, file="../data/traits.csv", row.names=FALSE)#
+site.years <- aggregate(Year~ Site, data=spec,#
+                        function(x) length(unique(x)))#
+#
+sites.to.keep <- site.years$Site[site.years$Year >= 5]#
+#
+## *******************************************************************#
+## create networks#
+## all sites with > 5 years#
+nets <- breakNet(spec[spec$Site %in% sites.to.keep,], 'Site', 'Year')#
+#
+## save networks for each site, timeframe#
+f.path <- '../data/networks'#
+save(nets, file=file.path(f.path, 'all_networks_years.Rdata'))#
+#
+## *******************************************************************#
+## keep only BACI sites#
+BACI.site <- c('Barger', 'Butler', 'Hrdy', 'MullerB', 'Sperandio')#
+spec <-  spec[spec$Site %in% BACI.site,]#
+veg <-  veg[veg$Site %in% BACI.site,]#
+#
+veg$ypr <- spec$ypr[match(paste(veg$Year, veg$Site),#
+                          paste(spec$Year, spec$Site))]#
+#
+save(spec, file='../data/networks/specimens.Rdata')#
+#
+## create a "year" columns grouping years 1-3 post restoration and 4-9#
+spec$assem <- 'early'#
+spec$assem[spec$ypr > 3] <- 'late'#
+#
+veg$assem <- 'early'#
+veg$assem[veg$ypr > 3] <- 'late'#
+#
+veg.sum <- aggregate(list(abundance=veg$NumQuads),#
+                     list(site=veg$Site,#
+                          status=veg$assem,#
+                          species=veg$PlantGenusSpecies),#
+                     sum)#
+#
+## *******************************************************************#
+## create networks#
+#
+## by early/late assembly #
+networks <- breakNet(spec, 'Site', 'assem')#
+#
+## save networks for each site, timeframe#
+saveDats(networks, names(networks), f.path)#
+save(networks, file=file.path(f.path, 'networks_stages.Rdata'))#
+#
+## for each year#
+nets <- breakNet(spec, 'Site', 'Year')#
+save(nets, file=file.path(f.path, 'baci_networks_years.Rdata'))#
+#
+## *******************************************************************#
+## specialization of each species at each site#
+#
+species.lev <- lapply(networks, function(x){#
+  sl <- specieslevel(x)#
+  sl$'higher level'$tot.int <- colSums(x)#
+  sl$'lower level'$tot.int <- rowSums(x)#
+  return(sl)#
+})#
+#
+specializations  <-  mapply(function(a, b)#
+  getSpec(species.lev = a,#
+          names.net = b),#
+  a = species.lev,#
+  b = names(networks),#
+  SIMPLIFY = FALSE)#
+#
+specializations <- do.call(rbind, specializations)#
+rownames(specializations) <- NULL#
+#
+f.path <- '../data/degree'#
+save(specializations, file=file.path(f.path, 'specializations.Rdata'))#
+## *******************************************************************#
+## change in visits of by the generalized pollinators#
+#
+## hist(specializations$proportional.generality[specializations$speciesType ==#
+##                                              "pollinator"],#
+##      xlab="Generalization")#
+#
+## plants#
+diff.gens.plants <- getVisitChange(0, 0.2, "proportional.generality",#
+                            "PlantGenusSpecies", "GenusSpecies")#
+#
+diff.spec.plants <- getVisitChange(0.5, 1, "proportional.generality",#
+                            "PlantGenusSpecies", "GenusSpecies")#
+#
+diff.all.plants <- getVisitChange(0, 1, "proportional.generality",#
+                           "PlantGenusSpecies", "GenusSpecies")#
+#
+## pollinators#
+diff.gens.pol <- getVisitChange(0, 0.2, "proportional.generality",#
+                            "GenusSpecies", "PlantGenusSpecies")#
+#
+diff.spec.pol <- getVisitChange(0.5, 1, "proportional.generality",#
+                            "GenusSpecies", "PlantGenusSpecies")#
+#
+diff.all.pol <- getVisitChange(0, 1, "proportional.generality",#
+                           "GenusSpecies", "PlantGenusSpecies")#
+#
+f.path <- '../data/degree'#
+save(diff.gens.plants, diff.spec.plants, diff.all.plants,#
+     file=file.path(f.path, 'PlantVisitDiffs.Rdata'))#
+write.csv(diff.all.plants,#
+          file=file.path(f.path, 'PlantVisitDiffs.csv'), row.names=FALSE)#
+#
+save(diff.gens.pol, diff.spec.pol, diff.all.pol,#
+     file=file.path(f.path, 'PolVisitDiffs.Rdata'))#
+write.csv(diff.all.pol,#
+          file=file.path(f.path, 'PolVisitDiffs.csv'), row.names=FALSE)#
+## *******************************************************************#
+## species lists for each site#
+#
+plants <- getSpecies(networks, rownames)#
+pols <- getSpecies(networks, rownames)#
+#
+f.path <- '../data/species'#
+write.csv(plants, file.path(f.path, 'plants.csv'),#
+          row.names=FALSE)#
+save(plants, file=file.path(f.path, 'plants.Rdata'))#
+#
+write.csv(pols, file.path(f.path, 'pollinators.csv'),#
+          row.names=FALSE)#
+save(pols, file=file.path(f.path, 'pols.Rdata'))#
+#
+## *******************************************************************#
+## species added between early and late stages#
+#
+plant.diffs <- getColExt(plants)#
+pol.diffs <- getColExt(pols)#
+#
+f.path <- '../data/speciesChange'#
+write.csv(plant.diffs, file.path(f.path, 'plants.csv'),#
+          row.names=FALSE)#
+#
+write.csv(pol.diffs, file.path(f.path, 'pollinators.csv'),#
+          row.names=FALSE)#
+#
+## *******************************************************************#
+## total plants at a site#
+f.path <- '../data/species'#
+plants <- plants[,-2]#
+plants <- unique(plants)#
+write.csv(plants, file.path(f.path, 'plants_all.csv'),#
+          row.names=FALSE)#
+#
+## *******************************************************************#
+## pollinator and plant degrees by years post restoration#
+spec$all <- 'all'#
+#
+yr.networks <- breakNet(spec, 'all', 'assem')#
+#
+d.pol <- lapply(yr.networks, colSums)#
+d.plant <- lapply(yr.networks, rowSums)#
+#
+f.path <- '../data/degree'#
+saveDats(d.pol, paste(names(d.pol), 'pollinators', sep="_"), f.path)#
+saveDats(d.plant, paste(names(d.plant), 'plants', sep="_"), f.path)#
+#
+by.year <- data.frame(t(sapply(c(d.plant, d.pol), calcStats)))#
+by.year$group <- rep(c('plants','pollinators'), each=2)#
+by.year$assembly <- rep(c('early', 'late'), 2)#
+#
+write.csv(by.year, file.path(f.path, 'stats_by_yr.csv'))#
+#
+## *******************************************************************#
+## pollinator and plant degrees across all years and sites#
+#
+all.networks <- breakNet(spec, 'all', 'all')#
+#
+d.pol.all <- lapply(all.networks, colSums)#
+d.plant.all <- lapply(all.networks, rowSums)#
+#
+saveDats(d.pol.all, 'across_yrs_pollinators', f.path)#
+saveDats(d.plant.all, 'across_yrs_plants', f.path)#
+#
+all.dats <- data.frame(t(sapply(c(d.plant.all, d.pol.all), calcStats)))#
+all.dats$group <- c('plants','pollinators')#
+#
+write.csv(all.dats, file.path(f.path, 'stats_across_yrs.csv'))#
+#
+## *******************************************************************#
+## characteristics of plant colonists#
+plant.col <- plant.diffs[plant.diffs$class == "colonist",]#
+#
+plant.col$earlyAbund <- veg.sum$abundance[veg.sum$status ==#
+                                          "early"][match(#
+                                           plant.col$species,#
+                                           veg.sum$species)]#
+plant.col$lateAbund <- veg.sum$abundance[veg.sum$status ==#
+                                         "late"][match(#
+                                          plant.col$species,#
+                                          veg.sum$species)]#
+#
+plant.col$degree <- d.plant$all_late[match(plant.col$species,#
+                                           names(d.plant$all_late))]#
+#
+## number of species that interact#
+con.plant <- lapply(yr.networks, getCon, 1)#
+#
+plant.col$partners <- con.plant$all_late[match(plant.col$species,#
+                                               names(con.plant$all_late))]#
+f.path <- '../data/speciesChange'#
+write.csv(plant.col, file.path(f.path, 'plants_char.csv'),#
+          row.names=FALSE)#
+#
+## *******************************************************************#
+## stable network structure#
+networks.by.year <- breakNet(spec, 'Site', 'Year')#
+#
+plant.species <- sapply(networks.by.year, nrow)#
+plant.species <- data.frame(richness=plant.species,#
+                            sites =#
+                              sapply(strsplit(names(plant.species),#
+                                              "_"),#
+                                     function(x) x[1]),#
+                            years =#
+                              sapply(strsplit(names(plant.species),#
+                                              "_"),#
+                                     function(x) x[2]))#
+write.csv(plant.species, file.path(f.path, 'plants_change.csv'),#
+          row.names=FALSE)
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
+source('src/initialize.R')#
+library(bipartite)#
+source('src/calcDis.R')#
+traits <- read.csv("../../data/traits.csv"#
+## ************************************************************#
+## #
+## ************************************************************
+)
+head(traits)
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
+source('src/initialize.R')#
+library(bipartite)#
+source('src/calcDis.R')#
+traits <- read.csv("../../data/traits.csv")#
+## ************************************************************#
+## #
+## ************************************************************#
+#
+## for each species at each site, 1) create a interaction partner by#
+## year matrix, 2) calculate the dissimilarity of interaction partners#
+## between years 3) extract dispersion values for each species, site#
+#
+load('../../data/networks/expanded_networks.Rdata')#
+#
+sites <- sapply(strsplit(names(nets), "[.]"), function(x) x[1])#
+#
+specs.agg <- aggregate(k  ~ GenusSpecies, data=specs, mean)#
+plants <- getDis(sites, 1, nets, specs.agg, traits)#
+pols <- getDis(sites, 2, nets, specs.agg, traits)
+head(pols)
+mod.pols.occ <- lmer(Dist~occ.date + (1|Site) + (1|GenusSpecies),#
+                 data=pols)
+summary(mod.pols.occ)
+head(traits)
+head(plants)
+hist(unique(cbind(plants$GenusSpecies, plants$k)))
+hist(unique(cbind(plants$GenusSpecies, pols$k)))
+unique(plants$k)
+cbind(plants$GenusSpecies, plants$k)
+hist(unique(cbind(plants$GenusSpecies, pols$k)$k))
+hist(unique(cbind(plants$GenusSpecies, pols$k)[,2]))
+hist(unique(cbind(plants$GenusSpecies, plants$k)[,2]))
+hist(unique(cbind(pols$GenusSpecies, pols$k)[,2]))
+hist(unique(cbind(plants$GenusSpecies, plants$k)[,2]))
+hist(unique(cbind(plants$GenusSpecies, plants$k)[,2]))
+hist(unique(cbind(pols$GenusSpecies, pols$k)[,2]))
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
+source('src/initialize.R')#
+#
+## ************************************************************#
+## coefficient of variation of abundance through time#
+## ************************************************************#
+byYear <- aggregate(list(Abund=spec$GenusSpecies),#
+                    list(GenusSpecies= spec$GenusSpecies,#
+                         Date=spec$Date,#
+                         SiteStatus= spec$SiteStatus,#
+                         Site=spec$Site), length)#
+#
+dprime <- cv.trait(spec, byYear, trait="d",#
+                   method= "time",#
+                   time.col="Date",#
+                   abund.col="Abund")#
+#
+itd <- cv.trait(spec, byYear, trait="ITD",#
+                method= "time",#
+                time.col="Date",#
+                abund.col="Abund")
+dprime.k.sd <- cv.trait(spec,#
+                        specs[specs$speciesType =="pollinator",],#
+                        trait="d",#
+                        method= "time", time.col="assem",#
+                        abund.col="k",#
+                        cv.function=sd,#
+                        zero2na=TRUE, standard.cv=FALSE,#
+                        na.rm=TRUE)#
+#
+dprime.closeness.sd <- cv.trait(spec,#
+                                specs[specs$speciesType =="pollinator",],#
+                                trait="d",#
+                                method= "time", time.col="assem",#
+                                abund.col="weighted.closeness",#
+                                cv.function=sd, zero2na=TRUE,#
+                                standard.cv=FALSE,#
+                                na.rm=TRUE)#
+#
+occ.k.sd <- cv.trait(spec,#
+                     specs[specs$speciesType =="pollinator",],#
+                     trait="occ.date",#
+                     method= "time", time.col="assem",#
+                     abund.col="k",#
+                     cv.function=sd, zero2na=TRUE, standard.cv=FALSE,#
+                     na.rm=TRUE)
+head(occ.k.sd$data)
+head(dprime.closeness.sd)
+head(dprime.closeness.sd$data)
+head(dprime$data)
+occ.k.sd$date$spec <-#
+  dprime$data$traits[match(occ.k.sd$date$GenusSpecies,#
+                           dprime$data$GenusSpecies)]
+plot(occ.k.sd$traits ~ occ.k.sd$spec)
+occ.k.sd$data$spec <-#
+  dprime$data$traits[match(occ.k.sd$date$GenusSpecies,#
+                           dprime$data$GenusSpecies)]#
+plot(occ.k.sd$data$traits ~ occ.k.sd$data$spec)
+occ.k.sd <- cv.trait(spec,#
+                     specs[specs$speciesType =="pollinator",],#
+                     trait="occ.date",#
+                     method= "time", time.col="assem",#
+                     abund.col="k",#
+                     cv.function=sd, zero2na=TRUE, standard.cv=FALSE,#
+                     na.rm=TRUE)#
+save(itd, dprime, dprime.k.sd, dprime.closeness.sd, occ.k.sd,#
+     file="saved/contMods.Rdata")#
+#
+occ.k.sd$data$spec <-#
+  dprime$data$traits[match(occ.k.sd$data$GenusSpecies,#
+                           dprime$data$GenusSpecies)]#
+plot(occ.k.sd$data$traits ~ occ.k.sd$data$spec)
+occ.k.sd$data$spec <-#
+  dprime$data$traits.ns[match(occ.k.sd$data$GenusSpecies,#
+                           dprime$data$GenusSpecies)]#
+plot(occ.k.sd$data$traits.s ~ occ.k.sd$data$spec)
+plot(occ.k.sd$data$traits.ns ~ occ.k.sd$data$spec)
