@@ -11,7 +11,7 @@ results$V2 <- as.character(results$V2)
 years1  <-  as.numeric(sapply(strsplit(results$V1, "_"), function(x) x[2]))
 years2  <-  as.numeric(sapply(strsplit(results$V2, "_"), function(x) x[2]))
 anos <- min(years1):max(years2)
-## anos <- anos[-which(anos == 2010)]
+anos <- anos[-which(anos == 2010)]
 years <- as.data.frame(matrix(NA, 7,2))
 for(n in 1:(length(anos)-1)){
   years[n,2] <- paste(anos[n], anos[n+1], sep="-")  
