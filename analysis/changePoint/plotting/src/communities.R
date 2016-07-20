@@ -1,3 +1,4 @@
+library(networkD3)
 
 plotNet <- function(){
   par(mar=c(0,0.5,0,0))
@@ -28,13 +29,68 @@ plotNet <- function(){
 }
 
 
+comm.mat2sample <-  function (z) {
+  temp <- data.frame(expand.grid(dimnames(z))[1:2],
+                     as.vector(as.matrix(z)))
+  temp <- temp[sort.list(temp[, 1]), ]
+  data.frame(source = temp[, 1], target = temp[, 2], value = temp[, 3])
+}
+
+
+
 plotDend <- function(){
   par(mar=c(0,0.5,0,0))
   layout(matrix(1:length(this.tree), nrow=1))
+  cebs <- lapply(this.tree, cluster_edge_betweenness)
+  attribs <- lapply(this.tree, get.vertex.attribute)
+  id.memb <- lapply(attribs, function(x){
+    out <- cbind(x$id, x$group)
+    colnames(out) <- c("id", "group")
+    return(out)
+  })
+  ## node membership history
+  out <- list()
+  for(i in 1:length(id.memb)){
+    if(i == 1) out <- id.memb[[i]]
+    else{
+      out <- merge(out, id.memb[[i]], by="id", all=TRUE)
+      out[, ncol(out)] <- out[, ncol(out)] + i*20
+    }    
+  }
+  ## counts of nodes that moved from one community to another
+  links <- list()
+  for(i in 2:ncol(out)){
+    if(i==ncol(out)) break
+    comm <- table(out[, i:(i+1)])
+    if(i==2) links <- comm.mat2sample(comm)
+    else{
+      links <- rbind(links, comm.mat2sample(comm))
+    }
+  }
+  links <- links[!links$value == 0,]
+  ## nodes <-
+  ## data.frame(name=paste("n", 1:length(unique(c(links$target,
+  ##              links$source))), sep=""))
+  ## nodes$name <- as.character(nodes$name)
+
+  ## sankeyNetwork(Links = links,
+  ##               Nodes = nodes,
+  ##               Source = 'source', Target = 'target',
+  ##               Value = 'value', NodeID = 'name',
+  ##               fontSize = 12,  nodeWidth = 30, units = 'TWh')
+
+  plot(gvisSankey(links, from="source", 
+                  to="target", weight="value",
+                  options=list(
+                    height=250,
+                    sankey="{link:{color:{fill:'lightblue'}}}"
+                    ))
+       )
   for(j in 1:length(this.tree)){
     comm.tree <- this.tree[[j]]
     l <- layout_with_fr(comm.tree)
-    ceb <- cluster_edge_betweenness(comm.tree)
+    ceb <- cebs[[j]]
+
     plot(ceb, comm.tree, vertex.label="",
          edge.width=0.4,
          vertex.size=4,
