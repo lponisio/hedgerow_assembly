@@ -1,4 +1,4 @@
-library(networkD3)
+require(googleVis)
 
 plotNet <- function(){
   par(mar=c(0,0.5,0,0))
