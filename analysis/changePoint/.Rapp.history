@@ -1,2542 +1,1548 @@
 rm(list=ls())#
+library(reshape)#
+setwd("~/Dropbox/hedgerow_assembly/analysis/changePoint/cptPeel")#
+results <- read.table('results_4.txt', sep=' ') #
+#
+logs <- read.table('LogLs_4.txt', sep=' ')#
+#
+## split the year and creates an extra table with year 1 and period#
+results$V1 <- as.character(results$V1)#
+results$V2 <- as.character(results$V2)#
+years1  <-  as.numeric(sapply(strsplit(results$V1, "_"), function(x) x[2]))#
+years2  <-  as.numeric(sapply(strsplit(results$V2, "_"), function(x) x[2]))#
+anos <- min(years1):max(years2)#
+anos <- anos[-which(anos == 2010)]#
+years <- as.data.frame(matrix(NA, 7,2))#
+for(n in 1:(length(anos)-1)){#
+  years[n,2] <- paste(anos[n], anos[n+1], sep="-")  #
+}#
+years[,1] <- anos[-length(anos)]#
+colnames(years) <- c('first', 'period')#
+## creates othe variables for results #
+sites  <- sapply(strsplit(results$V1, "_"), function(x) x[1])#
+max <- apply(results[,c(3:5)], 1, max)#
+numberOfOnes <- apply(results[,c(3:5)], 1,#
+                      function(x) length(which(x==1)))#
+max.index <- rep(NA, dim(results)[1])#
+results <- cbind(results,  sites, years1, max, numberOfOnes, max.index)#
+## checking if there is more than 1 value, and if yes, returns the#
+## index with the maxlog#
+for(row in 1: dim(results)[1]){#
+  if(results$numberOfOnes[row]>1){## se eh true tem mais de um ai tem#
+                                  ## que ver o log#
+    results$max.index[row] <- which.max(logs[row,c(3:5)])#
+  }#
+  else {## return the position of the max#
+    results$max.index[row] <- which(results[row,c(3:5)]==results$max[row])#
+  }#
+}#
+#
+## separating only the significative results#
+## for(i in 1:dim(results)[1]){#
+##  qual <- which(years$first%in%results$years1[i]==TRUE)#
+##  results$period[i] <- years[qual,1]#
+##  }#
+#
+sigs <- results[results$max>0.949,]#
+cp <- rep(NA, dim(sigs)[1])#
+value <- rep(NA, dim(sigs)[1])#
+sigs <- cbind(sigs, cp, value)#
+## cp is always the year + next year#
+## retorna o index que eh a soma de onde ta mais o max.index#
+for(i in 1:dim(sigs)[1]){#
+  y1 <- which(years$first%in%sigs$years1[i]==TRUE)#
+  sigs$cp[i] <- years$period[y1+(sigs$max.index[i]-1)]#
+  sigs$value[i] <- sigs[i,c(3:5)][sigs$max.index[i]]#
+}#
+sigs$value <- unlist(sigs$value)#
+changing.points <- sigs[,c(6,11,12)]#
+write.csv(changing.points, "changing.points.csv")
+rm(list=ls())#
+library(reshape)#
+setwd("~/Dropbox/hedgerow_assembly/analysis/changePoint/cptPeel")#
+#
+results <- read.table('results_4.txt', sep=' ') #
+logs <- read.table('LogLs_4.txt', sep=' ')#
+#
+## split the year and creates an extra table with year 1 and period#
+results$V1 <- as.character(results$V1)#
+results$V2 <- as.character(results$V2)#
+years1  <-  as.numeric(sapply(strsplit(results$V1, "_"), function(x) x[2]))#
+years2  <-  as.numeric(sapply(strsplit(results$V2, "_"), function(x) x[2]))#
+anos <- min(years1):max(years2)#
+anos <- anos[-which(anos == 2010)]#
+years <- as.data.frame(matrix(NA, 7,2))#
+for(n in 1:(length(anos)-1)){#
+  years[n,2] <- paste(anos[n], anos[n+1], sep="-")  #
+}#
+years[,1] <- anos[-length(anos)]#
+colnames(years) <- c('first', 'period')#
+## creates othe variables for results #
+sites  <- sapply(strsplit(results$V1, "_"), function(x) x[1])#
+max <- apply(results[,c(3:5)], 1, max)#
+numberOfOnes <- apply(results[,c(3:5)], 1,#
+                      function(x) length(which(x==1)))#
+max.index <- rep(NA, dim(results)[1])#
+results <- cbind(results,  sites, years1, max, numberOfOnes, max.index)#
+## checking if there is more than 1 value, and if yes, returns the#
+## index with the maxlog#
+for(row in 1: dim(results)[1]){#
+  if(results$numberOfOnes[row]>1){## se eh true tem mais de um ai tem#
+                                  ## que ver o log#
+    results$max.index[row] <- which.max(logs[row,c(3:5)])#
+  }#
+  else {## return the position of the max#
+    results$max.index[row] <- which(results[row,c(3:5)]==results$max[row])#
+  }#
+}#
+#
+## separating only the significative results#
+## for(i in 1:dim(results)[1]){#
+##  qual <- which(years$first%in%results$years1[i]==TRUE)#
+##  results$period[i] <- years[qual,1]#
+##  }#
+#
+sigs <- results[results$max>0.949,]#
+cp <- rep(NA, dim(sigs)[1])#
+value <- rep(NA, dim(sigs)[1])#
+sigs <- cbind(sigs, cp, value)#
+## cp is always the year + next year#
+## retorna o index que eh a soma de onde ta mais o max.index#
+for(i in 1:dim(sigs)[1]){#
+  y1 <- which(years$first%in%sigs$years1[i]==TRUE)#
+  sigs$cp[i] <- years$period[y1+(sigs$max.index[i]-1)]#
+  sigs$value[i] <- sigs[i,c(3:5)][sigs$max.index[i]]#
+}#
+sigs$value <- unlist(sigs$value)#
+changing.points <- sigs[,c(6,11,12)]#
+write.csv(changing.points, "changing_points.csv")
+write.csv(changing.points, "changing_points.csv", row.names=FALSE)
+rm(list=ls())#
+library(reshape)#
+setwd("~/Dropbox/hedgerow_assembly/analysis/changePoint/cptPeel")#
+#
+results <- read.table('results_4.txt', sep=' ') #
+logs <- read.table('LogLs_4.txt', sep=' ')#
+#
+## split the year and creates an extra table with year 1 and period#
+results$V1 <- as.character(results$V1)#
+results$V2 <- as.character(results$V2)#
+years1  <-  as.numeric(sapply(strsplit(results$V1, "_"), function(x) x[2]))#
+years2  <-  as.numeric(sapply(strsplit(results$V2, "_"), function(x) x[2]))#
+anos <- min(years1):max(years2)#
+anos <- anos[-which(anos == 2010)]#
+years <- as.data.frame(matrix(NA, 7,2))#
+for(n in 1:(length(anos)-1)){#
+  years[n,2] <- paste(anos[n], anos[n+1], sep="-")  #
+}#
+years[,1] <- anos[-length(anos)]#
+colnames(years) <- c('first', 'period')#
+## creates othe variables for results #
+sites  <- sapply(strsplit(results$V1, "_"), function(x) x[1])#
+max <- apply(results[,c(3:5)], 1, max)#
+numberOfOnes <- apply(results[,c(3:5)], 1,#
+                      function(x) length(which(x==1)))#
+max.index <- rep(NA, dim(results)[1])#
+results <- cbind(results,  sites, years1, max, numberOfOnes, max.index)#
+## checking if there is more than 1 value, and if yes, returns the#
+## index with the maxlog#
+for(row in 1: dim(results)[1]){#
+  if(results$numberOfOnes[row]>1){## se eh true tem mais de um ai tem#
+                                  ## que ver o log#
+    results$max.index[row] <- which.max(logs[row,c(3:5)])#
+  }#
+  else {## return the position of the max#
+    results$max.index[row] <- which(results[row,c(3:5)]==results$max[row])#
+  }#
+}#
+#
+## separating only the significative results#
+## for(i in 1:dim(results)[1]){#
+##  qual <- which(years$first%in%results$years1[i]==TRUE)#
+##  results$period[i] <- years[qual,1]#
+##  }#
+#
+sigs <- results[results$max>0.949,]#
+cp <- rep(NA, dim(sigs)[1])#
+value <- rep(NA, dim(sigs)[1])#
+sigs <- cbind(sigs, cp, value)#
+## cp is always the year + next year#
+## retorna o index que eh a soma de onde ta mais o max.index#
+for(i in 1:dim(sigs)[1]){#
+  y1 <- which(years$first%in%sigs$years1[i]==TRUE)#
+  sigs$cp[i] <- years$period[y1+(sigs$max.index[i]-1)]#
+  sigs$value[i] <- sigs[i,c(3:5)][sigs$max.index[i]]#
+}#
+sigs$value <- unlist(sigs$value)#
+changing.points <- sigs[,c(6,11,12)]#
+write.csv(changing.points, "changing_points.csv")
+rm(list=ls())#
+library(reshape)#
+setwd("~/Dropbox/hedgerow_assembly/analysis/changePoint/cptPeel")#
+#
+results <- read.table('results_4.txt', sep=' ') #
+logs <- read.table('LogLs_4.txt', sep=' ')#
+#
+## split the year and creates an extra table with year 1 and period#
+results$V1 <- as.character(results$V1)#
+results$V2 <- as.character(results$V2)#
+years1  <-  as.numeric(sapply(strsplit(results$V1, "_"), function(x) x[2]))#
+years2  <-  as.numeric(sapply(strsplit(results$V2, "_"), function(x) x[2]))#
+anos <- min(years1):max(years2)#
+anos <- anos[-which(anos == 2010)]#
+years <- as.data.frame(matrix(NA, 7,2))#
+for(n in 1:(length(anos)-1)){#
+  years[n,2] <- paste(anos[n], anos[n+1], sep="-")  #
+}#
+years[,1] <- anos[-length(anos)]#
+colnames(years) <- c('first', 'period')#
+## creates othe variables for results #
+sites  <- sapply(strsplit(results$V1, "_"), function(x) x[1])#
+max <- apply(results[,c(3:5)], 1, max)#
+numberOfOnes <- apply(results[,c(3:5)], 1,#
+                      function(x) length(which(x==1)))#
+max.index <- rep(NA, dim(results)[1])#
+results <- cbind(results,  sites, years1, max, numberOfOnes, max.index)#
+## checking if there is more than 1 value, and if yes, returns the#
+## index with the maxlog#
+for(row in 1: dim(results)[1]){#
+  if(results$numberOfOnes[row] > 1){## se eh true tem mais de um ai tem#
+                                  ## que ver o log#
+    browser()#
+    results$max.index[row] <- which.max(logs[row,c(3:5)])#
+  }#
+  else {## return the position of the max#
+    results$max.index[row] <- which(results[row,c(3:5)] == results$max[row])#
+  }#
+}
+results
+which.max(logs[row,c(3:5)]
+)
+results$max.index
+results$numberOfOnes[row] > 1
+results$max.index[row]
+results$max.index[row] <- which.max(logs[row,c(3:5)])
+results$max.index[row]
+results$max.index
+Q
+## checking if there is more than 1 value, and if yes, returns the#
+## index with the maxlog#
+for(row in 1:dim(results)[1]){#
+  if(results$numberOfOnes[row] > 1){## se eh true tem mais de um ai tem#
+                                  ## que ver o log#
+    results$max.index[row] <- which.max(logs[row,c(3:5)])#
+  }#
+  else {## return the position of the max#
+    results$max.index[row] <- which(results[row,c(3:5)] == results$max[row])#
+  }#
+}
+## checking if there is more than 1 value, and if yes, returns the#
+## index with the maxlog#
+for(row in 1:dim(results)[1]){#
+  if(results$numberOfOnes[row] > 1){## se eh true tem mais de um ai tem#
+                                  ## que ver o log#
+    results$max.index[row] <- which.max(logs[row,c(3:5)])#
+  }#
+  else {## return the position of the max#
+browser()#
+    results$max.index[row] <- which(results[row,c(3:5)] == results$max[row])#
+  }#
+}
+results$max.index[row] <- which(results[row,c(3:5)] == results$max[row])
+Q
+## checking if there is more than 1 value, and if yes, returns the#
+## index with the maxlog#
+for(row in 1:dim(results)[1]){#
+  if(results$numberOfOnes[row] > 1){## se eh true tem mais de um ai tem#
+                                  ## que ver o log#
+    results$max.index[row] <- which.max(logs[row,c(3:5)])#
+  }#
+  else {## return the position of the max#
+    results$max.index[row] <- try(which(results[row,c(3:5)] ==#
+                                        results$max[row]))#
+    if(interits(results$max.index[row], "try-error")) browser()#
+  }#
+}
+## checking if there is more than 1 value, and if yes, returns the#
+## index with the maxlog#
+for(row in 1:dim(results)[1]){#
+  if(results$numberOfOnes[row] > 1){## se eh true tem mais de um ai tem#
+                                  ## que ver o log#
+    results$max.index[row] <- which.max(logs[row,c(3:5)])#
+  }#
+  else {## return the position of the max#
+    results$max.index[row] <- try(which(results[row,c(3:5)] ==#
+                                        results$max[row]))#
+    if(inherits(results$max.index[row], "try-error")) browser()#
+  }#
+}
+## checking if there is more than 1 value, and if yes, returns the#
+## index with the maxlog#
+for(row in 1:dim(results)[1]){#
+  if(results$numberOfOnes[row] > 1){## se eh true tem mais de um ai tem#
+                                  ## que ver o log#
+    results$max.index[row] <- which.max(logs[row,c(3:5)])#
+  }#
+  else {## return the position of the max#
+    results$max.index[row] <- try(which(results[row,c(3:5)] ==#
+                                        results$max[row]))#
+    if(inherits(results$max.index, "try-error")) browser()#
+  }#
+}
+## checking if there is more than 1 value, and if yes, returns the#
+## index with the maxlog#
+for(row in 1:dim(results)[1]){#
+  if(results$numberOfOnes[row] > 1){## se eh true tem mais de um ai tem#
+                                  ## que ver o log#
+    results$max.index[row] <- which.max(logs[row,c(3:5)])#
+  }#
+  else {## return the position of the max#
+    results$max.index[row] <- which(results[row,c(3:5)] ==#
+                                        results$max[row])#
+    print( which(results[row,c(3:5)] ==#
+                                        results$max[row]))#
+  }#
+}
+## checking if there is more than 1 value, and if yes, returns the#
+## index with the maxlog#
+for(row in 1:dim(results)[1]){#
+  if(results$numberOfOnes[row] > 1){## se eh true tem mais de um ai tem#
+                                  ## que ver o log#
+    results$max.index[row] <- which.max(logs[row,c(3:5)])#
+  }#
+  else {## return the position of the max#
+    if(row == 9) browser()#
+    results$max.index[row] <- which(results[row,c(3:5)] ==#
+                                        results$max[row])#
+    print( which(results[row,c(3:5)] ==#
+                                        results$max[row]))#
+  }#
+}
+Q
+## checking if there is more than 1 value, and if yes, returns the#
+## index with the maxlog#
+for(row in 1:dim(results)[1]){#
+  if(results$numberOfOnes[row] > 1){## se eh true tem mais de um ai tem#
+                                  ## que ver o log#
+    results$max.index[row] <- which.max(logs[row,c(3:5)])#
+  }#
+  else {## return the position of the max#
+    if(row == 9) browser()#
+    results$max.index[row] <- which(results[row,c(3:5)] ==#
+                                        results$max[row])#
+    print( which(results[row,c(3:5)] ==#
+                                        results$max[row]))#
+  }#
+}
+results$max[row]
+which(results[row,c(3:5)] ==#
+                                        results$max[row])
+Q
+## checking if there is more than 1 value, and if yes, returns the#
+## index with the maxlog#
+for(row in 1:dim(results)[1]){#
+  if(results$numberOfOnes[row] > 1){## se eh true tem mais de um ai tem#
+                                  ## que ver o log#
+    results$max.index[row] <- which.max(logs[row,c(3:5)])#
+  }#
+  else {## return the position of the max#
+    if(row == 10) browser()#
+    results$max.index[row] <- which(results[row,c(3:5)] ==#
+                                        results$max[row])#
+    print( which(results[row,c(3:5)] ==#
+                                        results$max[row]))#
+  }#
+}
+which(results[row,c(3:5)] ==#
+                                        results$max[row])
+## checking if there is more than 1 value, and if yes, returns the#
+## index with the maxlog#
+for(row in 1:dim(results)[1]){#
+  if(results$numberOfOnes[row] > 1){## se eh true tem mais de um ai tem#
+                                  ## que ver o log#
+    results$max.index[row] <- which.max(logs[row,c(3:5)])#
+  }#
+  else {## return the position of the max#
+    results$max.index[row] <- which(results[row,c(3:5)] ==#
+                                        results$max[row][1])#
+    print( which(results[row,c(3:5)] ==#
+                                        results$max[row]))#
+  }#
+}
+## checking if there is more than 1 value, and if yes, returns the#
+## index with the maxlog#
+for(row in 1:dim(results)[1]){#
+  if(results$numberOfOnes[row] > 1){## se eh true tem mais de um ai tem#
+                                  ## que ver o log#
+    results$max.index[row] <- which.max(logs[row,c(3:5)])#
+  }#
+  else {## return the position of the max#
+    results$max.index[row] <- which(results[row,c(3:5)] ==#
+                                        results$max[row])[1]#
+    print( which(results[row,c(3:5)] ==#
+                                        results$max[row]))#
+  }#
+}
+rm(list=ls())#
+library(reshape)#
+setwd("~/Dropbox/hedgerow_assembly/analysis/changePoint/cptPeel")#
+#
+results <- read.table('results_4.txt', sep=' ') #
+logs <- read.table('LogLs_4.txt', sep=' ')#
+#
+## split the year and creates an extra table with year 1 and period#
+results$V1 <- as.character(results$V1)#
+results$V2 <- as.character(results$V2)#
+years1  <-  as.numeric(sapply(strsplit(results$V1, "_"), function(x) x[2]))#
+years2  <-  as.numeric(sapply(strsplit(results$V2, "_"), function(x) x[2]))#
+anos <- min(years1):max(years2)#
+anos <- anos[-which(anos == 2010)]#
+years <- as.data.frame(matrix(NA, 7,2))#
+for(n in 1:(length(anos)-1)){#
+  years[n,2] <- paste(anos[n], anos[n+1], sep="-")  #
+}#
+years[,1] <- anos[-length(anos)]#
+colnames(years) <- c('first', 'period')#
+## creates othe variables for results #
+sites  <- sapply(strsplit(results$V1, "_"), function(x) x[1])#
+max <- apply(results[,c(3:5)], 1, max)#
+numberOfOnes <- apply(results[,c(3:5)], 1,#
+                      function(x) length(which(x==1)))#
+max.index <- rep(NA, dim(results)[1])#
+results <- cbind(results,  sites, years1, max, numberOfOnes, max.index)#
+#
+## checking if there is more than 1 value, and if yes, returns the#
+## index with the maxlog#
+for(row in 1:dim(results)[1]){#
+  if(results$numberOfOnes[row] > 1){## se eh true tem mais de um ai tem#
+                                  ## que ver o log#
+    results$max.index[row] <- which.max(logs[row,c(3:5)])#
+  }#
+  else {## return the position of the max#
+    results$max.index[row] <- which(results[row,c(3:5)] ==#
+                                        results$max[row])[1]#
+  }#
+}#
+#
+## separating only the significative results#
+## for(i in 1:dim(results)[1]){#
+##  qual <- which(years$first%in%results$years1[i]==TRUE)#
+##  results$period[i] <- years[qual,1]#
+##  }#
+#
+sigs <- results[results$max>0.949,]#
+cp <- rep(NA, dim(sigs)[1])#
+value <- rep(NA, dim(sigs)[1])#
+sigs <- cbind(sigs, cp, value)#
+## cp is always the year + next year#
+## retorna o index que eh a soma de onde ta mais o max.index#
+for(i in 1:dim(sigs)[1]){#
+  y1 <- which(years$first%in%sigs$years1[i]==TRUE)#
+  sigs$cp[i] <- years$period[y1+(sigs$max.index[i]-1)]#
+  sigs$value[i] <- sigs[i,c(3:5)][sigs$max.index[i]]#
+}#
+sigs$value <- unlist(sigs$value)#
+changing.points <- sigs[,c(6,11,12)]#
+write.csv(changing.points, "changing_points.csv", row.names=FALSE)
+for(i in 1:dim(sigs)[1]){#
+  print(i)#
+  y1 <- which(years$first%in%sigs$years1[i]==TRUE)#
+  sigs$cp[i] <- years$period[y1+(sigs$max.index[i]-1)]#
+  sigs$value[i] <- sigs[i,c(3:5)][sigs$max.index[i]]#
+}
+## cp is always the year + next year#
+## retorna o index que eh a soma de onde ta mais o max.index#
+for(i in 1:dim(sigs)[1]){#
+  y1 <- which(years$first%in%sigs$years1[i]==TRUE)#
+  sigs$cp[i] <- years$period[y1+(sigs$max.index[i]-1)]#
+  sigs$value[i] <- sigs[i,c(3:5)][sigs$max.index[i]]#
+  print(paste(i, sigs[i,c(3:5)][sigs$max.index[i]])#
+}
+## cp is always the year + next year#
+## retorna o index que eh a soma de onde ta mais o max.index#
+for(i in 1:dim(sigs)[1]){#
+  y1 <- which(years$first%in%sigs$years1[i]==TRUE)#
+  sigs$cp[i] <- years$period[y1+(sigs$max.index[i]-1)]#
+  sigs$value[i] <- sigs[i,c(3:5)][sigs$max.index[i]]#
+  print(paste(i, sigs[i,c(3:5)][sigs$max.index[i]]))#
+}
+dim(sigs
+)
+## cp is always the year + next year#
+## retorna o index que eh a soma de onde ta mais o max.index#
+for(i in 1:dim(sigs)[1]){#
+  y1 <- which(years$first%in%sigs$years1[i]==TRUE)#
+  sigs$cp[i] <- years$period[y1+(sigs$max.index[i]-1)]#
+  print(paste(i, sigs[i,c(3:5)][sigs$max.index[i]]))#
+#
+  sigs$value[i] <- sigs[i,c(3:5)][sigs$max.index[i]]#
+}
+## cp is always the year + next year#
+## retorna o index que eh a soma de onde ta mais o max.index#
+for(i in 1:dim(sigs)[1]){#
+  y1 <- which(years$first%in%sigs$years1[i]==TRUE)#
+  print(paste(i,  years$period[y1+(sigs$max.index[i]-1)]))#
+  sigs$cp[i] <- years$period[y1+(sigs$max.index[i]-1)]#
+  sigs$value[i] <- sigs[i,c(3:5)][sigs$max.index[i]]#
+}
+## cp is always the year + next year#
+## retorna o index que eh a soma de onde ta mais o max.index#
+for(i in 1:dim(sigs)[1]){#
+  if(i==28) browser()#
+  y1 <- which(years$first%in%sigs$years1[i]==TRUE)#
+  print(paste(i,  years$period[y1+(sigs$max.index[i]-1)]))#
+  sigs$cp[i] <- years$period[y1+(sigs$max.index[i]-1)]#
+  sigs$value[i] <- sigs[i,c(3:5)][sigs$max.index[i]]#
+}
+y1 <- which(years$first%in%sigs$years1[i]==TRUE)
+y1
+sigs$years1[i]
+years$first
+Q
+rm(list=ls())#
+library(reshape)#
+setwd("~/Dropbox/hedgerow_assembly/analysis/changePoint/cptPeel")#
+#
+results <- read.table('results_4.txt', sep=' ') #
+logs <- read.table('LogLs_4.txt', sep=' ')#
+#
+## split the year and creates an extra table with year 1 and period#
+results$V1 <- as.character(results$V1)#
+results$V2 <- as.character(results$V2)#
+years1  <-  as.numeric(sapply(strsplit(results$V1, "_"), function(x) x[2]))#
+years2  <-  as.numeric(sapply(strsplit(results$V2, "_"), function(x) x[2]))#
+anos <- min(years1):max(years2)#
+## anos <- anos[-which(anos == 2010)]#
+years <- as.data.frame(matrix(NA, 7,2))#
+for(n in 1:(length(anos)-1)){#
+  years[n,2] <- paste(anos[n], anos[n+1], sep="-")  #
+}#
+years[,1] <- anos[-length(anos)]#
+colnames(years) <- c('first', 'period')#
+## creates othe variables for results #
+sites  <- sapply(strsplit(results$V1, "_"), function(x) x[1])#
+max <- apply(results[,c(3:5)], 1, max)#
+numberOfOnes <- apply(results[,c(3:5)], 1,#
+                      function(x) length(which(x==1)))#
+max.index <- rep(NA, dim(results)[1])#
+results <- cbind(results,  sites, years1, max, numberOfOnes, max.index)#
+#
+## checking if there is more than 1 value, and if yes, returns the#
+## index with the maxlog#
+for(row in 1:dim(results)[1]){#
+  if(results$numberOfOnes[row] > 1){## se eh true tem mais de um ai tem#
+                                  ## que ver o log#
+    results$max.index[row] <- which.max(logs[row,c(3:5)])#
+  }#
+  else {## return the position of the max#
+    results$max.index[row] <- which(results[row,c(3:5)] ==#
+                                        results$max[row])[1]#
+  }#
+}#
+#
+## separating only the significative results#
+## for(i in 1:dim(results)[1]){#
+##  qual <- which(years$first%in%results$years1[i]==TRUE)#
+##  results$period[i] <- years[qual,1]#
+##  }#
+#
+sigs <- results[results$max>0.949,]#
+cp <- rep(NA, dim(sigs)[1])#
+value <- rep(NA, dim(sigs)[1])#
+sigs <- cbind(sigs, cp, value)#
+#
+## cp is always the year + next year#
+## retorna o index que eh a soma de onde ta mais o max.index#
+for(i in 1:dim(sigs)[1]){#
+  ## if(i==28) browser()#
+  y1 <- which(years$first %in% sigs$years1[i] == TRUE)#
+  print(paste(i,  years$period[y1+(sigs$max.index[i]-1)]))#
+  sigs$cp[i] <- years$period[y1+(sigs$max.index[i]-1)]#
+  sigs$value[i] <- sigs[i,c(3:5)][sigs$max.index[i]]#
+}#
+#
+sigs$value <- unlist(sigs$value)#
+changing.points <- sigs[,c(6,11,12)]#
+#
+write.csv(changing.points, "changing_points.csv", row.names=FALSE)
+rm(list=ls())#
 setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-f.path <- "cptPeel/baci"#
 library(ape)#
 library(igraph)#
-library(parallel)#
-source('../assembly/src/misc.R', chdir = TRUE)#
+source('../networkLevel/src/misc.R')#
+source('plotting/src/communities.R', chdir = TRUE)#
+#
+fig.path <- 'plotting/figures'#
+f.path <- "cptPeel/baci"#
 load(file=file.path(f.path, "graphs.Rdata"))#
-options(mc.cores=10)
-load(file=file.path(f.path, "hrgs.Rdata"))
-ihrgs <- lapply(hrgs, as.igraph)#
-lapply(ihrgs, function(x) x$layout <- layout.reingold.tilford)
-sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])
-plotNet <- function(){#
-  par(mar=c(0,0,3,0))#
-  layout(matrix(1:length(g)))#
-  plot(ihrg, vertex.size=10,#
-       edge.arrow.size=0.2))#
-}#
 #
-for(i in unique(sites){#
-  browser()#
-  ihrg <- ihrgs[sites == i]#
-  pdf.f(plotNet,#
-        file=file.path(f.path, sprintf("%s_network.pdf", i)),#
-        width=8, height=4)#
+temp <- list.files(f.path, pattern="*.gml")#
+tree.graphs <-  lapply(temp, function(x){#
+  read.graph(file.path(f.path, x), format="gml")#
+})#
 #
-}
-plotNet <- function(){#
-  par(mar=c(0,0,3,0))#
-  layout(matrix(1:length(g)))#
-  plot(ihrg, vertex.size=10,#
-       edge.arrow.size=0.2)#
-}#
-#
-for(i in unique(sites){#
-  browser()#
-  ihrg <- ihrgs[sites == i]#
-  pdf.f(plotNet,#
-        file=file.path(f.path, sprintf("%s_network.pdf", i)),#
-        width=8, height=4)#
-#
-}
-for(i in unique(sites)){#
-  browser()#
-  ihrg <- ihrgs[sites == i]#
-  pdf.f(plotNet,#
-        file=file.path(f.path, sprintf("%s_network.pdf", i)),#
-        width=8, height=4)#
-#
-}
-ihrg <- ihrgs[sites == i]
-ihrg
-Q
-plotNet <- function(){#
-  par(mar=c(0,0,3,0))#
-  layout(matrix(1:length(ihrg)))#
-  for(i in 1:length(ihrg)){#
-    plot(ihrg[i], vertex.size=10,#
-         edge.arrow.size=0.2)#
-  }#
-}#
-#
-for(i in unique(sites)){#
-  ihrg <- ihrgs[sites == i]#
-  pdf.f(plotNet,#
-        file=file.path(f.path, sprintf("%s_networks.pdf", i)),#
-        width=8, height=4)#
-#
-}
-plotNet <- function(){#
-  par(mar=c(0,0,3,0))#
-  layout(matrix(1:length(ihrg)))#
-  for(i in j:length(ihrg)){#
-    plot(ihrg[j], vertex.size=10,#
-         edge.arrow.size=0.2)#
-  }#
-}#
-#
-for(i in unique(sites)){#
-  ihrg <- ihrgs[sites == i]#
-  pdf.f(plotNet,#
-        file=file.path(f.path, sprintf("%s_networks.pdf", i)),#
-        width=8, height=4)#
-#
-}
-plotNet <- function(){#
-  par(mar=c(0,0,3,0))#
-  layout(matrix(1:length(ihrg)))#
-  for(j in 1:length(ihrg)){#
-    plot(ihrg[j], vertex.size=10,#
-         edge.arrow.size=0.2)#
-  }#
-}#
-#
-for(i in unique(sites)){#
-  ihrg <- ihrgs[sites == i]#
-  pdf.f(plotNet,#
-        file=file.path(f.path, sprintf("%s_networks.pdf", i)),#
-        width=8, height=4)#
-#
-}
-plotNet <- function(){#
-  par(mar=c(0,0,3,0))#
-  layout(matrix(1:length(ihrg)))#
-  for(j in 1:length(ihrg)){#
-    browser()#
-    plot(ihrg[j], vertex.size=10,#
-         edge.arrow.size=0.2)#
-  }#
-}#
-#
-for(i in unique(sites)){#
-  ihrg <- ihrgs[sites == i]#
-  pdf.f(plotNet,#
-        file=file.path(f.path, sprintf("%s_networks.pdf", i)),#
-        width=8, height=4)#
-#
-}
-quartz( width=8, height=4)
-layout(matrix(1:length(ihrg)))
-j
-plot(ihrg[j], vertex.size=10,#
-         edge.arrow.size=0.2)
-ihrg[j]
-plot(ihrg[[j]], vertex.size=10,#
-         edge.arrow.size=0.2)
-Q
-plotNet <- function(){#
-  par(mar=c(0,0,3,0))#
-  layout(matrix(1:length(ihrg)))#
-  for(j in 1:length(ihrg)){#
-    plot(ihrg[[j]], vertex.size=10,#
-         edge.arrow.size=0.2)#
-  }#
-}#
-#
-for(i in unique(sites)){#
-  ihrg <- ihrgs[sites == i]#
-  pdf.f(plotNet,#
-        file=file.path(f.path, sprintf("%s_networks.pdf", i)),#
-        width=8, height=4)#
-#
-}
-plotNet <- function(){#
-  par(mar=c(0,0,3,0))#
-  layout(matrix(1:length(ihrg)))#
-  for(j in 1:length(ihrg)){#
-    plot(ihrg[[j]], vertex.size=10,#
-         edge.arrow.size=0.2)#
-  }#
-}#
-#
-for(i in unique(sites)){#
-  ihrg <- ihrgs[sites == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=8, height=4)#
-#
-}
-fig.path <- 'plotting/figures'
-plotNet <- function(){#
-  par(mar=c(0,0,3,0))#
-  layout(matrix(1:length(ihrg)))#
-  for(j in 1:length(ihrg)){#
-    plot(ihrg[[j]], vertex.size=10,#
-         edge.arrow.size=0.2)#
-  }#
-}#
-#
-for(i in unique(sites)){#
-  ihrg <- ihrgs[sites == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=8, height=4)#
-#
-}
-plotNet <- function(){#
-  par(mar=c(0,0,3,0))#
-  layout(matrix(1:length(ihrg), nrow=1))#
-  for(j in 1:length(ihrg)){#
-    plot(ihrg[[j]], vertex.size=10,#
-         edge.arrow.size=0.2)#
-  }#
-}#
-#
-for(i in unique(sites)){#
-  ihrg <- ihrgs[sites == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=8, height=4)#
-#
-}
-plotNet <- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(ihrg), nrow=1))#
-  for(j in 1:length(ihrg)){#
-    plot(ihrg[[j]], vertex.size=10,#
-         edge.arrow.size=0.2)#
-  }#
-}#
-#
-for(i in unique(sites)){#
-  ihrg <- ihrgs[sites == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=8, height=4)#
-#
-}
-plotNet <- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(ihrg), nrow=1))#
-  for(j in 1:length(ihrg)){#
-    plot(ihrg[[j]], vertex.size=10,#
-         edge.arrow.size=0.2)#
-  }#
-}#
-#
-for(i in unique(sites)){#
-  ihrg <- ihrgs[sites == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=8, height=2)#
-#
-}
-for(i in unique(sites)){#
-  ihrg <- ihrgs[sites == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=16, height=4)#
-#
-}
-?plot
-?plot.graph
-plotNet <- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(ihrg), nrow=1))#
-  for(j in 1:length(ihrg)){#
-    plot(ihrg[[j]], vertex.size=10,#
-         edge.arrow.size=0.2, vertex.label=NULL)#
-  }#
-}#
-#
-for(i in unique(sites)){#
-  ihrg <- ihrgs[sites == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=16, height=4)#
-#
-}
-plotNet <- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(ihrg), nrow=1))#
-  for(j in 1:length(ihrg)){#
-    plot(ihrg[[j]], vertex.size=10,#
-         edge.arrow.size=0.2, vertex.label="")#
-  }#
-}#
-#
-for(i in unique(sites)){#
-  ihrg <- ihrgs[sites == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=16, height=4)#
-#
-}
-sites
-plotDend<- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(hrg), nrow=1))#
-  for(j in 1:length(ihrg)){#
-    plot_dendrogram(ihrg[[j]])#
-  }#
-}#
-#
-for(i in unique(sites)){#
-  ihrg <- ihrgs[sites == i]#
-  hrg <- hrgs[sites == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=16, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_dendrograms.pdf", i)),#
-        width=16, height=4)#
-#
-}
-plotDend<- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(hrg), nrow=1))#
-  for(j in 1:length(hrg)){#
-    plot_dendrogram(hrg[[j]])#
-  }#
-}#
-#
-for(i in unique(sites)){#
-  ihrg <- ihrgs[sites == i]#
-  hrg <- hrgs[sites == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=16, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_dendrograms.pdf", i)),#
-        width=16, height=4)#
-#
-}
-plotNet <- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(ihrg), nrow=1))#
-  for(j in 1:length(ihrg)){#
-    plot(ihrg[[j]], vertex.size=10,#
-         edge.arrow.size=0.2, vertex.label="")#
-  }#
-}#
-#
-plotDend<- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(hrg), nrow=1))#
-  for(j in 1:length(hrg)){#
-    plot_dendrogram(hrg[[j]])#
-  }#
-}#
-#
-for(i in unique(sites)){#
-  ihrg <- ihrgs[sites == i]#
-  hrg <- hrgs[sites == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=16, height=2)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_dendrograms.pdf", i)),#
-        width=16, height=6)#
-#
-}
-graphs[[2]]
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly')#
-load('data/networks/networks_years.Rdata')#
-load('data/networks/allSpecimens.Rdata')#
-f.path <- "analysis/changePoint/cptPeel/baci"#
-#
-library(igraph)#
-library(parallel)#
-library(ape)#
-#
-## creates matrix of all combinations of plants and pollinators and#
-## fills it #
-expandNets <- function(sub.mat, all.mat){#
-  all.mat[match(rownames(sub.mat), rownames(all.mat)),#
-          match(colnames(sub.mat), colnames(all.mat))] <- sub.mat#
-  return(all.mat)#
-}#
-#
-pols <- unique(spec$GenusSpecies)#
-plants <- unique(spec$PlantGenusSpecies)#
-#
-all.pp <- matrix(0, nrow=length(plants),#
-                 ncol=length(pols))#
-rownames(all.pp) <- plants#
-colnames(all.pp) <- pols#
-#
-nets <- rapply(nets, expandNets, all.mat=all.pp,#
-               how="replace")#
-#
-mut.adj <- function(x) {#
-  nr <- dim(x)[1]#
-  nc <- dim(x)[2]#
-  to.fill <- matrix(0, ncol=nc + nr, nrow=nc + nr)#
-  to.fill[1:nr,(nr+1):(nc+nr)] <- x#
-  adj.mat <- graph.adjacency(to.fill, mode= "upper", weighted=TRUE)#
-  return(adj.mat)#
-}#
-#
-graphs <- lapply(nets, mut.adj)#
-names(graphs) <- gsub("[.]", "_", names(graphs))#
-#
-lutfile <- cbind(0:(length(V(graphs[[1]]))-1), 0:(length(V(graphs[[1]]))-1))#
-colnames(lutfile) <- c("virtual", "real") #
-write.table(lutfile,  row.names=FALSE, sep="\t",#
-            file=file.path(f.path, "graph-names.lut"))#
-#
-for(i in 1:length(graphs)){#
-  write.graph(graphs[[i]], file=file.path(f.path,#
-                             sprintf("%s.pairs",#
-                                     names(graphs)[i])))#
-}#
-#
-save(graphs, nets, file=file.path(f.path, "graphs.Rdata"))
-head(nets)
-nets[[1]]
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-library(ape)#
-library(igraph)#
-library(parallel)#
-source('../assembly/src/misc.R', chdir = TRUE)#
-options(mc.cores=5)#
-fig.path <- 'plotting/figures'#
-f.path <- "cptPeel/baci"#
-load(file=file.path(f.path, "graphs.Rdata"))
-nets[[1]]
-?graph.adjacency
-graph.incidence(nets[[1]])
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly')#
-load('data/networks/networks_years.Rdata')#
-load('data/networks/allSpecimens.Rdata')#
-f.path <- "analysis/changePoint/cptPeel/baci"#
-#
-library(igraph)#
-library(parallel)#
-library(ape)#
-#
-## creates matrix of all combinations of plants and pollinators and#
-## fills it #
-expandNets <- function(sub.mat, all.mat){#
-  all.mat[match(rownames(sub.mat), rownames(all.mat)),#
-          match(colnames(sub.mat), colnames(all.mat))] <- sub.mat#
-  return(all.mat)#
-}#
-#
-pols <- unique(spec$GenusSpecies)#
-plants <- unique(spec$PlantGenusSpecies)#
-#
-all.pp <- matrix(0, nrow=length(plants),#
-                 ncol=length(pols))#
-rownames(all.pp) <- plants#
-colnames(all.pp) <- pols#
-#
-nets <- rapply(nets, expandNets, all.mat=all.pp,#
-               how="replace")#
-graphs <- lapply(nets, graph.incidence, weighted=TRUE)#
-names(graphs) <- gsub("[.]", "_", names(graphs))#
-#
-lutfile <- cbind(0:(length(V(graphs[[1]]))-1), 0:(length(V(graphs[[1]]))-1))#
-colnames(lutfile) <- c("virtual", "real") #
-write.table(lutfile,  row.names=FALSE, sep="\t",#
-            file=file.path(f.path, "graph-names.lut"))#
-#
-for(i in 1:length(graphs)){#
-  write.graph(graphs[[i]], file=file.path(f.path,#
-                             sprintf("%s.pairs",#
-                                     names(graphs)[i])))#
-}#
-#
-save(graphs, nets, file=file.path(f.path, "graphs.Rdata"))
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-library(ape)#
-library(igraph)#
-library(parallel)#
-source('../assembly/src/misc.R', chdir = TRUE)#
-options(mc.cores=5)#
-fig.path <- 'plotting/figures'#
-f.path <- "cptPeel/baci"#
-load(file=file.path(f.path, "graphs.Rdata"))
-graphs[[1]]
-load(file=file.path(f.path, "hrgs.Rdata"))
-ihrgs <- lapply(hrgs, as.igraph)#
-lapply(ihrgs, function(x) x$layout <- layout.reingold.tilford)#
+#### plotting#
 #
 sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
+sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
+all.poss.yrs <- 2006:2015#
 #
-plotNet <- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(ihrg), nrow=1))#
-  for(j in 1:length(ihrg)){#
-    plot(ihrg[[j]], vertex.size=10,#
-         edge.arrow.size=0.2, vertex.label="")#
-  }#
-}#
-#
-plotDend<- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(hrg), nrow=1))#
-  for(j in 1:length(hrg)){#
-    plot_dendrogram(hrg[[j]])#
-  }#
-}#
-#
-for(i in unique(sites)){#
-  ihrg <- ihrgs[sites == i]#
-  hrg <- hrgs[sites == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=16, height=2)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_dendrograms.pdf", i)),#
-        width=16, height=6)#
-#
-}
-plotNet <- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(ihrg), nrow=1))#
-  for(j in 1:length(ihrg)){#
-    plot(ihrg[[j]], vertex.size=10,#
-         edge.arrow.size=0.2)#
-  }#
-}#
-#
-plotDend<- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(hrg), nrow=1))#
-  for(j in 1:length(hrg)){#
-    plot_dendrogram(hrg[[j]])#
-  }#
-}#
-#
-for(i in unique(sites)){#
-  ihrg <- ihrgs[sites == i]#
-  hrg <- hrgs[sites == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=16, height=2)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_dendrograms.pdf", i)),#
-        width=16, height=6)#
-#
-}
-hrgs[[1]]
-?fit_hgr
-?fit_hrg
-graphs[[1]]
-.+
-'+'
-('+')
-x <- list(1,4,7,9)
-do.call(x, +)
-do.call(x, '+')
-do.call(+, x)
-do.call('+', x)
-do.call(/+, x)
-graphs[[1]]
-?graph.incidence
-?make_bipartite_graph
-nets[[1]]
-make_bipartite_graph(nets[[1]])
-make_bipartite_graph(graphs[[1]])
-?make_bipartite_graph
-V(hrg[[1]])
-V(ihrg[[1]])
-graphs[[1]]
-plotNet <- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(g), nrow=1))#
-  for(j in 1:length(g)){#
-    plot(g[[j]], vertex.size=10,#
-         edge.arrow.size=0.2, vertex.label="",#
-         col=c(rep("tomato", length(rownames(net[[j]]))),#
-           rep("gold", length(colnames(net[[j]])))))#
-  }#
-}
-plotDend<- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(hrg), nrow=1))#
-  for(j in 1:length(hrg)){#
-    plot_dendrogram(hrg[[j]])#
-  }#
-}#
-#
-for(i in unique(sites)){#
-  g <- graphs[sites == i]#
+for(i in unique(sites.trees)){#
   net <- nets[sites == i]#
-  hrg <- hrgs[sites == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=16, height=2)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_dendrograms.pdf", i)),#
-        width=16, height=6)#
-#
-}
-plotNet <- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(g), nrow=1))#
-  for(j in 1:length(g)){#
-    cols <- c(rep("tomato", length(rownames(net[[j]]))),#
-           rep("gold", length(colnames(net[[j]])))))#
-    V(g[[j]])$color <- cols#
-    plot(g[[j]], vertex.size=10,#
-         edge.arrow.size=0.2, vertex.label="")#
-  }#
-}
-plotNet <- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(g), nrow=1))#
-  for(j in 1:length(g)){#
-    cols <- c(rep("tomato", length(rownames(net[[j]]))),#
-           rep("gold", length(colnames(net[[j]]))))#
-    V(g[[j]])$color <- cols#
-    plot(g[[j]], vertex.size=10,#
-         edge.arrow.size=0.2, vertex.label="")#
-  }#
-}
-plotDend<- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(hrg), nrow=1))#
-  for(j in 1:length(hrg)){#
-    plot_dendrogram(hrg[[j]])#
-  }#
-}#
-#
-for(i in unique(sites)){#
-  g <- graphs[sites == i]#
-  net <- nets[sites == i]#
-  hrg <- hrgs[sites == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=16, height=2)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_dendrograms.pdf", i)),#
-        width=16, height=6)#
-#
-}
-plotNet <- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(g), nrow=1))#
-  for(j in 1:length(g)){#
-    cols <- c(rep("tomato", length(rownames(net[[j]]))),#
-           rep("gold", length(colnames(net[[j]]))))#
-    V(g[[j]])$color <- cols#
-    igraph::plot(g[[j]], vertex.size=10,#
-         edge.arrow.size=0.2, vertex.label="")#
-  }#
-}#
-#
-plotDend<- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(hrg), nrow=1))#
-  for(j in 1:length(hrg)){#
-    plot_dendrogram(hrg[[j]])#
-  }#
-}#
-#
-for(i in unique(sites)){#
-  g <- graphs[sites == i]#
-  net <- nets[sites == i]#
-  hrg <- hrgs[sites == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=16, height=2)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_dendrograms.pdf", i)),#
-        width=16, height=6)#
-#
-}
-?plot.graph
-plotNet <- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(g), nrow=1))#
-  for(j in 1:length(g)){#
-    cols <- c(rep("tomato", length(rownames(net[[j]]))),#
-           rep("gold", length(colnames(net[[j]]))))#
-    V(g[[j]])$color <- cols#
-    plot.graph(g[[j]], vertex.size=10,#
-         edge.arrow.size=0.2, vertex.label="")#
-  }#
-}#
-#
-plotDend<- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(hrg), nrow=1))#
-  for(j in 1:length(hrg)){#
-    plot_dendrogram(hrg[[j]])#
-  }#
-}#
-#
-for(i in unique(sites)){#
-  g <- graphs[sites == i]#
-  net <- nets[sites == i]#
-  hrg <- hrgs[sites == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=16, height=2)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_dendrograms.pdf", i)),#
-        width=16, height=6)#
-#
-}
-library(igraph)
-plotNet <- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(g), nrow=1))#
-  for(j in 1:length(g)){#
-    cols <- c(rep("tomato", length(rownames(net[[j]]))),#
-           rep("gold", length(colnames(net[[j]]))))#
-    V(g[[j]])$color <- cols#
-    plot.graph(g[[j]], vertex.size=10,#
-         edge.arrow.size=0.2, vertex.label="")#
-  }#
-}#
-#
-plotDend<- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(hrg), nrow=1))#
-  for(j in 1:length(hrg)){#
-    plot_dendrogram(hrg[[j]])#
-  }#
-}#
-#
-for(i in unique(sites)){#
-  g <- graphs[sites == i]#
-  net <- nets[sites == i]#
-  hrg <- hrgs[sites == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=16, height=2)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_dendrograms.pdf", i)),#
-        width=16, height=6)#
-#
-}
-plotNet <- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(g), nrow=1))#
-  for(j in 1:length(g)){#
-    cols <- c(rep("tomato", length(rownames(net[[j]]))),#
-           rep("gold", length(colnames(net[[j]]))))#
-    V(g[[j]])$color <- cols#
-    g[[j]]$layout <- layout.reingold.tilford#
-    plot.graph(g[[j]], vertex.size=10,#
-         edge.arrow.size=0.2, vertex.label="")#
-  }#
-}#
-#
-plotDend<- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(hrg), nrow=1))#
-  for(j in 1:length(hrg)){#
-    plot_dendrogram(hrg[[j]])#
-  }#
-}#
-#
-for(i in unique(sites)){#
-  g <- graphs[sites == i]#
-  net <- nets[sites == i]#
-  hrg <- hrgs[sites == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=16, height=2)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_dendrograms.pdf", i)),#
-        width=16, height=6)#
-#
-}
-?plot.graph
-plotNet <- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(g), nrow=1))#
-  for(j in 1:length(g)){#
-    cols <- c(rep("tomato", length(rownames(net[[j]]))),#
-           rep("gold", length(colnames(net[[j]]))))#
-    V(g[[j]])$color <- cols#
-    g[[j]]$layout <- layout.reingold.tilford#
-    plot.igraph(g[[j]], vertex.size=10,#
-         edge.arrow.size=0.2, vertex.label="")#
-  }#
-}#
-#
-plotDend<- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(hrg), nrow=1))#
-  for(j in 1:length(hrg)){#
-    plot_dendrogram(hrg[[j]])#
-  }#
-}#
-#
-for(i in unique(sites)){#
-  g <- graphs[sites == i]#
-  net <- nets[sites == i]#
-  hrg <- hrgs[sites == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=16, height=2)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_dendrograms.pdf", i)),#
-        width=16, height=6)#
-#
-}
-?plot.igraph
-plotNet <- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(g), nrow=1))#
-  for(j in 1:length(g)){#
-    browser()#
-    cols <- c(rep("tomato", length(rownames(net[[j]]))),#
-           rep("gold", length(colnames(net[[j]]))))#
-    V(g[[j]])$color <- cols#
-    g[[j]]$layout <- layout.reingold.tilford#
-    plot.igraph(g[[j]], vertex.size=10,#
-         edge.arrow.size=0.2, vertex.label="")#
-  }#
-}#
-#
-plotDend<- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(hrg), nrow=1))#
-  for(j in 1:length(hrg)){#
-    plot_dendrogram(hrg[[j]])#
-  }#
-}#
-#
-for(i in unique(sites)){#
-  g <- graphs[sites == i]#
-  net <- nets[sites == i]#
-  hrg <- hrgs[sites == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=16, height=2)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_dendrograms.pdf", i)),#
-        width=16, height=6)#
-#
-}
-cols <- c(rep("tomato", length(rownames(net[[j]]))),#
-           rep("gold", length(colnames(net[[j]]))))
-cols
-V(g[[j]])$color <- cols
-g
-g[[j]]
-g[[j]]$layout <- layout.reingold.tilford
-plot.igraph(g[[j]], vertex.size=10,#
-         edge.arrow.size=0.2, vertex.label="")
-quartz()
-plot.igraph(g[[j]], vertex.size=10,#
-         edge.arrow.size=0.2, vertex.label="")
-Q
-lapply(graphs, function(x) x$layout <- layout_in_circle)#
-#
-sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
-#
-plotNet <- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(g), nrow=1))#
-  for(j in 1:length(g)){#
-    browser()#
-    cols <- c(rep("tomato", length(rownames(net[[j]]))),#
-           rep("gold", length(colnames(net[[j]]))))#
-    V(g[[j]])$color <- cols#
-    plot.igraph(g[[j]], vertex.size=10,#
-         edge.arrow.size=0.2, vertex.label="")#
-  }#
-}#
-#
-plotDend<- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(hrg), nrow=1))#
-  for(j in 1:length(hrg)){#
-    plot_dendrogram(hrg[[j]])#
-  }#
-}#
-#
-for(i in unique(sites)){#
-  g <- graphs[sites == i]#
-  net <- nets[sites == i]#
-  hrg <- hrgs[sites == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=16, height=2)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_dendrograms.pdf", i)),#
-        width=16, height=6)#
-#
-}
-Q
-plotNet <- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(g), nrow=1))#
-  for(j in 1:length(g)){#
-    cols <- c(rep("tomato", length(rownames(net[[j]]))),#
-           rep("gold", length(colnames(net[[j]]))))#
-    V(g[[j]])$color <- cols#
-    plot.igraph(g[[j]], vertex.size=10,#
-         edge.arrow.size=0.2, vertex.label="")#
-  }#
-}#
-#
-plotDend<- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(hrg), nrow=1))#
-  for(j in 1:length(hrg)){#
-    plot_dendrogram(hrg[[j]])#
-  }#
-}#
-#
-for(i in unique(sites)){#
-  g <- graphs[sites == i]#
-  net <- nets[sites == i]#
-  hrg <- hrgs[sites == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=16, height=2)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_dendrograms.pdf", i)),#
-        width=16, height=6)#
-#
-}
-plotNet <- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(g), nrow=1))#
-  for(j in 1:length(g)){#
-    cols <- c(rep("tomato", length(rownames(net[[j]]))),#
-           rep("gold", length(colnames(net[[j]]))))#
-    V(g[[j]])$color <- cols#
-    g[[j]]$layout <- layout_in_circle#
-    plot.igraph(g[[j]], vertex.size=10,#
-         edge.arrow.size=0.2, vertex.label="")#
-  }#
-}#
-#
-plotDend<- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(hrg), nrow=1))#
-  for(j in 1:length(hrg)){#
-    plot_dendrogram(hrg[[j]])#
-  }#
-}#
-#
-for(i in unique(sites)){#
-  g <- graphs[sites == i]#
-  net <- nets[sites == i]#
-  hrg <- hrgs[sites == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=16, height=2)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_dendrograms.pdf", i)),#
-        width=16, height=6)#
-#
-}
-plotNet <- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(g), nrow=1))#
-  for(j in 1:length(g)){#
-    cols <- c(rep("tomato", length(rownames(net[[j]]))),#
-           rep("gold", length(colnames(net[[j]]))))#
-    V(g[[j]])$color <- cols#
-    g[[j]]$layout <- layout_in_circle#
-    plot.igraph(g[[j]], vertex.size=6,#
-         edge.arrow.size=0.2, vertex.label="")#
-  }#
-}#
-#
-plotDend<- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(hrg), nrow=1))#
-  for(j in 1:length(hrg)){#
-    plot_dendrogram(hrg[[j]])#
-  }#
-}#
-#
-for(i in unique(sites)){#
-  g <- graphs[sites == i]#
-  net <- nets[sites == i]#
-  hrg <- hrgs[sites == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=16, height=2)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_dendrograms.pdf", i)),#
-        width=16, height=6)#
-#
-}
-grapg
-graph
-graphs[[1]]
-for(i in unique(sites)){#
-  g <- graphs[sites == i]#
-  net <- nets[sites == i]#
-  hrg <- hrgs[sites == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=3)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_dendrograms.pdf", i)),#
-        width=16, height=6)#
-#
-}
-plotNet <- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(g), nrow=1))#
-  for(j in 1:length(g)){#
-    cols <- c(rep("tomato", length(rownames(net[[j]]))),#
-           rep("gold", length(colnames(net[[j]]))))#
-    V(g[[j]])$color <- cols#
-    g[[j]]$layout <- layout_in_circle#
-    plot.igraph(g[[j]], vertex.size=2,#
-         edge.arrow.size=0.2, vertex.label="")#
-  }#
-}#
-#
-plotDend<- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(hrg), nrow=1))#
-  for(j in 1:length(hrg)){#
-    plot_dendrogram(hrg[[j]])#
-  }#
-}#
-#
-for(i in unique(sites)){#
-  g <- graphs[sites == i]#
-  net <- nets[sites == i]#
-  hrg <- hrgs[sites == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=3)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_dendrograms.pdf", i)),#
-        width=16, height=6)#
-#
-}
-plotNet <- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(g), nrow=1))#
-  for(j in 1:length(g)){#
-    cols <- c(rep("tomato", length(rownames(net[[j]]))),#
-           rep("gold", length(colnames(net[[j]]))))#
-    V(g[[j]])$color <- cols#
-    g[[j]]$layout <- layout_in_circle#
-    plot.igraph(g[[j]], vertex.size=2,#
-         edge.arrow.size=0.2, vertex.label="")#
-  }#
-}#
-#
-plotDend<- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(hrg), nrow=1))#
-  for(j in 1:length(hrg)){#
-    plot_dendrogram(hrg[[j]])#
-  }#
-}#
-#
-for(i in unique(sites)){#
-  g <- graphs[sites == i]#
-  net <- nets[sites == i]#
-  hrg <- hrgs[sites == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_dendrograms.pdf", i)),#
-        width=16, height=6)#
-#
-}
-plotNet <- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(g), nrow=1))#
-  for(j in 1:length(g)){#
-    cols <- c(rep("tomato", length(rownames(net[[j]]))),#
-           rep("gold", length(colnames(net[[j]]))))#
-    V(g[[j]])$color <- cols#
-    l <- layout_in_circle(g[[j]])#
-    plot.igraph(g[[j]], vertex.size=2,#
-         edge.arrow.size=0.2, vertex.label="", layout=l)#
-  }#
-}#
-#
-plotDend<- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(hrg), nrow=1))#
-  for(j in 1:length(hrg)){#
-    plot_dendrogram(hrg[[j]])#
-  }#
-}#
-#
-for(i in unique(sites)){#
-  g <- graphs[sites == i]#
-  net <- nets[sites == i]#
-  hrg <- hrgs[sites == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_dendrograms.pdf", i)),#
-        width=16, height=6)#
-#
-}
-plotNet <- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(g), nrow=1))#
-  for(j in 1:length(g)){#
-    browser()#
-    cols <- c(rep("tomato", length(rownames(net[[j]]))),#
-           rep("gold", length(colnames(net[[j]]))))#
-    V(g[[j]])$color <- cols#
-    g[[j]]$layout <- layout_in_circle#
-    plot.igraph(g[[j]], vertex.size=2,#
-         edge.arrow.size=0.2, vertex.label="")#
-  }#
-}#
-#
-plotDend<- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(hrg), nrow=1))#
-  for(j in 1:length(hrg)){#
-    plot_dendrogram(hrg[[j]])#
-  }#
-}#
-#
-for(i in unique(sites)){#
-  g <- graphs[sites == i]#
-  net <- nets[sites == i]#
-  hrg <- hrgs[sites == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_dendrograms.pdf", i)),#
-        width=16, height=6)#
-#
-}
-net[[j]]
-length(net)
-arr <- simplfy2arry(net)
-arr <- simplify2arry(net)
-arr <- simplify2array(net)
-arr
-dim(arr)
-apply(arr, c(1,2), sum)
-apply(arr, c(1,3), sum)
-apply(arr, 1:3, sum)
-test <- apply(arr, 1:3, sum)
-dim(test)
-test <- apply(arr, c(1,3), sum)
-dim(test)
-test <- apply(arr, c(1,2), sum)
-dim(test)
-Q
-plotNet <- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(net), nrow=1))#
-  for(j in 1:length(net)){#
-    browser()#
-    cols <- c(rep("tomato", length(rownames(net[[j]]))),#
-           rep("gold", length(colnames(net[[j]]))))#
-    V(g[[j]])$color <- cols#
-    g[[j]]$layout <- layout_in_circle#
-    plot.igraph(g[[j]], vertex.size=2,#
-         edge.arrow.size=0.2, vertex.label="")#
-  }#
-}#
-#
-plotDend<- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(hrg), nrow=1))#
-  for(j in 1:length(hrg)){#
-    plot_dendrogram(hrg[[j]])#
-  }#
-}#
-#
-for(i in unique(sites)){#
-  net <- nets[sites == i]#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plants <- rowSums(all.years)#
-  pol.sums <- colsSums(all.years)#
-  hrg <- hrgs[sites == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_dendrograms.pdf", i)),#
-        width=16, height=6)#
-#
-}
-for(i in unique(sites)){#
-  net <- nets[sites == i]#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plants <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  hrg <- hrgs[sites == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_dendrograms.pdf", i)),#
-        width=16, height=6)#
-#
-}
-all.years
-net[plants != 0, pols !=0]
-Q
-plotNet <- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(net), nrow=1))#
-  for(j in 1:length(net)){#
-    g <- net[plants != 0, pols !=0]#
-    cols <- c(rep("tomato", length(rownames(net[[j]]))),#
-           rep("gold", length(colnames(net[[j]]))))#
-    V(g[[j]])$color <- cols#
-    g[[j]]$layout <- layout_in_circle#
-    plot.igraph(g[[j]], vertex.size=2,#
-         edge.arrow.size=0.2, vertex.label="")#
-  }#
-}#
-#
-plotDend<- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(hrg), nrow=1))#
-  for(j in 1:length(hrg)){#
-    plot_dendrogram(hrg[[j]])#
-  }#
-}#
-#
-for(i in unique(sites)){#
-  net <- nets[sites == i]#
+  yrs <- sapply(strsplit(names(net), "[.]"), function(x) x[2])#
+  names(net) <- yrs#
   arr <- simplify2array(net)#
   all.years <-  apply(arr, c(1,2), sum)#
   plant.sums <- rowSums(all.years)#
   pol.sums <- colSums(all.years)#
-  hrg <- hrgs[sites == i]#
+  this.tree <- tree.graphs[sites.trees == i]#
   pdf.f(plotNet,#
         file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
         width=18, height=4)#
   pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_dendrograms.pdf", i)),#
-        width=16, height=6)#
-#
-}
-plotNet <- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(net), nrow=1))#
-  for(j in 1:length(net)){#
-    browser()#
-    g <- net[plant.sums != 0, pol.sums !=0]#
-    cols <- c(rep("tomato", length(rownames(net[[j]]))),#
-           rep("gold", length(colnames(net[[j]]))))#
-    V(g[[j]])$color <- cols#
-    g[[j]]$layout <- layout_in_circle#
-    plot.igraph(g[[j]], vertex.size=2,#
-         edge.arrow.size=0.2, vertex.label="")#
-  }#
+        file=file.path(fig.path, sprintf("%s_communities.pdf", i)),#
+        width=10, height=4)#
 }#
-#
-plotDend<- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(hrg), nrow=1))#
-  for(j in 1:length(hrg)){#
-    plot_dendrogram(hrg[[j]])#
-  }#
-}#
-#
-for(i in unique(sites)){#
-  net <- nets[sites == i]#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  hrg <- hrgs[sites == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_dendrograms.pdf", i)),#
-        width=16, height=6)#
-#
-}
-plant.sums != 0
-pol.sums !=0
-g <- net[plant.sums != 0, pol.sums !=0]
-g <- net[[j]][plant.sums != 0, pol.sums !=0]
-g
-g <- graph.incidence(g, weights=TRUE)
-?graph.incidence
-g <- graph.incidence(g, weighted=TRUE)
-plot(g)
-g <- net[[j]][plant.sums != 0, pol.sums !=0]#
-    gs <- graph.incidence(g, weighted=TRUE)
-Q
-plotNet <- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(net), nrow=1))#
-  for(j in 1:length(net)){#
-    g <- net[[j]][plant.sums != 0, pol.sums !=0]#
-    gs <- graph.incidence(g, weighted=TRUE)#
-    cols <- c(rep("tomato", length(rownames(g))),#
-           rep("gold", length(colnames(g))))#
-    V(g[[j]])$color <- cols#
-    g[[j]]$layout <- layout_in_circle#
-    plot.igraph(gs, vertex.size=2,#
-         edge.arrow.size=0.2, vertex.label="")#
-  }#
-}#
-#
-plotDend<- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(hrg), nrow=1))#
-  for(j in 1:length(hrg)){#
-    plot_dendrogram(hrg[[j]])#
-  }#
-}#
-#
-for(i in unique(sites)){#
-  net <- nets[sites == i]#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  hrg <- hrgs[sites == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_dendrograms.pdf", i)),#
-        width=16, height=6)#
-#
-}
-plotNet <- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(net), nrow=1))#
-  for(j in 1:length(net)){#
-    g <- net[[j]][plant.sums != 0, pol.sums !=0]#
-    gs <- graph.incidence(g, weighted=TRUE)#
-    cols <- c(rep("tomato", length(rownames(g))),#
-           rep("gold", length(colnames(g))))#
-    V(gs)$color <- cols#
-    gs$layout <- layout_in_circle#
-    plot.igraph(gs, vertex.size=2,#
-         edge.arrow.size=0.2, vertex.label="")#
-  }#
-}#
-#
-plotDend<- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(hrg), nrow=1))#
-  for(j in 1:length(hrg)){#
-    plot_dendrogram(hrg[[j]])#
-  }#
-}#
-#
-for(i in unique(sites)){#
-  net <- nets[sites == i]#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  hrg <- hrgs[sites == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_dendrograms.pdf", i)),#
-        width=16, height=6)#
-#
-}
-plotNet <- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(net), nrow=1))#
-  for(j in 1:length(net)){#
-    g <- net[[j]][plant.sums != 0, pol.sums !=0]#
-    gs <- graph.incidence(g, weighted=TRUE)#
-    cols <- c(rep("tomato", length(rownames(g))),#
-           rep("gold", length(colnames(g))))#
-    V(gs)$color <- cols#
-    gs$layout <- layout_in_circle#
-    plot.igraph(gs, vertex.size=4,#
-         edge.arrow.size=0.2, vertex.label="")#
-  }#
-}#
-#
-plotDend<- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(hrg), nrow=1))#
-  for(j in 1:length(hrg)){#
-    plot_dendrogram(hrg[[j]])#
-  }#
-}#
-#
-for(i in unique(sites)){#
-  net <- nets[sites == i]#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  hrg <- hrgs[sites == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_dendrograms.pdf", i)),#
-        width=16, height=6)#
-#
-}
-plotNet <- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(net), nrow=1))#
-  for(j in 1:length(net)){#
-    g <- net[[j]][plant.sums != 0, pol.sums !=0]#
-    gs <- graph.incidence(g, weighted=TRUE)#
-    cols <- c(rep("tomato", length(rownames(g))),#
-           rep("gold", length(colnames(g))))#
-    V(gs)$color <- cols#
-    V(gs)$size <- c(plant.sums, pol.sums)/sum(c(plant.sums, pol.sums))#
-    gs$layout <- layout_in_circle#
-    plot.igraph(gs, vertex.size=4,#
-         edge.arrow.size=0.2, vertex.label="")#
-  }#
-}#
-#
-plotDend<- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(hrg), nrow=1))#
-  for(j in 1:length(hrg)){#
-    plot_dendrogram(hrg[[j]])#
-  }#
-}#
-#
-for(i in unique(sites)){#
-  net <- nets[sites == i]#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  hrg <- hrgs[sites == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_dendrograms.pdf", i)),#
-        width=16, height=6)#
-#
-}
-warnings()
-plotNet <- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(net), nrow=1))#
-  for(j in 1:length(net)){#
-    g <- net[[j]][plant.sums != 0, pol.sums !=0]#
-    gs <- graph.incidence(g, weighted=TRUE)#
-    cols <- c(rep("tomato", length(rownames(g))),#
-           rep("gold", length(colnames(g))))#
-    V(gs)$color <- cols#
-    V(gs)$size <- c(rowSums(g), colSums(g))/sum(g)#
-    gs$layout <- layout_in_circle#
-    plot.igraph(gs,#
-         edge.arrow.size=0.2, vertex.label="")#
-  }#
-}#
-#
-plotDend<- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(hrg), nrow=1))#
-  for(j in 1:length(hrg)){#
-    plot_dendrogram(hrg[[j]])#
-  }#
-}#
-#
-for(i in unique(sites)){#
-  net <- nets[sites == i]#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  hrg <- hrgs[sites == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_dendrograms.pdf", i)),#
-        width=16, height=6)#
-#
-}
-plotNet <- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(net), nrow=1))#
-  for(j in 1:length(net)){#
-    g <- net[[j]][plant.sums != 0, pol.sums !=0]#
-    gs <- graph.incidence(g, weighted=TRUE)#
-    cols <- c(rep("tomato", length(rownames(g))),#
-           rep("gold", length(colnames(g))))#
-    V(gs)$color <- cols#
-    browser()#
-    V(gs)$size <- c(rowSums(g), colSums(g))/sum(g)#
-    gs$layout <- layout_in_circle#
-    plot.igraph(gs,#
-         edge.arrow.size=0.2, vertex.label="")#
-  }#
-}#
-#
-plotDend<- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(hrg), nrow=1))#
-  for(j in 1:length(hrg)){#
-    plot_dendrogram(hrg[[j]])#
-  }#
-}#
-#
-for(i in unique(sites)){#
-  net <- nets[sites == i]#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  hrg <- hrgs[sites == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_dendrograms.pdf", i)),#
-        width=16, height=6)#
-#
-}
-c(rowSums(g), colSums(g))/sum(g)
-sum(g)
-rowSums(g)
-c((rowSums(g) + 0.1), (colSums(g) + 0.1))/sum(g)
-plotNet <- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(net), nrow=1))#
-  for(j in 1:length(net)){#
-    g <- net[[j]][plant.sums != 0, pol.sums !=0]#
-    gs <- graph.incidence(g, weighted=TRUE)#
-    cols <- c(rep("tomato", length(rownames(g))),#
-           rep("gold", length(colnames(g))))#
-    V(gs)$color <- cols#
-    V(gs)$size <- c((rowSums(g) + 0.1), (colSums(g) + 0.1))/sum(g)#
-    gs$layout <- layout_in_circle#
-    plot.igraph(gs,#
-         edge.arrow.size=0.2, vertex.label="")#
-  }#
-}#
-#
-plotDend<- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(hrg), nrow=1))#
-  for(j in 1:length(hrg)){#
-    plot_dendrogram(hrg[[j]])#
-  }#
-}#
-#
-for(i in unique(sites)){#
-  net <- nets[sites == i]#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  hrg <- hrgs[sites == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_dendrograms.pdf", i)),#
-        width=16, height=6)#
-#
-}
-Q
-plotNet <- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(net), nrow=1))#
-  for(j in 1:length(net)){#
-    g <- net[[j]][plant.sums != 0, pol.sums !=0]#
-    gs <- graph.incidence(g, weighted=TRUE)#
-    cols <- c(rep("tomato", length(rownames(g))),#
-           rep("gold", length(colnames(g))))#
-    V(gs)$color <- cols#
-    V(gs)$size <- c((rowSums(g) + 0.1), (colSums(g) + 0.1))/sum(g)#
-    gs$layout <- layout_in_circle#
-    plot.igraph(gs,#
-         edge.arrow.size=0.2, vertex.label="")#
-  }#
-}
-plotDend<- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(hrg), nrow=1))#
-  for(j in 1:length(hrg)){#
-    plot_dendrogram(hrg[[j]])#
-  }#
-}#
-#
-for(i in unique(sites)){#
-  net <- nets[sites == i]#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  hrg <- hrgs[sites == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_dendrograms.pdf", i)),#
-        width=16, height=6)#
-#
-}
-plotNet <- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(net), nrow=1))#
-  for(j in 1:length(net)){#
-    g <- net[[j]][plant.sums != 0, pol.sums !=0]#
-    gs <- graph.incidence(g, weighted=TRUE)#
-    cols <- c(rep("tomato", length(rownames(g))),#
-           rep("gold", length(colnames(g))))#
-    V(gs)$color <- cols#
-    V(gs)$size <- c((rowSums(g) + 0.1), (colSums(g) + 0.1))#
-    gs$layout <- layout_in_circle#
-    plot.igraph(gs,#
-         edge.arrow.size=0.2, vertex.label="")#
-  }#
-}#
-#
-plotDend<- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(hrg), nrow=1))#
-  for(j in 1:length(hrg)){#
-    plot_dendrogram(hrg[[j]])#
-  }#
-}#
-#
-for(i in unique(sites)){#
-  net <- nets[sites == i]#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  hrg <- hrgs[sites == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_dendrograms.pdf", i)),#
-        width=16, height=6)#
-#
-}
-plotNet <- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(net), nrow=1))#
-  for(j in 1:length(net)){#
-    g <- net[[j]][plant.sums != 0, pol.sums !=0]#
-    gs <- graph.incidence(g, weighted=TRUE)#
-    cols <- c(rep("tomato", length(rownames(g))),#
-           rep("gold", length(colnames(g))))#
-    V(gs)$color <- cols#
-    V(gs)$size <- c((rowSums(g) + 0.1), (colSums(g) + 0.1))/2#
-    gs$layout <- layout_in_circle#
-    plot.igraph(gs,#
-         edge.arrow.size=0.2, vertex.label="")#
-  }#
-}#
-#
-plotDend<- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(hrg), nrow=1))#
-  for(j in 1:length(hrg)){#
-    plot_dendrogram(hrg[[j]])#
-  }#
-}#
-#
-for(i in unique(sites)){#
-  net <- nets[sites == i]#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  hrg <- hrgs[sites == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_dendrograms.pdf", i)),#
-        width=16, height=6)#
-#
-}
-for(i in unique(sites)){#
-  net <- nets[sites == i]#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  print(plant.sums[plant.sums!=0]))#
-  pol.sums <- colSums(all.years)#
-  hrg <- hrgs[sites == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_dendrograms.pdf", i)),#
-        width=16, height=6)#
-#
-}
-for(i in unique(sites)){#
-  net <- nets[sites == i]#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  print(plant.sums[plant.sums!=0])#
-  pol.sums <- colSums(all.years)#
-  hrg <- hrgs[sites == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_dendrograms.pdf", i)),#
-        width=16, height=6)#
-#
-}
-plotNet <- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(net), nrow=1))#
-  for(j in 1:length(net)){#
-    g <- net[[j]][plant.sums != 0, pol.sums !=0]#
-    gs <- graph.incidence(g, weighted=TRUE)#
-    cols <- c(rep("tomato", length(rownames(g))),#
-           rep("gold", length(colnames(g))))#
-    V(gs)$color <- cols#
-    V(gs)$size <- c((rowSums(g) + 0.1), (colSums(g) + 0.1))/2#
-    gs$layout <- layout_in_circle#
-    plot.igraph(gs,#
-         edge.arrow.size=0.2)#
-  }#
-}#
-#
-plotDend<- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(hrg), nrow=1))#
-  for(j in 1:length(hrg)){#
-    plot_dendrogram(hrg[[j]])#
-  }#
-}#
-#
-for(i in unique(sites)){#
-  net <- nets[sites == i]#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  print(plant.sums[plant.sums!=0])#
-  pol.sums <- colSums(all.years)#
-  hrg <- hrgs[sites == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_dendrograms.pdf", i)),#
-        width=16, height=6)#
-#
-}
-plotNet <- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(net), nrow=1))#
-  for(j in 1:length(net)){#
-    g <- net[[j]][plant.sums != 0, pol.sums !=0]#
-    gs <- graph.incidence(g, weighted=TRUE)#
-    cols <- c(rep("tomato", length(rownames(g))),#
-           rep("gold", length(colnames(g))))#
-    V(gs)$color <- cols#
-    importance <-  c((rowSums(g)), (colSums(g)))/2#
-    V(gs)$size <- importance#
-    E(gs)$width <- 1+E(gs)$weight/2#
-    gs$layout <- layout_in_circle#
-    plot.igraph(gs,#
-                vertex.label.cex=importance)#
-  }#
-}#
-#
-plotDend<- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(hrg), nrow=1))#
-  for(j in 1:length(hrg)){#
-    plot_dendrogram(hrg[[j]])#
-  }#
-}#
-#
-for(i in unique(sites)){#
-  net <- nets[sites == i]#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  hrg <- hrgs[sites == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_dendrograms.pdf", i)),#
-        width=16, height=6)#
-#
-}
-plotNet <- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(net), nrow=1))#
-  for(j in 1:length(net)){#
-    g <- net[[j]][plant.sums != 0, pol.sums !=0]#
-    gs <- graph.incidence(g, weighted=TRUE)#
-    cols <- c(rep("tomato", length(rownames(g))),#
-           rep("gold", length(colnames(g))))#
-    V(gs)$color <- cols#
-    importance <-  c((rowSums(g)), (colSums(g)))/2#
-    V(gs)$size <- importance#
-    E(gs)$width <- 1+E(gs)$weight/2#
-    gs$layout <- layout_in_circle#
-    plot.igraph(gs,#
-                vertex.label.cex=importance/10)#
-  }#
-}#
-#
-plotDend<- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(hrg), nrow=1))#
-  for(j in 1:length(hrg)){#
-    plot_dendrogram(hrg[[j]])#
-  }#
-}#
-#
-for(i in unique(sites)){#
-  net <- nets[sites == i]#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  hrg <- hrgs[sites == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_dendrograms.pdf", i)),#
-        width=16, height=6)#
-#
-}
-plotNet <- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(net), nrow=1))#
-  for(j in 1:length(net)){#
-    g <- net[[j]][plant.sums != 0, pol.sums !=0]#
-    gs <- graph.incidence(g, weighted=TRUE)#
-    cols <- c(rep("tomato", length(rownames(g))),#
-           rep("gold", length(colnames(g))))#
-    V(gs)$color <- cols#
-    importance <-  c((rowSums(g)), (colSums(g)))/2#
-    V(gs)$size <- importance#
-    E(gs)$width <- 1+E(gs)$weight/2#
-    gs$layout <- layout_in_circle#
-    plot.igraph(gs,#
-                vertex.label.cex=importance/20)#
-  }#
-}#
-#
-plotDend<- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(hrg), nrow=1))#
-  for(j in 1:length(hrg)){#
-    plot_dendrogram(hrg[[j]])#
-  }#
-}#
-#
-for(i in unique(sites)){#
-  net <- nets[sites == i]#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  hrg <- hrgs[sites == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_dendrograms.pdf", i)),#
-        width=16, height=6)#
-#
-}
-plotNet <- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(net), nrow=1))#
-  for(j in 1:length(net)){#
-    g <- net[[j]][plant.sums != 0, pol.sums !=0]#
-    gs <- graph.incidence(g, weighted=TRUE)#
-    cols <- c(rep("tomato", length(rownames(g))),#
-           rep("gold", length(colnames(g))))#
-    V(gs)$color <- cols#
-    importance <-  c((rowSums(g)), (colSums(g)))/2#
-    V(gs)$size <- importance#
-    E(gs)$width <- 1+E(gs)$weight/2#
-    gs$layout <- layout_in_circle#
-    browser()#
-    plot.igraph(gs,#
-                vertex.label.cex=importance/20)#
-  }#
-}#
-#
-plotDend<- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(hrg), nrow=1))#
-  for(j in 1:length(hrg)){#
-    plot_dendrogram(hrg[[j]])#
-  }#
-}#
-#
-for(i in unique(sites)){#
-  net <- nets[sites == i]#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  hrg <- hrgs[sites == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_dendrograms.pdf", i)),#
-        width=16, height=6)#
-#
-}
-importance
-?ifelse
-v.cols <- ifelse(importance == 0, "white", "black")
-v.cols
-Q
-plotNet <- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(net), nrow=1))#
-  for(j in 1:length(net)){#
-    g <- net[[j]][plant.sums != 0, pol.sums !=0]#
-    gs <- graph.incidence(g, weighted=TRUE)#
-    cols <- c(rep("tomato", length(rownames(g))),#
-           rep("gold", length(colnames(g))))#
-    V(gs)$color <- cols#
-    importance <-  c(rowSums(g), colSums(g))/2#
-    v.cols <- ifelse(importance == 0, "white", "black") #
-    V(gs)$size <- importance#
-    E(gs)$width <- 1+E(gs)$weight/2#
-    gs$layout <- layout_in_circle#
-    plot.igraph(gs,#
-                vertex.label.cex=importance/10,#
-                vertex.label.color=v.cols)#
-  }#
-}#
-#
-plotDend<- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(hrg), nrow=1))#
-  for(j in 1:length(hrg)){#
-    plot_dendrogram(hrg[[j]])#
-  }#
-}#
-#
-for(i in unique(sites)){#
-  net <- nets[sites == i]#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  hrg <- hrgs[sites == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_dendrograms.pdf", i)),#
-        width=16, height=6)#
-#
-}
-plotNet <- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(net), nrow=1))#
-  for(j in 1:length(net)){#
-    g <- net[[j]][plant.sums != 0, pol.sums !=0]#
-    gs <- graph.incidence(g, weighted=TRUE)#
-    cols <- c(rep("tomato", length(rownames(g))),#
-           rep("gold", length(colnames(g))))#
-    V(gs)$color <- cols#
-    importance <-  c(rowSums(g), colSums(g))/2#
-    v.cols <- ifelse(importance == 0, "", "black") #
-    V(gs)$size <- importance#
-    E(gs)$width <- 1+E(gs)$weight/2#
-    gs$layout <- layout_in_circle#
-    plot.igraph(gs,#
-                vertex.label.cex=importance/10,#
-                vertex.label.color=v.cols)#
-  }#
-}#
-#
-plotDend<- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(hrg), nrow=1))#
-  for(j in 1:length(hrg)){#
-    plot_dendrogram(hrg[[j]])#
-  }#
-}#
-#
-for(i in unique(sites)){#
-  net <- nets[sites == i]#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  hrg <- hrgs[sites == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_dendrograms.pdf", i)),#
-        width=16, height=6)#
-#
-}
-plotNet <- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(net), nrow=1))#
-  for(j in 1:length(net)){#
-    g <- net[[j]][plant.sums != 0, pol.sums !=0]#
-    gs <- graph.incidence(g, weighted=TRUE)#
-    cols <- c(rep("tomato", length(rownames(g))),#
-           rep("gold", length(colnames(g))))#
-    V(gs)$color <- cols#
-    browser()#
-    importance <-  c(rowSums(g), colSums(g))/2#
-    v.bas <- ifelse(importance == 0, "", "black") #
-    V(gs)$size <- importance#
-    E(gs)$width <- 1+E(gs)$weight/2#
-    gs$layout <- layout_in_circle#
-    plot.igraph(gs,#
-                vertex.label.cex=importance/10,#
-                vertex.label.color=v.cols)#
-  }#
-}#
-#
-plotDend<- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(hrg), nrow=1))#
-  for(j in 1:length(hrg)){#
-    plot_dendrogram(hrg[[j]])#
-  }#
-}#
-#
-for(i in unique(sites)){#
-  net <- nets[sites == i]#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  hrg <- hrgs[sites == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_dendrograms.pdf", i)),#
-        width=16, height=6)#
-#
-}
-importance <-  c(rowSums(g), colSums(g))/2
-importance
-v.bas <- names(importance)
-v.labs <- names(importance)
-Q
-plotNet <- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(net), nrow=1))#
-  for(j in 1:length(net)){#
-    g <- net[[j]][plant.sums != 0, pol.sums !=0]#
-    gs <- graph.incidence(g, weighted=TRUE)#
-    cols <- c(rep("tomato", length(rownames(g))),#
-           rep("gold", length(colnames(g))))#
-    V(gs)$color <- cols#
-    importance <-  c(rowSums(g), colSums(g))/2#
-    v.labs <- names(importance)#
-    v.labs[importance == 0] = ""#
-    V(gs)$size <- importance#
-    E(gs)$width <- 1+E(gs)$weight/2#
-    gs$layout <- layout_in_circle#
-    plot.igraph(gs,#
-                vertex.label.cex=importance/10,#
-                vertex.label=v.labs)#
-  }#
-}#
-#
-plotDend<- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(hrg), nrow=1))#
-  for(j in 1:length(hrg)){#
-    plot_dendrogram(hrg[[j]])#
-  }#
-}#
-#
-for(i in unique(sites)){#
-  net <- nets[sites == i]#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  hrg <- hrgs[sites == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_dendrograms.pdf", i)),#
-        width=16, height=6)#
-#
-}
-plotNet <- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(net), nrow=1))#
-  for(j in 1:length(net)){#
-    g <- net[[j]][plant.sums != 0, pol.sums !=0]#
-    gs <- graph.incidence(g, weighted=TRUE)#
-    cols <- c(rep("tomato", length(rownames(g))),#
-           rep("gold", length(colnames(g))))#
-    V(gs)$color <- cols#
-    importance <-  c(rowSums(g), colSums(g))/2#
-    v.labs <- names(importance)#
-    v.labs[importance == 0] = ""#
-    V(gs)$size <- importance#
-    E(gs)$width <- 1+E(gs)$weight/2#
-    gs$layout <- layout_in_circle#
-    plot.igraph(gs,#
-                ## vertex.label.cex=importance/10,#
-                vertex.label=v.labs)#
-  }#
-}#
-#
-plotDend<- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(hrg), nrow=1))#
-  for(j in 1:length(hrg)){#
-    plot_dendrogram(hrg[[j]])#
-  }#
-}#
-#
-for(i in unique(sites)){#
-  net <- nets[sites == i]#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  hrg <- hrgs[sites == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_dendrograms.pdf", i)),#
-        width=16, height=6)#
-#
-}
-plotNet <- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(net), nrow=1))#
-  for(j in 1:length(net)){#
-    g <- net[[j]][plant.sums != 0, pol.sums !=0]#
-    gs <- graph.incidence(g, weighted=TRUE)#
-    cols <- c(rep("tomato", length(rownames(g))),#
-           rep("gold", length(colnames(g))))#
-    V(gs)$color <- cols#
-    importance <-  c(rowSums(g), colSums(g))/2#
-    v.labs <- names(importance)#
-    v.labs[importance < 2] = ""#
-    V(gs)$size <- importance#
-    E(gs)$width <- 1+E(gs)$weight/2#
-    gs$layout <- layout_in_circle#
-    plot.igraph(gs,#
-                ## vertex.label.cex=importance/10,#
-                vertex.label=v.labs)#
-  }#
-}#
-#
-plotDend<- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(hrg), nrow=1))#
-  for(j in 1:length(hrg)){#
-    plot_dendrogram(hrg[[j]])#
-  }#
-}#
-#
-for(i in unique(sites)){#
-  net <- nets[sites == i]#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  hrg <- hrgs[sites == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_dendrograms.pdf", i)),#
-        width=16, height=6)#
-#
-}
-plotNet <- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(net), nrow=1))#
-  for(j in 1:length(net)){#
-    g <- net[[j]][plant.sums != 0, pol.sums !=0]#
-    gs <- graph.incidence(g, weighted=TRUE)#
-    cols <- c(rep("tomato", length(rownames(g))),#
-           rep("gold", length(colnames(g))))#
-    V(gs)$color <- cols#
-    importance <-  c(rowSums(g), colSums(g))/2#
-    v.labs <- names(importance)#
-    v.labs[importance < 5] = ""#
-    V(gs)$size <- importance#
-    E(gs)$width <- 1+E(gs)$weight/2#
-    gs$layout <- layout_in_circle#
-    plot.igraph(gs,#
-                ## vertex.label.cex=importance/10,#
-                vertex.label=v.labs)#
-  }#
-}#
-#
-plotDend<- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(hrg), nrow=1))#
-  for(j in 1:length(hrg)){#
-    plot_dendrogram(hrg[[j]])#
-  }#
-}#
-#
-for(i in unique(sites)){#
-  net <- nets[sites == i]#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  hrg <- hrgs[sites == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_dendrograms.pdf", i)),#
-        width=16, height=6)#
-#
-}
-plotNet <- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(net), nrow=1))#
-  for(j in 1:length(net)){#
-    g <- net[[j]][plant.sums != 0, pol.sums !=0]#
-    gs <- graph.incidence(g, weighted=TRUE)#
-    cols <- c(rep("tomato", length(rownames(g))),#
-           rep("gold", length(colnames(g))))#
-    V(gs)$color <- cols#
-    importance <-  c(rowSums(g), colSums(g))#
-    v.labs <- names(importance)#
-    v.labs[importance < 5] = ""#
-    V(gs)$size <- importance#
-    E(gs)$width <- 1+E(gs)$weight/2#
-    gs$layout <- layout_in_circle#
-    plot.igraph(gs, vertex.label="")#
-                ## ## vertex.label.cex=importance/10,#
-                ## vertex.label=v.labs)#
-  }#
-}#
-#
-plotDend<- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(hrg), nrow=1))#
-  for(j in 1:length(hrg)){#
-    plot_dendrogram(hrg[[j]])#
-  }#
-}#
-#
-for(i in unique(sites)){#
-  net <- nets[sites == i]#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  hrg <- hrgs[sites == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_dendrograms.pdf", i)),#
-        width=16, height=6)#
-#
-}
-plotNet <- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(net), nrow=1))#
-  for(j in 1:length(net)){#
-    g <- net[[j]][plant.sums != 0, pol.sums !=0]#
-    gs <- graph.incidence(g, weighted=TRUE)#
-    cols <- c(rep("tomato", length(rownames(g))),#
-           rep("gold", length(colnames(g))))#
-    V(gs)$color <- cols#
-    importance <-  c(rowSums(g), colSums(g))/2#
-    v.labs <- names(importance)#
-    v.labs[importance < 5] = ""#
-    V(gs)$size <- importance#
-    E(gs)$width <- 1+E(gs)$weight/2#
-    gs$layout <- layout_in_circle#
-    plot.igraph(gs, vertex.label="")#
-                ## ## vertex.label.cex=importance/10,#
-                ## vertex.label=v.labs)#
-  }#
-}#
-#
-plotDend<- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(hrg), nrow=1))#
-  for(j in 1:length(hrg)){#
-    plot_dendrogram(hrg[[j]])#
-  }#
-}#
-#
-for(i in unique(sites)){#
-  net <- nets[sites == i]#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  hrg <- hrgs[sites == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_dendrograms.pdf", i)),#
-        width=16, height=6)#
-#
-}
-plotNet <- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(net), nrow=1))#
-  for(j in 1:length(net)){#
-    g <- net[[j]][plant.sums != 0, pol.sums !=0]#
-    gs <- graph.incidence(g, weighted=TRUE)#
-    cols <- c(rep("tomato", length(rownames(g))),#
-           rep("gold", length(colnames(g))))#
-    V(gs)$color <- cols#
-    importance <-  c(rowSums(g) +0.1, colSums(g) + 0.1)/2#
-    v.labs <- names(importance)#
-    v.labs[importance < 5] = ""#
-    V(gs)$size <- importance#
-    E(gs)$width <- 1+E(gs)$weight/2#
-    gs$layout <- layout_in_circle#
-    plot.igraph(gs, vertex.label="")#
-                ## ## vertex.label.cex=importance/10,#
-                ## vertex.label=v.labs)#
-  }#
-}#
-#
-plotDend<- function(){#
-  par(mar=c(0,0.5,0,0))#
-  layout(matrix(1:length(hrg), nrow=1))#
-  for(j in 1:length(hrg)){#
-    plot_dendrogram(hrg[[j]])#
-  }#
-}#
-#
-for(i in unique(sites)){#
-  net <- nets[sites == i]#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  hrg <- hrgs[sites == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_dendrograms.pdf", i)),#
-        width=16, height=6)#
-#
-}
-for(i in unique(sites)){#
-  net <- nets[sites == i]#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  print(plant.sums)#
-  pol.sums <- colSums(all.years)#
-  hrg <- hrgs[sites == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_dendrograms.pdf", i)),#
-        width=16, height=6)#
-#
-}
-for(i in unique(sites)){#
-  net <- nets[sites == i]#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  print(plant.sums[plant.sums!=0])#
-  pol.sums <- colSums(all.years)#
-  hrg <- hrgs[sites == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_dendrograms.pdf", i)),#
-        width=16, height=6)#
-#
-}
-names(nets)
-## used wine nestedness calculator and null model#
-#
-calc.metric <- function(dat.web) {#
-  ## calculates modularity#
-  calc.mod <- function(dat.web){ #
-    ## converts a p-a matrix to a graph for modularity computation #
-    mut.adj <- function(x) {#
-      nr <- dim(x)[1]#
-      nc <- dim(x)[2]#
-      to.fill <- matrix(0, ncol=nc + nr, nrow=nc + nr)#
-      to.fill[1:nr,(nr+1):(nc+nr)] <- x#
-      adj.mat <- graph.adjacency(to.fill, mode= "upper", weighted=TRUE)#
-      return(adj.mat)#
-    }#
-    graph <- mut.adj(dat.web)#
-    weights <- as.vector(dat.web)#
-    weights <- weights[weights != 0]#
-#
-    ## if matrix is binary, modularity calculate is not affected by#
-    ## the weights#
-    greedy <- modularity(graph,#
-                         membership(fastgreedy.community(graph,#
-                                                         weights=weights)),#
-                         weights=weights)#
-    random.walk <-  modularity(graph,#
-                               membership(walktrap.community(graph,#
-                                                             weights=weights)),#
-                               weights=weights)#
-    dendro <-  modularity(graph,#
-                          membership(edge.betweenness.community(graph,#
-                                                                weights=#
-                                                                weights)),#
-                          weights=weights)#
-    return(c(greedy, random.walk, dendro))#
-  }#
-#
-  dat.web <- as.matrix(empty(dat.web))#
-  ## matrix of all the same number#
-  if(min(dat.web) == max(dat.web)){#
-    return(c(mets=rep(0, 1),#
-             mod.met=rep(0,3)))#
-  }else if(min(dat.web[dat.web != 0]) ==#
-           max(dat.web[dat.web !=0])){#
-    mets <- nestednodf(dat.web,#
-                       weighted=FALSE)$statistic["NODF"]#
-  } else{#
-    ## wine is for frequencies#
-    ## mets <- wine(dat.web)$win#
-      mets <- nestednodf(dat.web,#
-                       weighted=TRUE)$statistic["NODF"]#
-  }#
-  mod.met <- calc.mod(dat.web)#
-  return(c(mets, mod.met= mod.met))#
-}#
-#
-prob.null <- function(M) {#
-  randiag <- function(vdims) {#
-    mats <- diag(vdims)#
-    ## what cell number are the interactions#
-    posdiag <- 1:vdims + ((1:vdims - 1) * vdims)#
-    desp <- matrix(rep(1:vdims, vdims), vdims, vdims, #
-                   byrow = TRUE) - (1:vdims)#
-    fdesp <- sample(1:vdims)#
-    move <- desp[cbind(1:vdims, fdesp)]#
-    moved <- posdiag + move#
-    mdesp <- matrix(0, vdims, vdims)#
-    mdesp[moved] <- 1#
-    return(mdesp)#
-  }#
-  M <- as.matrix(M)#
-  values <- M[which(M > 0)]#
-  lvalues <- length(values)#
-  if (identical(dim(M)[1], dim(M)[2])) {#
-    vdims <- dim(M)[1]#
-    vdimb <- dim(M)[1]#
-  }#
-  if (!identical(dim(M)[1], dim(M)[2])) {#
-    dims <- which(dim(M) == min(dim(M)))#
-    vdims <- dim(M)[dims]#
-    dimb <- which(dim(M) == max(dim(M)))#
-    vdimb <- dim(M)[dimb]#
-  }#
-  MR <- matrix(0, vdims, vdimb)#
-  lMR <- vdims * vdimb#
-  sample1 <- sample(vdimb, vdims)#
-  diag1 <- randiag(vdims)#
-  MR[, sample1] <- diag1#
-  sample2 <- (1:vdimb)[-sample1]#
-  pos <- sample(vdims, length(sample2), replace = TRUE)#
-  MR[cbind(pos, sample2)] <- 2#
-  MRoccupied <- which(MR > 0)#
-  vleft <- lvalues - vdimb#
-  if (vleft > 0) #
-    MRoccupied <- c(MRoccupied, sample((1:lMR)[-MRoccupied], #
-                                       vleft))#
-  MR[MRoccupied] <- sample(values)#
-  if (dim(MR)[1] != dim(M)[1]) #
-    MR <- t(MR)#
-  return(MR)#
-}#
-#
-## function to simulate 1 null, and calculate statistics on it#
-null.stat <- function(dat.web) {#
-  sim.web <- prob.null(dat.web)#
-  return(calc.metric(sim.web))#
-}#
-#
-##  function that computes summary statistics on simulated null matrices#
-##  (nulls simulated from web N times)#
-network.metrics <- function (dat.web, N) {#
-  ## calculate pvalues#
-  pvals <- function(stats, nnull){#
-    rowSums(stats >= stats[, rep(1, ncol(stats))])/(nnull + 1)#
-  }#
-  ## calculate zvalues two different ways#
-  zvals <-function(stats){#
-    z.sd <- (stats[,1] -#
-             apply(stats, 1, mean, na.rm = TRUE))/#
-               apply(stats, 1, sd, na.rm = TRUE)#
-    z.sd[is.infinite(z.sd)] <- NA#
-    return(z.sd)#
-  }#
-  ## check that matrix is proper format (no empty row/col and no NAs)#
-  if(all(is.na(dat.web) == FALSE)) {#
-    ## drop empty rows and columns#
-    dat.web <- as.matrix(empty(dat.web))#
-    ## check to make sure emptied matrix is large enough#
-    ## to calculate statistics on#
-    if(is.matrix(dat.web)){#
-      if(all(dim(dat.web) >= 2)) {#
-        ## calculate null metrics#
-        null.stat <- replicate(N, null.stat(dat.web),#
-                               simplify=TRUE)#
-        ## calculate metrics from data#
-        true.stat <- calc.metric(dat.web)#
-        out.mets <- cbind(true.stat, null.stat)#
-        ## compute z scores#
-        zvalues <- zvals(out.mets)#
-        ## compute p-values#
-        pvalues <- pvals(out.mets, N)#
-        return(cbind(true.stat, zvalues, pvalues))#
-      }#
-    }#
-  }#
-  return(matrix(rep(NA,4*3), ncol=3)) #
-}#
-## prob.null.binary <- function(probs, fill, nrow, ncol) {#
-##   ones <- sample(1:length(probs), fill, replace=FALSE,#
-##                  prob=probs)#
-##   ## create resultant matrix#
-##   interact <- matrix(0, nrow=nrow, ncol=ncol)#
-##   interact[ones] <- 1#
-##   return(interact)#
+## out <- list()#
+## for(i in unique(sites)){#
+##   this.graph <- graphs[sites == i]#
+##   out[[i]] <- do.call(this.graph, +)#
+## }#
+#
+## plotHgr <- function(ihgr){#
+##   vn <- sub("Actor ", "", V(ihrg)$name)#
+##   colbar <- rainbow(length(optcom))#
+##   vc <- ifelse(is.na(V(ihrg)$prob), colbar[V(karate)$comm], "darkblue")#
+##   V(ihrg)$label <- ifelse(is.na(V(ihrg)$prob), vn, round(V(ihrg)$prob, 2))#
+##   par(mar=c(0,0.5,0,0))#
+##   plot(ihrg, vertex.size=10, edge.arrow.size=0.2,#
+##        vertex.shape="none", vertex.label.color=vc)#
+## }#
+## ap <- c(rep("P", length(rownames(nets1))),rep("A", length(colnames(nets1))))#
+## V(g1)$type <- ap#
+## colrs <- c(rep("tomato", length(rownames(nets1))),#
+##            rep("gold", length(colnames(nets1))))#
+## V(g1)$color <- colrs#
+## tree.hrg <- lapply(hrgs, hrg_tree)#
+#
+## dendro.hrg <- lapply(hrgs, hrg.dendrogram)#
+#
+## ihrgs <- lapply(hrgs, as.igraph)#
+#
+##  dendPlot(hrgs[[1]])#
+## ## hrgs#
+## hrgs <- mclapply(graphs, fit_hrg)#
+## ## hrg.trees <- mapply(function(a, b)#
+## ##                     consensus_tree(graph = a,#
+## ##                                    hrg = b,#
+## ##                                    num.samples = 10000),#
+## ##                     a =graphs,#
+## ##                     b = hrgs,#
+## ##                     SIMPLIFY = FALSE)#
+#
+## save(hrgs, file=file.path(f.path, "hrgs.Rdata"))#
+#
+## ## ## community clusters#
+## ## clust.gs <- mclapply(graphs, function(g){#
+## ##   optcom <- cluster_optimal(g)#
+## ##   V(g)$comm <- membership(optcom)#
+## ##   return(optcom)#
+## ## })#
+#
+## clust.gs <- mclapply(graphs,  cluster_optimal)#
+#
+## save(clust.gs, file=file.path(f.path, "clusts.Rdata"))                 #
+#
+## ihrgs <- lapply(hrgs, as.igraph)#
+## plotDend<- function(){#
+##   par(mar=c(0,0.5,0,0))#
+##   layout(matrix(1:length(hrg), nrow=1))#
+##   for(j in 1:length(hrg)){#
+##     plot_dendrogram(hrg[[j]])#
+##   }#
 ## }
-(m2 <- matrix(1, 10, 10))#
-lower.tri(m2)
-m2[lower.tri(m2)] <- 0
-m2
-test.1 <- network.metrics(m2, 100)
-library(bipartite)
-test.1 <- network.metrics(m2, 100)
-test.1
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
+library(ape)#
+library(igraph)#
+source('../networkLevel/src/misc.R')#
+source('plotting/src/communities.R', chdir = TRUE)#
+#
+fig.path <- 'plotting/figures'#
+f.path <- "cptPeel/baci"#
+load(file=file.path(f.path, "graphs.Rdata"))#
+#
+temp <- list.files(f.path, pattern="*.gml")#
+tree.graphs <-  lapply(temp, function(x){#
+  read.graph(file.path(f.path, x), format="gml")#
+})#
+#
+#### plotting#
+#
+sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
+sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
+all.poss.yrs <- 2006:2015#
+#
+for(i in unique(sites)){#
+  net <- nets[sites == i]#
+  yrs <- sapply(strsplit(names(net), "[.]"), function(x) x[2])#
+  names(net) <- yrs#
+  arr <- simplify2array(net)#
+  all.years <-  apply(arr, c(1,2), sum)#
+  plant.sums <- rowSums(all.years)#
+  pol.sums <- colSums(all.years)#
+  this.tree <- tree.graphs[sites.trees == i]#
+  pdf.f(plotNet,#
+        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
+        width=18, height=4)#
+  ## pdf.f(plotDend,#
+  ##       file=file.path(fig.path, sprintf("%s_communities.pdf", i)),#
+  ##       width=10, height=4)#
+}#
+## out <- list()#
+## for(i in unique(sites)){#
+##   this.graph <- graphs[sites == i]#
+##   out[[i]] <- do.call(this.graph, +)#
+## }#
+#
+## plotHgr <- function(ihgr){#
+##   vn <- sub("Actor ", "", V(ihrg)$name)#
+##   colbar <- rainbow(length(optcom))#
+##   vc <- ifelse(is.na(V(ihrg)$prob), colbar[V(karate)$comm], "darkblue")#
+##   V(ihrg)$label <- ifelse(is.na(V(ihrg)$prob), vn, round(V(ihrg)$prob, 2))#
+##   par(mar=c(0,0.5,0,0))#
+##   plot(ihrg, vertex.size=10, edge.arrow.size=0.2,#
+##        vertex.shape="none", vertex.label.color=vc)#
+## }#
+## ap <- c(rep("P", length(rownames(nets1))),rep("A", length(colnames(nets1))))#
+## V(g1)$type <- ap#
+## colrs <- c(rep("tomato", length(rownames(nets1))),#
+##            rep("gold", length(colnames(nets1))))#
+## V(g1)$color <- colrs#
+## tree.hrg <- lapply(hrgs, hrg_tree)#
+#
+## dendro.hrg <- lapply(hrgs, hrg.dendrogram)#
+#
+## ihrgs <- lapply(hrgs, as.igraph)#
+#
+##  dendPlot(hrgs[[1]])#
+## ## hrgs#
+## hrgs <- mclapply(graphs, fit_hrg)#
+## ## hrg.trees <- mapply(function(a, b)#
+## ##                     consensus_tree(graph = a,#
+## ##                                    hrg = b,#
+## ##                                    num.samples = 10000),#
+## ##                     a =graphs,#
+## ##                     b = hrgs,#
+## ##                     SIMPLIFY = FALSE)#
+#
+## save(hrgs, file=file.path(f.path, "hrgs.Rdata"))#
+#
+## ## ## community clusters#
+## ## clust.gs <- mclapply(graphs, function(g){#
+## ##   optcom <- cluster_optimal(g)#
+## ##   V(g)$comm <- membership(optcom)#
+## ##   return(optcom)#
+## ## })#
+#
+## clust.gs <- mclapply(graphs,  cluster_optimal)#
+#
+## save(clust.gs, file=file.path(f.path, "clusts.Rdata"))                 #
+#
+## ihrgs <- lapply(hrgs, as.igraph)#
+## plotDend<- function(){#
+##   par(mar=c(0,0.5,0,0))#
+##   layout(matrix(1:length(hrg), nrow=1))#
+##   for(j in 1:length(hrg)){#
+##     plot_dendrogram(hrg[[j]])#
+##   }#
+## }
+rm(list=ls())#
+library(reshape)#
+setwd("~/Dropbox/hedgerow_assembly/analysis/changePoint/cptPeel")#
+#
+results <- read.table('results_4.txt', sep=' ') #
+logs <- read.table('LogLs_4.txt', sep=' ')#
+#
+## split the year and creates an extra table with year 1 and period#
+results$V1 <- as.character(results$V1)#
+results$V2 <- as.character(results$V2)#
+years1  <-  as.numeric(sapply(strsplit(results$V1, "_"), function(x) x[2]))#
+years2  <-  as.numeric(sapply(strsplit(results$V2, "_"), function(x) x[2]))#
+anos <- min(years1):max(years2)#
+anos <- anos[-which(anos == 2010)]#
+years <- as.data.frame(matrix(NA, 7,2))#
+for(n in 1:(length(anos)-1)){#
+  years[n,2] <- paste(anos[n], anos[n+1], sep="-")  #
+}#
+years[,1] <- anos[-length(anos)]#
+colnames(years) <- c('first', 'period')#
+## creates othe variables for results #
+sites  <- sapply(strsplit(results$V1, "_"), function(x) x[1])#
+max <- apply(results[,c(3:5)], 1, max)#
+numberOfOnes <- apply(results[,c(3:5)], 1,#
+                      function(x) length(which(x==1)))#
+max.index <- rep(NA, dim(results)[1])#
+results <- cbind(results,  sites, years1, max, numberOfOnes, max.index)#
+#
+## checking if there is more than 1 value, and if yes, returns the#
+## index with the maxlog#
+for(row in 1:dim(results)[1]){#
+  if(results$numberOfOnes[row] > 1){## se eh true tem mais de um ai tem#
+                                  ## que ver o log#
+    results$max.index[row] <- which.max(logs[row,c(3:5)])#
+  }#
+  else {## return the position of the max#
+    results$max.index[row] <- which(results[row,c(3:5)] ==#
+                                        results$max[row])[1]#
+  }#
+}#
+#
+## separating only the significative results#
+## for(i in 1:dim(results)[1]){#
+##  qual <- which(years$first%in%results$years1[i]==TRUE)#
+##  results$period[i] <- years[qual,1]#
+##  }#
+#
+sigs <- results[results$max>0.949,]#
+cp <- rep(NA, dim(sigs)[1])#
+value <- rep(NA, dim(sigs)[1])#
+sigs <- cbind(sigs, cp, value)#
+#
+## cp is always the year + next year#
+## retorna o index que eh a soma de onde ta mais o max.index#
+for(i in 1:dim(sigs)[1]){#
+  ## if(i==28) browser()#
+  y1 <- which(years$first %in% sigs$years1[i] == TRUE)#
+  print(paste(i,  years$period[y1+(sigs$max.index[i]-1)]))#
+  sigs$cp[i] <- years$period[y1+(sigs$max.index[i]-1)]#
+  sigs$value[i] <- sigs[i,c(3:5)][sigs$max.index[i]]#
+}#
+#
+sigs$value <- unlist(sigs$value)#
+changing.points <- sigs[,c(6,11,12)]#
+#
+write.csv(changing.points, "changing_points.csv", row.names=FALSE)
+rm(list=ls())#
+library(reshape)#
+setwd("~/Dropbox/hedgerow_assembly/analysis/changePoint/cptPeel")#
+#
+results <- read.table('results_4.txt', sep=' ') #
+logs <- read.table('LogLs_4.txt', sep=' ')#
+#
+## split the year and creates an extra table with year 1 and period#
+results$V1 <- as.character(results$V1)#
+results$V2 <- as.character(results$V2)#
+years1  <-  as.numeric(sapply(strsplit(results$V1, "_"), function(x) x[2]))#
+years2  <-  as.numeric(sapply(strsplit(results$V2, "_"), function(x) x[2]))#
+anos <- min(years1):max(years2)#
+## anos <- anos[-which(anos == 2010)]#
+years <- as.data.frame(matrix(NA, 7,2))#
+for(n in 1:(length(anos)-1)){#
+  years[n,2] <- paste(anos[n], anos[n+1], sep="-")  #
+}#
+years[,1] <- anos[-length(anos)]#
+colnames(years) <- c('first', 'period')#
+## creates othe variables for results #
+sites  <- sapply(strsplit(results$V1, "_"), function(x) x[1])#
+max <- apply(results[,c(3:5)], 1, max)#
+numberOfOnes <- apply(results[,c(3:5)], 1,#
+                      function(x) length(which(x==1)))#
+max.index <- rep(NA, dim(results)[1])#
+results <- cbind(results,  sites, years1, max, numberOfOnes, max.index)#
+#
+## checking if there is more than 1 value, and if yes, returns the#
+## index with the maxlog#
+for(row in 1:dim(results)[1]){#
+  if(results$numberOfOnes[row] > 1){## se eh true tem mais de um ai tem#
+                                  ## que ver o log#
+    results$max.index[row] <- which.max(logs[row,c(3:5)])#
+  }#
+  else {## return the position of the max#
+    results$max.index[row] <- which(results[row,c(3:5)] ==#
+                                        results$max[row])[1]#
+  }#
+}#
+#
+## separating only the significative results#
+## for(i in 1:dim(results)[1]){#
+##  qual <- which(years$first%in%results$years1[i]==TRUE)#
+##  results$period[i] <- years[qual,1]#
+##  }#
+#
+sigs <- results[results$max>0.949,]#
+cp <- rep(NA, dim(sigs)[1])#
+value <- rep(NA, dim(sigs)[1])#
+sigs <- cbind(sigs, cp, value)#
+#
+## cp is always the year + next year#
+## retorna o index que eh a soma de onde ta mais o max.index#
+for(i in 1:dim(sigs)[1]){#
+  ## if(i==28) browser()#
+  y1 <- which(years$first %in% sigs$years1[i] == TRUE)#
+  print(paste(i,  years$period[y1+(sigs$max.index[i]-1)]))#
+  sigs$cp[i] <- years$period[y1+(sigs$max.index[i]-1)]#
+  sigs$value[i] <- sigs[i,c(3:5)][sigs$max.index[i]]#
+}#
+#
+sigs$value <- unlist(sigs$value)#
+changing.points <- sigs[,c(6,11,12)]#
+#
+write.csv(changing.points, "changing_points.csv", row.names=FALSE)
+rm(list=ls())#
+library(reshape)#
+setwd("~/Dropbox/hedgerow_assembly/analysis/changePoint/cptPeel")#
+#
+results <- read.table('results_4.txt', sep=' ') #
+logs <- read.table('LogLs_4.txt', sep=' ')#
+#
+## split the year and creates an extra table with year 1 and period#
+results$V1 <- as.character(results$V1)#
+results$V2 <- as.character(results$V2)#
+years1  <-  as.numeric(sapply(strsplit(results$V1, "_"), function(x) x[2]))#
+years2  <-  as.numeric(sapply(strsplit(results$V2, "_"), function(x) x[2]))#
+anos <- min(years1):max(years2)#
+## anos <- anos[-which(anos == 2010)]#
+years <- as.data.frame(matrix(NA, 7,2))#
+for(n in 1:(length(anos)-1)){#
+  years[n,2] <- paste(anos[n], anos[n+1], sep="-")  #
+}#
+years[,1] <- anos[-length(anos)]#
+colnames(years) <- c('first', 'period')#
+## creates othe variables for results #
+sites  <- sapply(strsplit(results$V1, "_"), function(x) x[1])#
+max <- apply(results[,c(3:5)], 1, max)#
+numberOfOnes <- apply(results[,c(3:5)], 1,#
+                      function(x) length(which(x==1)))#
+max.index <- rep(NA, dim(results)[1])#
+results <- cbind(results,  sites, years1, max, numberOfOnes, max.index)#
+#
+## checking if there is more than 1 value, and if yes, returns the#
+## index with the maxlog#
+for(row in 1:dim(results)[1]){#
+  if(results$numberOfOnes[row] > 1){## se eh true tem mais de um ai tem#
+                                  ## que ver o log#
+    results$max.index[row] <- which.max(logs[row,c(3:5)])#
+  }#
+  else {## return the position of the max#
+    results$max.index[row] <- which(results[row,c(3:5)] ==#
+                                        results$max[row])[1]#
+  }#
+}#
+#
+## separating only the significative results#
+## for(i in 1:dim(results)[1]){#
+##  qual <- which(years$first%in%results$years1[i]==TRUE)#
+##  results$period[i] <- years[qual,1]#
+##  }#
+#
+sigs <- results[results$max>0.949,]#
+cp <- rep(NA, dim(sigs)[1])#
+value <- rep(NA, dim(sigs)[1])#
+sigs <- cbind(sigs, cp, value)#
+#
+## cp is always the year + next year#
+## retorna o index que eh a soma de onde ta mais o max.index#
+for(i in 1:dim(sigs)[1]){#
+  ## if(i==28) browser()#
+  y1 <- which(years$first %in% sigs$years1[i] == TRUE)#
+  print(paste(i,  years$period[y1+(sigs$max.index[i]-1)]))#
+  sigs$cp[i] <- years$period[y1+(sigs$max.index[i]-1)]#
+  sigs$value[i] <- sigs[i,c(3:5)][sigs$max.index[i]]#
+}#
+#
+sigs$value <- unlist(sigs$value)#
+changing.points <- sigs[,c(6,11,12)]#
+#
+write.csv(changing.points, "changing_points.csv", row.names=FALSE)
+srm(list=ls())#
+library(reshape)#
+setwd("~/Dropbox/hedgerow_assembly/analysis/changePoint/cptPeel")#
+#
+results <- read.table('results_4.txt', sep=' ') #
+logs <- read.table('LogLs_4.txt', sep=' ')#
+#
+## split the year and creates an extra table with year 1 and period#
+results$V1 <- as.character(results$V1)#
+results$V2 <- as.character(results$V2)#
+years1  <-  as.numeric(sapply(strsplit(results$V1, "_"), function(x) x[2]))#
+years2  <-  as.numeric(sapply(strsplit(results$V2, "_"), function(x) x[2]))#
+anos <- min(years1):max(years2)#
+anos <- anos[-which(anos == 2010)]#
+years <- as.data.frame(matrix(NA, 7,2))#
+for(n in 1:(length(anos)-1)){#
+  years[n,2] <- paste(anos[n], anos[n+1], sep="-")  #
+}#
+years[,1] <- anos[-length(anos)]#
+colnames(years) <- c('first', 'period')#
+## creates othe variables for results #
+sites  <- sapply(strsplit(results$V1, "_"), function(x) x[1])#
+max <- apply(results[,c(3:5)], 1, max)#
+numberOfOnes <- apply(results[,c(3:5)], 1,#
+                      function(x) length(which(x==1)))#
+max.index <- rep(NA, dim(results)[1])#
+results <- cbind(results,  sites, years1, max, numberOfOnes, max.index)#
+#
+## checking if there is more than 1 value, and if yes, returns the#
+## index with the maxlog#
+for(row in 1:dim(results)[1]){#
+  if(results$numberOfOnes[row] > 1){## se eh true tem mais de um ai tem#
+                                  ## que ver o log#
+    results$max.index[row] <- which.max(logs[row,c(3:5)])#
+  }#
+  else {## return the position of the max#
+    results$max.index[row] <- which(results[row,c(3:5)] ==#
+                                        results$max[row])[1]#
+  }#
+}#
+#
+## separating only the significative results#
+## for(i in 1:dim(results)[1]){#
+##  qual <- which(years$first%in%results$years1[i]==TRUE)#
+##  results$period[i] <- years[qual,1]#
+##  }#
+#
+sigs <- results[results$max>0.949,]#
+cp <- rep(NA, dim(sigs)[1])#
+value <- rep(NA, dim(sigs)[1])#
+sigs <- cbind(sigs, cp, value)#
+#
+## cp is always the year + next year#
+## retorna o index que eh a soma de onde ta mais o max.index#
+for(i in 1:dim(sigs)[1]){#
+  ## if(i==28) browser()#
+  y1 <- which(years$first %in% sigs$years1[i] == TRUE)#
+  print(paste(i,  years$period[y1+(sigs$max.index[i]-1)]))#
+  sigs$cp[i] <- years$period[y1+(sigs$max.index[i]-1)]#
+  sigs$value[i] <- sigs[i,c(3:5)][sigs$max.index[i]]#
+}#
+#
+sigs$value <- unlist(sigs$value)#
+changing.points <- sigs[,c(6,11,12)]#
+#
+write.csv(changing.points, "changing_points.csv", row.names=FALSE)
+srm(list=ls())#
+library(reshape)#
+setwd("~/Dropbox/hedgerow_assembly/analysis/changePoint/cptPeel")#
+#
+results <- read.table('results_4.txt', sep=' ') #
+logs <- read.table('LogLs_4.txt', sep=' ')#
+#
+## split the year and creates an extra table with year 1 and period#
+results$V1 <- as.character(results$V1)#
+results$V2 <- as.character(results$V2)#
+years1  <-  as.numeric(sapply(strsplit(results$V1, "_"), function(x) x[2]))#
+years2  <-  as.numeric(sapply(strsplit(results$V2, "_"), function(x) x[2]))#
+anos <- min(years1):max(years2)#
+anos <- anos[-which(anos == 2010)]#
+years <- as.data.frame(matrix(NA, 7,2))#
+for(n in 1:(length(anos)-1)){#
+  years[n,2] <- paste(anos[n], anos[n+1], sep="-")  #
+}#
+years[,1] <- anos[-length(anos)]#
+colnames(years) <- c('first', 'period')#
+## creates othe variables for results #
+sites  <- sapply(strsplit(results$V1, "_"), function(x) x[1])#
+max <- apply(results[,c(3:5)], 1, max)#
+numberOfOnes <- apply(results[,c(3:5)], 1,#
+                      function(x) length(which(x==1)))#
+max.index <- rep(NA, dim(results)[1])#
+results <- cbind(results,  sites, years1, max, numberOfOnes, max.index)#
+#
+## checking if there is more than 1 value, and if yes, returns the#
+## index with the maxlog#
+for(row in 1:dim(results)[1]){#
+  if(results$numberOfOnes[row] > 1){## se eh true tem mais de um ai tem#
+                                  ## que ver o log#
+    results$max.index[row] <- which.max(logs[row,c(3:5)])#
+  }#
+  else {## return the position of the max#
+    results$max.index[row] <- which(results[row,c(3:5)] ==#
+                                        results$max[row])[1]#
+  }#
+}#
+#
+## separating only the significative results#
+## for(i in 1:dim(results)[1]){#
+##  qual <- which(years$first%in%results$years1[i]==TRUE)#
+##  results$period[i] <- years[qual,1]#
+##  }#
+#
+sigs <- results[results$max>0.949,]#
+cp <- rep(NA, dim(sigs)[1])#
+value <- rep(NA, dim(sigs)[1])#
+sigs <- cbind(sigs, cp, value)#
+#
+## cp is always the year + next year#
+## retorna o index que eh a soma de onde ta mais o max.index#
+for(i in 1:dim(sigs)[1]){#
+  ## if(i==28) browser()#
+  y1 <- which(years$first %in% sigs$years1[i] == TRUE)#
+  print(paste(i,  years$period[y1+(sigs$max.index[i]-1)]))#
+  sigs$cp[i] <- years$period[y1+(sigs$max.index[i]-1)]#
+  sigs$value[i] <- sigs[i,c(3:5)][sigs$max.index[i]]#
+}#
+#
+sigs$value <- unlist(sigs$value)#
+changing.points <- sigs[,c(6,11,12)]#
+#
+write.csv(changing.points, "changing_points.csv", row.names=FALSE)
+rm(list=ls())#
+setwd("~/Dropbox/hedgerow_assembly/analysis/changePoint")#
+#
+dats <- read.csv('cptPeel/changing_points')
+rm(list=ls())#
+setwd("~/Dropbox/hedgerow_assembly/analysis/changePoint")#
+#
+dats <- read.csv('cptPeel/changing_points.csv')
+head(dats)
+hist(dats$cp)
+counts <- table(dats)
+counts
+chpts <- colSums(counts)
+chpts
+dats
+counts <- table(dats[,-3])
+counts
+chpts <- colSums(counts)
+chpts
+hist(chpts)
+barplot(chpts)
+rm(list=ls())#
+library(reshape)#
+setwd("~/Dropbox/hedgerow_assembly/analysis/changePoint/cptPeel")#
+#
+results <- read.table('results_4.txt', sep=' ') #
+logs <- read.table('LogLs_4.txt', sep=' ')#
+#
+## split the year and creates an extra table with year 1 and period#
+results$V1 <- as.character(results$V1)#
+results$V2 <- as.character(results$V2)#
+years1  <-  as.numeric(sapply(strsplit(results$V1, "_"), function(x) x[2]))#
+years2  <-  as.numeric(sapply(strsplit(results$V2, "_"), function(x) x[2]))#
+anos <- min(years1):max(years2)#
+## anos <- anos[-which(anos == 2010)]#
+years <- as.data.frame(matrix(NA, 7,2))#
+for(n in 1:(length(anos)-1)){#
+  years[n,2] <- paste(anos[n], anos[n+1], sep="-")  #
+}#
+years[,1] <- anos[-length(anos)]#
+colnames(years) <- c('first', 'period')#
+## creates othe variables for results #
+sites  <- sapply(strsplit(results$V1, "_"), function(x) x[1])#
+max <- apply(results[,c(3:5)], 1, max)#
+numberOfOnes <- apply(results[,c(3:5)], 1,#
+                      function(x) length(which(x==1)))#
+max.index <- rep(NA, dim(results)[1])#
+results <- cbind(results,  sites, years1, max, numberOfOnes, max.index)#
+#
+## checking if there is more than 1 value, and if yes, returns the#
+## index with the maxlog#
+for(row in 1:dim(results)[1]){#
+  if(results$numberOfOnes[row] > 1){## se eh true tem mais de um ai tem#
+                                  ## que ver o log#
+    results$max.index[row] <- which.max(logs[row,c(3:5)])#
+  }#
+  else {## return the position of the max#
+    results$max.index[row] <- which(results[row,c(3:5)] ==#
+                                        results$max[row])[1]#
+  }#
+}#
+#
+## separating only the significative results#
+## for(i in 1:dim(results)[1]){#
+##  qual <- which(years$first%in%results$years1[i]==TRUE)#
+##  results$period[i] <- years[qual,1]#
+##  }#
+#
+sigs <- results[results$max>0.949,]#
+cp <- rep(NA, dim(sigs)[1])#
+value <- rep(NA, dim(sigs)[1])#
+sigs <- cbind(sigs, cp, value)#
+#
+## cp is always the year + next year#
+## retorna o index que eh a soma de onde ta mais o max.index#
+for(i in 1:dim(sigs)[1]){#
+  ## if(i==28) browser()#
+  y1 <- which(years$first %in% sigs$years1[i] == TRUE)#
+  print(paste(i,  years$period[y1+(sigs$max.index[i]-1)]))#
+  sigs$cp[i] <- years$period[y1+(sigs$max.index[i]-1)]#
+  sigs$value[i] <- sigs[i,c(3:5)][sigs$max.index[i]]#
+}#
+#
+sigs$value <- unlist(sigs$value)#
+changing.points <- sigs[,c(6,11,12)]#
+#
+write.csv(changing.points, "changing_points.csv", row.names=FALSE)
+rm(list=ls())#
+setwd("~/Dropbox/hedgerow_assembly/analysis/changePoint")#
+#
+dats <- read.csv('cptPeel/changing_points.csv')#
+#
+counts <- table(dats[,-3])#
+#
+chpts <- colSums(counts)
+chpts
+barplot(chpts)
+counts
+load('~/Dropbox/hedgerow_assembly/analysis/changePoint/cptPeel/baci/graphs.Rdata')
+names(graphs)
+load('cptPeel/baci/graphs.Rdata')
+sites <- unique(sapply(strsplit(names(graphs), "_"), function(x) x[1]))
+sites <- unique(sapply(strsplit(names(graphs), "_"), function(x)#
+                       x[1]))#
+no.chpt <- sites[!sites %in% rownames(counts)]
+no.chpt
+add.chpt <- matrix(0, nrow=length(no.chpt), ncol=ncol(counts))
+add.chpt
+sites <- unique(sapply(strsplit(names(graphs), "_"), function(x)#
+                       x[1]))#
+no.chpt <- sites[!sites %in% rownames(counts)]#
+add.chpt <- matrix(0, nrow=length(no.chpt), ncol=ncol(counts))#
+rownames(add.chpt) <- no.chpt#
+#
+rbind(counts, add.chpt)
+counts <- rbind(counts, add.chpt)
+counts
+chpts.sites <- rowSums(counts)
+chpt.sites
+chpts.sites
+barplot(chpts.sites)
+load('~/Dropbox/hedgerow_assembly/data/networks/allSpecimens.Rdata')
+load('../../data/networks/allSpecimens.Rdata')
+statuses <- spec$SiteStatus[match(names(chpts.sites), spec$Site)]
+statuses
+statuses <- spec$SiteStatus[match(names(chpts.sites), spec$Site)]#
+BACI.site <- c('Barger', 'Butler', 'Hrdy', 'MullerB', 'Sperandio')#
+statuses[names(chpts.sites) %in% BACI.site] <- "maturing"
+statuses
+density(chpts)
+plot(density(chpts.sites))
+hist(chpts.sites)
+chpts.sites
+?ist
+?hist
+hist(chpts.sites, prob=TRUE)
+hist(chpts.sites[statuses == "control"], prob=TRUE)
+hist(chpts.sites[statuses == "control"], prob=TRUE)#
+hist(chpts.sites[statuses == "maturing"], prob=TRUE)#
+hist(chpts.sites[statuses == "mature"], prob=TRUE)
+latout(matrix(1:3, nrow=1))#
+hist(chpts.sites[statuses == "control"], prob=TRUE, main="Unrestored")#
+hist(chpts.sites[statuses == "maturing"], prob=TRUE, main="Maturing")#
+hist(chpts.sites[statuses == "mature"], prob=TRUE, main="Mature")
+layout(matrix(1:3, nrow=1))#
+hist(chpts.sites[statuses == "control"], prob=TRUE, main="Unrestored")#
+hist(chpts.sites[statuses == "maturing"], prob=TRUE, main="Maturing")#
+hist(chpts.sites[statuses == "mature"], prob=TRUE, main="Mature")
+layout(matrix(1:3, nrow=1))#
+hist(chpts.sites[statuses == "control"], prob=TRUE,#
+     main="Unrestored", ylim=c(0,1))#
+hist(chpts.sites[statuses == "maturing"], prob=TRUE,#
+     main="Maturing", ylim=c(0,1))#
+hist(chpts.sites[statuses == "mature"], prob=TRUE,#
+     main="Mature", ylim=c(0,1))
+layout(matrix(1:3, nrow=1))#
+hist(chpts.sites[statuses == "control"], prob=TRUE,#
+     main="Unrestored", ylim=c(0,1.2))#
+hist(chpts.sites[statuses == "maturing"], prob=TRUE,#
+     main="Maturing", ylim=c(0,1.2))#
+hist(chpts.sites[statuses == "mature"], prob=TRUE,#
+     main="Mature", ylim=c(0,1.2))
+layout(matrix(1:3, nrow=1))#
+hist(chpts.sites[statuses == "control"], prob=TRUE,#
+     main="Unrestored", ylim=c(0,1.1))#
+hist(chpts.sites[statuses == "maturing"], prob=TRUE,#
+     main="Maturing", ylim=c(0,1.1))#
+hist(chpts.sites[statuses == "mature"], prob=TRUE,#
+     main="Mature", ylim=c(0,1.1))
+layout(matrix(1:3, nrow=1))#
+hist(chpts.sites[statuses == "control"], prob=TRUE,#
+     main="Unrestored", ylim=c(0,1.1),  xlim=c(0,4))#
+hist(chpts.sites[statuses == "maturing"], prob=TRUE,#
+     main="Maturing", ylim=c(0,1.1), xlim=c(0,4))#
+hist(chpts.sites[statuses == "mature"], prob=TRUE,#
+     main="Mature", ylim=c(0,1.1), xlim=c(0,4))
+chpts.sites
+?hist
+?hist
+hist(chpts.sites[statuses == "control"], prob=TRUE,#
+     main="Unrestored", ylim=c(0,1.1),  xlim=c(0,4),#
+     breaks=c(0:4))
+layout(matrix(1:3, nrow=1))#
+hist(chpts.sites[statuses == "control"], prob=TRUE,#
+     main="Unrestored", ylim=c(0,1.1),  xlim=c(0,4),#
+     breaks=0:4)#
+hist(chpts.sites[statuses == "maturing"], prob=TRUE,#
+     main="Maturing", ylim=c(0,1.1), xlim=c(0,4),#
+     breaks=0:4)#
+hist(chpts.sites[statuses == "mature"], prob=TRUE,#
+     main="Mature", ylim=c(0,1.1), xlim=c(0,4),#
+     breaks=0:4)
+poisson.test(c(11, 6+8+7), c(800, 1083+1050+878))
+c(11, 6+8+7)
+chisq.test(chpts.sites[statuses == "control"], chpts.sites[statuses == "maturing"])
+hist(chpts.sites[statuses == "control"], prob=TRUE,#
+     main="Unrestored", ylim=c(0,1),  xlim=c(0,4),#
+     breaks=0:4)
+cont <- hist(chpts.sites[statuses == "control"], prob=TRUE,#
+     main="Unrestored", ylim=c(0,1),  xlim=c(0,4),#
+     breaks=0:4)
+cont
+cont <- hist(chpts.sites[statuses == "control"], prob=TRUE,#
+     main="Unrestored", ylim=c(0,1),  xlim=c(0,4),#
+     breaks=0:4)#
+maturing <- hist(chpts.sites[statuses == "maturing"], prob=TRUE,#
+     main="Maturing", ylim=c(0,1), xlim=c(0,4),#
+     breaks=0:4)#
+mature <- hist(chpts.sites[statuses == "mature"], prob=TRUE,#
+     main="Mature", ylim=c(0,1), xlim=c(0,4),#
+     breaks=0:4)
+cont
+maturing
+mature
+chisq.test(cont$counts, maturing$counts)#
+chisq.test(mature$counts, maturing$counts)
+library(MASS)
+?fitdistr
+?fitdistr
+fit.cont <- fitdistr(chpts.sites[statuses == "control"], densfun="Poisson")
+fit.cont
+fit.cont <- fitdistr(chpts.sites[statuses == "control"],#
+                     densfun="Poisson")#
+fit.maturing <- fitdistr(chpts.sites[statuses == "maturing"],#
+                     densfun="Poisson")#
+fit.mature <- fitdistr(chpts.sites[statuses == "mature"],#
+                     densfun="Poisson")
+fit.cont
+fit.maturing
+fit.mature
+?fitdistr
+?logLik
+?dpoi
+?dpois
+dpois(0:7, lambda = 1)
+logLik(dpoi(chpts.sites[statuses == "maturing"], lambda=fit.cont))
+logLik(dpois(chpts.sites[statuses == "maturing"], lambda=fit.cont))
+dpois(chpts.sites[statuses == "maturing"], lambda=fit.cont)
+fit.cont
+fit.cont$lambda
+names(fit.cont)
+fot.cont$estimate
+dpois(chpts.sites[statuses == "maturing"], lambda=fit.cont$estimate)
+30481
+30481 -26127
+49384 - 4354
+46301#
+#
+*.4
+46301*.25
+dpois(chpts.sites[statuses == "maturing"], lambda=fit.cont$estimate)
+cont
+chpts.sites[statuses == "control"]
+lik.cont.mat <- prod(dpois(chpts.sites[statuses == "maturing"],#
+                           lambda=fit.cont$estimate))
+lik.cont.mat
+lik.cont.mat <- log(prod(dpois(chpts.sites[statuses == "maturing"],#
+                           lambda=fit.cont$estimate)))
+?logLik
+lik.cont.mat <- log(prod(dpois(chpts.sites[statuses == "maturing"],#
+                           lambda=fit.cont$estimate)))
+lik.cont.mat
+fit.maturing$lik
+names(fot.maturing)
+names(fit.maturing)
+fit.maturing$loglik
+?lrtest
+?pchisq(
+)
+pchisq(-2*(lik.cont.mat - fit.maturing$loglik), 1)
+1- pchisq(-2*(lik.cont.mat - fit.maturing$loglik), 1)
+lik.mat.mat <- log(prod(dpois(chpts.sites[statuses == "maturing"],#
+                           lambda=fit.mature$estimate)))
+1- pchisq(-2*(lik.mat.mat - fit.maturing$loglik), 1)
+## 1. Data frames: A data frame is a special list in which each#
+## element contains a vector that represents one column of a data#
+## table.  This means each element of a data frame must be a vector of#
+## the same length.#
+myDataFrame <- data.frame(x = c(1,2,3,4,5), y = c(2,1,2,4,6)) #
+myDataFrame#
+myDataFrame$x#
+myDataFrame[,'x']#
+myDataFrame[[1]]#
+## Notice how R outputs a data frame as a table, and how you can#
+## extract one column in different ways.#
+#
+## Data frames are particularly useful for handing data to R's#
+## analysis and graphics functions.  Most of those functions are#
+## designed to work with data frames if you need them to.  Here is an#
+## example.#
+plot(myDataFrame$x, myDataFrame$y)  # it is a bit of a pain to type#
+                                    # "myDataFrame" all the time#
+plot(x, y)  ## ERROR! R does not know what x and y are. They are#
+            ## "inside" myDataFrame.#
+plot(y~x, data = myDataFrame)  ## if we give the plot() function a#
+                                ## named argument, "data =#
+                                ## myDataFrame", and give the y and x#
+                                ## as a "formula": y~x, it will look#
+                                ## there for "x" and "y"!
+## Anything you can do with a list, you can do with a data frame, as#
+## long as the elements can still make a table.#
+myDataFrame[[2]][3] <- 4#
+myDataFrame[3,2] <- 4#
+#
+## QUESTION A: EXPLAIN WHAT THE PREVIOUS LINE OF CODE DID TO#
+## myDataFrame.#
+#
+## 2. Names of list and data.frame elements: The names of each element#
+## in a list or each column in a data frame can be obtained and#
+## changed using names():#
+names(myDataFrame) #
+names(myDataFrame)[2] <- "The column formerly known as y" #
+names(myDataFrame)#
+myDataFrame#
+myDataFrame[['The column formerly known as y']]#
+## Notice that it doesn't matter if you use single of double quotes in R.#
+#
+## 3. Here are a few useful functions for working with vectors.  I am#
+## listing them as a "guided tour" of R.  Some you've seen before.#
+myVector <- seq(5, 6, by = 0.1) #
+myVector#
+length(myVector)#
+max(myVector)#
+min(myVector)#
+sum(myVector)#
+mean(myVector)#
+sd(myVector)#
+var(myVector)#
+## Some of these functions do something useful even with non-numeric#
+## vectors.  For example, the sum function will treat TRUE as 1 and#
+## FALSE as 0.#
+sum(c(T, T, F, T)) #
+sum(myVector < 5.4)  ## Tells you how many values in myVector are < 5.4#
+#
+## QUESTION B: Explain how "sum(myVector < 5.4)" worked?! (You need to#
+## explain what "myVector < 5.4" gives to the sum function).#
+#
+## 4. Arithmetic in R: here are some examples of vectorized arithmetic#
+## in R (more "guided tour").  Try these:#
+myVector^2#
+sqrt(myVector)#
+exp(myVector)#
+log(myVector)#
+log(10)   ## aha, this is not log base 10. must be natural log.#
+log(2.72) ## aha, this is definitely natural log#
+myVector - mean(myVector)#
+## Notice that myVector is a vector but mean(myVector) is a single#
+## number.  R is smart enough to know that you want the number#
+## mean(myVector) subtracted from each element of myVector.#
+(myVector - mean(myVector))^2#
+sum( (myVector - mean(myVector))^2 )#
+## Wow, the sum of squares! (Follow the parentheses carefully!)#
+#
+## 5. Distributions in R. We will start with the normal distribution#
+## functions.  Get R's help page on these:#
+#
+help(rnorm) ## or "?rnorm".#
+#
+## Notice that since "pnorm", "dnorm", "qnorm", and "rnorm" are all#
+## related and use similar arguments, R has them consolidated onto one#
+## help page (which you can get by asking for the help page for any of#
+## them)#
+#
+## Let's plot the pdf of a normal distribution with mean 5 and#
+## standard deviation 0.1.  Let's do that by making a vector of x#
+## values over a relevant range - say within 4 standard deviations of#
+## the mean - and then making a vector of y values from the pdf.#
+#
+x <- seq(4.6, 5.4, length = 1000) #
+yPDF <- dnorm(x, 5, .1) #
+## Notice that dnorm (and the related functions) are smart enough to#
+## figure out what you want when the first argument is a vector and#
+## the second and third arguments are single numbers.  You want yPDF#
+## to be a vector of the dnorm answer matching each element in the#
+## input vector x.  So x contains a vector of 1000 values for the#
+## x-axis, and yPDF contains the corresponding 1000 values of the#
+## normal probability density function.#
+#
+## Let's check that the yPDF values are correct. Let's compare the#
+## 200th one by direct calculation:#
+x[200]#
+yPDF[200]#
+## QUESTION C: USE THE ARITHMETIC FUNCTIONS IN R TO CALCULATE THE#
+## NORMAL PROBABILITY DENSITY FUNCTION VALUE (e.g. FROM QK EQUATION 1#
+## ON PAGE 10, OR FROM LECTURE NOTES) FOR THE 200th VALUE OF x. HINT:#
+## YOU CAN GET pi SIMPLY BY TYPING "pi".#
+sigma <-1#
+mu <- 0#
+out.x <- (1/(sigma*sqrt(2*pi)))*exp(-((x[200]-mu)^2)/(2*sigma^2))#
+## Ok, let's plot the pdf:#
+#
+plot(x, yPDF)#
+#
+## Hmmm, I'd rather have it plot line segments between each point than#
+## those big circles (you can't tell because they are so tightly#
+## packed, but the curve looks thick because each point is plotted as#
+## a circle by default):#
+#
+plot(x, yPDF, type = "l")
+plot(x, yPDF, type = "l", col="red", main = "Normal PDF with mean = 5.0 and SD = 0.1")
+ys <- c(60.02, 65.19, 70.43, 70.80, 95.77) ## data#
+#
+mus <- c(70, 80, 90, 80, 80) ## means#
+#
+sigmas <- c(10, 10, 10, 6, 14) ## sds
+?dnorm
+##1.a#
+pdfnorm <-  function(mu, sigma, x){ ##x is a vector of data values, mu is the mean of the normal, sigma is the sd#
+  out.x <- numeric(length(x))#
+  for(i in 1:length(x)){#
+    out.x[i] <- (1/(sigma*sqrt(2*pi)))*exp(-((x[i]-mu)^2)/(2*sigma^2))#
+  }#
+  return(out.x)#
+}#
+ys <- c(60.02, 65.19, 70.43, 70.80, 95.77) ## data#
+#
+mus <- c(70, 80, 90, 80, 80) ## means#
+#
+sigmas <- c(10, 10, 10, 6, 14) ## sds#
+#
+out.pdfs <- vector(mode="list", length=length(mus))#
+#
+for(j in 1:length(mus)){#
+  out.pdfs[[j]] <- pdfnorm(mu=mus[j], sigma=sigmas[j], x=ys)#
+}#
+#
+out.pdfs
+dnorm(ys, ms, sigmas)
+dnorm(ys, mus, sigmas)
+lik.norm <- lapply(out.pdfs, prod)
+lik.norm
+for(i in 1:length(mus)){}
+for(i in 1:length(mus)){}
+for(i in 1:length(mus)){
+dnorm(ys, mus[i], sigmas[i])
+}
+for(i in 1:length(mus)){
+prod(dnorm(ys, mus[i], sigmas[i]))
+}
+out <- list()
+for(i in 1:length(mus)){
+prod(dnorm(ys, mus[i], sigmas[i]))
+out[[1]] <- prod(dnorm(ys, mus[i], sigmas[i]))
+}
+out
+out <- list()
+for(i in 1:length(mus)){
+out[[i]] <- prod(dnorm(ys, mus[i], sigmas[i]))
+}
+out
+out.pdfs
+out
+lik.norm
+fit.cont
+fit.maturing
+30481-26127
+(30481-26127)/2
+49384-2177
+26127+2177
