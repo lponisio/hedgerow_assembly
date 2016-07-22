@@ -1,1645 +1,550 @@
-ls()\
+## standardd#
+install.packages("parallel")#
+#
+## community analysis#
+install.packages("vegan")#
+#
+## networks#
+install.packages("igraph")#
+install.packages("bipartite")#
+install.packages("RColorBrewer")#
+install.packages("sna")#
+#
+## phylogeny#
+install.packages("TreeSim")#
+install.packages("ape")#
+install.packages("picante")#
+install.packages("geiger")#
+#
+## misc#
+install.packages("mvtnorm")#
+install.packages("classInt")#
+install.packages("fields")#
+install.packages("poilog")#
+install.packages("moments")#
+#
+## jags#
+install.packages("rjags")#
+install.packages("R2jags")#
+install.packages("runjags")#
+install.packages("ggmcmc")#
+#
+## spatial#
+install.packages("sp")#
+install.packages("rgdal")#
+install.packages("raster")#
+install.packages("spatstat")#
+install.packages("maptools")#
+install.packages("SDMTools")#
+#
+## models#
+install.packages("lme4")#
+install.packages("RSQLite")#
+install.packages("lmerTest")#
+install.packages("metafor")#
+install.packages("pbkrtest")#
+install.packages("glmmADMB", repos=c("http://glmmadmb.r-forge.r-project.org/repos", getOption("repos")),type="source")#
+## dynamic docs#
+install.packages("knitr")
+2+2+3+2
+(9*16) + 2+7+11+8
+172/16
+(2*16) + (2*16) + 2 +(3*16) + 16 + 7 +16+11+8
+172/16
+3*6
+18/12
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
+library(ape)#
+library(igraph)#
+source('../networkLevel/src/misc.R')#
+source('plotting/src/communities.R', chdir = TRUE)#
+#
+fig.path <- 'plotting/figures'#
+f.path <- "cptPeel/baci"#
+load(file=file.path(f.path, "graphs.Rdata"))#
+#
+temp <- list.files(f.path, pattern="*.gml")#
+tree.graphs <-  lapply(temp, function(x){#
+  read.graph(file.path(f.path, x), format="gml")#
+})#
+#
+#### plotting#
+#
+sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
+sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
+all.poss.yrs <- 2006:2015#
+#
+for(i in unique(sites.trees)){#
+  print(i)#
+  net <- nets[sites == i]#
+  yrs <- sapply(strsplit(names(net), "[.]"), function(x) x[2])#
+  names(net) <- yrs#
+  arr <- simplify2array(net)#
+  all.years <-  apply(arr, c(1,2), sum)#
+  plant.sums <- rowSums(all.years)#
+  pol.sums <- colSums(all.years)#
+  this.tree <- tree.graphs[sites.trees == i]#
+  pdf.f(plotNet,#
+        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
+        width=18, height=4)#
+  pdf.f(plotDend,#
+        file=file.path(fig.path, sprintf("%s_communities.pdf", i)),#
+        width=10, height=4)#
+}#
+#
+names.v <- names(V(graphs[[1]]))#
+num.v <- 0:length(names.v)#
+#
+getSpecies <- function(out, names.v, num.v){#
+  out$names <- names.v[match(out$label, num.v)]#
+  memb <- apply(out[, -c(1, ncol(out))], 2, table)#
+  core <- sapply(memb, function(x) names(x)[x == max(x)])#
+  stayed <- list()#
+  for(i in 1:length(core)){#
+    stayed[[i]] <- out[, i+1] == core[i]#
+  }#
+  ind.stayed <- Reduce("*", stayed)#
+  stayed.core <- out$names[ind.stayed ==1]#
+  left.core <- out$names[ind.stayed==0]#
+  return(list(stayed.core, left.core))#
+}#
+#
+l.path <- 'plotting/saved'#
+site.nodes <- list.files(l.path, "nodes")#
+site.cores <- list()#
+#
+for(i in 1:length(site.nodes)){#
+  load(file.path(l.path, site.nodes[i]))#
+  site.cores[[i]] <- getSpecies(out, names.v, num.v)#
+}
+site.nodes
+site.cores[[1]]
+getSpecies <- function(out, names.v, num.v){#
+  out$names <- names.v[match(out$label, num.v)]#
+  memb <- apply(out[, -c(1, ncol(out))], 2, table)#
+  core <- sapply(memb, function(x) names(x)[x == max(x)])#
+  stayed <- list()#
+  for(i in 1:length(core)){#
+    stayed[[i]] <- out[, i+1] == core[i]#
+  }#
+  ind.stayed <- Reduce("*", stayed)#
+  stayed.core <- out$names[ind.stayed ==1]#
+  left.core <- out$names[ind.stayed==0]#
+  return(list(stayed=stayed.core, left=left.core))#
+}#
+#
+l.path <- 'plotting/saved'#
+site.nodes <- list.files(l.path, "nodes")#
+site.cores <- list()#
+#
+for(i in 1:length(site.nodes)){#
+  load(file.path(l.path, site.nodes[i]))#
+  site.cores[[i]] <- getSpecies(out, names.v, num.v)#
+}
+site.noes$stayed
+site.core$stayed
+site.cores$stayed
+getSpecies <- function(out, names.v, num.v){#
+  out$names <- names.v[match(out$label, num.v)]#
+  memb <- apply(out[, -c(1, ncol(out))], 2, table)#
+  core <- sapply(memb, function(x) names(x)[x == max(x)])#
+  stayed <- list()#
+  for(i in 1:length(core)){#
+    stayed[[i]] <- out[, i+1] == core[i]#
+  }#
+  ind.stayed <- Reduce("*", stayed)#
+  stayed.core <- out$names[ind.stayed ==1]#
+  left.core <- out$names[ind.stayed==0]#
+  return(list(stayed=stayed.core, left=left.core))#
+}#
+#
+l.path <- 'plotting/saved'#
+site.nodes <- list.files(l.path, "nodes")#
+site.cores <- list()#
+#
+for(i in 1:length(site.nodes)){#
+  load(file.path(l.path, site.nodes[i]))#
+  site.cores[[i]] <- getSpecies(out, names.v, num.v)#
+}
+site.cores[[1]]$stayed
+names(site.cores)
+names(out)
+names(graphs)
+istes
+sites
+sites.tree
+sites.trees
+names(site.cores) <- unique(sites.trees)
+site.cores[["Barger"]]
+lapply(site.cores, length)
+num.sp <- rapply(site.cores, length, how="replace")
+num.so
+num.sp
+?rappl
+?rapply
+num.sp <- rapply(site.cores, length, how="unlist")
+num.sp
+sites <- rep(names(num.sp), num.sp)
+sites
+cores <- do.call(rbind, site.cores)
+head(cores)
+names(site.cores) <- unique(sites.trees)#
+site.cores <- unlist(site.cores, recursive=FALSE)
+site.cores
+num.sp <- rapply(site.cores, length, how="replace")
+num.sp
+num.sp <- sapply(site.cores, length)
+num.so
+num.sp
+cores <- do.call(rbind, site.cores)
+for(i in 1:length(site.nodes)){#
+  load(file.path(l.path, site.nodes[i]))#
+  site.cores[[i]] <- getSpecies(out, names.v, num.v)#
+}#
+#
+names(site.cores) <- unique(sites.trees)#
+site.cores <- unlist(site.cores, recursive=FALSE)#
+#
+num.sp <- sapply(site.cores, length)
+num.so
+num.sp
+for(i in 1:length(site.nodes)){#
+  load(file.path(l.path, site.nodes[i]))#
+  site.cores[[i]] <- getSpecies(out, names.v, num.v)#
+}#
+#
+names(site.cores) <- unique(sites.trees)#
+site.cores <- unlist(site.cores, recursive=FALSE)#
+#
+num.sp <- sapply(site.cores, length)
+num.sp
+l.path <- 'plotting/saved'#
+site.nodes <- list.files(l.path, "nodes")#
+site.cores <- list()#
+#
+for(i in 1:length(site.nodes)){#
+  load(file.path(l.path, site.nodes[i]))#
+  site.cores[[i]] <- getSpecies(out, names.v, num.v)#
+}
+names(site.cores) <- unique(sites.trees)
+site.cores
+l.path <- 'plotting/saved'#
+site.nodes <- list.files(l.path, "nodes")#
+site.cores <- list()#
+#
+for(i in 1:length(site.nodes)){#
+  load(file.path(l.path, site.nodes[i]))#
+  site.cores[[i]] <- getSpecies(out, names.v, num.v)#
+}#
+#
+names(site.cores) <- unique(sites.trees)#
+site.cores <- unlist(site.cores, recursive=FALSE)
+site.cores
+num.sp <- sapply(site.cores, length)
+num.so
+num.sp
+site.cores <- do.call(rbind, site.cores)
+site.cores
+l.path <- 'plotting/saved'#
+site.nodes <- list.files(l.path, "nodes")#
+site.cores <- list()#
+#
+for(i in 1:length(site.nodes)){#
+  load(file.path(l.path, site.nodes[i]))#
+  site.cores[[i]] <- getSpecies(out, names.v, num.v)#
+}#
+#
+names(site.cores) <- unique(sites.trees)#
+site.cores <- unlist(site.cores, recursive=FALSE)#
+#
+num.sp <- sapply(site.cores, length)
+site.cores
+l.path <- 'plotting/saved'#
+site.nodes <- list.files(l.path, "nodes")#
+site.cores <- list()#
+#
+for(i in 1:length(site.nodes)){#
+  load(file.path(l.path, site.nodes[i]))#
+  site.cores[[i]] <- getSpecies(out, names.v, num.v)#
+}#
+#
+names(site.cores) <- unique(sites.trees)#
+site.cores <- unlist(site.cores, recursive=FALSE)#
+#
+num.sp <- sapply(site.cores, length)
+length(site.cores)
+dim(site.cores)
+site.cores
+site.cores <- unlist(site.cores)
+site.cores
+site.cores$Site <- rep(names(num.sp), num.sp)
+l.path <- 'plotting/saved'#
+site.nodes <- list.files(l.path, "nodes")#
+site.cores <- list()#
+#
+for(i in 1:length(site.nodes)){#
+  load(file.path(l.path, site.nodes[i]))#
+  site.cores[[i]] <- getSpecies(out, names.v, num.v)#
+}#
+#
+names(site.cores) <- unique(sites.trees)#
+site.cores <- unlist(site.cores, recursive=FALSE)#
+#
+num.sp <- sapply(site.cores, length)#
+#
+site.cores <- as.data.frame(unlist(site.cores))
+site.cores
+rownames(site.cores) <- NULL
+site.cores
+site.cores$Site <- rep(names(num.sp), num.sp)
+site.cores
+site.cores$SiteStat <- rep(names(num.sp), num.sp)
+strsplit(site.cores$SiteStat)
+strsplit(site.cores$SiteStat, "[.]")
+site.cores$Site <- sapply(strsplit(site.cores$SiteStat, "[.]"), function(x) x[1])
+site.cores
+site.cores$comm <- sapply(strsplit(site.cores$SiteStat, "[.]"), function(x) x[2])
+site.cores
+head(spec)
+load('~/Dropbox/hedgerow_assembly/analysis/speciesLevel/saved/specs.Rdata')
+head(spec)
+head(specs)
+colnames(site.cores)
+l.path <- 'plotting/saved'#
+site.nodes <- list.files(l.path, "nodes")#
+site.cores <- list()#
+#
+for(i in 1:length(site.nodes)){#
+  load(file.path(l.path, site.nodes[i]))#
+  site.cores[[i]] <- getSpecies(out, names.v, num.v)#
+}#
+#
+names(site.cores) <- unique(sites.trees)#
+site.cores <- unlist(site.cores, recursive=FALSE)#
+#
+num.sp <- sapply(site.cores, length)#
+#
+site.cores <- as.data.frame(unlist(site.cores))#
+rownames(site.cores) <- NULL#
+colnames(site.cores) <- "GenusSpecies"#
+#
+site.cores$SiteStat <- rep(names(num.sp), num.sp)#
+site.cores$Site <- sapply(strsplit(site.cores$SiteStat, "[.]"), function(x) x[1])#
+site.cores$comm <- sapply(strsplit(site.cores$SiteStat, "[.]"), function(x) x[2])#
+#
+load('~/Dropbox/hedgerow_assembly/analysis/speciesLevel/saved/specs.Rdata')
+site.cores$speciesType <- specs$speciesType[match(site.cores$GenusSpecies,#
+specs$GenusSpecies)]
+site.cores
+site.cores
+load('~/Dropbox/hedgerow_assembly/analysis/speciesLevel/saved/mods/specs_ypr.Rdata')
 ls()
-comm.flower$comm
-rm(list=ls())#
-setwd('~/Dropbox/wildFireUse/analysis/beta-div')#
-binary <- FALSE#
-alpha <- TRUE#
-data.types <- c("search", "line")#
-parks <- c("YOSE","SEQI")#
-subs <- c("all", "pols")#
-for(i in data.types){#
-  data.type <- i#
-  for(j in parks){#
-    park <- j#
-    for(k in subs){#
-      sub <- k#
-      source('src/initialize.R')#
-      dis.flower <- mapply(function(a, b, c, d)#
-                           beta.status(comm= a,#
-                                       status= b,#
-                                       dis.method=dis.method,#
-                                       nulls=c,#
-                                       occ=binary,#
-                                       years=d,#
-                                       sub=sub),#
-                           a=comm.flower$comm,#
-                           b=comm.flower$status,#
-                           c= nulls.flower,#
-                           d= unique(comm.flower$years),#
-                           SIMPLIFY=FALSE)#
+head(specs)
+load('~/Dropbox/hedgerow_assembly/data/networks/allSpecimens.Rdata')#
 #
-      dats.flower <- data.frame(site=unlist(comm.flower$sites),#
-                                status=unlist(comm.flower$status),#
-                                year=comm.flower$years,#
-                                dist=unlist(lapply(dis.flower, function(x)#
-                                  x$distances)))#
-      save(dats.flower, file=data.path)#
-    }#
-  }#
-}#
-## run model, plot#
-#
-for(i in data.types){#
-  data.type <- i#
-  for(j in parks){#
-    park <- j#
-    for(k in subs){#
-      sub <- k#
-      source('src/initialize.R')#
-      load(file=data.path)#
-      dats.flower$status <- factor(dats.flower$status,#
-                                   levels=c("Unburned", "Very low",#
-                                     "Low", "Moderate", "High"))#
-      mod.flower <- lmer(dist ~ status +#
-                         (1|site),#
-                         data=dats.flower)#
-      save(mod.flower, file=mod.path)#
-#
-      print("*************************************")#
-      print(paste(data.type, park, sub))#
-      print(summary(mod.flower))#
-#
-      plotBetaDiv(dis.method =dis.method,#
-                  dists= dats.flower$dist,#
-                  status= dats.flower$status,#
-                  occ=occ,#
-                  data.type=data.type,#
-                  park=park,#
-                  sub=sub)#
-#
-      try(test.plt <- plotCoeffs(dis.method =dis.method,#
-                 mod=mod.flower,#
-                 status= dats.flower$status,#
-                 data.type=data.type,#
-                 occ=occ,#
-                 park=park,#
-                 sub=sub))#
-#
-    }#
-  }#
-}
-rm(list=ls())#
-setwd('~/Dropbox/wildFireUse/analysis/beta-div')#
-binary <- FALSE#
-alpha <- TRUE#
-data.types <- c("line")#
-parks <- c("YOSE","SEQI")#
-subs <- c("all", "pols")#
-for(i in data.types){#
-  data.type <- i#
-  for(j in parks){#
-    park <- j#
-    for(k in subs){#
-      sub <- k#
-      source('src/initialize.R')#
-      dis.flower <- mapply(function(a, b, c, d)#
-                           beta.status(comm= a,#
-                                       status= b,#
-                                       dis.method=dis.method,#
-                                       nulls=c,#
-                                       occ=binary,#
-                                       years=d,#
-                                       sub=sub),#
-                           a=comm.flower$comm,#
-                           b=comm.flower$status,#
-                           c= nulls.flower,#
-                           d= unique(comm.flower$years),#
-                           SIMPLIFY=FALSE)#
-#
-      dats.flower <- data.frame(site=unlist(comm.flower$sites),#
-                                status=unlist(comm.flower$status),#
-                                year=comm.flower$years,#
-                                dist=unlist(lapply(dis.flower, function(x)#
-                                  x$distances)))#
-      save(dats.flower, file=data.path)#
-    }#
-  }#
-}#
-## run model, plot#
-#
-for(i in data.types){#
-  data.type <- i#
-  for(j in parks){#
-    park <- j#
-    for(k in subs){#
-      sub <- k#
-      source('src/initialize.R')#
-      load(file=data.path)#
-      dats.flower$status <- factor(dats.flower$status,#
-                                   levels=c("Unburned", "Very low",#
-                                     "Low", "Moderate", "High"))#
-      mod.flower <- lmer(dist ~ status +#
-                         (1|site),#
-                         data=dats.flower)#
-      save(mod.flower, file=mod.path)#
-#
-      print("*************************************")#
-      print(paste(data.type, park, sub))#
-      print(summary(mod.flower))#
-#
-      plotBetaDiv(dis.method =dis.method,#
-                  dists= dats.flower$dist,#
-                  status= dats.flower$status,#
-                  occ=occ,#
-                  data.type=data.type,#
-                  park=park,#
-                  sub=sub)#
-#
-      try(test.plt <- plotCoeffs(dis.method =dis.method,#
-                 mod=mod.flower,#
-                 status= dats.flower$status,#
-                 data.type=data.type,#
-                 occ=occ,#
-                 park=park,#
-                 sub=sub))#
-#
-    }#
-  }#
-}
-load('~/Dropbox/wildFireUse/analysis/beta-div/saved/communities/line-abundance-YOSE-all.Rdata')
+site.cores$speciesType <- ifelse(site.cores$GenusSpecies %in% #
+unique(spec$GenusSpecies), "pollinator", "plant")
+site.cores
 ls()
-rm(list=ls())
-ls()
-load('~/Dropbox/wildFireUse/analysis/beta-div/saved/communities/line-abundance-YOSE-all.Rdata')
-ls()
-comm.flower
-library(pbkrtest)#
-library(lme4)#
-library(lmerTest)#
-library(vegan)#
-library(fields)#
-library(raster)#
-library(bipartite)#
-source('src/misc.R')#
-source('src/beta.R')#
-source('src/plotting/plotDists.R')#
+samp2site.spp
+?split
+site.cores <- split(site.cores, site.cores$speciesType)
+site.cores
+samp2site.spp
+comm.mat <- lapply(site.cores, function(x){#
+samp2site.spp(x, x$Site, x$GenusSpecies, x$Abund)#
+})
+site.cores
+l.path <- 'plotting/saved'#
+site.nodes <- list.files(l.path, "nodes")#
+site.cores <- list()#
 #
-if(data.type == "line") load('../../data/line.Rdata')#
-if(data.type == "search") load('../../data/search.Rdata')#
-#
-save.dir.comm <- "saved/communities"#
-save.dir.nulls <- "saved/nulls"#
-save.dir.mods <- "saved/mods"#
-save.dir.data <- "saved/data"#
-#
-if(!binary & alpha){#
-  occ <- "abundance"#
-  dis.method <- "chao"#
-  load(file=file.path(save.dir.comm,#
-         sprintf("%s-abund-%s-%s.Rdata", data.type, park, sub)))#
-  load(file=file.path(save.dir.nulls,#
-         sprintf("%s-alpha-%s-%s.Rdata", data.type, park, sub)))#
-  mod.path <- file.path(save.dir.mods,#
-                        sprintf("%s-abund-alpha-%s-%s.Rdata",#
-                                data.type, park, sub))#
-  data.path <- file.path(save.dir.data,#
-                         sprintf("%s-abund-alpha-%s-%s.Rdata",#
-                                 data.type, park, sub))#
+for(i in 1:length(site.nodes)){#
+  load(file.path(l.path, site.nodes[i]))#
+  site.cores[[i]] <- getSpecies(out, names.v, num.v)#
 }#
 #
-if(!binary & !alpha){#
-  occ <- "indiv"#
-  dis.method <- "chao"#
-  load(file=file.path(save.dir.comm,#
-         sprintf("%s-abund-%s-%s.Rdata", data.type, park, sub)))#
-  load(file=file.path(save.dir.nulls,#
-         sprintf("%s-indiv-%s-%s.Rdata", data.type, park, sub)))#
-  mod.path <- file.path(save.dir.mods,#
-                        sprintf("%s-abund-indiv-%s-%s.Rdata",#
-                                data.type, park, sub))#
-  data.path <- file.path(save.dir.data,#
-                         sprintf("%s-abund-indiv-%s-%s.Rdata",#
-                                 data.type, park, sub))#
-}#
+names(site.cores) <- unique(sites.trees)#
+site.cores <- unlist(site.cores, recursive=FALSE)#
 #
-if(binary){#
-  occ <- "occ"#
-  dis.method <- "jaccard"#
-  load(file=file.path(save.dir.comm,#
-         sprintf("%s-occ-%s-%s.Rdata", data.type, park, sub)))#
-  load(file=file.path(save.dir.nulls,#
-         sprintf("%s-occ-%s-%s.Rdata", data.type, park, sub)))#
-  mod.path <- file.path(save.dir.mods,#
-                        sprintf("%s-occ-%s-%s.Rdata",#
-                                data.type, park, sub))#
-  data.path <- file.path(save.dir.data,#
-                         sprintf("%s-abund-occ-%s-%s.Rdata",#
-                                 data.type, park, sub))#
-}
-rm(list=ls())#
-setwd('~/Dropbox/wildFireUse/analysis/beta-div')#
-binary <- FALSE#
-alpha <- TRUE#
-## data.types <- c("search", "line")#
-data.types <- c("line")#
-parks <- c("YOSE","SEQI")#
-subs <- c("all", "pols")#
-for(i in data.types){#
-  data.type <- i#
-  for(j in parks){#
-    park <- j#
-    for(k in subs){#
-      sub <- k#
-      source('src/initialize.R')#
-      dis.flower <- mapply(function(a, b, c, d)#
-                           beta.status(comm= a,#
-                                       status= b,#
-                                       dis.method=dis.method,#
-                                       nulls=c,#
-                                       occ=binary,#
-                                       years=d,#
-                                       sub=sub),#
-                           a=comm.flower$comm,#
-                           b=comm.flower$status,#
-                           c= nulls.flower,#
-                           d= unique(comm.flower$years),#
-                           SIMPLIFY=FALSE)#
+num.sp <- sapply(site.cores, length)#
 #
-      dats.flower <- data.frame(site=unlist(comm.flower$sites),#
-                                status=unlist(comm.flower$status),#
-                                year=comm.flower$years,#
-                                dist=unlist(lapply(dis.flower, function(x)#
-                                  x$distances)))#
-      save(dats.flower, file=data.path)#
-    }#
-  }#
-}#
-## run model, plot#
+site.cores <- as.data.frame(unlist(site.cores))#
+rownames(site.cores) <- NULL#
+colnames(site.cores) <- "GenusSpecies"#
 #
-for(i in data.types){#
-  data.type <- i#
-  for(j in parks){#
-    park <- j#
-    for(k in subs){#
-      sub <- k#
-      source('src/initialize.R')#
-      load(file=data.path)#
-      dats.flower$status <- factor(dats.flower$status,#
-                                   levels=c("Unburned", "Very low",#
-                                     "Low", "Moderate", "High"))#
-      mod.flower <- lmer(dist ~ status +#
-                         (1|site),#
-                         data=dats.flower)#
-      save(mod.flower, file=mod.path)#
+site.cores$SiteStat <- rep(names(num.sp), num.sp)#
+site.cores$Site <- sapply(strsplit(site.cores$SiteStat, "[.]"), function(x) x[1])#
+site.cores$comm <- sapply(strsplit(site.cores$SiteStat, "[.]"), function(x) x[2])#
 #
-      print("*************************************")#
-      print(paste(data.type, park, sub))#
-      print(summary(mod.flower))#
+load('~/Dropbox/hedgerow_assembly/data/networks/allSpecimens.Rdata')#
 #
-      plotBetaDiv(dis.method =dis.method,#
-                  dists= dats.flower$dist,#
-                  status= dats.flower$status,#
-                  occ=occ,#
-                  data.type=data.type,#
-                  park=park,#
-                  sub=sub)#
+site.cores$speciesType <- ifelse(site.cores$GenusSpecies %in% #
+unique(spec$GenusSpecies), "pollinator", "plant")#
 #
-      try(test.plt <- plotCoeffs(dis.method =dis.method,#
-                 mod=mod.flower,#
-                 status= dats.flower$status,#
-                 data.type=data.type,#
-                 occ=occ,#
-                 park=park,#
-                 sub=sub))#
+site.cores$Abund <- 1#
 #
-    }#
-  }#
-}
-rm(list=ls())#
-setwd('~/Dropbox/wildFireUse/analysis/beta-div')#
-binary <- FALSE#
-alpha <- TRUE#
-## data.types <- c("search", "line")#
-data.types <- c("line")#
-parks <- c("YOSE","SEQI")#
-subs <- c("all", "pols")#
-for(i in data.types){#
-  data.type <- i#
-  for(j in parks){#
-    park <- j#
-    for(k in subs){#
-      sub <- k#
-      source('src/initialize.R')#
-      dis.flower <- mapply(function(a, b, c, d)#
-                           beta.status(comm= a,#
-                                       status= b,#
-                                       dis.method=dis.method,#
-                                       nulls=c,#
-                                       occ=binary,#
-                                       years=d,#
-                                       sub=sub),#
-                           a=comm.flower$comm,#
-                           b=comm.flower$status,#
-                           c= nulls.flower,#
-                           d= unique(comm.flower$years),#
-                           SIMPLIFY=FALSE)#
+site.cores <- split(site.cores, site.cores$speciesType)#
 #
-      dats.flower <- data.frame(site=unlist(comm.flower$sites),#
-                                status=unlist(comm.flower$status),#
-                                year=comm.flower$years,#
-                                dist=unlist(lapply(dis.flower, function(x)#
-                                  x$distances)))#
-      save(dats.flower, file=data.path)#
-    }#
-  }#
-}
-for(i in data.types){#
-  data.type <- i#
-  for(j in parks){#
-    park <- j#
-    for(k in subs){#
-      sub <- k#
-      source('src/initialize.R')#
-      load(file=data.path)#
-      dats.flower$status <- factor(dats.flower$status,#
-                                   levels=c("Unburned", "Very low",#
-                                     "Low", "Moderate", "High"))#
-      mod.flower <- lmer(dist ~ status +#
-                         (1|site),#
-                         data=dats.flower)#
-      save(mod.flower, file=mod.path)#
-#
-      print("*************************************")#
-      print(paste(data.type, park, sub))#
-      print(summary(mod.flower))#
-#
-      plotBetaDiv(dis.method =dis.method,#
-                  dists= dats.flower$dist,#
-                  status= dats.flower$status,#
-                  occ=occ,#
-                  data.type=data.type,#
-                  park=park,#
-                  sub=sub)#
-#
-      try(test.plt <- plotCoeffs(dis.method =dis.method,#
-                 mod=mod.flower,#
-                 status= dats.flower$status,#
-                 data.type=data.type,#
-                 occ=occ,#
-                 park=park,#
-                 sub=sub))#
-#
-    }#
-  }#
-}
-rm(list=ls())#
-setwd('~/Dropbox/wildFireUse/analysis/beta-div')#
-binary <- TRUE#
-alpha <- TRUE#
-data.types <- c("search", "line")#
-## data.types <- c("line")#
-parks <- c("YOSE","SEQI")#
-subs <- c("all", "pols")#
-for(i in data.types){#
-  data.type <- i#
-  for(j in parks){#
-    park <- j#
-    for(k in subs){#
-      sub <- k#
-      source('src/initialize.R')#
-      dis.flower <- mapply(function(a, b, c, d)#
-                           beta.status(comm= a,#
-                                       status= b,#
-                                       dis.method=dis.method,#
-                                       nulls=c,#
-                                       occ=binary,#
-                                       years=d,#
-                                       sub=sub),#
-                           a=comm.flower$comm,#
-                           b=comm.flower$status,#
-                           c= nulls.flower,#
-                           d= unique(comm.flower$years),#
-                           SIMPLIFY=FALSE)#
-#
-      dats.flower <- data.frame(site=unlist(comm.flower$sites),#
-                                status=unlist(comm.flower$status),#
-                                year=comm.flower$years,#
-                                dist=unlist(lapply(dis.flower, function(x)#
-                                  x$distances)))#
-      save(dats.flower, file=data.path)#
-    }#
-  }#
-}#
-## run model, plot#
-#
-for(i in data.types){#
-  data.type <- i#
-  for(j in parks){#
-    park <- j#
-    for(k in subs){#
-      sub <- k#
-      source('src/initialize.R')#
-      load(file=data.path)#
-      dats.flower$status <- factor(dats.flower$status,#
-                                   levels=c("Unburned", "Very low",#
-                                     "Low", "Moderate", "High"))#
-      mod.flower <- lmer(dist ~ status +#
-                         (1|site),#
-                         data=dats.flower)#
-      save(mod.flower, file=mod.path)#
-#
-      print("*************************************")#
-      print(paste(data.type, park, sub))#
-      print(summary(mod.flower))#
-#
-      plotBetaDiv(dis.method =dis.method,#
-                  dists= dats.flower$dist,#
-                  status= dats.flower$status,#
-                  occ=occ,#
-                  data.type=data.type,#
-                  park=park,#
-                  sub=sub)#
-#
-      try(test.plt <- plotCoeffs(dis.method =dis.method,#
-                                 mod=mod.flower,#
-                                 status= dats.flower$status,#
-                                 data.type=data.type,#
-                                 occ=occ,#
-                                 park=park,#
-                                 sub=sub))#
-#
-    }#
-  }#
-}
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-library(ape)#
-library(igraph)#
-source('../networkLevel/src/misc.R')#
-source('plotting/src/communities.R', chdir = TRUE)#
-#
-fig.path <- 'plotting/figures'#
-f.path <- "cptPeel/baci"#
-load(file=file.path(f.path, "graphs.Rdata"))#
-#
-temp <- list.files(f.path, pattern="*.gml")#
-tree.graphs <-  lapply(temp, function(x){#
-  read.graph(file.path(f.path, x), format="gml")#
-})#
-#
-#### plotting#
-#
-sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
-sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
-all.poss.yrs <- 2006:2015#
-#
-for(i in unique(sites.trees)){#
-  net <- nets[sites == i]#
-  yrs <- sapply(strsplit(names(net), "[.]"), function(x) x[2])#
-  names(net) <- yrs#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  this.tree <- tree.graphs[sites.trees == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_communities.pdf", i)),#
-        width=10, height=4)#
-}
-comm.tree
-ceb
-edgelist <- get.data.frame(comm.tree) #this will give us a data frame with
-edgelist
-colnames(edgelist) <- c("source","target","value")
-ceb
-edgelist <- get.data.frame(ceb) #this will give us a data frame with from,t
-E(comm.tree)$weight = 1#
-    edgelist <- get.data.frame(comm.tree) #this will give us a data frame with from,to,weight#
-    colnames(edgelist) <- c("source","target","value")#
-                                        #make character rather than numeric for proper functioning#
-    edgelist$source <- as.character(edgelist$source)#
-    edgelist$target <- as.character(edgelist$target)#
-    sankeyPlot <- rCharts$new()#
-    sankeyPlot$setLib('libraries/widgets/d3_sankey')#
-    sankeyPlot$setTemplate(script = "libraries/widgets/d3_sankey/layouts/chart.html")
-require(rCharts)
-instll.packages("rCharts")
-install.packages("rCharts")
-require(devtools)#
-install_github('rCharts', 'ramnathv')
-sankeyPlot <- rCharts$new()
-library(Rcharts)
-library(rCharts)
-sankeyPlot <- rCharts$new()
-sankeyPlot$setLib('libraries/widgets/d3_sankey')#
-    sankeyPlot$setTemplate(script = "libraries/widgets/d3_sankey/layouts/chart.html")
-sankeyPlot$set(#
-  data = edgelist,#
-  nodeWidth = 15,#
-  nodePadding = 10,#
-  layout = 32,#
-  width = 960,#
-  height = 500#
-)#
-sankeyPlot$print(chartId = 'sankey1')
-quartz()
-sankeyPlot$set(#
-  data = edgelist,#
-  nodeWidth = 15,#
-  nodePadding = 10,#
-  layout = 32,#
-  width = 960,#
-  height = 500#
-)#
-sankeyPlot$print(chartId = 'sankey1')
-install.packages("networkD3")
-library(networkD3)
+comm.mat <- lapply(site.cores, function(x){#
+samp2site.spp(x, x$Site, x$GenusSpecies, x$Abund)#
+})
+site.cores
+comm.mat <- lapply(site.cores, function(x){#
+samp2site.spp(x, x$Site, x$GenusSpecies, x$Abund)#
+})
+comm.mat <- lapply(site.cores, function(x){#
+samp2site.spp(x, x$Site, x$GenusSpecies, x$Abund)#
+})
+comm.mat <- lapply(site.cores, function(x){#
+browser()#
+samp2site.spp(x, x$Site, x$GenusSpecies, x$Abund)#
+})
 Q
-URL <- paste0('https://cdn.rawgit.com/christophergandrud/networkD3/',#
-'master/JSONdata/energy.json')#
-energy <- jsonlite::fromJSON(URL)#
-# Plot#
-sankeyNetwork(Links = energy$links, Nodes = energy$nodes, Source = 'source',#
-Target = 'target', Value = 'value', NodeID = 'name',#
-units = 'TWh', fontSize = 12, nodeWidth = 30)
-head(energy)
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-library(ape)#
-library(igraph)#
-source('../networkLevel/src/misc.R')#
-source('plotting/src/communities.R', chdir = TRUE)#
-#
-fig.path <- 'plotting/figures'#
-f.path <- "cptPeel/baci"#
-load(file=file.path(f.path, "graphs.Rdata"))#
-#
-temp <- list.files(f.path, pattern="*.gml")#
-tree.graphs <-  lapply(temp, function(x){#
-  read.graph(file.path(f.path, x), format="gml")#
-})#
-#
-#### plotting#
-#
-sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
-sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
-all.poss.yrs <- 2006:2015#
-#
-for(i in unique(sites.trees)){#
-  net <- nets[sites == i]#
-  yrs <- sapply(strsplit(names(net), "[.]"), function(x) x[2])#
-  names(net) <- yrs#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  this.tree <- tree.graphs[sites.trees == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_communities.pdf", i)),#
-        width=10, height=4)#
-}
-cebs[1]
-?cluster_edge_betweenness
-cebs[[1]]$membership
-cebs[[2]]$membership
-cebs[[1]]$V
-names(cebs[[1]])
-cebs[[1]]$removed.edges
-membership(cebs[[1]])
-membership(cebs[[2]])
-length(membership(cebs[[2]]))
-length(membership(cebs[[1]]))
-length(membership(cebs[[3]]))
-this.tree[[1]]
-this.tree$V
-V(this.tree)
-V(this.tree[[1]])
-V(this.tree[[2]])
-V(this.tree[[1]])$name
-V(this.tree[[1]])
-get.vertex.attribute(this.tree[[1]])
-get.vertex.attribute(this.tree[[2]])
-head(energy)
-URL <- paste0('https://cdn.rawgit.com/christophergandrud/networkD3/',#
-'master/JSONdata/energy.json')#
-energy <- jsonlite::fromJSON(URL)
-head(energy)
-sankeyNetwork(Links = energy$links, Nodes = energy$nodes, Source = 'source',#
-Target = 'target', Value = 'value', NodeID = 'name',#
-units = 'TWh', fontSize = 12, nodeWidth = 30)
-nodes = c(1:36)
-pairs=c()#
-for (j in seq(1,36,by=4)) pairs=c(pairs,j,j+1,j+1,j+2,j+2,j+3)#
-pairs#
-g <- graph(pairs)#
-plot(g)#
-E(g)#
-E(g)$weights <- rep(c(16667,500,100),9)#
-length(E(g)$weights)
-pairs=c()#
-for (j in seq(1,36,by=4)) pairs=c(pairs,j,j+1,j+1,j+2,j+2,j+3)#
-pairs#
-g <- graph(pairs)#
-plot(g)#
-E(g)#
-E(g)$weights <- rep(c(16667,500,100),9)#
-length(E(g)$weights)
-g <- this.tree[[1]]
-E(g)$weight = 1
-edgelist <- get.data.frame(g)
-colnames(edgelist)
-edgelist$source <- as.character(edgelist$source)#
-edgelist$target <- as.character(edgelist$target)
-edgelist
-this.tree
-get.vertex.attribute(this.tree[[2]])
-get.vertex.attribute(this.tree[[3]])
-get.vertex.attribute(this.tree[[4]])
-Q
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-library(ape)#
-library(igraph)#
-source('../networkLevel/src/misc.R')#
-source('plotting/src/communities.R', chdir = TRUE)#
-#
-fig.path <- 'plotting/figures'#
-f.path <- "cptPeel/baci"#
-load(file=file.path(f.path, "graphs.Rdata"))#
-#
-temp <- list.files(f.path, pattern="*.gml")#
-tree.graphs <-  lapply(temp, function(x){#
-  read.graph(file.path(f.path, x), format="gml")#
-})#
-#
-#### plotting#
-#
-sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
-sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
-all.poss.yrs <- 2006:2015#
-#
-for(i in unique(sites.trees)){#
-  net <- nets[sites == i]#
-  yrs <- sapply(strsplit(names(net), "[.]"), function(x) x[2])#
-  names(net) <- yrs#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  this.tree <- tree.graphs[sites.trees == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_communities.pdf", i)),#
-        width=10, height=4)#
-}
-cebs
-attribs <- lapply(cebs, get.vertex.attribute)
-attribs <- lapply(this.tree, get.vertex.attribute)
-attribs[[1]]
-id.memb <- lapply(attribs, function(x) cbind(x$ids, x$group))
-id.memb
-attribs[[1]]$ids
-attribs[[1]]$id
-attribs[[1]]$group
-id.memb <- lapply(attribs, function(x) cbind(x$id, x$group))
-id.memb
-lapply(id.memb, dim)
-?merge
-out <- list()#
-  for(i in 1:length(id.memb){#
-    out <- merge(id.memb[[i]], id.memb[[i+1]], "id") #
-    }
-for(i in 1:length(id.memb)){#
-    out <- merge(id.memb[[i]], id.memb[[i+1]], "id") #
-    }
-out
-Q
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-library(ape)#
-library(igraph)#
-source('../networkLevel/src/misc.R')#
-source('plotting/src/communities.R', chdir = TRUE)#
-#
-fig.path <- 'plotting/figures'#
-f.path <- "cptPeel/baci"#
-load(file=file.path(f.path, "graphs.Rdata"))#
-#
-temp <- list.files(f.path, pattern="*.gml")#
-tree.graphs <-  lapply(temp, function(x){#
-  read.graph(file.path(f.path, x), format="gml")#
-})#
-#
-#### plotting#
-#
-sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
-sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
-all.poss.yrs <- 2006:2015#
-#
-for(i in unique(sites.trees)){#
-  net <- nets[sites == i]#
-  yrs <- sapply(strsplit(names(net), "[.]"), function(x) x[2])#
-  names(net) <- yrs#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  this.tree <- tree.graphs[sites.trees == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_communities.pdf", i)),#
-        width=10, height=4)#
-}
-I
-i
-out <- merge(id.memb[[i]], id.memb[[i+1]], "id")
-id.memb[[i]]
-Q
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-library(ape)#
-library(igraph)#
-source('../networkLevel/src/misc.R')#
-source('plotting/src/communities.R', chdir = TRUE)#
-#
-fig.path <- 'plotting/figures'#
-f.path <- "cptPeel/baci"#
-load(file=file.path(f.path, "graphs.Rdata"))#
-#
-temp <- list.files(f.path, pattern="*.gml")#
-tree.graphs <-  lapply(temp, function(x){#
-  read.graph(file.path(f.path, x), format="gml")#
-})#
-#
-#### plotting#
-#
-sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
-sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
-all.poss.yrs <- 2006:2015#
-#
-for(i in unique(sites.trees)){#
-  net <- nets[sites == i]#
-  yrs <- sapply(strsplit(names(net), "[.]"), function(x) x[2])#
-  names(net) <- yrs#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  this.tree <- tree.graphs[sites.trees == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_communities.pdf", i)),#
-        width=10, height=4)#
-}
-out <- merge(id.memb[[i]], id.memb[[i+1]], "id")
-id.memb[[i]]
-?merge
-out <- merge(id.memb[[i]], id.memb[[i+1]], by="id", incomparables = NA)
-out <- merge(x=id.memb[[i]], y=id.memb[[i+1]], by="id", incomparables = NA)
-lapply(id.memb, nrow)
-lapply(id.memb, dim)
-id.memb
-Q
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-library(ape)#
-library(igraph)#
-source('../networkLevel/src/misc.R')#
-source('plotting/src/communities.R', chdir = TRUE)#
-#
-fig.path <- 'plotting/figures'#
-f.path <- "cptPeel/baci"#
-load(file=file.path(f.path, "graphs.Rdata"))#
-#
-temp <- list.files(f.path, pattern="*.gml")#
-tree.graphs <-  lapply(temp, function(x){#
-  read.graph(file.path(f.path, x), format="gml")#
-})#
-#
-#### plotting#
-#
-sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
-sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
-all.poss.yrs <- 2006:2015#
-#
-for(i in unique(sites.trees)){#
-  net <- nets[sites == i]#
-  yrs <- sapply(strsplit(names(net), "[.]"), function(x) x[2])#
-  names(net) <- yrs#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  this.tree <- tree.graphs[sites.trees == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_communities.pdf", i)),#
-        width=10, height=4)#
-}
+comm.mat <- lapply(site.cores, function(x){#
+browser()#
+samp2site.spp(x, x$Site, x$GenusSpecies, x$Abund)#
+})
 x
-id.memb[[i]]
-out <- merge(id.memb[[i]], id.memb[[i+1]], by="id")
-out
+samp2site.spp(x, x$Site, x$GenusSpecies, x$Abund)
+x$Site
+samp2site.spp(x$Site, x$GenusSpecies, x$Abund)
 Q
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-library(ape)#
-library(igraph)#
-source('../networkLevel/src/misc.R')#
-source('plotting/src/communities.R', chdir = TRUE)#
-#
-fig.path <- 'plotting/figures'#
-f.path <- "cptPeel/baci"#
-load(file=file.path(f.path, "graphs.Rdata"))#
-#
-temp <- list.files(f.path, pattern="*.gml")#
-tree.graphs <-  lapply(temp, function(x){#
-  read.graph(file.path(f.path, x), format="gml")#
-})#
-#
-#### plotting#
-#
-sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
-sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
-all.poss.yrs <- 2006:2015#
-#
-for(i in unique(sites.trees)){#
-  net <- nets[sites == i]#
-  yrs <- sapply(strsplit(names(net), "[.]"), function(x) x[2])#
-  names(net) <- yrs#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  this.tree <- tree.graphs[sites.trees == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_communities.pdf", i)),#
-        width=10, height=4)#
-}
-for(i in 1:length(id.memb)){#
-    if(i == length(id.memb)) stop#
-    out <- merge(id.memb[[i]], id.memb[[i+1]], by="id") #
-  }
-OUT
-out
-Q
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-library(ape)#
-library(igraph)#
-source('../networkLevel/src/misc.R')#
-source('plotting/src/communities.R', chdir = TRUE)#
-#
-fig.path <- 'plotting/figures'#
-f.path <- "cptPeel/baci"#
-load(file=file.path(f.path, "graphs.Rdata"))#
-#
-temp <- list.files(f.path, pattern="*.gml")#
-tree.graphs <-  lapply(temp, function(x){#
-  read.graph(file.path(f.path, x), format="gml")#
-})#
-#
-#### plotting#
-#
-sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
-sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
-all.poss.yrs <- 2006:2015#
-#
-for(i in unique(sites.trees)){#
-  net <- nets[sites == i]#
-  yrs <- sapply(strsplit(names(net), "[.]"), function(x) x[2])#
-  names(net) <- yrs#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  this.tree <- tree.graphs[sites.trees == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_communities.pdf", i)),#
-        width=10, height=4)#
-}
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-library(ape)#
-library(igraph)#
-source('../networkLevel/src/misc.R')#
-source('plotting/src/communities.R', chdir = TRUE)#
-#
-fig.path <- 'plotting/figures'#
-f.path <- "cptPeel/baci"#
-load(file=file.path(f.path, "graphs.Rdata"))#
-#
-temp <- list.files(f.path, pattern="*.gml")#
-tree.graphs <-  lapply(temp, function(x){#
-  read.graph(file.path(f.path, x), format="gml")#
-})#
-#
-#### plotting#
-#
-sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
-sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
-all.poss.yrs <- 2006:2015#
-#
-for(i in unique(sites.trees)){#
-  net <- nets[sites == i]#
-  yrs <- sapply(strsplit(names(net), "[.]"), function(x) x[2])#
-  names(net) <- yrs#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  this.tree <- tree.graphs[sites.trees == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_communities.pdf", i)),#
-        width=10, height=4)#
-}
-out
-Q
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-library(ape)#
-library(igraph)#
-source('../networkLevel/src/misc.R')#
-source('plotting/src/communities.R', chdir = TRUE)#
-#
-fig.path <- 'plotting/figures'#
-f.path <- "cptPeel/baci"#
-load(file=file.path(f.path, "graphs.Rdata"))#
-#
-temp <- list.files(f.path, pattern="*.gml")#
-tree.graphs <-  lapply(temp, function(x){#
-  read.graph(file.path(f.path, x), format="gml")#
-})#
-#
-#### plotting#
-#
-sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
-sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
-all.poss.yrs <- 2006:2015#
-#
-for(i in unique(sites.trees)){#
-  net <- nets[sites == i]#
-  yrs <- sapply(strsplit(names(net), "[.]"), function(x) x[2])#
-  names(net) <- yrs#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  this.tree <- tree.graphs[sites.trees == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_communities.pdf", i)),#
-        width=10, height=4)#
-}
-out
-length(this.tree)
-head(energy)
-sankeyNetwork(Links = energy$links, Nodes = energy$nodes, Source = 'source',#
-Target = 'target', Value = 'value', NodeID = 'name',#
-units = 'TWh', fontSize = 12, nodeWidth = 30)
-URL <- paste0('https://cdn.rawgit.com/christophergandrud/networkD3/',#
-'master/JSONdata/energy.json')#
-energy <- jsonlite::fromJSON(URL)
-head(energy)
-names(this.tree)
-this.tree
-Q
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-library(ape)#
-library(igraph)#
-source('../networkLevel/src/misc.R')#
-source('plotting/src/communities.R', chdir = TRUE)#
-#
-fig.path <- 'plotting/figures'#
-f.path <- "cptPeel/baci"#
-load(file=file.path(f.path, "graphs.Rdata"))#
-#
-temp <- list.files(f.path, pattern="*.gml")#
-tree.graphs <-  lapply(temp, function(x){#
-  read.graph(file.path(f.path, x), format="gml")#
-})#
-#
-#### plotting#
-#
-sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
-sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
-all.poss.yrs <- 2006:2015#
-#
-for(i in unique(sites.trees)){#
-  net <- nets[sites == i]#
-  yrs <- sapply(strsplit(names(net), "[.]"), function(x) x[2])#
-  names(net) <- yrs#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  this.tree <- tree.graphs[sites.trees == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_communities.pdf", i)),#
-        width=10, height=4)#
-}
-out
-Q
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-library(ape)#
-library(igraph)#
-source('../networkLevel/src/misc.R')#
-source('plotting/src/communities.R', chdir = TRUE)#
-#
-fig.path <- 'plotting/figures'#
-f.path <- "cptPeel/baci"#
-load(file=file.path(f.path, "graphs.Rdata"))#
-#
-temp <- list.files(f.path, pattern="*.gml")#
-tree.graphs <-  lapply(temp, function(x){#
-  read.graph(file.path(f.path, x), format="gml")#
-})#
-#
-#### plotting#
-#
-sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
-sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
-all.poss.yrs <- 2006:2015#
-#
-for(i in unique(sites.trees)){#
-  net <- nets[sites == i]#
-  yrs <- sapply(strsplit(names(net), "[.]"), function(x) x[2])#
-  names(net) <- yrs#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  this.tree <- tree.graphs[sites.trees == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_communities.pdf", i)),#
-        width=10, height=4)#
-}
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-library(ape)#
-library(igraph)#
-source('../networkLevel/src/misc.R')#
-source('plotting/src/communities.R', chdir = TRUE)#
-#
-fig.path <- 'plotting/figures'#
-f.path <- "cptPeel/baci"#
-load(file=file.path(f.path, "graphs.Rdata"))#
-#
-temp <- list.files(f.path, pattern="*.gml")#
-tree.graphs <-  lapply(temp, function(x){#
-  read.graph(file.path(f.path, x), format="gml")#
-})#
-#
-#### plotting#
-#
-sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
-sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
-all.poss.yrs <- 2006:2015#
-#
-for(i in unique(sites.trees)){#
-  net <- nets[sites == i]#
-  yrs <- sapply(strsplit(names(net), "[.]"), function(x) x[2])#
-  names(net) <- yrs#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  this.tree <- tree.graphs[sites.trees == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_communities.pdf", i)),#
-        width=10, height=4)#
-}
-out
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-library(ape)#
-library(igraph)#
-source('../networkLevel/src/misc.R')#
-source('plotting/src/communities.R', chdir = TRUE)#
-#
-fig.path <- 'plotting/figures'#
-f.path <- "cptPeel/baci"#
-load(file=file.path(f.path, "graphs.Rdata"))#
-#
-temp <- list.files(f.path, pattern="*.gml")#
-tree.graphs <-  lapply(temp, function(x){#
-  read.graph(file.path(f.path, x), format="gml")#
-})#
-#
-#### plotting#
-#
-sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
-sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
-all.poss.yrs <- 2006:2015#
-#
-for(i in unique(sites.trees)){#
-  net <- nets[sites == i]#
-  yrs <- sapply(strsplit(names(net), "[.]"), function(x) x[2])#
-  names(net) <- yrs#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  this.tree <- tree.graphs[sites.trees == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_communities.pdf", i)),#
-        width=10, height=4)#
-}
-Q
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-library(ape)#
-library(igraph)#
-source('../networkLevel/src/misc.R')#
-source('plotting/src/communities.R', chdir = TRUE)#
-#
-fig.path <- 'plotting/figures'#
-f.path <- "cptPeel/baci"#
-load(file=file.path(f.path, "graphs.Rdata"))#
-#
-temp <- list.files(f.path, pattern="*.gml")#
-tree.graphs <-  lapply(temp, function(x){#
-  read.graph(file.path(f.path, x), format="gml")#
-})#
-#
-#### plotting#
-#
-sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
-sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
-all.poss.yrs <- 2006:2015#
-#
-for(i in unique(sites.trees)){#
-  net <- nets[sites == i]#
-  yrs <- sapply(strsplit(names(net), "[.]"), function(x) x[2])#
-  names(net) <- yrs#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  this.tree <- tree.graphs[sites.trees == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_communities.pdf", i)),#
-        width=10, height=4)#
-}
-out
-table(out[, 2:3])
-?table
-test1 <- table(out[, 2:3])
-text1
-test1
-c(test1)
-comm2.sample
-ls()
-comm.mat2sample <-  function (z) {#
-  temp <- data.frame(expand.grid(dimnames(z))[1:2], as.vector(as.matrix(z)))#
-  temp <- temp[sort.list(temp[, 1]), ]#
-  data.frame(Site = temp[, 1], Abund = temp[, 3], GenSp = temp[, 2])#
-}
-comm.mat2.sample(test1)
-comm.mat2sample(test1)
-URL <- paste0('https://cdn.rawgit.com/christophergandrud/networkD3/',#
-'master/JSONdata/energy.json')#
-energy <- jsonlite::fromJSON(URL)
-head(energy)
-comm.mat2sample <-  function (z) {#
-  temp <- data.frame(expand.grid(dimnames(z))[1:2],#
-                     as.vector(as.matrix(z)))#
-  temp <- temp[sort.list(temp[, 1]), ]#
-  data.frame(source = temp[, 1], target = temp[, 2], value = temp[, 3])#
-}
-comm.mat2sample(test1)
-test1 <- table(out[, 3:4])
-comm.mat2.sample(test1)
-comm.mat2sample(test1)
-dim(out)
-head(energy)
-Q
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-library(ape)#
-library(igraph)#
-source('../networkLevel/src/misc.R')#
-source('plotting/src/communities.R', chdir = TRUE)#
-#
-fig.path <- 'plotting/figures'#
-f.path <- "cptPeel/baci"#
-load(file=file.path(f.path, "graphs.Rdata"))#
-#
-temp <- list.files(f.path, pattern="*.gml")#
-tree.graphs <-  lapply(temp, function(x){#
-  read.graph(file.path(f.path, x), format="gml")#
-})#
-#
-#### plotting#
-#
-sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
-sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
-all.poss.yrs <- 2006:2015#
-#
-for(i in unique(sites.trees)){#
-  net <- nets[sites == i]#
-  yrs <- sapply(strsplit(names(net), "[.]"), function(x) x[2])#
-  names(net) <- yrs#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  this.tree <- tree.graphs[sites.trees == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_communities.pdf", i)),#
-        width=10, height=4)#
-}
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-library(ape)#
-library(igraph)#
-source('../networkLevel/src/misc.R')#
-source('plotting/src/communities.R', chdir = TRUE)#
-#
-fig.path <- 'plotting/figures'#
-f.path <- "cptPeel/baci"#
-load(file=file.path(f.path, "graphs.Rdata"))#
-#
-temp <- list.files(f.path, pattern="*.gml")#
-tree.graphs <-  lapply(temp, function(x){#
-  read.graph(file.path(f.path, x), format="gml")#
-})#
-#
-#### plotting#
-#
-sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
-sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
-all.poss.yrs <- 2006:2015#
-#
-for(i in unique(sites.trees)){#
-  net <- nets[sites == i]#
-  yrs <- sapply(strsplit(names(net), "[.]"), function(x) x[2])#
-  names(net) <- yrs#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  this.tree <- tree.graphs[sites.trees == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_communities.pdf", i)),#
-        width=10, height=4)#
-}
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-library(ape)#
-library(igraph)#
-source('../networkLevel/src/misc.R')#
-source('plotting/src/communities.R', chdir = TRUE)#
-#
-fig.path <- 'plotting/figures'#
-f.path <- "cptPeel/baci"#
-load(file=file.path(f.path, "graphs.Rdata"))#
-#
-temp <- list.files(f.path, pattern="*.gml")#
-tree.graphs <-  lapply(temp, function(x){#
-  read.graph(file.path(f.path, x), format="gml")#
-})#
-#
-#### plotting#
-#
-sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
-sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
-all.poss.yrs <- 2006:2015#
-#
-for(i in unique(sites.trees)){#
-  net <- nets[sites == i]#
-  yrs <- sapply(strsplit(names(net), "[.]"), function(x) x[2])#
-  names(net) <- yrs#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  this.tree <- tree.graphs[sites.trees == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_communities.pdf", i)),#
-        width=10, height=4)#
-}
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-library(ape)#
-library(igraph)#
-source('../networkLevel/src/misc.R')#
-source('plotting/src/communities.R', chdir = TRUE)#
-#
-fig.path <- 'plotting/figures'#
-f.path <- "cptPeel/baci"#
-load(file=file.path(f.path, "graphs.Rdata"))#
-#
-temp <- list.files(f.path, pattern="*.gml")#
-tree.graphs <-  lapply(temp, function(x){#
-  read.graph(file.path(f.path, x), format="gml")#
-})#
-#
-#### plotting#
-#
-sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
-sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
-all.poss.yrs <- 2006:2015#
-#
-for(i in unique(sites.trees)){#
-  net <- nets[sites == i]#
-  yrs <- sapply(strsplit(names(net), "[.]"), function(x) x[2])#
-  names(net) <- yrs#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  this.tree <- tree.graphs[sites.trees == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_communities.pdf", i)),#
-        width=10, height=4)#
-}
-comm <- table(out[, i:(i+1)])
-comm
-if(i==2) links <- comm.mat2sample(comm)
-links
-Q
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-library(ape)#
-library(igraph)#
-source('../networkLevel/src/misc.R')#
-source('plotting/src/communities.R', chdir = TRUE)#
-#
-fig.path <- 'plotting/figures'#
-f.path <- "cptPeel/baci"#
-load(file=file.path(f.path, "graphs.Rdata"))#
-#
-temp <- list.files(f.path, pattern="*.gml")#
-tree.graphs <-  lapply(temp, function(x){#
-  read.graph(file.path(f.path, x), format="gml")#
-})#
-#
-#### plotting#
-#
-sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
-sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
-all.poss.yrs <- 2006:2015#
-#
-for(i in unique(sites.trees)){#
-  net <- nets[sites == i]#
-  yrs <- sapply(strsplit(names(net), "[.]"), function(x) x[2])#
-  names(net) <- yrs#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  this.tree <- tree.graphs[sites.trees == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_communities.pdf", i)),#
-        width=10, height=4)#
-}
-links
-out
-Q
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-library(ape)#
-library(igraph)#
-source('../networkLevel/src/misc.R')#
-source('plotting/src/communities.R', chdir = TRUE)#
-#
-fig.path <- 'plotting/figures'#
-f.path <- "cptPeel/baci"#
-load(file=file.path(f.path, "graphs.Rdata"))#
-#
-temp <- list.files(f.path, pattern="*.gml")#
-tree.graphs <-  lapply(temp, function(x){#
-  read.graph(file.path(f.path, x), format="gml")#
-})#
-#
-#### plotting#
-#
-sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
-sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
-all.poss.yrs <- 2006:2015#
-#
-for(i in unique(sites.trees)){#
-  net <- nets[sites == i]#
-  yrs <- sapply(strsplit(names(net), "[.]"), function(x) x[2])#
-  names(net) <- yrs#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  this.tree <- tree.graphs[sites.trees == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_communities.pdf", i)),#
-        width=10, height=4)#
-}
-out
-links
-head(energy)
-URL <- paste0('https://cdn.rawgit.com/christophergandrud/networkD3/',#
-'master/JSONdata/energy.json')#
-energy <- jsonlite::fromJSON(URL)
-head(energy)
-links <- links[!links$value == 0,]
-links
-head(energy)
-nodes <- unique(out[, 2:ncol(out)])
-nodes
-nodes <- unique(c(out[, 2:ncol(out)]))
-nodes
-out
-sankeyNetwork(Links = links , Source = 'source', Target = 'target',#
-              Value = 'value', NodeID = 'name', units = 'TWh',#
-              fontSize = 12, n deWidth = 30)
-sankeyNetwork(Links = links , Source = 'source', Target = 'target',#
-              Value = 'value', NodeID = 'name', units = 'TWh',#
-              fontSize = 12,  deWidth = 30)
-sankeyNetwork(Links = links , Source = 'source', Target = 'target',#
-              Value = 'value', NodeID = 'name', units = 'TWh',#
-              fontSize = 12,  nodeWidth = 30)
-links
-sankeyNetwork(Links = links , Nodes = links$source,#
-              Source = 'source', Target = 'target',#
-              Value = 'value', NodeID = 'name', units = 'TWh',#
-              fontSize = 12,  nodeWidth = 30)
-energy
-data.frame(links$source, name="")
-sankeyNetwork(Links = links , Nodes = data.frame(links$source, name=""),#
-              Source = 'source', Target = 'target',#
-              Value = 'value', NodeID = 'name', units = 'TWh',#
-              fontSize = 12,  nodeWidth = 30)
-sankeyNetwork(Links = links , Nodes = data.frame(links$source,#
-                                name=links$source),#
-              Source = 'source', Target = 'target',#
-              Value = 'value', NodeID = 'name', units = 'TWh',#
-              fontSize = 12,  nodeWidth = 30)
-links
-data.frame(links$source,#
-                                name=links$source)
-energy$nodes
-rownames(energy$nodes)
-nodes <- data.frame(name=links$source)#
-  rownames(nodes) <- links$source
-nodes
-links
-nodes <- data.frame(name=unique(links$source))
-nodes
-rownames(nodes) <- unique(links$source)
-nodes
-sankeyNetwork(Links = links,#
-              Nodes = nodes,#
-              Source = 'source', Target = 'target',#
-              Value = 'value', NodeID = 'name', units = 'TWh',#
-              fontSize = 12,  nodeWidth = 30)
-sankeyNetwork(Links = links,#
-              Nodes = nodes,#
-              Source = 'source', Target = 'target',#
-              Value = 'value', NodeID = 'name',#
-              fontSize = 12,  nodeWidth = 30)
-sankeyNetwork(Links = links,#
-              Nodes = nodes,#
-              Source = 'source', Target = 'target',#
-              Value = 'value', NodeID = 'name',#
-              fontSize = 12,  nodeWidth = 30)
-links
-energy$links
-energy$nodes
-sankeyNetwork(Links = energy$links, Nodes = energy$nodes, Source = 'source',#
-Target = 'target', Value = 'value', NodeID = 'name',#
-units = 'TWh', fontSize = 12, nodeWidth = 30)
-dim(energy$links)
-dim(energy$nodes)
-unique(energy$links[,1])
-length(unique(energy$links[,1]))
-length(unique(energy$links[,12]))
-length(unique(energy$links[,2]))
-nodes <- data.frame(name=1:nrow(links))
-nodes
-sankeyNetwork(Links = links,#
-              Nodes = nodes,#
-              Source = 'source', Target = 'target',#
-              Value = 'value', NodeID = 'name',#
-              fontSize = 12,  nodeWidth = 30)
-nodes
-g <- graph.tree(40, children = 4)
-g
-E(g)$weight = 1
-edgelist <- get.data.frame(g) #this will give us a data frame with from,to,weight#
-colnames(edgelist) <- c("source","target","value")#
-#make character rather than numeric for proper functioning#
-edgelist$source <- as.character(edgelist$source)#
-edgelist$target <- as.character(edgelist$target)
-edgelist
-sankeyPlot <- rCharts$new()#
-sankeyPlot$setLib('libraries/widgets/d3_sankey')#
-sankeyPlot$setTemplate(script = "libraries/widgets/d3_sankey/layouts/chart.html")
-sankeyPlot$set(#
-  data = links,#
-  nodeWidth = 15,#
-  nodePadding = 10,#
-  layout = 32,#
-  width = 960,#
-  height = 500#
+comm.mat <- lapply(site.cores, function(x){#
+samp2site.spp(x$Site, x$GenusSpecies, x$Abund)#
+})
+comm.mat$plant
+site.cores <- lapply(site.cores, function(y) split(y, y$core))
+colnames(site.cores)
+colnames(site.cores[[1]])
+site.cores <- lapply(site.cores, function(y) split(y, y$comm))
+site.cores$plant$core
+site.cores$plant
+site.cores <- unlist(site.cores, recursive = FALS
+E)
+site.cores <- unlist(site.cores, recursive = FALSE)
+names(site.cores)
+comm.mat <- lapply(site.cores, function(x){#
+samp2site.spp(x$Site, x$GenusSpecies, x$Abund)#
+})
+comm.mat
+?pcoa
+?betadisper
+library(vegan)
+?betadisper
+?adonis
+site.cores[[1]]
+l.path <- 'plotting/saved'#
+site.nodes <- list.files(l.path, "nodes")#
+site.cores <- list()#
+#
+for(i in 1:length(site.nodes)){#
+  load(file.path(l.path, site.nodes[i]))#
+  site.cores[[i]] <- getSpecies(out, names.v, num.v)#
+}#
+#
+names(site.cores) <- unique(sites.trees)#
+site.cores <- unlist(site.cores, recursive=FALSE)#
+#
+num.sp <- sapply(site.cores, length)#
+#
+site.cores <- as.data.frame(unlist(site.cores))#
+rownames(site.cores) <- NULL#
+colnames(site.cores) <- "GenusSpecies"#
+#
+site.cores$SiteStat <- rep(names(num.sp), num.sp)#
+site.cores$Site <- sapply(strsplit(site.cores$SiteStat, "[.]"), function(x) x[1])#
+site.cores$comm <- sapply(strsplit(site.cores$SiteStat, "[.]"), function(x) x[2])#
+#
+load('~/Dropbox/hedgerow_assembly/data/networks/allSpecimens.Rdata')#
+#
+site.cores$speciesType <- ifelse(site.cores$GenusSpecies %in% #
+unique(spec$GenusSpecies), "pollinator", "plant")#
+#
+site.cores$Abund <- 1#
+#
+site.cores <- split(site.cores, site.cores$speciesType)#
+site.cores <- lapply(site.cores, function(y) split(y, y$comm))#
+site.cores <- unlist(site.cores, recursive = FALSE)#
+#
+comm.mat <- lapply(site.cores, function(x){#
+samp2site.spp(x$SiteStat, x$GenusSpecies, x$Abund)#
+})
+comm.mat
+l.path <- 'plotting/saved'#
+site.nodes <- list.files(l.path, "nodes")#
+site.cores <- list()#
+#
+for(i in 1:length(site.nodes)){#
+  load(file.path(l.path, site.nodes[i]))#
+  site.cores[[i]] <- getSpecies(out, names.v, num.v)#
+}#
+#
+names(site.cores) <- unique(sites.trees)#
+site.cores <- unlist(site.cores, recursive=FALSE)#
+#
+num.sp <- sapply(site.cores, length)#
+#
+site.cores <- as.data.frame(unlist(site.cores))#
+rownames(site.cores) <- NULL#
+colnames(site.cores) <- "GenusSpecies"#
+#
+site.cores$SiteStat <- rep(names(num.sp), num.sp)#
+site.cores$Site <- sapply(strsplit(site.cores$SiteStat, "[.]"), function(x) x[1])#
+site.cores$comm <- sapply(strsplit(site.cores$SiteStat, "[.]"), function(x) x[2])#
+#
+load('~/Dropbox/hedgerow_assembly/data/networks/allSpecimens.Rdata')#
+#
+site.cores$speciesType <- ifelse(site.cores$GenusSpecies %in% #
+unique(spec$GenusSpecies), "pollinator", "plant")#
+#
+site.cores$Abund <- 1#
+#
+site.cores <- split(site.cores, site.cores$speciesType)#
+#
+comm.mat <- lapply(site.cores, function(x){#
+samp2site.spp(x$SiteStat, x$GenusSpecies, x$Abund)#
+})
+comm.mat
+?adonis
+data(dune)#
+data(dune.env)
+dune.env
+dune
+comm.mat$plants
+comm.mat$plant
+rownames(comm.mat$plant)
+site.cores$comm
+site.cores$plants$comm
+site.cores$plants
+site.cores
+names(site.cores)
+site.cores$plant
+site.cores$plant$comm
+rownames(comm.mat$plant)
+sapply(strplit(rownames(comm.mat$plant), "[.]")
 )
-sankeyPlot$print(chartId = 'sankey1')
-sankeyPlot2 <- rCharts$new()#
-sankeyPlot2$setLib('libraries/widgets/d3_sankey')#
-sankeyPlot2$setTemplate(script = 'libraries/widgets/d3_sankey/layouts/chart.html')
-sankeyPlot2$set(#
-  data = links,#
-  nodeWidth = 15,#
-  nodePadding = 10,#
-  layout = 32,#
-  width = 960,#
-  height = 500#
+sapply(strplit(rownames(comm.mat$plant), "[.]"), function(x) x[2])
+sapply(strsplit(rownames(comm.mat$plant), "[.]"), function(x) x[2])
+?adonis
+plant.dis <- adonis(comm.mat$plant ~#
+sapply(strsplit(rownames(comm.mat$plant), "[.]"), function(x) x[2]))
+plant.dis
+plant.dis
+pol.dis <- adonis(comm.mat$pollinator ~#
+sapply(strsplit(rownames(comm.mat$pollintor), "[.]"), function(x) x[2]))
+comm.mat$pollinator
+sapply(strsplit(rownames(comm.mat$pollintor), "[.]"), function(x) x[2])
+pol.dis <- adonis(comm.mat$pollinator ~#
+sapply(strsplit(rownames(comm.mat$pollintor), "[.]"), function(x) x[2]))
+comm.mat$pollinator
+sapply(strsplit(rownames(comm.mat$pollintor), "[.]"), function(x) x[2])
+pol.dis <- adonis(comm.mat$pollinator ~#
+sapply(strsplit(rownames(comm.mat$pollinator), "[.]"), function(x) x[2]))
+pol.dis
+pcoa.comm <- cmdscale(comm.mat$pollinator)
+pcoa.comm <- cmdscale(veg.dist(comm.mat$pollinator, method="jaccard")
 )
-sankeyPlot2
-Q
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-library(ape)#
-library(igraph)#
-source('../networkLevel/src/misc.R')#
-source('plotting/src/communities.R', chdir = TRUE)#
-#
-fig.path <- 'plotting/figures'#
-f.path <- "cptPeel/baci"#
-load(file=file.path(f.path, "graphs.Rdata"))#
-#
-temp <- list.files(f.path, pattern="*.gml")#
-tree.graphs <-  lapply(temp, function(x){#
-  read.graph(file.path(f.path, x), format="gml")#
-})#
-#
-#### plotting#
-#
-sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
-sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
-all.poss.yrs <- 2006:2015#
-#
-for(i in unique(sites.trees)){#
-  net <- nets[sites == i]#
-  yrs <- sapply(strsplit(names(net), "[.]"), function(x) x[2])#
-  names(net) <- yrs#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  this.tree <- tree.graphs[sites.trees == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_communities.pdf", i)),#
-        width=10, height=4)#
-}
+pcoa.comm <- cmdscale(vegdist(comm.mat$pollinator, method="jaccard"))
+pcoa.comm
