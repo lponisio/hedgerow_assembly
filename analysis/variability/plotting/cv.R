@@ -107,14 +107,17 @@ plot.predict.div(new.dd=itd.pi,
 ## ************************************************************
 ## persistence network position
 ## ************************************************************
+occ.k.sd$data$SiteStatus <- "all"
 dd.occ <- expand.grid(traits=seq(
                            from= min(occ.k.sd$data$traits, na.rm=TRUE),
                            to= max(occ.k.sd$data$traits, na.rm=TRUE),
                            length=10),
-                         SiteStatus= c("control", "maturing", "mature"),
+                         ## SiteStatus= c("control", "maturing",
+                      ## "mature"),
+                      SiteStatus="all",
                          cv= 0)
 
-occ.pi <- predict.int(mod= occ.k.sd$lm,
+occ.pi <- predict.int(mod= occ.k.sd$lm.nss,
                         dd=dd.occ,
                         y="cv",
                         family="gaussian")
@@ -124,9 +127,11 @@ plot.predict.div(new.dd=occ.pi,
                  dats=occ.k.sd$data,
                  xs="traits",
                  y1="cv",
-                 xlabel="Persistence",
-                 legend.loc="topleft",
+                 xlabel="Pollinator persistence",
+                 legend.loc="bottomright",
                  height=5,
                  width=5,
-                 x.adj=0.5)
+                 x.adj=0.5,
+                 treatments="all",
+                 col.lines="black")
 

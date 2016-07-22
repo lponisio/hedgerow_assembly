@@ -21,6 +21,7 @@ sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])
 all.poss.yrs <- 2006:2015
 
 for(i in unique(sites.trees)){
+  print(i)
   net <- nets[sites == i]
   yrs <- sapply(strsplit(names(net), "[.]"), function(x) x[2])
   names(net) <- yrs
@@ -37,11 +38,31 @@ for(i in unique(sites.trees)){
         width=10, height=4)
 }
 
+names.v <- names(V(graphs[[1]]))
+num.v <- 0:length(names.v)
 
+getSpecies <- function(out, names.v, num.v){
+  out$names <- names.v[match(out$label, num.v)]
+  memb <- apply(out[, -c(1, ncol(out))], 2, table)
+  core <- sapply(memb, function(x) names(x)[x == max(x)])
+  stayed <- list()
+  for(i in 1:length(core)){
+    stayed[[i]] <- out[, i+1] == core[i]
+  }
+  ind.stayed <- Reduce("*", stayed)
+  stayed.core <- out$names[ind.stayed ==1]
+  left.core <- out$names[ind.stayed==0]
+  return(list(stayed.core, left.core))
+}
 
+l.path <- 'plotting/saved'
+site.nodes <- list.files(l.path, "nodes")
+site.cores <- list()
 
-
-
+for(i in 1:length(site.nodes)){
+  load(file.path(l.path, site.nodes[i]))
+  site.cores[[i]] <- getSpecies(out, names.v, num.v)
+}
 
 
 ## out <- list()

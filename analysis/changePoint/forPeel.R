@@ -52,10 +52,10 @@ for(i in 1:length(graphs)){
                                      names(graphs)[i])))
 }
 
-
+graphs.num <- graphs
 graphs <- lapply(nets, graph.incidence, weighted=TRUE)
 names(graphs) <- gsub("[.]", "_", names(graphs))
-save(graphs, nets, file=file.path(f.path, "graphs.Rdata"))
+save(graphs, graphs.num, nets, file=file.path(f.path, "graphs.Rdata"))
 
 lutfile <- cbind(0:(length(V(graphs[[1]]))-1), 0:(length(V(graphs[[1]]))-1))
                  

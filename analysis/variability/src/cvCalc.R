@@ -48,7 +48,9 @@ cv.trait <- function(spec.dat,
   }
   lm.cv <- lmer(cv ~ SiteStatus*traits + (1|Site) + (1|GenusSpecies),
                 data=dats[!is.na(dats$cv),])
-  return(list(data=dats, lm=lm.cv))
+  lm.cv.nss <- lmer(cv ~ traits + (1|Site) + (1|GenusSpecies),
+                data=dats[!is.na(dats$cv),])
+  return(list(data=dats, lm=lm.cv, lm.nss=lm.cv.nss))
 }
 
 

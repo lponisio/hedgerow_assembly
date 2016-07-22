@@ -37,37 +37,41 @@ comm.mat2sample <-  function (z) {
 }
 
 
-
 plotDend <- function(){
   par(mar=c(0,0.5,0,0))
   layout(matrix(1:length(this.tree), nrow=1))
   cebs <- lapply(this.tree, cluster_edge_betweenness)
   attribs <- lapply(this.tree, get.vertex.attribute)
   id.memb <- lapply(attribs, function(x){
-    out <- cbind(x$id, x$group)
-    colnames(out) <- c("id", "group")
-    return(out)
+    membs <- data.frame(label=x$label, group=x$group)
+    membs <- membs[!grepl("D", membs$label),]
+    membs <- membs[!grepl("root", membs$label),]
+    membs$group <- as.numeric(membs$group)
+    return(membs)
   })
   ## node membership history
   out <- list()
-  for(i in 1:length(id.memb)){
-    if(i == 1) out <- id.memb[[i]]
+  for(k in 1:length(id.memb)){
+    if(k == 1) out <- id.memb[[k]]
     else{
-      out <- merge(out, id.memb[[i]], by="id", all=TRUE)
-      out[, ncol(out)] <- out[, ncol(out)] + i*20
+      out <- merge(out, id.memb[[k]], by="label", all=TRUE)
+      out[, ncol(out)] <- out[, ncol(out)] + k*20
     }    
   }
+
+  save(out, file=sprintf('plotting/saved/nodes_%s.Rdata', i))
   ## counts of nodes that moved from one community to another
   links <- list()
-  for(i in 2:ncol(out)){
-    if(i==ncol(out)) break
-    comm <- table(out[, i:(i+1)])
-    if(i==2) links <- comm.mat2sample(comm)
+  for(z in 2:ncol(out)){
+    if(z==ncol(out)) break
+    comm <- table(out[, z:(z+1)])
+    if(z==2) links <- comm.mat2sample(comm)
     else{
       links <- rbind(links, comm.mat2sample(comm))
     }
   }
   links <- links[!links$value == 0,]
+  save(links, file=sprintf('plotting/saved/links_%s.Rdata', i))
   ## nodes <-
   ## data.frame(name=paste("n", 1:length(unique(c(links$target,
   ##              links$source))), sep=""))
@@ -83,7 +87,14 @@ plotDend <- function(){
                   to="target", weight="value",
                   options=list(
                     height=250,
-                    sankey="{link:{color:{fill:'lightblue'}}}"
+                    sankey="{link: {color: { fill: '#d799ae' } },
+                        node: { width: 4, 
+                                color: { fill: '#a61d4c' },
+                                label: { fontName: 'Times-Roman',
+                                         fontSize: 14,
+                                         color: '#871b47',
+                                         bold: true,
+                                         italic: true }}}"
                     ))
        )
   for(j in 1:length(this.tree)){

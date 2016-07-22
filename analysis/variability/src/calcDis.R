@@ -11,9 +11,6 @@ calcDisper <- function(arr, ind){
     return(NA)
   } else{
     pp.disper <- lapply(pp.dis, function(z){
-      ## if(all(as.matrix(z) == 0)){
-      ##   return(NA)
-      ## }else{
       out <- try(betadisper(z,
                             group=rep("1",
                               nrow(as.matrix(z))))$distances,
@@ -29,7 +26,7 @@ calcDisper <- function(arr, ind){
   }
 }
 
-calcDis <- function(site, ind, nets){
+calcDis <- function(site, ind, nets, spec){
   these.nets <- nets[sites == site]
   arr <- simplify2array(these.nets)
   pp <- calcDisper(arr, ind)
@@ -43,15 +40,18 @@ calcDis <- function(site, ind, nets){
                                Year =  sapply(strsplit(
                                  unlist(sapply(pp, names)), "[.]"),
                                  function(x) x[2])))
-    if(inherits(out.dist, "try-error")) browser()
+    out.dist$SiteStatus <- spec$SiteStatus[match(paste(out.dist$Site,
+                                                 out.dist$Year),
+                                           paste(spec$Site,
+                                                 spec$Year))]
     rownames(out.dist) <- NULL
     return(out.dist)
   }
 }
 
 
-getDis <- function(sites, ind, nets, specs.agg, traits){
-  pp <- lapply(unique(sites), calcDis, ind=ind, nets)
+getDis <- function(sites, ind, nets, specs.agg, traits, spec){
+  pp <- lapply(unique(sites), calcDis, ind=ind, nets, spec)
   pp <- pp[!sapply(pp, function(x) all(is.na(x)))]
   pp <- do.call(rbind, pp)
   pp$k <- specs.agg$k[match(pp$GenusSpecies, specs.agg$GenusSpecies)]

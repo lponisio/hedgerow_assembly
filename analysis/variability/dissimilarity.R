@@ -16,28 +16,43 @@ load('../../data/networks/expanded_networks.Rdata')
 sites <- sapply(strsplit(names(nets), "[.]"), function(x) x[1])
 
 specs.agg <- aggregate(k  ~ GenusSpecies, data=specs, mean)
-plants <- getDis(sites, 1, nets, specs.agg, traits)
-pols <- getDis(sites, 2, nets, specs.agg, traits)
+plants <- getDis(sites, 1, nets, specs.agg, traits, spec)
+pols <- getDis(sites, 2, nets, specs.agg, traits, spec)
 
+## dipersion of interaction parteners by core/periphery (continuus
+## metric) (categoric metric didn'et make sense bec so few had values
+## > 1)
 mod.pols <- lmer(Dist~k + (1|Site) + (1|GenusSpecies),
                  data=pols)
-mod.pols.cat <- lmer(Dist~core + (1|Site) + (1|GenusSpecies),
-                     data=pols)
-mod.pols.d <- lmer(Dist~d + (1|Site) + (1|GenusSpecies),
-                   data=pols)
-mod.pols.occ <- lmer(Dist~occ.date + (1|Site) + (1|GenusSpecies),
-                     data=pols)
-summary(mod.pols)
-summary(mod.pols.cat)
-summary(mod.pols.d)
-summary(mod.pols.occ)
+
+## only two species with k >1
+hist(unique(data.frame(pols$GenusSpecies, pols$k))$pols.k)
 
 mod.plants <- lmer(Dist~k + (1|Site) + (1|GenusSpecies),
                    data=plants)
-mod.plants.cat <- lmer(Dist~core + (1|Site) + (1|GenusSpecies),
-                       data=plants)
+
+## only one species with k >1
+hist(unique(data.frame(plants$GenusSpecies, plants$k))$plants.k)
+
+## by specialization
+mod.pols.d <- lmer(Dist~d + (1|Site) + (1|GenusSpecies),
+                   data=pols)
+
 mod.plants.d <- lmer(Dist~d + (1|Site) + (1|GenusSpecies),
                      data=plants)
+
+## pollinator date occurrence
+mod.pols.occ <- lmer(Dist~occ.date + (1|Site) + (1|GenusSpecies),
+                     data=pols)
+
+summary(mod.pols)
+summary(mod.pols.d)
+summary(mod.pols.occ)
+
 summary(mod.plants)
-summary(mod.plants.cat)
 summary(mod.plants.d)
+
+
+save(pols, plants, mod.pols,
+     mod.plants, mod.plants.d,
+     mod.pols.d, file="saved/dissMods.Rdata")

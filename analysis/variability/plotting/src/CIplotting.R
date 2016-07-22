@@ -92,11 +92,12 @@ plot.predict.div <- function(new.dd,
                              x.adj=-0.5,
                              width=8, height=5,
                              xlabel,
-                             scaled=TRUE){
+                             scaled=TRUE,
+                             treatments = c("control", "maturing",
+                               "mature"),
+                             col.lines =  brewer.pal(3, "Dark2")[c(2, 1, 3)]){
   plot.ci <- function(){
-    col.lines <-  brewer.pal(3, "Dark2")[c(2, 1, 3)]
     col.fill <- add.alpha(col.lines, alpha=0.2)
-    treatments <- c("control", "maturing", "mature")
     names(col.lines) <- names(col.fill) <- treatments
     layout(matrix(1, ncol=1))
     par(oma=c(6, 5, 2, 1),
@@ -108,10 +109,12 @@ plot.predict.div <- function(new.dd,
                ylabel,
                scaled=scaled)
     mtext(xlabel, 1, line=3.5, cex=1.5, adj=x.adj)
-    legend(legend.loc,
-           legend=c("Unrestored", "Maturing", "Mature"),
-           col=col.lines,
-           pch=16, bty="n", cex=1)
+    if(length(treatments) > 1){
+      legend(legend.loc,
+             legend=c("Unrestored", "Maturing", "Mature"),
+             col=col.lines,
+             pch=16, bty="n", cex=1)
+    }
   }
   path <- 'figures'
   pdf.f(plot.ci, file=file.path(path,
