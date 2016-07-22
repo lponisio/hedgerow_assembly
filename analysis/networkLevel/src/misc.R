@@ -11,7 +11,7 @@ pdf.f <- function(f, file, ...) {
 
 ## convert occurrence data into a site by species matrix
 samp2site.spp <- function(site, spp, abund, FUN=mean) { 
-  x <- tapply(abund, list(site=site,spp=spp), FUN)
+  x <- tapply(abund, list(site, spp), FUN)
   x[is.na(x)] <- 0
   
   return(x)

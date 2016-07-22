@@ -1,5 +1,6 @@
 library(ape)
 library(vegan)
+library(FD)
 library(igraph)
 source('../networkLevel/src/misc.R')
 source('plotting/src/plotPcoa.R')

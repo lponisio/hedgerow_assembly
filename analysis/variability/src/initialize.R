@@ -1,6 +1,8 @@
 library(lme4)
 library(vegan)
 library(fields)
+library(linkcomm)
+library(picante)
 library(raster)
 library(lmerTest)
 source('src/misc.R')

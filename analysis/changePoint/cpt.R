@@ -2,6 +2,7 @@ rm(list=ls())
 setwd("~/Dropbox/hedgerow_assembly/analysis/changePoint")
 load('cptPeel/baci/graphs.Rdata')
 load('../../data/networks/allSpecimens.Rdata')
+library(MASS)
 dats <- read.csv('cptPeel/changing_points.csv')
 
 counts <- table(dats[,-3])
@@ -37,18 +38,28 @@ mature <- hist(chpts.sites[statuses == "mature"], prob=TRUE,
 ## fit poisson distributions to data
 fit.cont <- fitdistr(chpts.sites[statuses == "control"],
                      densfun="Poisson")
+fit.cont
 fit.maturing <- fitdistr(chpts.sites[statuses == "maturing"],
                      densfun="Poisson")
+fit.maturing
 fit.mature <- fitdistr(chpts.sites[statuses == "mature"],
                      densfun="Poisson")
+fit.mature
 
 ## likelihood ratio text of fit of control model on maturing data,
 ## mature model on maturing data
 lik.cont.mat <- log(prod(dpois(chpts.sites[statuses == "maturing"],
                            lambda=fit.cont$estimate)))
-lik.mat.mat <- log(prod(dpois(chpts.sites[statuses == "maturing"],
+lik.mature.mat <- log(prod(dpois(chpts.sites[statuses == "maturing"],
                            lambda=fit.mature$estimate)))
+lik.mature.cont <- log(prod(dpois(chpts.sites[statuses == "mature"],
+                           lambda=fit.cont$estimate)))
 
+## maturing is unlikely to be drawn from control
 1- pchisq(-2*(lik.cont.mat - fit.maturing$loglik), 1)
 
-1- pchisq(-2*(lik.mat.mat - fit.maturing$loglik), 1)
+## or mature
+1- pchisq(-2*(lik.mature.mat - fit.maturing$loglik), 1)
+
+## but mature could be draw from control
+1- pchisq(-2*(lik.mature.cont - fit.mature$loglik), 1)
