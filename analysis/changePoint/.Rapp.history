@@ -1,1750 +1,15 @@
-getSpecies <- function(out, names.v, num.v){#
-  out$names <- names.v[match(out$label, num.v)]#
-  memb <- apply(out[, -c(1, ncol(out))], 2, table)#
-  core <- sapply(memb, function(x) names(x)[x == max(x)])#
-  stayed <- list()#
-  for(i in 1:length(core)){#
-    stayed[[i]] <- out[, i+1] == core[i]#
-  }#
-  browser()#
-  ind.stayed <- Reduce("*", stayed)#
-  stayed.core <- out$names[ind.stayed]#
-  left.core <- out$names[!ind.stayed]#
-  return(list(stayed.core, left.core))#
-}#
-#
-l.path <- 'plotting/saved'#
-site.nodes <- list.files(l.path, "nodes")#
-site.cores <- list()#
-#
-for(i in 1:length(site.nodes)){#
-  load(file.path(l.path, site.nodes[i]))#
-  site.cores[[i]] <- getSpecies(out, names.v, num.v)#
-}
-stayed
-ind.stayed <- Reduce("*", stayed)
-ind.stayed
-out$names
-stayed.core <- out$names[ind.stayed]
-stayed.core
-ind.stayed
-ind.stayed*TRUE
-ind.stayed ==1
-Q
-getSpecies <- function(out, names.v, num.v){#
-  out$names <- names.v[match(out$label, num.v)]#
-  memb <- apply(out[, -c(1, ncol(out))], 2, table)#
-  core <- sapply(memb, function(x) names(x)[x == max(x)])#
-  stayed <- list()#
-  for(i in 1:length(core)){#
-    stayed[[i]] <- out[, i+1] == core[i]#
-  }#
-  ind.stayed <- Reduce("*", stayed)#
-  stayed.core <- out$names[ind.stayed ==1]#
-  left.core <- out$names[ind.stayed==0]#
-  return(list(stayed.core, left.core))#
-}#
-#
-l.path <- 'plotting/saved'#
-site.nodes <- list.files(l.path, "nodes")#
-site.cores <- list()#
-#
-for(i in 1:length(site.nodes)){#
-  load(file.path(l.path, site.nodes[i]))#
-  site.cores[[i]] <- getSpecies(out, names.v, num.v)#
-}
-site.cores[[1]]
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-library(ape)#
-library(vegan)#
-library(igraph)#
-source('../networkLevel/src/misc.R')#
-source('plotting/src/communities.R', chdir = TRUE)#
-#
-fig.path <- 'plotting/figures'#
-f.path <- "cptPeel/baci"#
-load(file=file.path(f.path, "graphs.Rdata"))#
-#
-temp <- list.files(f.path, pattern="*.gml")#
-tree.graphs <-  lapply(temp, function(x){#
-  read.graph(file.path(f.path, x), format="gml")#
-})#
-#
-#### plotting#
-#
-sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
-sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
-all.poss.yrs <- 2006:2015#
-#
-for(i in unique(sites.trees)){#
-  print(i)#
-  net <- nets[sites == i]#
-  yrs <- sapply(strsplit(names(net), "[.]"), function(x) x[2])#
-  names(net) <- yrs#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  this.tree <- tree.graphs[sites.trees == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_communities.pdf", i)),#
-        width=10, height=4)#
-}#
-#
-names.v <- names(V(graphs[[1]]))#
-num.v <- 0:length(names.v)#
-#
-getSpecies <- function(out, names.v, num.v){#
-  out$names <- names.v[match(out$label, num.v)]#
-  memb <- apply(out[, -c(1, ncol(out))], 2, table)#
-  core <- sapply(memb, function(x) names(x)[x == max(x)])#
-  stayed <- list()#
-  for(i in 1:length(core)){#
-    stayed[[i]] <- out[, i+1] == core[i]#
-  }#
-  ind.stayed <- Reduce("*", stayed)#
-  stayed.core <- out$names[ind.stayed ==1]#
-  left.core <- out$names[ind.stayed==0]#
-  return(list(stayed=stayed.core, left=left.core))#
-}#
-#
-l.path <- 'plotting/saved'#
-site.nodes <- list.files(l.path, "nodes")#
-site.cores <- list()#
-#
-for(i in 1:length(site.nodes)){#
-  load(file.path(l.path, site.nodes[i]))#
-  site.cores[[i]] <- getSpecies(out, names.v, num.v)#
-}#
-#
-names(site.cores) <- unique(sites.trees)#
-site.cores <- unlist(site.cores, recursive=FALSE)#
-#
-num.sp <- sapply(site.cores, length)#
-#
-site.cores <- as.data.frame(unlist(site.cores))#
-rownames(site.cores) <- NULL#
-colnames(site.cores) <- "GenusSpecies"#
-#
-site.cores$SiteStat <- rep(names(num.sp), num.sp)#
-site.cores$Site <- sapply(strsplit(site.cores$SiteStat, "[.]"), #
-                          function(x) x[1])#
-site.cores$comm <- sapply(strsplit(site.cores$SiteStat, "[.]"),#
-                          function(x) x[2])#
-#
-load('~/Dropbox/hedgerow_assembly/data/networks/allSpecimens.Rdata')#
-#
-site.cores$speciesType <- ifelse(site.cores$GenusSpecies %in% #
-                                 unique(spec$GenusSpecies), "pollinator", "plant")#
-#
-site.cores$Abund <- 1#
-#
-site.cores <- split(site.cores, site.cores$speciesType)#
-#
-comm.mat <- lapply(site.cores, function(x){#
-  samp2site.spp(x$SiteStat, x$GenusSpecies, x$Abund)#
-})#
-#
-plant.dis <- adonis(comm.mat$plant ~#
-                    sapply(strsplit(rownames(comm.mat$plant), "[.]"),#
-                           function(x) x[2]))#
-#
-pol.dis <- adonis(comm.mat$pollinator ~#
-                  sapply(strsplit(rownames(comm.mat$pollinator),#
-                  "[.]"),#
-                         function(x) x[2]))
-adonis
-?adonis
-status.plant <- sapply(strsplit(rownames(comm.mat$plant), "[.]"),#
-                           function(x) x[2]))#
-status.pol <-   sapply(strsplit(rownames(comm.mat$pollinator), "[.]"),#
-                         function(x) x[2]))#
-#
-plant.dis <- adonis(comm.mat$plant ~ status.plant, method="jaccard")#
-#
-pol.dis <- adonis(comm.mat$pollinator ~ status.pol, method="jaccard")
-status.plant <- sapply(strsplit(rownames(comm.mat$plant), "[.]"),#
-                           function(x) x[2])#
-status.pol <-   sapply(strsplit(rownames(comm.mat$pollinator), "[.]"),#
-                         function(x) x[2])#
-#
-plant.dis <- adonis(comm.mat$plant ~ status.plant, method="jaccard")#
-#
-pol.dis <- adonis(comm.mat$pollinator ~ status.pol, method="jaccard")
-plant.dis
-plant.perm <- adonis(comm.mat$plant ~ status.plant, method="jaccard")#
-#
-pol.perm <- adonis(comm.mat$pollinator ~ status.pol, method="jaccard")
-plant.perm <- adonis(comm.mat$plant ~ status.plant, method="jaccard")#
-plant.pcoa <-  cmdscale(comm.mat$plant, method="jaccard")#
-#
-pol.perm <- adonis(comm.mat$pollinator ~ status.pol, method="jaccard")#
-pol.pcoa <-  cmdscale(comm.mat$pol, method="jaccard")
-plant.perm <- adonis(comm.mat$plant ~ status.plant, method="jaccard")#
-plant.pcoa <-  cmdscale(vegdist(comm.mat$plant, method="jaccard"))#
-#
-pol.perm <- adonis(comm.mat$pollinator ~ status.pol, method="jaccard")#
-pol.pcoa <-  cmdscale(vegdist(comm.mat$pol, method="jaccard"))
-pol.pcoa
-status.pol
-plot.beta.div <- function(pcoas, statuses){#
-  f <- function(){#
-    pcoa <- function(pcoa.comm, status, i){#
-      plot(pcoa.comm[status == 'left',], asp=1,#
-           col=cols[1], pch=16, cex=1.5,#
-           ylim=range(pcoa.comm[,2]) + c(0,0.2),#
-           xlim=range(pcoa.comm[,1]),#
-           xlab='',#
-           ylab='',#
-           xaxt='n',#
-           yaxt='n',#
-           cex.lab=1.5)#
-      points(pcoa.comm[status == 'stayed',],#
-             col=cols[2], pch=16, cex=1.5)#
-      ordihull(pcoa.comm, status)#
-      if(i %in% c(3,4)){#
-        mtext('PCoA1', 1, line=2, cex=1.5)#
-        if(i==2){#
-          mtext('Plants', 2, line=5, cex=1.5)#
-        }#
-      }#
-      if(i==1){#
-        legend('topleft',#
-               legend=c('Not core', 'Core'),#
-               col=cols, pch=16, bty='n', cex=1.3)#
-        mtext('Bees', 2, line=5, cex=1.5)#
-      }#
-    }#
-    layout(matrix(1:2, ncol=1, byrow=TRUE))#
-    par(oma=c(2,7,1,1), mar=c(2,0,1,0.5),#
-        mgp=c(2,1,0), cex.axis=1.5)#
-    cols <- c("darkolivegreen3",#
-              "darkgoldenrod1")#
-    out.pcoa <- vector("list", length=length(all.comms))#
-    for(i in 1:length()){#
-      pcoa(pcoas[[i]], statuses[[i], i=i)#
-    }#
-  }#
-  f.path <- 'figures/pcoa'#
-  pdf.f(f, file= file.path(f.path, "pcoa.pdf"),#
-        width=7, height=7)#
-}#
-#
-plot.beta.div(list(pol.pcoa, plant.pcoa), list(status.pol, status.plant))
-plot.beta.div <- function(pcoas, statuses){#
-  f <- function(){#
-    pcoa <- function(pcoa.comm, status, i){#
-      plot(pcoa.comm[status == 'left',], asp=1,#
-           col=cols[1], pch=16, cex=1.5,#
-           ylim=range(pcoa.comm[,2]) + c(0,0.2),#
-           xlim=range(pcoa.comm[,1]),#
-           xlab='',#
-           ylab='',#
-           xaxt='n',#
-           yaxt='n',#
-           cex.lab=1.5)#
-      points(pcoa.comm[status == 'stayed',],#
-             col=cols[2], pch=16, cex=1.5)#
-      ordihull(pcoa.comm, status)#
-      if(i %in% c(3,4)){#
-        mtext('PCoA1', 1, line=2, cex=1.5)#
-        if(i==2){#
-          mtext('Plants', 2, line=5, cex=1.5)#
-        }#
-      }#
-      if(i==1){#
-        legend('topleft',#
-               legend=c('Not core', 'Core'),#
-               col=cols, pch=16, bty='n', cex=1.3)#
-        mtext('Bees', 2, line=5, cex=1.5)#
-      }#
-    }#
-    layout(matrix(1:2, ncol=1, byrow=TRUE))#
-    par(oma=c(2,7,1,1), mar=c(2,0,1,0.5),#
-        mgp=c(2,1,0), cex.axis=1.5)#
-    cols <- c("darkolivegreen3",#
-              "darkgoldenrod1")#
-    out.pcoa <- vector("list", length=length(all.comms))#
-    for(i in 1:length(pcoas)){#
-      pcoa(pcoas[[i]], statuses[[i], i=i)#
-    }#
-  }#
-  f.path <- 'figures/pcoa'#
-  pdf.f(f, file= file.path(f.path, "pcoa.pdf"),#
-        width=7, height=7)#
-}#
-#
-plot.beta.div(list(pol.pcoa, plant.pcoa), list(status.pol, status.plant))
-plot.beta.div <- function(pcoas, statuses){#
-  f <- function(){#
-    pcoa <- function(pcoa.comm, status, i){#
-      plot(pcoa.comm[status == 'left',], asp=1,#
-           col=cols[1], pch=16, cex=1.5,#
-           ylim=range(pcoa.comm[,2]) + c(0,0.2),#
-           xlim=range(pcoa.comm[,1]),#
-           xlab='',#
-           ylab='',#
-           xaxt='n',#
-           yaxt='n',#
-           cex.lab=1.5)#
-      points(pcoa.comm[status == 'stayed',],#
-             col=cols[2], pch=16, cex=1.5)#
-      ordihull(pcoa.comm, status)#
-      if(i %in% c(3,4)){#
-        mtext('PCoA1', 1, line=2, cex=1.5)#
-        if(i==2){#
-          mtext('Plants', 2, line=5, cex=1.5)#
-        }#
-      }#
-      if(i==1){#
-        legend('topleft',#
-               legend=c('Not core', 'Core'),#
-               col=cols, pch=16, bty='n', cex=1.3)#
-        mtext('Bees', 2, line=5, cex=1.5)#
-      }#
-    }#
-    layout(matrix(1:2, ncol=1, byrow=TRUE))#
-    par(oma=c(2,7,1,1), mar=c(2,0,1,0.5),#
-        mgp=c(2,1,0), cex.axis=1.5)#
-    cols <- c("darkolivegreen3",#
-              "darkgoldenrod1")#
-    out.pcoa <- vector("list", length=length(all.comms))#
-    for(i in 1:length(pcoas)){#
-      pcoa(pcoas[[i]], statuses[[i]], i=i)#
-    }#
-  }#
-  f.path <- 'figures/pcoa'#
-  pdf.f(f, file= file.path(f.path, "pcoa.pdf"),#
-        width=7, height=7)#
-}#
-#
-plot.beta.div(list(pol.pcoa, plant.pcoa), list(status.pol, status.plant))
-plot.beta.div <- function(pcoas, statuses){#
-  f <- function(){#
-    pcoa <- function(pcoa.comm, status, i){#
-      plot(pcoa.comm[status == 'left',], asp=1,#
-           col=cols[1], pch=16, cex=1.5,#
-           ylim=range(pcoa.comm[,2]) + c(0,0.2),#
-           xlim=range(pcoa.comm[,1]),#
-           xlab='',#
-           ylab='',#
-           xaxt='n',#
-           yaxt='n',#
-           cex.lab=1.5)#
-      points(pcoa.comm[status == 'stayed',],#
-             col=cols[2], pch=16, cex=1.5)#
-      ordihull(pcoa.comm, status)#
-      if(i %in% c(3,4)){#
-        mtext('PCoA1', 1, line=2, cex=1.5)#
-        if(i==2){#
-          mtext('Plants', 2, line=5, cex=1.5)#
-        }#
-      }#
-      if(i==1){#
-        legend('topleft',#
-               legend=c('Not core', 'Core'),#
-               col=cols, pch=16, bty='n', cex=1.3)#
-        mtext('Bees', 2, line=5, cex=1.5)#
-      }#
-    }#
-    layout(matrix(1:2, ncol=1, byrow=TRUE))#
-    par(oma=c(2,7,1,1), mar=c(2,0,1,0.5),#
-        mgp=c(2,1,0), cex.axis=1.5)#
-    cols <- c("darkolivegreen3",#
-              "darkgoldenrod1")#
-    out.pcoa <- vector("list", length=length(all.comms))#
-    for(i in 1:length(pcoas)){#
-      pcoa(pcoas[[i]], statuses[[i]], i=i)#
-    }#
-  }#
-  f.path <- 'figures'#
-  pdf.f(f, file= file.path(f.path, "pcoa.pdf"),#
-        width=7, height=7)#
-}#
-#
-plot.beta.div(list(pol.pcoa, plant.pcoa), list(status.pol, status.plant))
-plot.beta.div <- function(pcoas, statuses){#
-  f <- function(){#
-    pcoa <- function(pcoa.comm, status, i){#
-      plot(pcoa.comm[status == 'left',], asp=1,#
-           col=cols[1], pch=16, cex=1.5,#
-           ylim=range(pcoa.comm[,2]) + c(0,0.2),#
-           xlim=range(pcoa.comm[,1]),#
-           xlab='',#
-           ylab='',#
-           xaxt='n',#
-           yaxt='n',#
-           cex.lab=1.5)#
-      points(pcoa.comm[status == 'stayed',],#
-             col=cols[2], pch=16, cex=1.5)#
-      ordihull(pcoa.comm, status)#
-      if(i %in% c(3,4)){#
-        mtext('PCoA1', 1, line=2, cex=1.5)#
-        if(i==2){#
-          mtext('Plants', 2, line=5, cex=1.5)#
-        }#
-      }#
-      if(i==1){#
-        legend('topleft',#
-               legend=c('Not core', 'Core'),#
-               col=cols, pch=16, bty='n', cex=1.3)#
-        mtext('Bees', 2, line=5, cex=1.5)#
-      }#
-    }#
-    layout(matrix(1:2, ncol=1, byrow=TRUE))#
-    par(oma=c(2,7,1,1), mar=c(2,0,1,0.5),#
-        mgp=c(2,1,0), cex.axis=1.5)#
-    cols <- c("darkolivegreen3",#
-              "darkgoldenrod1")#
-    out.pcoa <- vector("list", length=length(all.comms))#
-    for(i in 1:length(pcoas)){#
-      pcoa(pcoas[[i]], statuses[[i]], i=i)#
-    }#
-  }#
-  f.path <- 'plotting/figures/'#
-  pdf.f(f, file= file.path(f.path, "pcoa.pdf"),#
-        width=7, height=7)#
-}#
-#
-plot.beta.div(list(pol.pcoa, plant.pcoa), list(status.pol, status.plant))
-plot.beta.div <- function(pcoas, statuses){#
-  f <- function(){#
-    pcoa <- function(pcoa.comm, status, i){#
-      plot(pcoa.comm[status == 'left',], asp=1,#
-           col=cols[1], pch=16, cex=1.5,#
-           ylim=range(pcoa.comm[,2]) + c(0,0.2),#
-           xlim=range(pcoa.comm[,1]),#
-           xlab='',#
-           ylab='',#
-           xaxt='n',#
-           yaxt='n',#
-           cex.lab=1.5)#
-      points(pcoa.comm[status == 'stayed',],#
-             col=cols[2], pch=16, cex=1.5)#
-      ordihull(pcoa.comm, status)#
-      if(i %in% c(3,4)){#
-        mtext('PCoA1', 1, line=2, cex=1.5)#
-        if(i==2){#
-          mtext('Plants', 2, line=5, cex=1.5)#
-        }#
-      }#
-      if(i==1){#
-        legend('topleft',#
-               legend=c('Not core', 'Core'),#
-               col=cols, pch=16, bty='n', cex=1.3)#
-        mtext('Bees', 2, line=5, cex=1.5)#
-      }#
-    }#
-    layout(matrix(1:2, ncol=1, byrow=TRUE))#
-    par(oma=c(2,7,1,1), mar=c(2,0,1,0.5),#
-        mgp=c(2,1,0), cex.axis=1.5)#
-    cols <- c("darkolivegreen3",#
-              "darkgoldenrod1")#
-    for(i in 1:length(pcoas)){#
-      pcoa(pcoas[[i]], statuses[[i]], i=i)#
-    }#
-  }#
-  f.path <- 'plotting/figures/'#
-  pdf.f(f, file= file.path(f.path, "pcoa.pdf"),#
-        width=7, height=7)#
-}#
-#
-plot.beta.div(list(pol.pcoa, plant.pcoa), list(status.pol, status.plant))
-plot.beta.div <- function(pcoas, statuses){#
-  f <- function(){#
-    pcoa <- function(pcoa.comm, status, i){#
-      plot(pcoa.comm[status == 'left',], asp=1,#
-           col=cols[1], pch=16, cex=1.5,#
-           ylim=range(pcoa.comm[,2]) + c(0,0.2),#
-           xlim=range(pcoa.comm[,1]),#
-           xlab='',#
-           ylab='',#
-           xaxt='n',#
-           yaxt='n',#
-           cex.lab=1.5)#
-      points(pcoa.comm[status == 'stayed',],#
-             col=cols[2], pch=16, cex=1.5)#
-      ordihull(pcoa.comm, status)#
-      if(i %in% c(3,4)){#
-        mtext('PCoA1', 1, line=2, cex=1.5)#
-        if(i==2){#
-          mtext('Plants', 2, line=5, cex=1.5)#
-        }#
-      }#
-      if(i==1){#
-        legend('topleft',#
-               legend=c('Not core', 'Core'),#
-               col=cols, pch=16, bty='n', cex=1.3)#
-        mtext('Bees', 2, line=5, cex=1.5)#
-      }#
-    }#
-    layout(matrix(1:2, ncol=1, byrow=TRUE))#
-    par(oma=c(2,7,1,1), mar=c(2,0,1,0.5),#
-        mgp=c(2,1,0), cex.axis=1.5)#
-    cols <- c("darkolivegreen3",#
-              "darkgoldenrod1")#
-    for(i in 1:length(pcoas)){#
-      pcoa(pcoas[[i]], statuses[[i]], i=i)#
-    }#
-  }#
-  f.path <- 'plotting/figures'#
-  pdf.f(f, file= file.path(f.path, "pcoa.pdf"),#
-        width=7, height=7)#
-}#
-#
-plot.beta.div(list(pol.pcoa, plant.pcoa), list(status.pol, status.plant))
-status.plant <- sapply(strsplit(rownames(comm.mat$plant), "[.]"),#
-                           function(x) x[2])#
-status.pol <-   sapply(strsplit(rownames(comm.mat$pollinator), "[.]"),#
-                         function(x) x[2])#
-#
-plant.perm <- adonis(comm.mat$plant ~ status.plant, method="jaccard")#
-plant.pcoa <-  cmdscale(vegdist(comm.mat$plant, method="jaccard"))#
-#
-pol.perm <- adonis(comm.mat$pollinator ~ status.pol, method="jaccard")#
-pol.pcoa <-  cmdscale(vegdist(comm.mat$pol, method="jaccard"))#
-#
-plot.beta.div <- function(pcoas, statuses){#
-  f <- function(){#
-    pcoa <- function(pcoa.comm, status, i){#
-      plot(pcoa.comm[status == 'left',], asp=1,#
-           col=cols[1], pch=16, cex=1.5,#
-           ylim=range(pcoa.comm[,2]) + c(0,0.2),#
-           xlim=range(pcoa.comm[,1]),#
-           xlab='',#
-           ylab='',#
-           xaxt='n',#
-           yaxt='n',#
-           cex.lab=1.5)#
-      points(pcoa.comm[status == 'stayed',],#
-             col=cols[2], pch=16, cex=1.5)#
-      ordihull(pcoa.comm, status)#
-      if(i %in% c(3,4)){#
-        mtext('PCoA1', 1, line=2, cex=1.5)#
-        if(i==2){#
-          mtext('Plants', 2, line=5, cex=1.5)#
-        }#
-      }#
-      if(i==1){#
-        legend('topleft',#
-               legend=c('Not core', 'Core'),#
-               col=cols, pch=16, bty='n', cex=1.3)#
-        mtext('Bees', 2, line=5, cex=1.5)#
-      }#
-    }#
-    layout(matrix(1:2, ncol=1, byrow=TRUE))#
-    par(oma=c(2,7,1,1), mar=c(2,0,1,0.5),#
-        mgp=c(2,1,0), cex.axis=1.5)#
-    cols <- c("darkolivegreen3",#
-              "darkgoldenrod1")#
-    for(i in 1:length(pcoas)){#
-      pcoa(pcoas[[i]], statuses[[i]], i=i)#
-    }#
-  }#
-  f.path <- 'plotting/figures/pcoa'#
-  pdf.f(f, file= file.path(f.path, "pcoa.pdf"),#
-        width=7, height=7)#
-}#
-#
-plot.beta.div(list(pol.pcoa, plant.pcoa), list(status.pol, status.plant))
-status.plant <- sapply(strsplit(rownames(comm.mat$plant), "[.]"),#
-                           function(x) x[2])#
-status.pol <-   sapply(strsplit(rownames(comm.mat$pollinator), "[.]"),#
-                         function(x) x[2])#
-#
-plant.perm <- adonis(comm.mat$plant ~ status.plant, method="jaccard")#
-plant.pcoa <-  cmdscale(vegdist(comm.mat$plant, method="jaccard"))#
-#
-pol.perm <- adonis(comm.mat$pollinator ~ status.pol, method="jaccard")#
-pol.pcoa <-  cmdscale(vegdist(comm.mat$pol, method="jaccard"))#
-#
-plot.beta.div <- function(pcoas, statuses){#
-  f <- function(){#
-    pcoa <- function(pcoa.comm, status, i){#
-      plot(pcoa.comm[status == 'left',], asp=1,#
-           col=cols[1], pch=16, cex=1.5,#
-           ylim=range(pcoa.comm[,2]) + c(0,0.2),#
-           xlim=range(pcoa.comm[,1]),#
-           xlab='',#
-           ylab='',#
-           xaxt='n',#
-           yaxt='n',#
-           cex.lab=1.5)#
-      points(pcoa.comm[status == 'stayed',],#
-             col=cols[2], pch=16, cex=1.5)#
-      ordihull(pcoa.comm, status)#
-      mtext('PCoA1', 1, line=2, cex=1.5)#
-      if(i==2){#
-        mtext('Plants', 2, line=2, cex=1.5)#
-        mtext('PCoA1', 1, line=2, cex=1.5)#
-      }#
-      if(i==1){#
-        legend('topleft',#
-               legend=c('Not core', 'Core'),#
-               col=cols, pch=16, bty='n', cex=1.3)#
-        mtext('Bees', 2, line=5, cex=1.5)#
-      }#
-    }#
-    layout(matrix(1:2, ncol=1, byrow=TRUE))#
-    par(oma=c(2,7,1,1), mar=c(2,0,1,0.5),#
-        mgp=c(2,1,0), cex.axis=1.5)#
-    cols <- c("darkolivegreen3",#
-              "darkgoldenrod1")#
-    for(i in 1:length(pcoas)){#
-      pcoa(pcoas[[i]], statuses[[i]], i=i)#
-    }#
-  }#
-  f.path <- 'plotting/figures/pcoa'#
-  pdf.f(f, file= file.path(f.path, "pcoa.pdf"),#
-        width=7, height=7)#
-}#
-#
-plot.beta.div(list(pol.pcoa, plant.pcoa), list(status.pol, status.plant))
-plot.beta.div <- function(pcoas, statuses){#
-  f <- function(){#
-    pcoa <- function(pcoa.comm, status, i){#
-      plot(pcoa.comm[status == 'left',], asp=1,#
-           col=cols[1], pch=16, cex=1.5,#
-           ylim=range(pcoa.comm[,2]) + c(0,0.2),#
-           xlim=range(pcoa.comm[,1]),#
-           xlab='',#
-           ylab='',#
-           xaxt='n',#
-           yaxt='n',#
-           cex.lab=1.5)#
-      points(pcoa.comm[status == 'stayed',],#
-             col=cols[2], pch=16, cex=1.5)#
-      ordihull(pcoa.comm, status)#
-      mtext('PCoA1', 1, line=2, cex=1.5)#
-      if(i==2){#
-        mtext('Plants', 2, line=3, cex=1.5)#
-        mtext('PCoA1', 1, line=2, cex=1.5)#
-      }#
-      if(i==1){#
-        legend('topleft',#
-               legend=c('Not core', 'Core'),#
-               col=cols, pch=16, bty='n', cex=1.3)#
-        mtext('Bees', 2, line=3, cex=1.5)#
-      }#
-    }#
-    layout(matrix(1:2, ncol=1, byrow=TRUE))#
-    par(oma=c(2,7,1,1), mar=c(2,0,1,0.5),#
-        mgp=c(2,1,0), cex.axis=1.5)#
-    cols <- c("darkolivegreen3",#
-              "darkgoldenrod1")#
-    for(i in 1:length(pcoas)){#
-      pcoa(pcoas[[i]], statuses[[i]], i=i)#
-    }#
-  }#
-  f.path <- 'plotting/figures/pcoa'#
-  pdf.f(f, file= file.path(f.path, "pcoa.pdf"),#
-        width=4, height=7)#
-}#
-#
-plot.beta.div(list(pol.pcoa, plant.pcoa), list(status.pol, status.plant))
-plot.beta.div <- function(pcoas, statuses){#
-  f <- function(){#
-    pcoa <- function(pcoa.comm, status, i){#
-      plot(pcoa.comm[status == 'left',], asp=1,#
-           col=cols[1], pch=16, cex=1.5,#
-           ylim=range(pcoa.comm[,2]) + c(0,0.2),#
-           xlim=range(pcoa.comm[,1]),#
-           xlab='',#
-           ylab='',#
-           xaxt='n',#
-           yaxt='n',#
-           cex.lab=1.5)#
-      points(pcoa.comm[status == 'stayed',],#
-             col=cols[2], pch=16, cex=1.5)#
-      ordihull(pcoa.comm, status)#
-      mtext('PCoA1', 1, line=1.5, cex=1.5)#
-      if(i==2){#
-        mtext('Plants', 2, line=3.5, cex=1.5)#
-        mtext('PCoA2', 2, line=1.5, cex=1.5)#
-      }#
-      if(i==1){#
-        legend('topleft',#
-               legend=c('Not core', 'Core'),#
-               col=cols, pch=16, bty='n', cex=1.3)#
-        mtext('Bees', 2, line=3.5, cex=1.5)#
-      }#
-    }#
-    layout(matrix(1:2, ncol=1, byrow=TRUE))#
-    par(oma=c(2,7,1,1), mar=c(2,0,1,0.5),#
-        mgp=c(2,1,0), cex.axis=1.5)#
-    cols <- c("darkolivegreen3",#
-              "darkgoldenrod1")#
-    for(i in 1:length(pcoas)){#
-      pcoa(pcoas[[i]], statuses[[i]], i=i)#
-    }#
-  }#
-  f.path <- 'plotting/figures/pcoa'#
-  pdf.f(f, file= file.path(f.path, "pcoa.pdf"),#
-        width=4, height=7)#
-}#
-#
-plot.beta.div(list(pol.pcoa, plant.pcoa), list(status.pol, status.plant))
-plot.beta.div <- function(pcoas, statuses){#
-  f <- function(){#
-    pcoa <- function(pcoa.comm, status, i){#
-      plot(pcoa.comm[status == 'left',], asp=1,#
-           col=cols[1], pch=16, cex=1.5,#
-           ylim=range(pcoa.comm[,2]) + c(0,0.2),#
-           xlim=range(pcoa.comm[,1]),#
-           xlab='',#
-           ylab='',#
-           xaxt='n',#
-           yaxt='n',#
-           cex.lab=1.5)#
-      points(pcoa.comm[status == 'stayed',],#
-             col=cols[2], pch=16, cex=1.5)#
-      ordihull(pcoa.comm, status)#
-      mtext('PCoA2', 2, line=1.5, cex=1.5)#
-      if(i==2){#
-        mtext('Plants', 2, line=3.5, cex=1.5)#
-        mtext('PCoA1', 1, line=1.5, cex=1.5)#
-      }#
-      if(i==1){#
-        legend('topleft',#
-               legend=c('Not core', 'Core'),#
-               col=cols, pch=16, bty='n', cex=1.3)#
-        mtext('Bees', 2, line=3.5, cex=1.5)#
-      }#
-    }#
-    layout(matrix(1:2, ncol=1, byrow=TRUE))#
-    par(oma=c(2,7,1,1), mar=c(2,0,1,0.5),#
-        mgp=c(2,1,0), cex.axis=1.5)#
-    cols <- c("darkolivegreen3",#
-              "darkgoldenrod1")#
-    for(i in 1:length(pcoas)){#
-      pcoa(pcoas[[i]], statuses[[i]], i=i)#
-    }#
-  }#
-  f.path <- 'plotting/figures/pcoa'#
-  pdf.f(f, file= file.path(f.path, "pcoa.pdf"),#
-        width=4, height=7)#
-}#
-#
-plot.beta.div(list(pol.pcoa, plant.pcoa), list(status.pol, status.plant))
-plot.beta.div <- function(pcoas, statuses){#
-  f <- function(){#
-    pcoa <- function(pcoa.comm, status, i){#
-      plot(pcoa.comm[status == 'left',], asp=1,#
-           col=cols[1], pch=16, cex=1.5,#
-           ylim=range(pcoa.comm[,2]) + c(0,0.2),#
-           xlim=range(pcoa.comm[,1]),#
-           xlab='',#
-           ylab='',#
-           xaxt='n',#
-           yaxt='n',#
-           cex.lab=1.5)#
-      points(pcoa.comm[status == 'stayed',],#
-             col=cols[2], pch=16, cex=1.5)#
-      ordihull(pcoa.comm, status)#
-      mtext('PCoA2', 2, line=1.5, cex=1.5)#
-      if(i==2){#
-        mtext('Plants', 2, line=3.5, cex=1.5)#
-        mtext('PCoA1', 1, line=1.5, cex=1.5)#
-      }#
-      if(i==1){#
-        legend('topleft',#
-               legend=c('Not core', 'Core'),#
-               col=cols, pch=16, bty='n', cex=1.3)#
-        mtext('Bees', 2, line=3.5, cex=1.5)#
-      }#
-    }#
-    layout(matrix(1:2, ncol=1, byrow=TRUE))#
-    par(oma=c(2,7,1,1), mar=c(0.5,0,1,0.5),#
-        mgp=c(2,1,0), cex.axis=1.5)#
-    cols <- c("darkolivegreen3",#
-              "darkgoldenrod1")#
-    for(i in 1:length(pcoas)){#
-      pcoa(pcoas[[i]], statuses[[i]], i=i)#
-    }#
-  }#
-  f.path <- 'plotting/figures/pcoa'#
-  pdf.f(f, file= file.path(f.path, "pcoa.pdf"),#
-        width=4, height=7)#
-}#
-#
-plot.beta.div(list(pol.pcoa, plant.pcoa), list(status.pol, status.plant))
-plot.beta.div <- function(pcoas, statuses){#
-  f <- function(){#
-    pcoa <- function(pcoa.comm, status, i){#
-      plot(pcoa.comm[status == 'left',], asp=1,#
-           col=cols[1], pch=16, cex=1.5,#
-           ylim=range(pcoa.comm[,2]) + c(0,0.2),#
-           xlim=range(pcoa.comm[,1]),#
-           xlab='',#
-           ylab='',#
-           xaxt='n',#
-           yaxt='n',#
-           cex.lab=1.5)#
-      points(pcoa.comm[status == 'stayed',],#
-             col=cols[2], pch=16, cex=1.5)#
-      ordihull(pcoa.comm, status)#
-      mtext('PCoA2', 2, line=1.5, cex=1.5)#
-      if(i==2){#
-        mtext('Plants', 2, line=4, cex=1.5)#
-        mtext('PCoA1', 1, line=1.5, cex=1.5)#
-      }#
-      if(i==1){#
-        legend('topleft',#
-               legend=c('Not core', 'Core'),#
-               col=cols, pch=16, bty='n', cex=1.3)#
-        mtext('Bees', 2, line=4, cex=1.5)#
-      }#
-    }#
-    layout(matrix(1:2, ncol=1, byrow=TRUE))#
-    par(oma=c(2,7,1,1), mar=c(0.5,0,1,0.5),#
-        mgp=c(2,1,0), cex.axis=1.5)#
-    cols <- c("darkolivegreen3",#
-              "darkgoldenrod1")#
-    for(i in 1:length(pcoas)){#
-      pcoa(pcoas[[i]], statuses[[i]], i=i)#
-    }#
-  }#
-  f.path <- 'plotting/figures/pcoa'#
-  pdf.f(f, file= file.path(f.path, "pcoa.pdf"),#
-        width=4, height=6)#
-}#
-#
-plot.beta.div(list(pol.pcoa, plant.pcoa),#
-              list(status.pol, status.plant))
-plot.beta.div <- function(pcoas, statuses){#
-  f <- function(){#
-    pcoa <- function(pcoa.comm, status, i){#
-      plot(pcoa.comm[status == 'left',], asp=1,#
-           col=cols[1], pch=16, cex=1.5,#
-           ylim=range(pcoa.comm[,2]) + c(0,0.2),#
-           xlim=range(pcoa.comm[,1]),#
-           xlab='',#
-           ylab='',#
-           xaxt='n',#
-           yaxt='n',#
-           cex.lab=1.5)#
-      points(pcoa.comm[status == 'stayed',],#
-             col=cols[2], pch=16, cex=1.5)#
-      ordihull(pcoa.comm, status)#
-      mtext('PCoA2', 2, line=1.5, cex=1.5)#
-      if(i==2){#
-        mtext('Plants', 2, line=4, cex=1.5)#
-        mtext('PCoA1', 1, line=1.5, cex=1.5)#
-      }#
-      if(i==1){#
-        legend('topleft',#
-               legend=c('Not core', 'Core'),#
-               col=cols, pch=16, bty='n', cex=1.3)#
-        mtext('Bees', 2, line=4, cex=1.5)#
-      }#
-    }#
-    layout(matrix(1:2, ncol=1, byrow=TRUE))#
-    par(oma=c(2,7,1,1), mar=c(0.5,0,1,0.5),#
-        mgp=c(2,1,0), cex.axis=1.5)#
-    cols <- c("darkolivegreen3",#
-              "darkgoldenrod1")#
-    for(i in 1:length(pcoas)){#
-      pcoa(pcoas[[i]], statuses[[i]], i=i)#
-    }#
-  }#
-  f.path <- 'plotting/figures/pcoa'#
-  pdf.f(f, file= file.path(f.path, "pcoa.pdf"),#
-        width=4, height=5)#
-}#
-#
-plot.beta.div(list(pol.pcoa, plant.pcoa),#
-              list(status.pol, status.plant))
-plot.beta.div <- function(pcoas, statuses){#
-  f <- function(){#
-    pcoa <- function(pcoa.comm, status, i){#
-      plot(pcoa.comm[status == 'left',], asp=1,#
-           col=cols[1], pch=16, cex=1.5,#
-           ylim=range(pcoa.comm[,2]) + c(0,0.2),#
-           xlim=range(pcoa.comm[,1]),#
-           xlab='',#
-           ylab='',#
-           xaxt='n',#
-           yaxt='n',#
-           cex.lab=1.5)#
-      points(pcoa.comm[status == 'stayed',],#
-             col=cols[2], pch=16, cex=1.5)#
-      ordihull(pcoa.comm, status)#
-      mtext('PCoA2', 2, line=1.5, cex=1.5)#
-      if(i==2){#
-        mtext('Plants', 2, line=4, cex=1.5)#
-        mtext('PCoA1', 1, line=1.5, cex=1.5)#
-      }#
-      if(i==1){#
-        legend('topleft',#
-               legend=c('Not core', 'Core'),#
-               col=cols, pch=16, bty='n', cex=1.1)#
-        mtext('Bees', 2, line=4, cex=1.5)#
-      }#
-    }#
-    layout(matrix(1:2, ncol=1, byrow=TRUE))#
-    par(oma=c(2,7,1,1), mar=c(0.5,0,1,0.5),#
-        mgp=c(2,1,0), cex.axis=1.5)#
-    cols <- c("darkolivegreen3",#
-              "darkgoldenrod1")#
-    for(i in 1:length(pcoas)){#
-      pcoa(pcoas[[i]], statuses[[i]], i=i)#
-    }#
-  }#
-  f.path <- 'plotting/figures/pcoa'#
-  pdf.f(f, file= file.path(f.path, "pcoa.pdf"),#
-        width=4, height=5)#
-}#
-#
-plot.beta.div(list(pol.pcoa, plant.pcoa),#
-              list(status.pol, status.plant))
-plot.beta.div <- function(pcoas, statuses){#
-  f <- function(){#
-    pcoa <- function(pcoa.comm, status, i){#
-      plot(pcoa.comm[status == 'left',], asp=1,#
-           col=cols[1], pch=16, cex=1.5,#
-           ylim=range(pcoa.comm[,2]) + c(0,0.2),#
-           xlim=range(pcoa.comm[,1]),#
-           xlab='',#
-           ylab='',#
-           xaxt='n',#
-           yaxt='n',#
-           cex.lab=1.5)#
-      points(pcoa.comm[status == 'stayed',],#
-             col=cols[2], pch=16, cex=1.5)#
-      ordihull(pcoa.comm, status)#
-      mtext('PCoA2', 2, line=1.5, cex=1.5)#
-      if(i==2){#
-        mtext('Plants', 2, line=4, cex=1.5)#
-        mtext('PCoA1', 1, line=1.2, cex=1.5)#
-      }#
-      if(i==1){#
-        legend('topleft',#
-               legend=c('Not core', 'Core'),#
-               col=cols, pch=16, bty='n', cex=1.1)#
-        mtext('Bees', 2, line=4, cex=1.5)#
-      }#
-    }#
-    layout(matrix(1:2, ncol=1, byrow=TRUE))#
-    par(oma=c(2,7,1,1), mar=c(0.5,0,1,0.5),#
-        mgp=c(2,1,0), cex.axis=1.5)#
-    cols <- c("darkolivegreen3",#
-              "darkgoldenrod1")#
-    for(i in 1:length(pcoas)){#
-      pcoa(pcoas[[i]], statuses[[i]], i=i)#
-    }#
-  }#
-  f.path <- 'plotting/figures/pcoa'#
-  pdf.f(f, file= file.path(f.path, "pcoa.pdf"),#
-        width=4, height=5)#
-}#
-#
-plot.beta.div(list(pol.pcoa, plant.pcoa),#
-              list(status.pol, status.plant))
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-library(ape)#
-library(vegan)#
-library(igraph)#
-source('../networkLevel/src/misc.R')#
-source('plotting/src/plotPcoa.R')#
-load('../../data/networks/allSpecimens.Rdata')#
-#
-fig.path <- 'plotting/figures'#
-load(file=file.path(f.path, "graphs.Rdata"))#
-#
-names.v <- names(V(graphs[[1]]))#
-num.v <- 0:length(names.v)#
-#
-getSpecies <- function(out, names.v, num.v){#
-  out$names <- names.v[match(out$label, num.v)]#
-  memb <- apply(out[, -c(1, ncol(out))], 2, table)#
-  core <- sapply(memb, function(x) names(x)[x == max(x)])#
-  stayed <- list()#
-  for(i in 1:length(core)){#
-    stayed[[i]] <- out[, i+1] == core[i]#
-  }#
-  ind.stayed <- Reduce("*", stayed)#
-  stayed.core <- out$names[ind.stayed ==1]#
-  left.core <- out$names[ind.stayed==0]#
-  return(list(stayed=stayed.core, left=left.core))#
-}#
-#
-l.path <- 'plotting/saved'#
-site.nodes <- list.files(l.path, "nodes")#
-site.cores <- list()#
-#
-for(i in 1:length(site.nodes)){#
-  load(file.path(l.path, site.nodes[i]))#
-  site.cores[[i]] <- getSpecies(out, names.v, num.v)#
-}#
-#
-names(site.cores) <- unique(sites.trees)#
-site.cores <- unlist(site.cores, recursive=FALSE)#
-#
-num.sp <- sapply(site.cores, length)#
-#
-site.cores <- as.data.frame(unlist(site.cores))#
-rownames(site.cores) <- NULL#
-colnames(site.cores) <- "GenusSpecies"#
-#
-site.cores$SiteStat <- rep(names(num.sp), num.sp)#
-site.cores$Site <- sapply(strsplit(site.cores$SiteStat, "[.]"), #
-                          function(x) x[1])#
-site.cores$comm <- sapply(strsplit(site.cores$SiteStat, "[.]"),#
-                          function(x) x[2])#
-#
-site.cores$speciesType <- ifelse(site.cores$GenusSpecies %in% #
-                                 unique(spec$GenusSpecies),#
-                                 "pollinator", "plant")#
-#
-site.cores$Abund <- 1#
-#
-site.cores <- split(site.cores, site.cores$speciesType)#
-#
-comm.mat <- lapply(site.cores, function(x){#
-  samp2site.spp(x$SiteStat, x$GenusSpecies, x$Abund)#
-})#
-#
-status.plant <- sapply(strsplit(rownames(comm.mat$plant), "[.]"),#
-                           function(x) x[2])#
-status.pol <-   sapply(strsplit(rownames(comm.mat$pollinator), "[.]"),#
-                         function(x) x[2])#
-#
-plant.perm <- adonis(comm.mat$plant ~ status.plant, method="jaccard")#
-plant.pcoa <-  cmdscale(vegdist(comm.mat$plant, method="jaccard"))#
-#
-pol.perm <- adonis(comm.mat$pollinator ~ status.pol, method="jaccard")#
-pol.pcoa <-  cmdscale(vegdist(comm.mat$pol, method="jaccard"))#
-#
-plot.beta.div(list(pol.pcoa, plant.pcoa),#
-              list(status.pol, status.plant))
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-library(ape)#
-library(vegan)#
-library(igraph)#
-source('../networkLevel/src/misc.R')#
-source('plotting/src/plotPcoa.R')#
-load('../../data/networks/allSpecimens.Rdata')#
-#
-fig.path <- 'plotting/figures'#
-f.path <- "cptPeel/baci"#
-load(file=file.path(f.path, "graphs.Rdata"))#
-#
-names.v <- names(V(graphs[[1]]))#
-num.v <- 0:length(names.v)#
-#
-getSpecies <- function(out, names.v, num.v){#
-  out$names <- names.v[match(out$label, num.v)]#
-  memb <- apply(out[, -c(1, ncol(out))], 2, table)#
-  core <- sapply(memb, function(x) names(x)[x == max(x)])#
-  stayed <- list()#
-  for(i in 1:length(core)){#
-    stayed[[i]] <- out[, i+1] == core[i]#
-  }#
-  ind.stayed <- Reduce("*", stayed)#
-  stayed.core <- out$names[ind.stayed ==1]#
-  left.core <- out$names[ind.stayed==0]#
-  return(list(stayed=stayed.core, left=left.core))#
-}#
-#
-l.path <- 'plotting/saved'#
-site.nodes <- list.files(l.path, "nodes")#
-site.cores <- list()#
-#
-for(i in 1:length(site.nodes)){#
-  load(file.path(l.path, site.nodes[i]))#
-  site.cores[[i]] <- getSpecies(out, names.v, num.v)#
-}#
-#
-names(site.cores) <- unique(sites.trees)#
-site.cores <- unlist(site.cores, recursive=FALSE)#
-#
-num.sp <- sapply(site.cores, length)#
-#
-site.cores <- as.data.frame(unlist(site.cores))#
-rownames(site.cores) <- NULL#
-colnames(site.cores) <- "GenusSpecies"#
-#
-site.cores$SiteStat <- rep(names(num.sp), num.sp)#
-site.cores$Site <- sapply(strsplit(site.cores$SiteStat, "[.]"), #
-                          function(x) x[1])#
-site.cores$comm <- sapply(strsplit(site.cores$SiteStat, "[.]"),#
-                          function(x) x[2])#
-#
-site.cores$speciesType <- ifelse(site.cores$GenusSpecies %in% #
-                                 unique(spec$GenusSpecies),#
-                                 "pollinator", "plant")#
-#
-site.cores$Abund <- 1#
-#
-site.cores <- split(site.cores, site.cores$speciesType)#
-#
-comm.mat <- lapply(site.cores, function(x){#
-  samp2site.spp(x$SiteStat, x$GenusSpecies, x$Abund)#
-})#
-#
-status.plant <- sapply(strsplit(rownames(comm.mat$plant), "[.]"),#
-                           function(x) x[2])#
-status.pol <-   sapply(strsplit(rownames(comm.mat$pollinator), "[.]"),#
-                         function(x) x[2])#
-#
-plant.perm <- adonis(comm.mat$plant ~ status.plant, method="jaccard")#
-plant.pcoa <-  cmdscale(vegdist(comm.mat$plant, method="jaccard"))#
-#
-pol.perm <- adonis(comm.mat$pollinator ~ status.pol, method="jaccard")#
-pol.pcoa <-  cmdscale(vegdist(comm.mat$pol, method="jaccard"))#
-#
-plot.beta.div(list(pol.pcoa, plant.pcoa),#
-              list(status.pol, status.plant))
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-library(ape)#
-library(vegan)#
-library(igraph)#
-source('../networkLevel/src/misc.R')#
-source('plotting/src/plotPcoa.R')#
-load('../../data/networks/allSpecimens.Rdata')#
-#
-fig.path <- 'plotting/figures'#
-f.path <- "cptPeel/baci"#
-load(file=file.path(f.path, "graphs.Rdata"))#
-#
-temp <- list.files(f.path, pattern="*.gml")#
-tree.graphs <-  lapply(temp, function(x){#
-  read.graph(file.path(f.path, x), format="gml")#
-})#
-#
-sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
-sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
-#
-names.v <- names(V(graphs[[1]]))#
-num.v <- 0:length(names.v)#
-#
-getSpecies <- function(out, names.v, num.v){#
-  out$names <- names.v[match(out$label, num.v)]#
-  memb <- apply(out[, -c(1, ncol(out))], 2, table)#
-  core <- sapply(memb, function(x) names(x)[x == max(x)])#
-  stayed <- list()#
-  for(i in 1:length(core)){#
-    stayed[[i]] <- out[, i+1] == core[i]#
-  }#
-  ind.stayed <- Reduce("*", stayed)#
-  stayed.core <- out$names[ind.stayed ==1]#
-  left.core <- out$names[ind.stayed==0]#
-  return(list(stayed=stayed.core, left=left.core))#
-}#
-#
-l.path <- 'plotting/saved'#
-site.nodes <- list.files(l.path, "nodes")#
-site.cores <- list()#
-#
-for(i in 1:length(site.nodes)){#
-  load(file.path(l.path, site.nodes[i]))#
-  site.cores[[i]] <- getSpecies(out, names.v, num.v)#
-}#
-#
-names(site.cores) <- unique(sites.trees)#
-site.cores <- unlist(site.cores, recursive=FALSE)#
-#
-num.sp <- sapply(site.cores, length)#
-#
-site.cores <- as.data.frame(unlist(site.cores))#
-rownames(site.cores) <- NULL#
-colnames(site.cores) <- "GenusSpecies"#
-#
-site.cores$SiteStat <- rep(names(num.sp), num.sp)#
-site.cores$Site <- sapply(strsplit(site.cores$SiteStat, "[.]"), #
-                          function(x) x[1])#
-site.cores$comm <- sapply(strsplit(site.cores$SiteStat, "[.]"),#
-                          function(x) x[2])#
-#
-site.cores$speciesType <- ifelse(site.cores$GenusSpecies %in% #
-                                 unique(spec$GenusSpecies),#
-                                 "pollinator", "plant")#
-#
-site.cores$Abund <- 1#
-#
-site.cores <- split(site.cores, site.cores$speciesType)#
-#
-comm.mat <- lapply(site.cores, function(x){#
-  samp2site.spp(x$SiteStat, x$GenusSpecies, x$Abund)#
-})#
-#
-status.plant <- sapply(strsplit(rownames(comm.mat$plant), "[.]"),#
-                           function(x) x[2])#
-status.pol <-   sapply(strsplit(rownames(comm.mat$pollinator), "[.]"),#
-                         function(x) x[2])#
-#
-plant.perm <- adonis(comm.mat$plant ~ status.plant, method="jaccard")#
-plant.pcoa <-  cmdscale(vegdist(comm.mat$plant, method="jaccard"))#
-#
-pol.perm <- adonis(comm.mat$pollinator ~ status.pol, method="jaccard")#
-pol.pcoa <-  cmdscale(vegdist(comm.mat$pol, method="jaccard"))#
-#
-plot.beta.div(list(pol.pcoa, plant.pcoa),#
-              list(status.pol, status.plant))
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-library(ape)#
-library(vegan)#
-library(igraph)#
-source('../networkLevel/src/misc.R')#
-source('plotting/src/plotPcoa.R')#
-load('../../data/networks/allSpecimens.Rdata')#
-#
-fig.path <- 'plotting/figures'#
-f.path <- "cptPeel/baci"#
-load(file=file.path(f.path, "graphs.Rdata"))#
-#
-temp <- list.files(f.path, pattern="*.gml")#
-tree.graphs <-  lapply(temp, function(x){#
-  read.graph(file.path(f.path, x), format="gml")#
-})#
-#
-sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
-sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
-#
-names.v <- names(V(graphs[[1]]))#
-num.v <- 0:length(names.v)#
-#
-getSpecies <- function(out, names.v, num.v){#
-  out$names <- names.v[match(out$label, num.v)]#
-  memb <- apply(out[, -c(1, ncol(out))], 2, table)#
-  core <- sapply(memb, function(x) names(x)[x == max(x)])#
-  stayed <- list()#
-  for(i in 1:length(core)){#
-    stayed[[i]] <- out[, i+1] == core[i]#
-  }#
-  ind.stayed <- Reduce("*", stayed)#
-  stayed.core <- out$names[ind.stayed ==1]#
-  left.core <- out$names[ind.stayed==0]#
-  return(list(stayed=stayed.core, left=left.core))#
-}#
-#
-l.path <- 'plotting/saved'#
-site.nodes <- list.files(l.path, "nodes")#
-site.cores <- list()#
-#
-for(i in 1:length(site.nodes)){#
-  load(file.path(l.path, site.nodes[i]))#
-  site.cores[[i]] <- getSpecies(out, names.v, num.v)#
-}#
-#
-names(site.cores) <- unique(sites.trees)#
-site.cores <- unlist(site.cores, recursive=FALSE)#
-#
-num.sp <- sapply(site.cores, length)#
-#
-site.cores <- as.data.frame(unlist(site.cores))#
-rownames(site.cores) <- NULL#
-colnames(site.cores) <- "GenusSpecies"#
-#
-site.cores$SiteStat <- rep(names(num.sp), num.sp)#
-site.cores$Site <- sapply(strsplit(site.cores$SiteStat, "[.]"), #
-                          function(x) x[1])#
-site.cores$comm <- sapply(strsplit(site.cores$SiteStat, "[.]"),#
-                          function(x) x[2])#
-#
-site.cores$speciesType <- ifelse(site.cores$GenusSpecies %in% #
-                                 unique(spec$GenusSpecies),#
-                                 "pollinator", "plant")#
-#
-site.cores$Abund <- 1#
-#
-site.cores <- split(site.cores, site.cores$speciesType)#
-#
-comm.mat <- lapply(site.cores, function(x){#
-  samp2site.spp(x$SiteStat, x$GenusSpecies, x$Abund)#
-})#
-#
-status.plant <- sapply(strsplit(rownames(comm.mat$plant), "[.]"),#
-                           function(x) x[2])#
-status.pol <-   sapply(strsplit(rownames(comm.mat$pollinator), "[.]"),#
-                         function(x) x[2])#
-#
-plant.perm <- adonis(comm.mat$plant ~ status.plant, method="jaccard")#
-plant.pcoa <-  cmdscale(vegdist(comm.mat$plant, method="jaccard"))#
-#
-pol.perm <- adonis(comm.mat$pollinator ~ status.pol, method="jaccard")#
-pol.pcoa <-  cmdscale(vegdist(comm.mat$pol, method="jaccard"))#
-#
-plot.beta.div(list(pol.pcoa, plant.pcoa),#
-              list(status.pol, status.plant), fig.path)
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-source('plotting/src/initialize.R')
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-source('plotting/src/initialize.R')#
-#
-site.cores <- list()#
-for(i in 1:length(site.nodes)){#
-  load(file.path(l.path, site.nodes[i]))#
-  site.cores[[i]] <- getSpecies(out, names.v, num.v)#
-}#
-#
-names(site.cores) <- unique(sites.trees)#
-site.cores <- unlist(site.cores, recursive=FALSE)#
-#
-num.sp <- sapply(site.cores, length)#
-#
-site.cores <- as.data.frame(unlist(site.cores))#
-rownames(site.cores) <- NULL#
-colnames(site.cores) <- "GenusSpecies"#
-#
-site.cores$SiteStat <- rep(names(num.sp), num.sp)#
-site.cores$Site <- sapply(strsplit(site.cores$SiteStat, "[.]"), #
-                          function(x) x[1])#
-site.cores$comm <- sapply(strsplit(site.cores$SiteStat, "[.]"),#
-                          function(x) x[2])#
-#
-site.cores$speciesType <- ifelse(site.cores$GenusSpecies %in% #
-                                 unique(spec$GenusSpecies),#
-                                 "pollinator", "plant")#
-#
-site.cores$Abund <- 1#
-#
-site.cores <- split(site.cores, site.cores$speciesType)#
-#
-comm.mat <- lapply(site.cores, function(x){#
-  samp2site.spp(x$SiteStat, x$GenusSpecies, x$Abund)#
-})#
-#
-status.plant <- sapply(strsplit(rownames(comm.mat$plant), "[.]"),#
-                           function(x) x[2])#
-status.pol <-   sapply(strsplit(rownames(comm.mat$pollinator), "[.]"),#
-                         function(x) x[2])#
-#
-plant.perm <- adonis(comm.mat$plant ~ status.plant,#
-                     method="jaccard")#
-pol.perm <- adonis(comm.mat$pollinator ~ status.pol,#
-                   method="jaccard")#
-#
-plot.beta.div(list(comm.mat$pol, comm.mat$plant),#
-              list(status.pol, status.plant), fig.path)
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-source('plotting/src/initialize.R')#
-#
-site.cores <- list()#
-for(i in 1:length(site.nodes)){#
-  load(file.path(l.path, site.nodes[i]))#
-  site.cores[[i]] <- getSpecies(out, names.v, num.v)#
-}#
-#
-names(site.cores) <- unique(sites.trees)#
-site.cores <- unlist(site.cores, recursive=FALSE)#
-#
-num.sp <- sapply(site.cores, length)#
-#
-site.cores <- as.data.frame(unlist(site.cores))#
-rownames(site.cores) <- NULL#
-colnames(site.cores) <- "GenusSpecies"#
-#
-site.cores$SiteStat <- rep(names(num.sp), num.sp)#
-site.cores$Site <- sapply(strsplit(site.cores$SiteStat, "[.]"), #
-                          function(x) x[1])#
-site.cores$comm <- sapply(strsplit(site.cores$SiteStat, "[.]"),#
-                          function(x) x[2])#
-#
-site.cores$speciesType <- ifelse(site.cores$GenusSpecies %in% #
-                                 unique(spec$GenusSpecies),#
-                                 "pollinator", "plant")#
-#
-site.cores$Abund <- 1#
-#
-site.cores <- split(site.cores, site.cores$speciesType)#
-#
-comm.mat <- lapply(site.cores, function(x){#
-  samp2site.spp(x$SiteStat, x$GenusSpecies, x$Abund)#
-})#
-#
-status.plant <- sapply(strsplit(rownames(comm.mat$plant), "[.]"),#
-                           function(x) x[2])#
-status.pol <-   sapply(strsplit(rownames(comm.mat$pollinator), "[.]"),#
-                         function(x) x[2])#
-#
-plant.perm <- adonis(comm.mat$plant ~ status.plant,#
-                     method="jaccard")#
-pol.perm <- adonis(comm.mat$pollinator ~ status.pol,#
-                   method="jaccard")#
-#
-plot.beta.div(list(comm.mat$pol, comm.mat$plant),#
-              list(status.pol, status.plant), fig.path)
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-source('plotting/src/initialize.R')#
-#
-site.cores <- list()#
-for(i in 1:length(site.nodes)){#
-  load(file.path(l.path, site.nodes[i]))#
-  site.cores[[i]] <- getSpecies(out, names.v, num.v)#
-}#
-#
-names(site.cores) <- unique(sites.trees)#
-site.cores <- unlist(site.cores, recursive=FALSE)#
-#
-num.sp <- sapply(site.cores, length)#
-#
-site.cores <- as.data.frame(unlist(site.cores))#
-rownames(site.cores) <- NULL#
-colnames(site.cores) <- "GenusSpecies"#
-#
-site.cores$SiteStat <- rep(names(num.sp), num.sp)#
-site.cores$Site <- sapply(strsplit(site.cores$SiteStat, "[.]"), #
-                          function(x) x[1])#
-site.cores$comm <- sapply(strsplit(site.cores$SiteStat, "[.]"),#
-                          function(x) x[2])#
-#
-site.cores$speciesType <- ifelse(site.cores$GenusSpecies %in% #
-                                 unique(spec$GenusSpecies),#
-                                 "pollinator", "plant")#
-#
-site.cores$Abund <- 1#
-#
-site.cores <- split(site.cores, site.cores$speciesType)#
-#
-comm.mat <- lapply(site.cores, function(x){#
-  samp2site.spp(x$SiteStat, x$GenusSpecies, x$Abund)#
-})#
-#
-status.plant <- sapply(strsplit(rownames(comm.mat$plant), "[.]"),#
-                           function(x) x[2])#
-status.pol <-   sapply(strsplit(rownames(comm.mat$pollinator), "[.]"),#
-                         function(x) x[2])#
-#
-plant.perm <- adonis(comm.mat$plant ~ status.plant,#
-                     method="jaccard")#
-pol.perm <- adonis(comm.mat$pollinator ~ status.pol,#
-                   method="jaccard")#
-#
-plot.beta.div(list(comm.mat$pol, comm.mat$plant),#
-              list(status.pol, status.plant), fig.path,#
-              method= "jaccard")
-getSpecies <- function(out, names.v, num.v){#
-  out$names <- names.v[match(out$label, num.v)]#
-  memb <- apply(out[, -c(1, ncol(out))], 2, table)#
-  core <- sapply(memb, function(x) names(x)[x == max(x)])#
-  stayed <- list()#
-  for(i in 1:length(core)){#
-    stayed[[i]] <- out[, i+1] == core[i]#
-  }#
-  ind.stayed <- Reduce("*", stayed)#
-  stayed.core <- out$names[ind.stayed ==1]#
-  left.core <- out$names[ind.stayed==0]#
-  return(list(stayed=stayed.core, left=left.core))#
-}#
-#
-plot.beta.div <- function(comms, statuses, fig.path, method){#
-  f <- function(){#
-    pcoa <- function(comm, status, i, method){#
-      pcoa.comm <-  cmdscale(vegdist(comm, method=method))#
-      plot(pcoa.comm[status == 'left',], asp=1,#
-           col=cols[1], pch=16, cex=1.5,#
-           ylim=range(pcoa.comm[,2]) + c(0,0.2),#
-           xlim=range(pcoa.comm[,1]),#
-           xlab='',#
-           ylab='',#
-           xaxt='n',#
-           yaxt='n',#
-           cex.lab=1.5)#
-      points(pcoa.comm[status == 'stayed',],#
-             col=cols[2], pch=16, cex=1.5)#
-      ordihull(pcoa.comm, status)#
-      mtext('PCoA2', 2, line=1.5, cex=1.5)#
-      if(i==2){#
-        mtext('Plants', 2, line=4, cex=1.5)#
-        mtext('PCoA1', 1, line=1.2, cex=1.5)#
-      }#
-      if(i==1){#
-        legend('topleft',#
-               legend=c('Not core', 'Core'),#
-               col=cols, pch=16, bty='n', cex=1.1)#
-        mtext('Bees', 2, line=4, cex=1.5)#
-      }#
-    }#
-    layout(matrix(1:2, ncol=1, byrow=TRUE))#
-    par(oma=c(2,7,1,1), mar=c(0.5,0,1,0.5),#
-        mgp=c(2,1,0), cex.axis=1.5)#
-    cols <- c("darkolivegreen3",#
-              "darkgoldenrod1")#
-    for(i in 1:length(comms)){#
-      pcoa(comms[[i]], statuses[[i]], i=i,#
-           method=method)#
-    }#
-  }#
-#
-  pdf.f(f, file= file.path(fig.path, "pcoa/pcoa.pdf"),#
-        width=4, height=5)#
-}
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-source('plotting/src/initialize.R')#
-#
-site.cores <- list()#
-for(i in 1:length(site.nodes)){#
-  load(file.path(l.path, site.nodes[i]))#
-  site.cores[[i]] <- getSpecies(out, names.v, num.v)#
-}#
-#
-names(site.cores) <- unique(sites.trees)#
-site.cores <- unlist(site.cores, recursive=FALSE)#
-#
-num.sp <- sapply(site.cores, length)#
-#
-site.cores <- as.data.frame(unlist(site.cores))#
-rownames(site.cores) <- NULL#
-colnames(site.cores) <- "GenusSpecies"#
-#
-site.cores$SiteStat <- rep(names(num.sp), num.sp)#
-site.cores$Site <- sapply(strsplit(site.cores$SiteStat, "[.]"), #
-                          function(x) x[1])#
-site.cores$comm <- sapply(strsplit(site.cores$SiteStat, "[.]"),#
-                          function(x) x[2])#
-#
-site.cores$speciesType <- ifelse(site.cores$GenusSpecies %in% #
-                                 unique(spec$GenusSpecies),#
-                                 "pollinator", "plant")#
-#
-site.cores$Abund <- 1#
-#
-site.cores <- split(site.cores, site.cores$speciesType)#
-#
-comm.mat <- lapply(site.cores, function(x){#
-  samp2site.spp(x$SiteStat, x$GenusSpecies, x$Abund)#
-})#
-#
-status.plant <- sapply(strsplit(rownames(comm.mat$plant), "[.]"),#
-                           function(x) x[2])#
-status.pol <-   sapply(strsplit(rownames(comm.mat$pollinator), "[.]"),#
-                         function(x) x[2])#
-#
-plant.perm <- adonis(comm.mat$plant ~ status.plant,#
-                     method="jaccard")#
-pol.perm <- adonis(comm.mat$pollinator ~ status.pol,#
-                   method="jaccard")#
-#
-plot.beta.div(list(comm.mat$pol, comm.mat$plant),#
-              list(status.pol, status.plant), fig.path,#
-              method= "jaccard")
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-source('plotting/src/initialize.R')#
-#
-site.cores <- list()#
-for(i in 1:length(site.nodes)){#
-  load(file.path(l.path, site.nodes[i]))#
-  site.cores[[i]] <- getSpecies(out, names.v, num.v)#
-}#
-#
-names(site.cores) <- unique(sites.trees)#
-site.cores <- unlist(site.cores, recursive=FALSE)#
-#
-num.sp <- sapply(site.cores, length)#
-#
-site.cores <- as.data.frame(unlist(site.cores))#
-rownames(site.cores) <- NULL#
-colnames(site.cores) <- "GenusSpecies"#
-#
-site.cores$SiteStat <- rep(names(num.sp), num.sp)#
-site.cores$speciesType <- ifelse(site.cores$GenusSpecies %in% #
-                                 unique(spec$GenusSpecies),#
-                                 "pollinator", "plant")#
-#
-site.cores$Abund <- 1#
-#
-site.cores <- split(site.cores, site.cores$speciesType)#
-#
-comm.mat <- lapply(site.cores, function(x){#
-  samp2site.spp(x$SiteStat, x$GenusSpecies, x$Abund)#
-})#
-#
-status.plant <- sapply(strsplit(rownames(comm.mat$plant), "[.]"),#
-                           function(x) x[2])#
-status.pol <-   sapply(strsplit(rownames(comm.mat$pollinator), "[.]"),#
-                         function(x) x[2])#
-#
-plant.perm <- adonis(comm.mat$plant ~ status.plant,#
-                     method="jaccard")#
-pol.perm <- adonis(comm.mat$pollinator ~ status.pol,#
-                   method="jaccard")#
-#
-plot.beta.div(list(comm.mat$pol, comm.mat$plant),#
-              list(status.pol, status.plant), fig.path,#
-              method= "jaccard")
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-source('plotting/src/initialize.R')#
-#
-sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
-sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
-all.poss.yrs <- 2006:2015#
-#
-for(i in unique(sites.trees)){#
-  print(i)#
-  net <- nets[sites == i]#
-  yrs <- sapply(strsplit(names(net), "[.]"), function(x) x[2])#
-  names(net) <- yrs#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  this.tree <- tree.graphs[sites.trees == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_communities.pdf", i)),#
-        width=10, height=4)#
-}
-site.cores
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-source('plotting/src/initialize.R')#
-#
-site.cores <- list()#
-for(i in 1:length(site.nodes)){#
-  load(file.path(l.path, site.nodes[i]))#
-  site.cores[[i]] <- getSpecies(out, names.v, num.v)#
-}#
-#
-names(site.cores) <- unique(sites.trees)#
-site.cores <- unlist(site.cores, recursive=FALSE)#
-#
-num.sp <- sapply(site.cores, length)#
-#
-site.cores <- as.data.frame(unlist(site.cores))#
-rownames(site.cores) <- NULL#
-colnames(site.cores) <- "GenusSpecies"#
-#
-site.cores$SiteStat <- rep(names(num.sp), num.sp)#
-site.cores$speciesType <- ifelse(site.cores$GenusSpecies %in% #
-                                 unique(spec$GenusSpecies),#
-                                 "pollinator", "plant")#
-#
-site.cores$Abund <- 1#
-#
-site.cores <- split(site.cores, site.cores$speciesType)#
-#
-comm.mat <- lapply(site.cores, function(x){#
-  samp2site.spp(x$SiteStat, x$GenusSpecies, x$Abund)#
-})#
-#
-status.plant <- sapply(strsplit(rownames(comm.mat$plant), "[.]"),#
-                           function(x) x[2])#
-status.pol <-   sapply(strsplit(rownames(comm.mat$pollinator), "[.]"),#
-                         function(x) x[2])#
-#
-plant.perm <- adonis(comm.mat$plant ~ status.plant,#
-                     method="jaccard")#
-pol.perm <- adonis(comm.mat$pollinator ~ status.pol,#
-                   method="jaccard")#
-#
-plot.beta.div(list(comm.mat$pol, comm.mat$plant),#
-              list(status.pol, status.plant),#
-              fig.path,#
-              method= "jaccard")
-site.cores
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-source('plotting/src/initialize.R')#
-#
-site.cores <- makeCores(site.nodes, l.path, names.v, num.v)#
-#
-comm.mat <- lapply(site.cores, function(x){#
-  samp2site.spp(x$SiteStat, x$GenusSpecies, x$Abund)#
-})#
-#
-status.plant <- sapply(strsplit(rownames(comm.mat$plant), "[.]"),#
-                           function(x) x[2])#
-status.pol <-   sapply(strsplit(rownames(comm.mat$pollinator), "[.]"),#
-                         function(x) x[2])#
-#
-plant.perm <- adonis(comm.mat$plant ~ status.plant,#
-                     method="jaccard")#
-pol.perm <- adonis(comm.mat$pollinator ~ status.pol,#
-                   method="jaccard")#
-#
-plot.beta.div(list(comm.mat$pol, comm.mat$plant),#
-              list(status.pol, status.plant),#
-              fig.path,#
-              method= "jaccard")
-makeComm <- function(site.core){#
-  comm.mat <-  samp2site.spp(site.core$SiteStat,#
-                             site.core$GenusSpecies,#
-                             site.core$Abund)#
-#
-  status <- sapply(strsplit(rownames(comm.mat), "[.]"),#
-                   function(x) x[2])#
-  return(list(comm=comm.mat, status=status))#
-}#
-#
-comm.mats <- lapply(site.cores, makeComm)
-comm.mats
-names(comm.mats)
-names(comm.mats[[1]])
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-source('plotting/src/initialize.R')#
-method <- "jaccard"#
-site.cores <- makeCores(site.nodes, l.path, names.v, num.v)#
-#
-## create community matrics#
-comm.mats <- lapply(site.cores, makeComm)#
-#
-## run perm anovas#
-plant.perm <- adonis(comm.mats$plant$comm ~ comm.mats$plant$status,#
-                     method=method)#
-pol.perm <- adonis(comm.mats$pollinator$comm ~ comm.mats$pollinator$status,#
-                   method=method)#
-## plotting#
-plot.beta.div(list(comm.mat$pol, comm.mat$plant),#
-              list(status.pol, status.plant),#
-              fig.path,#
-              method= method)
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-source('plotting/src/initialize.R')#
-method <- "jaccard"#
-site.cores <- makeCores(site.nodes, l.path, names.v, num.v)#
-#
-## create community matrics#
-comm.mats <- lapply(site.cores, makeComm)#
-#
-## run perm anovas#
-plant.perm <- adonis(comm.mats$plant$comm ~ comm.mats$plant$status,#
-                     method=method)#
-pol.perm <- adonis(comm.mats$pollinator$comm ~ comm.mats$pollinator$status,#
-                   method=method)#
-## plotting#
-plot.beta.div(list(comm.mats$pollinator$comm, comm.mats$plant$comm),#
-              list(comm.mats$pollinator$status, comm.mats$plant$status),#
-              fig.path,#
-              method= method)
-?betadisper
-v
-plant.beta <- betadisper(comm.mats$plant$comm ~ comm.mats$plant$status,#
-                     method=method)
-?betadisper
-?betadisper
-plant.beta <- betadisper(vegdist(comm.mats$plant$comm, method=method),#
-                         group=comm.mats$plant$status)
-plant.beta
-?betadisper
-permutest(plant.beta, pairwise = TRUE, permutations = 99)
-## pollinators#
-pol.perm <- adonis(comm.mats$pollinator$comm ~ comm.mats$pollinator$status,#
-                   method=method)#
-pol.beta <- betadisper(vegdist(comm.mats$pollinator$comm, method=method),#
-                         group=comm.mats$pollinator$status)#
-permutest(pol.beta, pairwise = TRUE, permutations = 99)
-site.cores[[1]]
-site.nodes
+library(FD)
+?dbFD
+Examples#
+#
+# mixed trait types, NA's#
+ex1 <- dbFD(dummy$trait, dummy$abun)#
+ex1
+class(dummy$trait)
+class(dumy$abund)
+class(dummy$abund)
+class(dummy$abun)
+dummy$abun
 rm(list=ls())#
 setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
 source('plotting/src/initialize.R')#
@@ -1758,14 +23,16 @@ comm.mats <- lapply(site.cores, makeComm)#
 ## plants#
 plant.perm <- adonis(comm.mats$plant$comm ~ comm.mats$plant$status,#
                      method=method)#
-plant.beta <- betadisper(vegdist(comm.mats$plant$comm, method=method),#
+plant.beta <- betadisper(vegdist(comm.mats$plant$comm,#
+                                 method=method),#
                          group=comm.mats$plant$status)#
 permutest(plant.beta, pairwise = TRUE, permutations = 99)#
 #
 ## pollinators#
 pol.perm <- adonis(comm.mats$pollinator$comm ~ comm.mats$pollinator$status,#
                    method=method)#
-pol.beta <- betadisper(vegdist(comm.mats$pollinator$comm, method=method),#
+pol.beta <- betadisper(vegdist(comm.mats$pollinator$comm,#
+                               method=method),#
                          group=comm.mats$pollinator$status)#
 permutest(pol.beta, pairwise = TRUE, permutations = 99)#
 #
@@ -1773,188 +40,151 @@ permutest(pol.beta, pairwise = TRUE, permutations = 99)#
 plot.beta.div(list(comm.mats$pollinator$comm, comm.mats$plant$comm),#
               list(comm.mats$pollinator$status, comm.mats$plant$status),#
               fig.path,#
-              method= method)
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-source('plotting/src/initialize.R')#
-method <- "jaccard"#
-site.cores <- makeCores(site.nodes, l.path, names.v, num.v)#
+              method= method)#
 #
-## create community matrics#
-comm.mats <- lapply(site.cores, makeComm)#
-#
-## run perm anovas#
-## plants#
-plant.perm <- adonis(comm.mats$plant$comm ~ comm.mats$plant$status,#
-                     method=method)#
-plant.beta <- betadisper(vegdist(comm.mats$plant$comm, method=method),#
-                         group=comm.mats$plant$status)#
-permutest(plant.beta, pairwise = TRUE, permutations = 99)#
-#
+## who are the core species? Species that are never in the core?#
 ## pollinators#
-pol.perm <- adonis(comm.mats$pollinator$comm ~ comm.mats$pollinator$status,#
-                   method=method)#
-pol.beta <- betadisper(vegdist(comm.mats$pollinator$comm, method=method),#
-                         group=comm.mats$pollinator$status)#
-permutest(pol.beta, pairwise = TRUE, permutations = 99)#
 #
-## plotting#
-plot.beta.div(list(comm.mats$pollinator$comm, comm.mats$plant$comm),#
-              list(comm.mats$pollinator$status, comm.mats$plant$status),#
-              fig.path,#
-              method= method)
-unique(site.cores$pollinator$Site)
-## who are the core species?#
-## pollinators#
-for(i in 1:length(unique(site.cores$pollinator$Site))){#
-  stayed.pol <- list()#
-  stayed.pol[[i]] <-#
-    site.cores$pollinator$GenusSpecies[site.cores$pollinator$comm == "stayed"]#
-}
-stayed.pol <- list()#
-for(i in 1:length(unique(site.cores$pollinator$Site))){#
-  stayed.pol[[i]] <-#
-    site.cores$pollinator$GenusSpecies[site.cores$pollinator$comm == "stayed"]#
-}
-stayed.pol
-count.stayed <- table(unlist(stayed.pol))
-count.stayed
-length(unique(site.cores$pollinator$Site)
-)
-stayed.pol <- list()#
-for(i in 1:length(unique(site.cores$pollinator$Site))){#
-  stayed.pol[[i]] <-#
-    site.cores$pollinator$GenusSpecies[site.cores$pollinator$comm == "stayed"]#
-}
-length(stayed.pol)
-count.stayed <- table(do.call(rbind, stayed.pol))
-count.stayed
-unique(stayed.pol[[1]])
-length(unique(stayed.pol[[1]]))
-length(stayed.pol[[1]])
-stayed.pol <- list()#
-for(i in 1:length(unique(site.cores$pollinator$Site))){#
-  stayed.pol[[i]] <-#
-    unique(site.cores$pollinator$GenusSpecies[#
-                        site.cores$pollinator$comm == "stayed"])#
-}#
-count.stayed <- table(do.call(rbind, stayed.pol))
-count.stayed
-stayed
-stayed.pol
 stayed.pol <-#
-  sites.cores$pollinator$GenusSpecies[sites.cores$pollinator$comm =="stayed"]
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-source('plotting/src/initialize.R')#
-method <- "jaccard"#
-site.cores <- makeCores(site.nodes, l.path, names.v, num.v)#
-#
-## create community matrics#
-comm.mats <- lapply(site.cores, makeComm)#
-#
-## run perm anovas#
-## plants#
-plant.perm <- adonis(comm.mats$plant$comm ~ comm.mats$plant$status,#
-                     method=method)#
-plant.beta <- betadisper(vegdist(comm.mats$plant$comm, method=method),#
-                         group=comm.mats$plant$status)#
-permutest(plant.beta, pairwise = TRUE, permutations = 99)#
-#
-## pollinators#
-pol.perm <- adonis(comm.mats$pollinator$comm ~ comm.mats$pollinator$status,#
-                   method=method)#
-pol.beta <- betadisper(vegdist(comm.mats$pollinator$comm, method=method),#
-                         group=comm.mats$pollinator$status)#
-permutest(pol.beta, pairwise = TRUE, permutations = 99)#
-#
-## plotting#
-plot.beta.div(list(comm.mats$pollinator$comm, comm.mats$plant$comm),#
-              list(comm.mats$pollinator$status, comm.mats$plant$status),#
-              fig.path,#
-              method= method)
-stayed.pol <-#
-  site.cores$pollinator$GenusSpecies[site.cores$pollinator$comm =="stayed"]
-stayed.pol
-v
-count.stayed <- table(stayed.pol)
-count.staued
-count.stayed
-count.stayed <- count.stayed[count.stayed != 0]
-count.stayed
-always.stayed <- count.stayed[count.stayed == 5]
-always.stayed
-left.pol <-#
-  site.cores$pollinator$GenusSpecies[site.cores$pollinator$comm =="left"]#
-count.left <- table(left.pol)#
-count.left <- count.left[count.left != 0]#
-always.left <- count.left[count.left == 5]
-always.left
-## plants#
-stayed.plant <-#
-  site.cores$plant$GenusSpecies[site.cores$plant$comm =="stayed"]#
-count.stayed <- table(stayed.plant)#
-count.stayed <- count.stayed[count.stayed != 0]#
-always.stayed <- count.stayed[count.stayed == 5]#
-left.plant <-#
-  site.cores$plant$GenusSpecies[site.cores$plant$comm =="left"]#
-count.left <- table(left.plant)#
-count.left <- count.left[count.left != 0]#
-always.left <- count.left[count.left == 5]
-stayed.plant
-left.plant
-stayed.pol <-#
-  site.cores$pollinator$GenusSpecies[site.cores$pollinator$comm =="stayed"]#
+  site.cores$pollinator$GenusSpecies[site.cores$pollinator$comm ==#
+                                     "stayed"]#
 count.stayed.pol <- table(stayed.pol)#
 count.stayed.pol <- count.stayed.pol[count.stayed.pol != 0]#
 always.stayed.pol <- count.stayed.pol[count.stayed.pol == 5]#
+#
+hist(count.stayed.pol, breaks=0:5)#
+#
 left.pol <-#
-  site.cores$pollinator$GenusSpecies[site.cores$pollinator$comm =="left"]#
+  site.cores$pollinator$GenusSpecies[site.cores$pollinator$comm ==#
+                                     "left"]#
 count.left.pol <- table(left.pol)#
 count.left.pol <- count.left.pol[count.left.pol != 0]#
 always.left.pol <- count.left.pol[count.left.pol == 5]#
 #
 ## plants#
 stayed.plant <-#
-  site.cores$plant$GenusSpecies[site.cores$plant$comm =="stayed"]#
-count.stayed.plant <- table(stayed.plant.plant)#
-count.stayed.plant <- count.stayed.plant[count.stayed.plant != 0]#
-always.stayed.plant <- count.stayed.plant[count.stayed.plant == 5]#
-left.plant <-#
-  site.cores$plant$GenusSpecies[site.cores$plant$comm =="left"]#
-count.left.plant <- table(left.plant.plant)#
-count.left.plant <- count.left.plant[count.left.plant != 0]#
-always.left.plant <- count.left.plant[count.left.plant == 5]
-## plants#
-stayed.plant <-#
-  site.cores$plant$GenusSpecies[site.cores$plant$comm =="stayed"]#
+  site.cores$plant$GenusSpecies[site.cores$plant$comm ==#
+                                "stayed"]#
 count.stayed.plant <- table(stayed.plant)#
 count.stayed.plant <- count.stayed.plant[count.stayed.plant != 0]#
 always.stayed.plant <- count.stayed.plant[count.stayed.plant == 5]#
+#
+hist(count.stayed.plant, breaks=0:5)#
+#
 left.plant <-#
-  site.cores$plant$GenusSpecies[site.cores$plant$comm =="left"]#
+  site.cores$plant$GenusSpecies[site.cores$plant$comm ==#
+                                "left"]#
 count.left.plant <- table(left.plant)#
 count.left.plant <- count.left.plant[count.left.plant != 0]#
-always.left.plant <- count.left.plant[count.left.plant == 5]
-always.stayed.plant
-always.left.pol
-always.stayed.plant
-always.left.plant
-sometimes.stayed.plant <- count.stayed.plant[count.stayed.plant < 5]
-sometimes.stayed.plant
-hist(stayed.pol)
-hist(count.stayed.pol)
-hist(count.stayed.plant)
-?hist
-hist(count.stayed.plant, breaks=1:5)
-hist(count.stayed.plant, breaks=0:5)
-hist(count.stayed.pol, breaks=0:5)
-barplot(count.stayed.pol)
-hist(count.stayed.pol, breaks=0:5)
-head(spec)
-library(FD)
-?dbFD
-## ************************************************************#
+always.left.plant <- count.left.plant[count.left.plant == 5]#
+## traits#
+load('~/Dropbox/hedgerow_network/analysis/functional_traits/saved/traitsbee.Rdata')#
+#
+bee.comm <- comm.mats$pollinator$comm[, colnames(comm.mats$pollinator$comm)#
+                                          %in% rownames(traits)]#
+traits <- traits[rownames(traits) %in% colnames(bee.comm),]#
+## bee.comm <- bee.comm[colnames(bee.comm) %in% rownames(traits),]#
+traits <- traits[colnames(bee.comm),]
+bee.comm <- bee.comm[colnames(bee.comm) %in% rownames(traits),]
+bee.comm <- comm.mats$pollinator$comm[, colnames(comm.mats$pollinator$comm)#
+                                          %in% rownames(traits)]#
+traits <- traits[rownames(traits) %in% colnames(bee.comm),]#
+bee.comm <- bee.comm[colnames(bee.comm) %in% rownames(traits),]#
+traits <- traits[colnames(bee.comm),]
+colnames(bee.comm)
+rownames(traits)
+bee.comm
+as.matrix(bee.comm)
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
+source('plotting/src/initialize.R')#
+method <- "jaccard"#
+site.cores <- makeCores(site.nodes, l.path, names.v, num.v)#
+#
+## create community matrics#
+comm.mats <- lapply(site.cores, makeComm)#
+#
+## run perm anovas#
+## plants#
+plant.perm <- adonis(comm.mats$plant$comm ~ comm.mats$plant$status,#
+                     method=method)#
+plant.beta <- betadisper(vegdist(comm.mats$plant$comm,#
+                                 method=method),#
+                         group=comm.mats$plant$status)#
+permutest(plant.beta, pairwise = TRUE, permutations = 99)#
+#
+## pollinators#
+pol.perm <- adonis(comm.mats$pollinator$comm ~ comm.mats$pollinator$status,#
+                   method=method)#
+pol.beta <- betadisper(vegdist(comm.mats$pollinator$comm,#
+                               method=method),#
+                         group=comm.mats$pollinator$status)#
+permutest(pol.beta, pairwise = TRUE, permutations = 99)#
+#
+## plotting#
+plot.beta.div(list(comm.mats$pollinator$comm, comm.mats$plant$comm),#
+              list(comm.mats$pollinator$status, comm.mats$plant$status),#
+              fig.path,#
+              method= method)#
+#
+## who are the core species? Species that are never in the core?#
+## pollinators#
+#
+stayed.pol <-#
+  site.cores$pollinator$GenusSpecies[site.cores$pollinator$comm ==#
+                                     "stayed"]#
+count.stayed.pol <- table(stayed.pol)#
+count.stayed.pol <- count.stayed.pol[count.stayed.pol != 0]#
+always.stayed.pol <- count.stayed.pol[count.stayed.pol == 5]#
+#
+hist(count.stayed.pol, breaks=0:5)#
+#
+left.pol <-#
+  site.cores$pollinator$GenusSpecies[site.cores$pollinator$comm ==#
+                                     "left"]#
+count.left.pol <- table(left.pol)#
+count.left.pol <- count.left.pol[count.left.pol != 0]#
+always.left.pol <- count.left.pol[count.left.pol == 5]#
+#
+## plants#
+stayed.plant <-#
+  site.cores$plant$GenusSpecies[site.cores$plant$comm ==#
+                                "stayed"]#
+count.stayed.plant <- table(stayed.plant)#
+count.stayed.plant <- count.stayed.plant[count.stayed.plant != 0]#
+always.stayed.plant <- count.stayed.plant[count.stayed.plant == 5]#
+#
+hist(count.stayed.plant, breaks=0:5)#
+#
+left.plant <-#
+  site.cores$plant$GenusSpecies[site.cores$plant$comm ==#
+                                "left"]#
+count.left.plant <- table(left.plant)#
+count.left.plant <- count.left.plant[count.left.plant != 0]#
+always.left.plant <- count.left.plant[count.left.plant == 5]#
+## traits#
+load('~/Dropbox/hedgerow_network/analysis/functional_traits/saved/traitsbee.Rdata')#
+#
+bee.comm <- comm.mats$pollinator$comm[, colnames(comm.mats$pollinator$comm)#
+                                          %in% rownames(traits)]
+bee.comm
+traits <- traits[rownames(traits) %in% colnames(bee.comm),]#
+bee.comm <- bee.comm[colnames(bee.comm) %in% rownames(traits),]#
+traits <- traits[colnames(bee.comm),]
+bee.fdiv <- dbFD(traits, bee.comm)
+class(bee.comm)
+class(traits)
+traits
+traits <- apply(traits, as.numeric)
+traits <- apply(traits, 2, as.numeric)
+traits
+## traits#
+load('~/Dropbox/hedgerow_network/analysis/functional_traits/saved/traitsbee.Rdata')#
+#
+bee.comm <- comm.mats$pollinator$comm[, colnames(comm.mats$pollinator$comm)#
+                                          %in% rownames(traits)]#
+traits <- traits[rownames(traits) %in% colnames(bee.comm),]
+traits.cat <- apply(traits## ************************************************************#
 rm(list=ls())#
 setwd('~/Dropbox/hedgerow_network')#
 library(abind)#
@@ -2012,21 +242,8 @@ res <- run.analysis(sites=sites,#
                     cts.traits=cts.traits,#
                     cat.traits=cat.traits,#
                     occ.abun='abun')#
-#
-fn <- sprintf('%s_%s_%s.RData', bee.syr, sites, 'abun')#
-save(res, file=file.path('analysis/functional_traits/saved', fn))#
-#
-summary(res$FRic$model.out)#
-summary(res$FEve$model.out)#
-summary(res$FDiv$model.out)#
-summary(res$FDis$model.out)#
-## ************************************************************#
-statuses <- sapply(strsplit(rownames(dd.model$num.samples), ":"),#
-                   function(x) x[2])#
-to.write <- dd.model$num.samples[order(statuses),]#
-write.table(to.write, sep=" & ",#
-      file="~/Dropbox/hedgerow_network/beta-div-ms/tables/sampleTable.txt")
-## ************************************************************#
+, 2, as.factor)
+traits.cat <- apply(traits## ************************************************************#
 rm(list=ls())#
 setwd('~/Dropbox/hedgerow_network')#
 library(abind)#
@@ -2084,21 +301,7 @@ res <- run.analysis(sites=sites,#
                     cts.traits=cts.traits,#
                     cat.traits=cat.traits,#
                     occ.abun='abun')#
-#
-fn <- sprintf('%s_%s_%s.RData', bee.syr, sites, 'abun')#
-save(res, file=file.path('analysis/functional_traits/saved', fn))#
-#
-summary(res$FRic$model.out)#
-summary(res$FEve$model.out)#
-summary(res$FDiv$model.out)#
-summary(res$FDis$model.out)#
-## ************************************************************#
-statuses <- sapply(strsplit(rownames(dd.model$num.samples), ":"),#
-                   function(x) x[2])#
-to.write <- dd.model$num.samples[order(statuses),]#
-write.table(to.write, sep=" & ",#
-      file="~/Dropbox/hedgerow_network/beta-div-ms/tables/sampleTable.txt")
-getwd()
+, 2, as.factor)
 ## ************************************************************#
 rm(list=ls())#
 setwd('~/Dropbox/hedgerow_network')#
@@ -2156,21 +359,7 @@ res <- run.analysis(sites=sites,#
                     drop.parasites=FALSE,#
                     cts.traits=cts.traits,#
                     cat.traits=cat.traits,#
-                    occ.abun='abun')#
-#
-fn <- sprintf('%s_%s_%s.RData', bee.syr, sites, 'abun')#
-save(res, file=file.path('analysis/functional_traits/saved', fn))#
-#
-summary(res$FRic$model.out)#
-summary(res$FEve$model.out)#
-summary(res$FDiv$model.out)#
-summary(res$FDis$model.out)#
-## ************************************************************#
-statuses <- sapply(strsplit(rownames(dd.model$num.samples), ":"),#
-                   function(x) x[2])#
-to.write <- dd.model$num.samples[order(statuses),]#
-write.table(to.write, sep=" & ",#
-      file="~/Dropbox/hedgerow_network/beta-div-ms/tables/sampleTable.txt")
+                    occ.abun='abun')
 ## ************************************************************#
 rm(list=ls())#
 setwd('~/Dropbox/hedgerow_network')#
@@ -2196,347 +385,15 @@ source(file.path(src.dir, 'prep.R'))#
 source(file.path(src.dir, 'analyses.R'))#
 #
 sites <- 'total'#
-bee.syr <- 'bee'#
-cts.traits <- c('d',#
-                'MeanITD')#
-cat.traits <- c('CropPollinator',#
-                'Lecty',#
-                'NestLoc',#
-                'Excavate',#
-                'Sociality')#
-#
-## bee.syr <- 'syr'#
+## bee.syr <- 'bee'#
 ## cts.traits <- c('d',#
-##                 'WingLength')#
-## cat.traits <- c('LarvalDiet')#
+##                 'MeanITD')#
+## cat.traits <- c('CropPollinator',#
+##                 'Lecty',#
+##                 'NestLoc',#
+##                 'Excavate',#
+##                 'Sociality')#
 #
-## ****************************************#
-## to get number of samples per year#
-dd.model <- prep.dat(sites=sites,#
-                     bee.syr=bee.syr,#
-                     drop.na=TRUE,#
-                     drop.parasites=FALSE,#
-                     cts.traits=cts.traits,#
-                     cat.traits=cat.traits,#
-                     occ.abun='abun')#
-#
-## ****************************************#
-#
-res <- run.analysis(sites=sites,#
-                    bee.syr=bee.syr,#
-                    drop.na=TRUE,#
-                    drop.parasites=FALSE,#
-                    cts.traits=cts.traits,#
-                    cat.traits=cat.traits,#
-                    occ.abun='abun')#
-#
-fn <- sprintf('%s_%s_%s.RData', bee.syr, sites, 'abun')#
-save(res, file=file.path('analysis/functional_traits/saved', fn))#
-#
-summary(res$FRic$model.out)#
-summary(res$FEve$model.out)#
-summary(res$FDiv$model.out)#
-summary(res$FDis$model.out)#
-## ************************************************************#
-statuses <- sapply(strsplit(rownames(dd.model$num.samples), ":"),#
-                   function(x) x[2])#
-to.write <- dd.model$num.samples[order(statuses),]#
-write.table(to.write, sep=" & ",#
-      file="~/Dropbox/hedgerow_network/beta-div-ms/tables/sampleTable.txt")
-## ************************************************************#
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_network')#
-library(abind)#
-library(FD)#
-library(bipartite)#
-library(parallel)#
-library(lme4)#
-library(lmerTest)#
-src.dir <- 'analysis/functional_traits/src'#
-source(file.path(src.dir, 'misc.R'))#
-source(file.path(src.dir, 'site-lists.R'))#
-source(file.path(src.dir, 'prep.R'))#
-source(file.path(src.dir, 'analyses.R'))#
-## ************************************************************#
-#
-## ************************************************************#
-## create and save data#
-src.dir <- 'analysis/functional_traits/src'#
-source(file.path(src.dir, 'misc.R'))#
-source(file.path(src.dir, 'site-lists.R'))#
-source(file.path(src.dir, 'prep.R'))#
-source(file.path(src.dir, 'analyses.R'))#
-#
-sites <- 'total'#
-bee.syr <- 'bee'#
-cts.traits <- c('d',#
-                'MeanITD')#
-cat.traits <- c('CropPollinator',#
-                'Lecty',#
-                'NestLoc',#
-                'Excavate',#
-                'Sociality')#
-#
-## bee.syr <- 'syr'#
-## cts.traits <- c('d',#
-##                 'WingLength')#
-## cat.traits <- c('LarvalDiet')#
-#
-## ****************************************#
-## to get number of samples per year#
-dd.model <- prep.dat(sites=sites,#
-                     bee.syr=bee.syr,#
-                     drop.na=TRUE,#
-                     drop.parasites=FALSE,#
-                     cts.traits=cts.traits,#
-                     cat.traits=cat.traits,#
-                     occ.abun='abun')#
-#
-## ****************************************#
-#
-res <- run.analysis(sites=sites,#
-                    bee.syr=bee.syr,#
-                    drop.na=TRUE,#
-                    drop.parasites=FALSE,#
-                    cts.traits=cts.traits,#
-                    cat.traits=cat.traits,#
-                    occ.abun='abun')#
-#
-fn <- sprintf('%s_%s_%s.RData', bee.syr, sites, 'abun')#
-save(res, file=file.path('analysis/functional_traits/saved', fn))#
-#
-summary(res$FRic$model.out)#
-summary(res$FEve$model.out)#
-summary(res$FDiv$model.out)#
-summary(res$FDis$model.out)#
-## ************************************************************#
-statuses <- sapply(strsplit(rownames(dd.model$num.samples), ":"),#
-                   function(x) x[2])#
-to.write <- dd.model$num.samples[order(statuses),]#
-write.table(to.write, sep=" & ",#
-      file="~/Dropbox/hedgerow_network/beta-div-ms/tables/sampleTable.txt")
-## ************************************************************#
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_network')#
-library(abind)#
-library(FD)#
-library(bipartite)#
-library(parallel)#
-library(lme4)#
-library(lmerTest)#
-src.dir <- 'analysis/functional_traits/src'#
-source(file.path(src.dir, 'misc.R'))#
-source(file.path(src.dir, 'site-lists.R'))#
-source(file.path(src.dir, 'prep.R'))#
-source(file.path(src.dir, 'analyses.R'))#
-## ************************************************************#
-#
-## ************************************************************#
-## create and save data#
-src.dir <- 'analysis/functional_traits/src'#
-source(file.path(src.dir, 'misc.R'))#
-source(file.path(src.dir, 'site-lists.R'))#
-source(file.path(src.dir, 'prep.R'))#
-source(file.path(src.dir, 'analyses.R'))#
-#
-sites <- 'total'#
-bee.syr <- 'bee'#
-cts.traits <- c('d',#
-                'MeanITD')#
-cat.traits <- c('CropPollinator',#
-                'Lecty',#
-                'NestLoc',#
-                'Excavate',#
-                'Sociality')#
-#
-## bee.syr <- 'syr'#
-## cts.traits <- c('d',#
-##                 'WingLength')#
-## cat.traits <- c('LarvalDiet')#
-#
-## ****************************************#
-## to get number of samples per year#
-dd.model <- prep.dat(sites=sites,#
-                     bee.syr=bee.syr,#
-                     drop.na=TRUE,#
-                     drop.parasites=FALSE,#
-                     cts.traits=cts.traits,#
-                     cat.traits=cat.traits,#
-                     occ.abun='abun')#
-#
-## ****************************************#
-#
-res <- run.analysis(sites=sites,#
-                    bee.syr=bee.syr,#
-                    drop.na=TRUE,#
-                    drop.parasites=FALSE,#
-                    cts.traits=cts.traits,#
-                    cat.traits=cat.traits,#
-                    occ.abun='abun')#
-#
-fn <- sprintf('%s_%s_%s.RData', bee.syr, sites, 'abun')#
-save(res, file=file.path('analysis/functional_traits/saved', fn))#
-#
-summary(res$FRic$model.out)#
-summary(res$FEve$model.out)#
-summary(res$FDiv$model.out)#
-summary(res$FDis$model.out)#
-## ************************************************************#
-statuses <- sapply(strsplit(rownames(dd.model$num.samples), ":"),#
-                   function(x) x[2])#
-to.write <- dd.model$num.samples[order(statuses),]#
-write.table(to.write, sep=" & ",#
-      file="~/Dropbox/hedgerow_network/beta-div-ms/tables/sampleTable.txt")
-ls()
-getwd()
-Q
-Q
-## ************************************************************#
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_network')#
-library(abind)#
-library(FD)#
-library(bipartite)#
-library(parallel)#
-library(lme4)#
-library(lmerTest)#
-src.dir <- 'analysis/functional_traits/src'#
-source(file.path(src.dir, 'misc.R'))#
-source(file.path(src.dir, 'site-lists.R'))#
-source(file.path(src.dir, 'prep.R'))#
-source(file.path(src.dir, 'analyses.R'))#
-## ************************************************************#
-#
-## ************************************************************#
-## create and save data#
-src.dir <- 'analysis/functional_traits/src'#
-source(file.path(src.dir, 'misc.R'))#
-source(file.path(src.dir, 'site-lists.R'))#
-source(file.path(src.dir, 'prep.R'))#
-source(file.path(src.dir, 'analyses.R'))#
-#
-sites <- 'total'#
-bee.syr <- 'bee'#
-cts.traits <- c('d',#
-                'MeanITD')#
-cat.traits <- c('CropPollinator',#
-                'Lecty',#
-                'NestLoc',#
-                'Excavate',#
-                'Sociality')#
-#
-## bee.syr <- 'syr'#
-## cts.traits <- c('d',#
-##                 'WingLength')#
-## cat.traits <- c('LarvalDiet')#
-#
-## ****************************************#
-## to get number of samples per year#
-dd.model <- prep.dat(sites=sites,#
-                     bee.syr=bee.syr,#
-                     drop.na=TRUE,#
-                     drop.parasites=FALSE,#
-                     cts.traits=cts.traits,#
-                     cat.traits=cat.traits,#
-                     occ.abun='abun')#
-#
-## ****************************************#
-#
-res <- run.analysis(sites=sites,#
-                    bee.syr=bee.syr,#
-                    drop.na=TRUE,#
-                    drop.parasites=FALSE,#
-                    cts.traits=cts.traits,#
-                    cat.traits=cat.traits,#
-                    occ.abun='abun')#
-#
-fn <- sprintf('%s_%s_%s.RData', bee.syr, sites, 'abun')#
-save(res, file=file.path('analysis/functional_traits/saved', fn))#
-#
-summary(res$FRic$model.out)#
-summary(res$FEve$model.out)#
-summary(res$FDiv$model.out)#
-summary(res$FDis$model.out)#
-## ************************************************************#
-statuses <- sapply(strsplit(rownames(dd.model$num.samples), ":"),#
-                   function(x) x[2])#
-to.write <- dd.model$num.samples[order(statuses),]#
-write.table(to.write, sep=" & ",#
-      file="~/Dropbox/hedgerow_network/beta-div-ms/tables/sampleTable.txt")
-## ************************************************************#
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_network')#
-library(abind)#
-library(FD)#
-library(bipartite)#
-library(parallel)#
-library(lme4)#
-library(lmerTest)#
-src.dir <- 'analysis/functional_traits/src'#
-source(file.path(src.dir, 'misc.R'))#
-source(file.path(src.dir, 'site-lists.R'))#
-source(file.path(src.dir, 'prep.R'))#
-source(file.path(src.dir, 'analyses.R'))#
-## ************************************************************#
-#
-## ************************************************************#
-## create and save data#
-src.dir <- 'analysis/functional_traits/src'#
-source(file.path(src.dir, 'misc.R'))#
-source(file.path(src.dir, 'site-lists.R'))#
-source(file.path(src.dir, 'prep.R'))#
-source(file.path(src.dir, 'analyses.R'))#
-#
-sites <- 'total'#
-bee.syr <- 'bee'#
-cts.traits <- c('d',#
-                'MeanITD')#
-cat.traits <- c('CropPollinator',#
-                'Lecty',#
-                'NestLoc',#
-                'Excavate',#
-                'Sociality')#
-#
-## bee.syr <- 'syr'#
-## cts.traits <- c('d',#
-##                 'WingLength')#
-## cat.traits <- c('LarvalDiet')#
-#
-## ****************************************#
-## to get number of samples per year#
-dd.model <- prep.dat(sites=sites,#
-                     bee.syr=bee.syr,#
-                     drop.na=TRUE,#
-                     drop.parasites=FALSE,#
-                     cts.traits=cts.traits,#
-                     cat.traits=cat.traits,#
-                     occ.abun='abun')#
-#
-## ****************************************#
-#
-res <- run.analysis(sites=sites,#
-                    bee.syr=bee.syr,#
-                    drop.na=TRUE,#
-                    drop.parasites=FALSE,#
-                    cts.traits=cts.traits,#
-                    cat.traits=cat.traits,#
-                    occ.abun='abun')#
-#
-fn <- sprintf('%s_%s_%s.RData', bee.syr, sites, 'abun')#
-save(res, file=file.path('analysis/functional_traits/saved', fn))#
-#
-summary(res$FRic$model.out)#
-summary(res$FEve$model.out)#
-summary(res$FDiv$model.out)#
-summary(res$FDis$model.out)#
-## ************************************************************#
-statuses <- sapply(strsplit(rownames(dd.model$num.samples), ":"),#
-                   function(x) x[2])#
-to.write <- dd.model$num.samples[order(statuses),]#
-write.table(to.write, sep=" & ",#
-      file="~/Dropbox/hedgerow_network/beta-div-ms/tables/sampleTable.txt")
-load('~/Dropbox/hedgerow_network/analysis/functional_traits/saved/traitsbee.Rdata')
-head(traits)
 bee.syr <- 'syr'#
 cts.traits <- c('d',#
                 'WingLength')#
@@ -2563,63 +420,18 @@ res <- run.analysis(sites=sites,#
                     occ.abun='abun')#
 #
 fn <- sprintf('%s_%s_%s.RData', bee.syr, sites, 'abun')#
-save(res, file=file.path('analysis/functional_traits/saved', fn))
-traits[, "CropPollinator"]
-traits[, -"CropPollinator"]
-head(traits)
-comm.mats$pollinator$comm
-comm.mats$pollinator$commrm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-source('plotting/src/initialize.R')#
-method <- "jaccard"#
-site.cores <- makeCores(site.nodes, l.path, names.v, num.v)#
+save(res, file=file.path('analysis/functional_traits/saved', fn))#
 #
-## create community matrics#
-comm.mats <- lapply(site.cores, makeComm)#
-#
-## run perm anovas#
-## plants#
-plant.perm <- adonis(comm.mats$plant$comm ~ comm.mats$plant$status,#
-                     method=method)#
-plant.beta <- betadisper(vegdist(comm.mats$plant$comm,#
-                                 method=method),#
-                         group=comm.mats$plant$status)#
-permutest(plant.beta, pairwise = TRUE, permutations = 99)
-comm.mats$pollinator$comm
-## traits#
-load('~/Dropbox/hedgerow_network/analysis/functional_traits/saved/traitsbee.Rdata')#
-#
-bee.comm <-#
-  comm.mats$pollinator$comm[colnames(comm.mats$pollinator$comm) %in%#
-                            colnames(traits)]
-bee.comm
-bee.comm <-#
-  comm.mats$pollinator$comm[colnames(comm.mats$pollinator$comm) %in%#
-                            rownames(traits)]
-bee.comm
-bee.comm <-#
-  comm.mats$pollinator$comm[colnames(comm.mats$pollinator$comm) %in%#
-                            rownames(traits),]
-colnames(comm.mats$pollinator$comm) %in%#
-                            rownames(traits)
-bee.comm <-#
-  comm.mats$pollinator$comm[, colnames(comm.mats$pollinator$comm) %in%#
-                            rownames(traits)]
-bee.comm
-bee.fdiv <- dbFD(traits, bee.comm)
-comm.bee
-bee.comm
-traits
-bee.comm <-#
-  comm.mats$pollinator$comm[, colnames(comm.mats$pollinator$comm) %in%#
-                            rownames(traits)]#
-bee.fdiv <- dbFD(traits, bee.comm)
-?dbFD
-bee.fdiv <- dbFD(traits, bee.comm, w.abund=FALSE)
-?dbFD
-bee.fdiv <- dbFD(traits, bee.comm, w.abun=FALSE)
-class(bee.comm)
-class(traits)
+summary(res$FRic$model.out)#
+summary(res$FEve$model.out)#
+summary(res$FDiv$model.out)#
+summary(res$FDis$model.out)#
+## ************************************************************#
+statuses <- sapply(strsplit(rownames(dd.model$num.samples), ":"),#
+                   function(x) x[2])#
+to.write <- dd.model$num.samples[order(statuses),]#
+write.table(to.write, sep=" & ",#
+      file="~/Dropbox/hedgerow_network/beta-div-ms/tables/sampleTable.txt")#
 ## ************************************************************#
 rm(list=ls())#
 setwd('~/Dropbox/hedgerow_network')#
@@ -2645,14 +457,20 @@ source(file.path(src.dir, 'prep.R'))#
 source(file.path(src.dir, 'analyses.R'))#
 #
 sites <- 'total'#
-bee.syr <- 'bee'#
+## bee.syr <- 'bee'#
+## cts.traits <- c('d',#
+##                 'MeanITD')#
+## cat.traits <- c('CropPollinator',#
+##                 'Lecty',#
+##                 'NestLoc',#
+##                 'Excavate',#
+##                 'Sociality')#
+#
+bee.syr <- 'syr'#
 cts.traits <- c('d',#
-                'MeanITD')#
-cat.traits <- c('CropPollinator',#
-                'Lecty',#
-                'NestLoc',#
-                'Excavate',#
-                'Sociality')
+                'WingLength')#
+cat.traits <- c('LarvalDiet')#
+#
 ## ****************************************#
 ## to get number of samples per year#
 dd.model <- prep.dat(sites=sites,#
@@ -2661,7 +479,10 @@ dd.model <- prep.dat(sites=sites,#
                      drop.parasites=FALSE,#
                      cts.traits=cts.traits,#
                      cat.traits=cat.traits,#
-                     occ.abun='abun')
+                     occ.abun='abun')#
+#
+## ****************************************#
+#
 res <- run.analysis(sites=sites,#
                     bee.syr=bee.syr,#
                     drop.na=TRUE,#
@@ -2669,114 +490,6 @@ res <- run.analysis(sites=sites,#
                     cts.traits=cts.traits,#
                     cat.traits=cat.traits,#
                     occ.abun='abun')
-Q
-res <- run.analysis(sites=sites,#
-                    bee.syr=bee.syr,#
-                    drop.na=TRUE,#
-                    drop.parasites=FALSE,#
-                    cts.traits=cts.traits,#
-                    cat.traits=cat.traits,#
-                    occ.abun='abun')
-res <- run.analysis(sites=sites,#
-                    bee.syr=bee.syr,#
-                    drop.na=TRUE,#
-                    drop.parasites=FALSE,#
-                    cts.traits=cts.traits,#
-                    cat.traits=cat.traits,#
-                    occ.abun='abun')
-Q
-res <- run.analysis(sites=sites,#
-                    bee.syr=bee.syr,#
-                    drop.na=TRUE,#
-                    drop.parasites=FALSE,#
-                    cts.traits=cts.traits,#
-                    cat.traits=cat.traits,#
-                    occ.abun='abun')
-class(traits)
-class(mat)
-mat
-traits
-Q
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-source('plotting/src/initialize.R')#
-method <- "jaccard"#
-site.cores <- makeCores(site.nodes, l.path, names.v, num.v)#
-#
-## create community matrics#
-comm.mats <- lapply(site.cores, makeComm)#
-#
-## run perm anovas#
-## plants#
-plant.perm <- adonis(comm.mats$plant$comm ~ comm.mats$plant$status,#
-                     method=method)#
-plant.beta <- betadisper(vegdist(comm.mats$plant$comm,#
-                                 method=method),#
-                         group=comm.mats$plant$status)#
-permutest(plant.beta, pairwise = TRUE, permutations = 99)#
-#
-## pollinators#
-pol.perm <- adonis(comm.mats$pollinator$comm ~ comm.mats$pollinator$status,#
-                   method=method)#
-pol.beta <- betadisper(vegdist(comm.mats$pollinator$comm,#
-                               method=method),#
-                         group=comm.mats$pollinator$status)#
-permutest(pol.beta, pairwise = TRUE, permutations = 99)#
-#
-## plotting#
-plot.beta.div(list(comm.mats$pollinator$comm, comm.mats$plant$comm),#
-              list(comm.mats$pollinator$status, comm.mats$plant$status),#
-              fig.path,#
-              method= method)#
-#
-## who are the core species? Species that are never in the core?#
-## pollinators#
-#
-stayed.pol <-#
-  site.cores$pollinator$GenusSpecies[site.cores$pollinator$comm ==#
-                                     "stayed"]#
-count.stayed.pol <- table(stayed.pol)#
-count.stayed.pol <- count.stayed.pol[count.stayed.pol != 0]#
-always.stayed.pol <- count.stayed.pol[count.stayed.pol == 5]#
-#
-hist(count.stayed.pol, breaks=0:5)#
-#
-left.pol <-#
-  site.cores$pollinator$GenusSpecies[site.cores$pollinator$comm ==#
-                                     "left"]#
-count.left.pol <- table(left.pol)#
-count.left.pol <- count.left.pol[count.left.pol != 0]#
-always.left.pol <- count.left.pol[count.left.pol == 5]#
-#
-## plants#
-stayed.plant <-#
-  site.cores$plant$GenusSpecies[site.cores$plant$comm ==#
-                                "stayed"]#
-count.stayed.plant <- table(stayed.plant)#
-count.stayed.plant <- count.stayed.plant[count.stayed.plant != 0]#
-always.stayed.plant <- count.stayed.plant[count.stayed.plant == 5]#
-#
-hist(count.stayed.plant, breaks=0:5)#
-#
-left.plant <-#
-  site.cores$plant$GenusSpecies[site.cores$plant$comm ==#
-                                "left"]#
-count.left.plant <- table(left.plant)#
-count.left.plant <- count.left.plant[count.left.plant != 0]#
-always.left.plant <- count.left.plant[count.left.plant == 5]#
-## traits#
-load('~/Dropbox/hedgerow_network/analysis/functional_traits/saved/traitsbee.Rdata')
-bee.comm <-#
-  comm.mats$pollinator$comm[, colnames(comm.mats$pollinator$comm) %in%#
-                            rownames(traits)]
-head(traits)
-traits <- traits[rownames(traits) %in% colnames(bee.comm),]
-traits
-v
-bee.fdiv <- dbFD(traits, bee.comm, w.abun=FALSE)
-class(traits)
-traits
-bee.comm
 rm(list=ls())#
 setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
 source('plotting/src/initialize.R')#
@@ -2847,236 +560,678 @@ always.left.plant <- count.left.plant[count.left.plant == 5]#
 ## traits#
 load('~/Dropbox/hedgerow_network/analysis/functional_traits/saved/traitsbee.Rdata')#
 #
-bee.comm <-#
-  comm.mats$pollinator$comm[, colnames(comm.mats$pollinator$comm) %in%#
-                            rownames(traits)]
-head(bee.comm)
-traits <- traits[rownames(traits) %in% colnames(bee.comm),]#
-bee.fdiv <- dbFD(traits, bee.comm, w.abun=FALSE)
-install.packages(FD)
-install.packages("FD")
-library(FD)
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-source('plotting/src/initialize.R')#
-method <- "jaccard"#
-site.cores <- makeCores(site.nodes, l.path, names.v, num.v)#
-#
-## create community matrics#
-comm.mats <- lapply(site.cores, makeComm)#
-#
-## run perm anovas#
-## plants#
-plant.perm <- adonis(comm.mats$plant$comm ~ comm.mats$plant$status,#
-                     method=method)#
-plant.beta <- betadisper(vegdist(comm.mats$plant$comm,#
-                                 method=method),#
-                         group=comm.mats$plant$status)#
-permutest(plant.beta, pairwise = TRUE, permutations = 99)#
-#
-## pollinators#
-pol.perm <- adonis(comm.mats$pollinator$comm ~ comm.mats$pollinator$status,#
-                   method=method)#
-pol.beta <- betadisper(vegdist(comm.mats$pollinator$comm,#
-                               method=method),#
-                         group=comm.mats$pollinator$status)#
-permutest(pol.beta, pairwise = TRUE, permutations = 99)#
-#
-## plotting#
-plot.beta.div(list(comm.mats$pollinator$comm, comm.mats$plant$comm),#
-              list(comm.mats$pollinator$status, comm.mats$plant$status),#
-              fig.path,#
-              method= method)#
-#
-## who are the core species? Species that are never in the core?#
-## pollinators#
-#
-stayed.pol <-#
-  site.cores$pollinator$GenusSpecies[site.cores$pollinator$comm ==#
-                                     "stayed"]#
-count.stayed.pol <- table(stayed.pol)#
-count.stayed.pol <- count.stayed.pol[count.stayed.pol != 0]#
-always.stayed.pol <- count.stayed.pol[count.stayed.pol == 5]#
-#
-hist(count.stayed.pol, breaks=0:5)#
-#
-left.pol <-#
-  site.cores$pollinator$GenusSpecies[site.cores$pollinator$comm ==#
-                                     "left"]#
-count.left.pol <- table(left.pol)#
-count.left.pol <- count.left.pol[count.left.pol != 0]#
-always.left.pol <- count.left.pol[count.left.pol == 5]#
-#
-## plants#
-stayed.plant <-#
-  site.cores$plant$GenusSpecies[site.cores$plant$comm ==#
-                                "stayed"]#
-count.stayed.plant <- table(stayed.plant)#
-count.stayed.plant <- count.stayed.plant[count.stayed.plant != 0]#
-always.stayed.plant <- count.stayed.plant[count.stayed.plant == 5]#
-#
-hist(count.stayed.plant, breaks=0:5)#
-#
-left.plant <-#
-  site.cores$plant$GenusSpecies[site.cores$plant$comm ==#
-                                "left"]#
-count.left.plant <- table(left.plant)#
-count.left.plant <- count.left.plant[count.left.plant != 0]#
-always.left.plant <- count.left.plant[count.left.plant == 5]#
-## traits#
-load('~/Dropbox/hedgerow_network/analysis/functional_traits/saved/traitsbee.Rdata')#
-#
-bee.comm <-#
-  comm.mats$pollinator$comm[, colnames(comm.mats$pollinator$comm) %in%#
-                            rownames(traits)]#
-#
-traits <- traits[rownames(traits) %in% colnames(bee.comm),]#
-bee.fdiv <- dbFD(traits, bee.comm, w.abun=FALSE)
-?dbFD
-ex1 <- dbFD(dummy$trait, dummy$abun)
-dummy
-FD:::dummy
-traits[colnames(bee.comm),]
-## traits#
-load('~/Dropbox/hedgerow_network/analysis/functional_traits/saved/traitsbee.Rdata')#
-#
-bee.comm <-#
-  comm.mats$pollinator$comm[, colnames(comm.mats$pollinator$comm) %in%#
-                            rownames(traits)]#
-traits <- traits[rownames(traits) %in% colnames(bee.comm),]#
-traits <- traits[colnames(bee.comm),]#
-#
-bee.fdiv <- dbFD(traits, bee.comm, w.abun=FALSE)
-class(bee.comm)
-class(bee.comm[[1]])
-bee.comm
-bee.fdiv <- dbFD(traits, data.frame(bee.comm), w.abun=FALSE)
-data.frame(bee.comm)
-## traits#
-load('~/Dropbox/hedgerow_network/analysis/functional_traits/saved/traitsbee.Rdata')#
-#
-bee.comm <-#
-  as.data.frame(comm.mats$pollinator$comm[, colnames(comm.mats$pollinator$comm)#
-                                          %in% rownames(traits)])
-bee.comm
+bee.comm <- comm.mats$pollinator$comm[, colnames(comm.mats$pollinator$comm)#
+                                          %in% rownames(traits)]#
 traits <- traits[rownames(traits) %in% colnames(bee.comm),]
 traits <- traits[colnames(bee.comm),]
-traits
-colnames(bee.comm)
-traits
-bee.comm <-#
-  as.data.frame(comm.mats$pollinator$comm[, colnames(comm.mats$pollinator$comm)#
-                                          %in% rownames(traits)])#
-traits <- traits[rownames(traits) %in% colnames(bee.comm),]#
-bee.comm <- bee.comm[colnames(bee.comm) %in% rownames(traits),]#
-traits <- traits[colnames(bee.comm),]#
-#
-bee.fdiv <- dbFD(traits, data.frame(bee.comm), w.abun=FALSE)
-x <- traits#
-a <- bee.comm#
-row.names(x)[!(row.names(x) %in% row.names(t(a)))]#
-row.names(t(a))[!(row.names(t(a)) %in% row.names(x))]
-identical(row.names(x), row.names(t(a)))
-## traits#
-load('~/Dropbox/hedgerow_network/analysis/functional_traits/saved/traitsbee.Rdata')#
-#
-bee.comm <-#
-  as.data.frame(comm.mats$pollinator$comm[, colnames(comm.mats$pollinator$comm)#
-                                          %in% rownames(traits)])#
-traits <- traits[rownames(traits) %in% colnames(bee.comm),]#
-bee.comm <- bee.comm[colnames(bee.comm) %in% rownames(traits),]#
-traits <- traits[colnames(bee.comm),]#
-#
-bee.fdiv <- dbFD(traits, data.frame(bee.comm))
-## traits#
-load('~/Dropbox/hedgerow_network/analysis/functional_traits/saved/traitsbee.Rdata')#
-#
-bee.comm <-#
-  as.data.frame(comm.mats$pollinator$comm[, colnames(comm.mats$pollinator$comm)#
-                                          %in% rownames(traits)])#
-traits <- traits[rownames(traits) %in% colnames(bee.comm),]#
-bee.comm <- bee.comm[colnames(bee.comm) %in% rownames(traits),]#
-traits <- traits[colnames(bee.comm),]#
-#
 bee.fdiv <- dbFD(traits, bee.comm)
-## traits#
-load('~/Dropbox/hedgerow_network/analysis/functional_traits/saved/traitsbee.Rdata')#
+bee.fdiv
+bee.fdiv$FDis
+comm.mats$pollinator$status
+comm.mats$pollinator$comm
+site.cores
+sites.bee <- sapply(strsplit(rownames(bee.comm)), function(x) x[1])
+sites.bee <- sapply(strsplit(rownames(bee.comm), "[.]"),#
+                    function(x) x[1])
+sites.bee
+statuses.bee <- sapply(strsplit(rownames(bee.comm), "[.]"),#
+                    function(x) x[2])
+lmer(bee.fdiv$FDis ~ statuses.bee + (1|sites.bee))
+fdiv.bee.mod <- lmer(bee.fdiv$FDis ~ statuses.bee + (1|sites.bee))
+fdiv.bee.mod <- lmer(bee.fdiv$FDis ~ statuses.bee + (1|sites.bee))
+summary(fdiv.bee.mod)
+names(bee.fdiv)
+fdis.bee.mod <- lmer(bee.fdiv$FDis ~ statuses.bee + (1|sites.bee))#
+summary(fdis.bee.mod)#
 #
-bee.comm <-#
-  as.data.frame(comm.mats$pollinator$comm[, colnames(comm.mats$pollinator$comm)#
-                                          %in% rownames(traits)])#
-traits <- traits[rownames(traits) %in% colnames(bee.comm),]#
-bee.comm <- bee.comm[colnames(bee.comm) %in% rownames(traits),]#
-traits <- traits[colnames(bee.comm),]#
+fdiv.bee.mod <- lmer(bee.fdiv$FDiv ~ statuses.bee + (1|sites.bee))#
+summary(fdiv.bee.mod)
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
+source('src/initialize.R')#
 #
-bee.fdiv <- dbFD(traits, empty(bee.comm))
-bee.comm <-#
-  bipartite::empty(comm.mats$pollinator$comm[,#
-                                             colnames(comm.mats$pollinator$comm)#
-                                          %in% rownames(traits)])
-bee.comm
-bee.comm <- as.data.frame(bee.comm)#
+## ************************************************************#
+## prepare link community in terminal#
+## ************************************************************#
 #
-traits <- traits[rownames(traits) %in% colnames(bee.comm),]#
-bee.comm <- bee.comm[colnames(bee.comm) %in% rownames(traits),]#
-traits <- traits[colnames(bee.comm),]#
+edges.com <- cbind(as.character(spec$GenusSpecies),#
+                  as.character(spec$PlantGenusSpecies))#
 #
-bee.fdiv <- dbFD(traits, bee.comm)
-x <- traits#
-a <- bee.comm#
-row.names(x)[!(row.names(x) %in% row.names(t(a)))]#
-row.names(t(a))[!(row.names(t(a)) %in% row.names(x))]
-rowSums(bee.comm)
-bee.comm <-#
-  bipartite::empty(comm.mats$pollinator$comm[,#
-                                             colnames(comm.mats$pollinator$comm)#
-                                          %in% rownames(traits)])
-rowSums(bee.comm)
-bee.comm <-#
-  as.datam.frame(comm.mats$pollinator$comm[,#
-                                             colnames(comm.mats$pollinator$comm)#
-                                          %in% rownames(traits)])#
+lc <- getLinkCommunities(edges.com, hcmethod = "average",#
+                         bipartite=TRUE)#
+save(lc, file="saved/lc.Rdata")
+load(file="saved/lc.Rdata")#
+phylo.int <- calcCommDis(spec, "Int", lc, abund.w=TRUE)#
+save(phylo.int, file="saved/phyloInt.Rdata")
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
+source('src/initialize.R')#
+soruce('phyloIntBeta.R')
+source('phyloIntBeta.R')
+source('src/phyloIntBeta.R')
+phylo.int <- calcCommDis(spec, "Int", lc, abund.w=TRUE)#
+save(phylo.int, file="saved/phyloInt.Rdata")
+edges.com <- cbind(as.character(spec$GenusSpecies),#
+                  as.character(spec$PlantGenusSpecies))
+edges.comm
+edges.com
+paste(edges.comm)
+paste(edges.com)
+spec$Int <- paste(spec$GenusSpecies),#
+                  spec$PlantGenusSpecies)#
+phylo.int <- calcCommDis(spec, "Int", lc, abund.w=TRUE)
+spec$Int <- paste(spec$GenusSpecies,#
+                  spec$PlantGenusSpecies)#
+phylo.int <- calcCommDis(spec, "Int", lc, abund.w=TRUE)
+load(file="saved/lc.Rdata")#
 #
-traits <- traits[rownames(traits) %in% colnames(bee.comm),]#
-bee.comm <- bee.comm[colnames(bee.comm) %in% rownames(traits),]#
-traits <- traits[colnames(bee.comm),]#
+spec$Int <- paste(spec$GenusSpecies,#
+                  spec$PlantGenusSpecies)#
+phylo.int <- calcCommDis(spec, "Int", lc, abund.w=TRUE)#
+save(phylo.int, file="saved/phyloInt.Rdata")
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
+source('src/initialize.R')#
+source('src/phyloIntBeta.R')#
 #
-bee.fdiv <- dbFD(traits, bee.comm)
-## traits#
-load('~/Dropbox/hedgerow_network/analysis/functional_traits/saved/traitsbee.Rdata')#
+## ************************************************************#
+## prepare link community in terminal#
+## ************************************************************#
+edges.com <- cbind(as.character(spec$GenusSpecies),#
+                  as.character(spec$PlantGenusSpecies))#
 #
-bee.comm <-#
-  as.data.frame(comm.mats$pollinator$comm[,#
-                                             colnames(comm.mats$pollinator$comm)#
-                                          %in% rownames(traits)])#
+## lc <- getLinkCommunities(edges.com, hcmethod = "average",#
+##                          bipartite=TRUE)#
+## save(lc, file="saved/lc.Rdata")#
 #
-traits <- traits[rownames(traits) %in% colnames(bee.comm),]#
-bee.comm <- bee.comm[colnames(bee.comm) %in% rownames(traits),]#
-traits <- traits[colnames(bee.comm),]
-bee.fdiv <- dbFD(traits, bee.comm)
-bee.comm
-bee.comm <-#
-  as.data.frame(comm.mats$pollinator$comm[,#
-                                             colnames(comm.mats$pollinator$comm)#
-                                          %in% rownames(traits)])
-bee.comm
-traits <- traits[rownames(traits) %in% colnames(bee.comm),]
-traits
-bee.comm <- bee.comm[colnames(bee.comm) %in% rownames(traits),]
-bee.comm
-rownames(traits)
-## traits#
-load('~/Dropbox/hedgerow_network/analysis/functional_traits/saved/traitsbee.Rdata')#
+## ************************************************************#
+## turnover of phylo interactions through time#
+## ************************************************************#
+load(file="saved/lc.Rdata")#
+spec$Int <- paste(spec$GenusSpecies,#
+                  spec$PlantGenusSpecies)#
+phylo.int <- calcCommDis(spec, "Int", lc, abund.w=TRUE)#
+save(phylo.int, file="saved/phyloInt.Rdata")
+rm(list=ls())#
+library(lme4)#
+library(lmerTest)#
+library(vegan)#
+library(linkcomm)#
+library(picante)#
+setwd('~/Dropbox/hedgerow_network/analysis/intBeta')#
+source('src/misc.R')#
+source('src/phyloIntBeta.R')#
+source('src/predictIntervals.R')#
+source('src/CIplotting.R')#
+load('../../data/spec_network.Rdata')#
 #
-bee.comm <-#
-  as.data.frame(comm.mats$pollinator$comm[,#
-                                             colnames(comm.mats$pollinator$comm)#
-                                          %in% rownames(traits)])#
-traits <- traits[rownames(traits) %in% colnames(bee.comm),]#
-## bee.comm <- bee.comm[colnames(bee.comm) %in% rownames(traits),]#
-traits <- traits[colnames(bee.comm),]#
+## ************************************************************#
+## prepare link community in terminal#
+## ************************************************************#
 #
-bee.fdiv <- dbFD(traits, bee.comm)
-class(traits)
-class(bee.comm)
-?dbFD
+## edges.com <- cbind(as.character(spec$GenusSpecies),#
+##                   as.character(spec$PlantGenusSpecies))#
+#
+## lc <- getLinkCommunities(edges.com, hcmethod = "average",#
+##                          bipartite=TRUE)#
+## save(lc, file="saved/lc.Rdata")#
+#
+## ************************************************************#
+## turnover of phylo interactions through time#
+## ************************************************************#
+load(file="saved/lc.Rdata")#
+phylo.int <- calcCommDis(spec, "Int", lc, abund.w=TRUE)#
+save(phylo.int, file="saved/phyloInt.Rdata")#
+#
+## interaction lifespans#
+#
+int.lives <- lapply(phylo.int$comm, function(x) sort(colSums(x)))#
+#
+plot(NA, ylim=c(0,1), xlim=c(0,100))#
+lapply(int.lives, function(x) points(density(x), type='l'))#
+## linear model of phylo int by years between samples#
+load(file="saved/phyloInt.Rdata")#
+phylo.int.mod <- lmer(PhyloInt ~ Dist*SiteStatus +#
+                      (1|Site),#
+                      data=phylo.int$phylo.int)
+rm(list=ls())#
+library(lme4)#
+library(lmerTest)#
+library(vegan)#
+library(linkcomm)#
+library(picante)#
+setwd('~/Dropbox/hedgerow_network/analysis/intBeta')#
+source('src/misc.R')#
+source('src/phyloIntBeta.R')#
+source('src/predictIntervals.R')#
+source('src/CIplotting.R')#
+load('../../data/spec_network.Rdata')
+rm(list=ls())#
+library(lme4)#
+library(lmerTest)#
+library(vegan)#
+library(linkcomm)#
+library(picante)#
+setwd('~/Dropbox/hedgerow_network/analysis/intBeta')#
+source('src/misc.R')#
+source('src/phyloIntBeta.R')#
+source('src/predictIntervals.R')#
+source('src/CIplotting.R')#
+load('../../data/spec_network.Rdata')
+## ************************************************************#
+## turnover of phylo interactions through time#
+## ************************************************************#
+load(file="saved/lc.Rdata")#
+phylo.int <- calcCommDis(spec, "Int", lc, abund.w=TRUE)#
+save(phylo.int, file="saved/phyloInt.Rdata")
+comdist
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
+source('src/initialize.R')#
+source('src/phyloIntBeta.R')#
+#
+## ************************************************************#
+## prepare link community in terminal#
+## ************************************************************#
+edges.com <- cbind(as.character(spec$GenusSpecies),#
+                  as.character(spec$PlantGenusSpecies))#
+#
+## lc <- getLinkCommunities(edges.com, hcmethod = "average",#
+##                          bipartite=TRUE)#
+## save(lc, file="saved/lc.Rdata")#
+#
+## ************************************************************#
+## turnover of phylo interactions through time#
+## ************************************************************#
+load(file="saved/lc.Rdata")#
+spec$Int <- paste(spec$GenusSpecies,#
+                  spec$PlantGenusSpecies)#
+phylo.int <- calcCommDis(spec, "Int", lc, abund.w=TRUE)#
+save(phylo.int, file="saved/phyloInt.Rdata")
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
+source('src/initialize.R')#
+source('src/phyloIntBeta.R')#
+#
+## ************************************************************#
+## prepare link community in terminal#
+## ************************************************************#
+edges.com <- cbind(as.character(spec$GenusSpecies),#
+                  as.character(spec$PlantGenusSpecies))#
+#
+## lc <- getLinkCommunities(edges.com, hcmethod = "average",#
+##                          bipartite=TRUE)#
+## save(lc, file="saved/lc.Rdata")#
+#
+## ************************************************************#
+## turnover of phylo interactions through time#
+## ************************************************************#
+load(file="saved/lc.Rdata")#
+spec$Int <- paste(spec$GenusSpecies,#
+                  spec$PlantGenusSpecies)#
+phylo.int <- calcCommDis(spec, "Int", lc, abund.w=TRUE)#
+save(phylo.int, file="saved/phyloInt.Rdata")#
+#
+## linear model of phylo int by years between samples#
+load(file="saved/phyloInt.Rdata")#
+phylo.int.mod <- lmer(PhyloInt ~ Dist*SiteStatus +#
+                      (1|Site),#
+                      data=phylo.int$phylo.int)#
+#
+plot.box(ylabel="Node turnover",#
+                 dats=phylo.int$phylo.int,#
+                 y1="PhyloInt")
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
+source('src/initialize.R')#
+source('src/phyloIntBeta.R')#
+#
+## ************************************************************#
+## prepare link community in terminal#
+## ************************************************************#
+edges.com <- cbind(as.character(spec$GenusSpecies),#
+                  as.character(spec$PlantGenusSpecies))#
+#
+## lc <- getLinkCommunities(edges.com, hcmethod = "average",#
+##                          bipartite=TRUE)#
+## save(lc, file="saved/lc.Rdata")#
+#
+## ************************************************************#
+## turnover of phylo interactions through time#
+## ************************************************************#
+load(file="saved/lc.Rdata")#
+spec$Int <- paste(spec$GenusSpecies,#
+                  spec$PlantGenusSpecies)#
+phylo.int <- calcCommDis(spec, "Int", lc, abund.w=TRUE)#
+save(phylo.int, file="saved/phyloInt.Rdata")#
+#
+## linear model of phylo int by years between samples#
+load(file="saved/phyloInt.Rdata")#
+phylo.int.mod <- lmer(PhyloInt ~ Dist*SiteStatus +#
+                      (1|Site),#
+                      data=phylo.int$phylo.int)#
+#
+plot.box(ylabel="Node turnover",#
+                 dats=phylo.int$phylo.int,#
+                 y1="PhyloInt")
+rm(list=ls())#
+library(RColorBrewer)#
+setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
+source("plotting/src/predictIntervals.R")#
+source("plotting/src/CIplotting.R")#
+source('../networkLevel/src/misc.R', chdir = TRUE)#
+load('saved/contMods.Rdata')#
+#
+## ************************************************************#
+## dprime abundance#
+## ************************************************************#
+#
+dd.dprime <- expand.grid(traits=seq(#
+                           from= min(dprime$data$traits),#
+                           to= max(dprime$data$traits),#
+                           length=10),#
+                         SiteStatus= c("control", "maturing", "mature"),#
+                         cv= 0)#
+#
+dprime.pi <- predict.int(mod= dprime$lm,#
+                        dd=dd.dprime,#
+                        y="cv",#
+                        family="gaussian")#
+#
+plot.predict.div(new.dd=dprime.pi,#
+                 ylabel="Coefficient of variation",#
+                 dats=dprime$data,#
+                 xs="traits",#
+                 y1="cv",#
+                 xlabel="Specialization",#
+                 legend.loc="bottomright",#
+                 height=5,#
+                 width=5,#
+                 x.adj=0.5)#
+## ************************************************************#
+## dprime network position - k#
+## ************************************************************#
+#
+dprime.pi <- predict.int(mod= dprime.k.sd$lm,#
+                        dd=dd.dprime,#
+                        y="cv",#
+                        family="gaussian")#
+#
+plot.predict.div(new.dd=dprime.pi,#
+                 ylabel="Network position variability",#
+                 dats=dprime.k.sd$data,#
+                 xs="traits",#
+                 y1="cv",#
+                 xlabel="Specialization",#
+                 legend.loc="topright",#
+                 height=5,#
+                 width=5,#
+                 x.adj=0.5)#
+## ************************************************************#
+## dprime network position - closeness#
+## ************************************************************#
+#
+dprime.pi.cl <- predict.int(mod= dprime.closeness.sd$lm,#
+                        dd=dd.dprime,#
+                        y="cv",#
+                        family="gaussian")#
+#
+plot.predict.div(new.dd=dprime.pi.cl,#
+                 ylabel="Closeness variability",#
+                 dats=dprime.closeness.sd$data,#
+                 xs="traits",#
+                 y1="cv",#
+                 xlabel="Specialization",#
+                 legend.loc="topright",#
+                 height=5,#
+                 width=5,#
+                 x.adj=0.5)#
+## ************************************************************#
+## itd abundance#
+## ************************************************************#
+#
+dd.itd <- expand.grid(traits=seq(#
+                           from= min(itd$data$traits, na.rm=TRUE),#
+                           to= max(itd$data$traits, na.rm=TRUE),#
+                           length=10),#
+                         SiteStatus= c("control", "maturing", "mature"),#
+                         cv= 0)#
+#
+itd.pi <- predict.int(mod= itd$lm,#
+                        dd=dd.itd,#
+                        y="cv",#
+                        family="gaussian")#
+#
+plot.predict.div(new.dd=itd.pi,#
+                 ylabel="Coefficient of variation",#
+                 dats=itd$data,#
+                 xs="traits",#
+                 y1="cv",#
+                 xlabel="Body size",#
+                 legend.loc="bottomright",#
+                 height=5,#
+                 width=5,#
+                 x.adj=0.5)#
+#
+## ************************************************************#
+## persistence network position#
+## ************************************************************#
+occ.k.sd$data$SiteStatus <- "all"#
+dd.occ <- expand.grid(traits=seq(#
+                           from= min(occ.k.sd$data$traits, na.rm=TRUE),#
+                           to= max(occ.k.sd$data$traits, na.rm=TRUE),#
+                           length=10),#
+                         ## SiteStatus= c("control", "maturing",#
+                      ## "mature"),#
+                      SiteStatus="all",#
+                         cv= 0)#
+#
+occ.pi <- predict.int(mod= occ.k.sd$lm.nss,#
+                        dd=dd.occ,#
+                        y="cv",#
+                        family="gaussian")#
+#
+plot.predict.div(new.dd=occ.pi,#
+                 ylabel="Network position variability",#
+                 dats=occ.k.sd$data,#
+                 xs="traits",#
+                 y1="cv",#
+                 xlabel="Pollinator persistence",#
+                 legend.loc="bottomright",#
+                 height=5,#
+                 width=5,#
+                 x.adj=0.5,#
+                 treatments="all",#
+                 col.lines="black")
+rm(list=ls())#
+library(RColorBrewer)#
+setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
+source("plotting/src/predictIntervals.R")#
+source("plotting/src/CIplotting.R")#
+source('../networkLevel/src/misc.R', chdir = TRUE)#
+load('saved/dissMods.Rdata')#
+#
+## ************************************************************#
+## interaction dispersion, k, plants#
+## ************************************************************#
+plants$SiteStatus <- "all"#
+pols$SiteStatus <- "all"#
+#
+dd.plants.k <- expand.grid(k=seq(#
+                             from= min(plants$k),#
+                             to= max(plants$k),#
+                             length=10),#
+                           ## SiteStatus= c("control", "maturing",#
+                           ## "mature"),#
+                           SiteStatus= c("all"),#
+                           Dist= 0)#
+#
+plants.k.pi <- predict.int(mod= mod.plants,#
+                           dd=dd.plants.k,#
+                           y="Dist",#
+                           family="gaussian")#
+#
+plot.predict.div(new.dd=plants.k.pi,#
+                 ylabel="Interaction dispersion",#
+                 dats=plants,#
+                 xs="k",#
+                 y1="Dist",#
+                 xlabel="Plant network position",#
+                 legend.loc="topright",#
+                 height=5,#
+                 width=5,#
+                 x.adj=0.5,#
+                 scaled=FALSE,#
+                 treatments="all",#
+                 col.lines="black")#
+## ************************************************************#
+## interaction dispersion, dprime, plants#
+## ************************************************************#
+#
+dd.plants.d <- expand.grid(d=seq(#
+                             from= min(plants$d),#
+                             to= max(plants$d),#
+                             length=10),#
+                           SiteStatus= c("all"),#
+                           ## SiteStatus= c("control", "maturing", "mature"),#
+                           Dist= 0)#
+#
+plants.d.pi <- predict.int(mod= mod.plants.d,#
+                           dd=dd.plants.d,#
+                           y="Dist",#
+                           family="gaussian")#
+#
+plot.predict.div(new.dd=plants.d.pi,#
+                 ylabel="Interaction dispersion",#
+                 dats=plants,#
+                 xs="d",#
+                 y1="Dist",#
+                 xlabel="Plant specialization",#
+                 legend.loc="topright",#
+                 height=5,#
+                 width=5,#
+                 x.adj=0.5,#
+                 scaled=FALSE,#
+                 treatments="all",#
+                 col.lines="black")#
+## ************************************************************#
+## interaction dispersion, k, pols#
+## ************************************************************#
+#
+dd.pols.k <- expand.grid(k=seq(#
+                           from= min(pols$k),#
+                           to= max(pols$k),#
+                           length=10),#
+                         SiteStatus= c("all"),#
+                         ## SiteStatus= c("control", "maturing", "mature"),#
+                         Dist= 0)#
+#
+pols.k.pi <- predict.int(mod= mod.pols,#
+                         dd=dd.pols.k,#
+                         y="Dist",#
+                         family="gaussian")#
+#
+plot.predict.div(new.dd=pols.k.pi,#
+                 ylabel="Interaction dispersion",#
+                 dats=pols,#
+                 xs="k",#
+                 y1="Dist",#
+                 xlabel="Pollinator network position",#
+                 legend.loc="topright",#
+                 height=5,#
+                 width=5,#
+                 x.adj=0.5,#
+                 scaled=FALSE,#
+                 treatments="all",#
+                 col.lines="black")#
+## ************************************************************#
+## interaction dispersion, dprime, pols#
+## ************************************************************#
+#
+dd.pols.d <- expand.grid(d=seq(#
+                           from= min(pols$d),#
+                           to= max(pols$d),#
+                           length=10),#
+                         SiteStatus= c("all"),#
+                         ## SiteStatus= c("control", "maturing", "mature"),#
+                         Dist= 0)#
+#
+pols.d.pi <- predict.int(mod= mod.pols.d,#
+                         dd=dd.pols.d,#
+                         y="Dist",#
+                         family="gaussian")#
+#
+plot.predict.div(new.dd=pols.d.pi,#
+                 ylabel="Interaction dispersion",#
+                 dats=pols,#
+                 xs="d",#
+                 y1="Dist",#
+                 xlabel="Pollinator specialization",#
+                 legend.loc="topright",#
+                 height=5,#
+                 width=5,#
+                 x.adj=0.5,#
+                 scaled=FALSE,#
+                 treatments="all",#
+                 col.lines="black")
+phylo.int.mod
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
+source('src/initialize.R')#
+source('src/phyloIntBeta.R')#
+#
+## ************************************************************#
+## prepare link community in terminal#
+## ************************************************************#
+edges.com <- cbind(as.character(spec$GenusSpecies),#
+                  as.character(spec$PlantGenusSpecies))#
+#
+## lc <- getLinkCommunities(edges.com, hcmethod = "average",#
+##                          bipartite=TRUE)#
+## save(lc, file="saved/lc.Rdata")#
+#
+## ************************************************************#
+## turnover of phylo interactions through time#
+## ************************************************************#
+load(file="saved/lc.Rdata")#
+spec$Int <- paste(spec$GenusSpecies,#
+                  spec$PlantGenusSpecies)#
+phylo.int <- calcCommDis(spec, "Int", lc, abund.w=TRUE)#
+save(phylo.int, file="saved/phyloInt.Rdata")#
+#
+## linear model of phylo int by years between samples#
+load(file="saved/phyloInt.Rdata")#
+phylo.int.mod <- lmer(PhyloInt ~ Dist*SiteStatus +#
+                      (1|Site),#
+                      data=phylo.int$phylo.int)#
+#
+plot.box(ylabel="Node turnover",#
+                 dats=phylo.int$phylo.int,#
+                 y1="PhyloInt")
+summary(phylo.int.mod)
+rm(list=ls())#
+setwd("~/Dropbox/hedgerow_assembly/analysis/changePoint")#
+load('cptPeel/baci/graphs.Rdata')#
+load('../../data/networks/allSpecimens.Rdata')#
+dats <- read.csv('cptPeel/changing_points.csv')#
+#
+counts <- table(dats[,-3])#
+#
+chpts.yrs <- colSums(counts)#
+barplot(chpts.yrs)#
+#
+sites <- unique(sapply(strsplit(names(graphs), "_"), function(x)#
+                       x[1]))#
+no.chpt <- sites[!sites %in% rownames(counts)]#
+add.chpt <- matrix(0, nrow=length(no.chpt), ncol=ncol(counts))#
+rownames(add.chpt) <- no.chpt#
+#
+counts <- rbind(counts, add.chpt)#
+#
+chpts.sites <- rowSums(counts)#
+#
+statuses <- spec$SiteStatus[match(names(chpts.sites), spec$Site)]#
+BACI.site <- c('Barger', 'Butler', 'Hrdy', 'MullerB', 'Sperandio')#
+statuses[names(chpts.sites) %in% BACI.site] <- "maturing"#
+#
+layout(matrix(1:3, nrow=1))#
+cont <- hist(chpts.sites[statuses == "control"], prob=TRUE,#
+     main="Unrestored", ylim=c(0,1),  xlim=c(0,4),#
+     breaks=0:4)#
+maturing <- hist(chpts.sites[statuses == "maturing"], prob=TRUE,#
+     main="Maturing", ylim=c(0,1), xlim=c(0,4),#
+     breaks=0:4)#
+mature <- hist(chpts.sites[statuses == "mature"], prob=TRUE,#
+     main="Mature", ylim=c(0,1), xlim=c(0,4),#
+     breaks=0:4)#
+#
+## fit poisson distributions to data#
+fit.cont <- fitdistr(chpts.sites[statuses == "control"],#
+                     densfun="Poisson")#
+fit.maturing <- fitdistr(chpts.sites[statuses == "maturing"],#
+                     densfun="Poisson")#
+fit.mature <- fitdistr(chpts.sites[statuses == "mature"],#
+                     densfun="Poisson")#
+#
+## likelihood ratio text of fit of control model on maturing data,#
+## mature model on maturing data#
+lik.cont.mat <- log(prod(dpois(chpts.sites[statuses == "maturing"],#
+                           lambda=fit.cont$estimate)))#
+lik.mature.mat <- log(prod(dpois(chpts.sites[statuses == "maturing"],#
+                           lambda=fit.mature$estimate)))#
+lik.mature.cont <- log(prod(dpois(chpts.sites[statuses == "control"],#
+                           lambda=fit.mature$estimate)))#
+#
+1- pchisq(-2*(lik.cont.mat - fit.maturing$loglik), 1)#
+#
+1- pchisq(-2*(lik.mature.mat - fit.maturing$loglik), 1)#
+#
+1- pchisq(-2*(lik.mature.cont - fit.maturing$loglik), 1)
+rm(list=ls())#
+setwd("~/Dropbox/hedgerow_assembly/analysis/changePoint")#
+load('cptPeel/baci/graphs.Rdata')#
+load('../../data/networks/allSpecimens.Rdata')#
+library(MASS)#
+dats <- read.csv('cptPeel/changing_points.csv')#
+#
+counts <- table(dats[,-3])#
+#
+chpts.yrs <- colSums(counts)#
+barplot(chpts.yrs)#
+#
+sites <- unique(sapply(strsplit(names(graphs), "_"), function(x)#
+                       x[1]))#
+no.chpt <- sites[!sites %in% rownames(counts)]#
+add.chpt <- matrix(0, nrow=length(no.chpt), ncol=ncol(counts))#
+rownames(add.chpt) <- no.chpt#
+#
+counts <- rbind(counts, add.chpt)#
+#
+chpts.sites <- rowSums(counts)#
+#
+statuses <- spec$SiteStatus[match(names(chpts.sites), spec$Site)]#
+BACI.site <- c('Barger', 'Butler', 'Hrdy', 'MullerB', 'Sperandio')#
+statuses[names(chpts.sites) %in% BACI.site] <- "maturing"#
+#
+layout(matrix(1:3, nrow=1))#
+cont <- hist(chpts.sites[statuses == "control"], prob=TRUE,#
+     main="Unrestored", ylim=c(0,1),  xlim=c(0,4),#
+     breaks=0:4)#
+maturing <- hist(chpts.sites[statuses == "maturing"], prob=TRUE,#
+     main="Maturing", ylim=c(0,1), xlim=c(0,4),#
+     breaks=0:4)#
+mature <- hist(chpts.sites[statuses == "mature"], prob=TRUE,#
+     main="Mature", ylim=c(0,1), xlim=c(0,4),#
+     breaks=0:4)#
+#
+## fit poisson distributions to data#
+fit.cont <- fitdistr(chpts.sites[statuses == "control"],#
+                     densfun="Poisson")#
+fit.maturing <- fitdistr(chpts.sites[statuses == "maturing"],#
+                     densfun="Poisson")#
+fit.mature <- fitdistr(chpts.sites[statuses == "mature"],#
+                     densfun="Poisson")#
+#
+## likelihood ratio text of fit of control model on maturing data,#
+## mature model on maturing data#
+lik.cont.mat <- log(prod(dpois(chpts.sites[statuses == "maturing"],#
+                           lambda=fit.cont$estimate)))#
+lik.mature.mat <- log(prod(dpois(chpts.sites[statuses == "maturing"],#
+                           lambda=fit.mature$estimate)))#
+lik.mature.cont <- log(prod(dpois(chpts.sites[statuses == "control"],#
+                           lambda=fit.mature$estimate)))#
+#
+1- pchisq(-2*(lik.cont.mat - fit.maturing$loglik), 1)#
+#
+1- pchisq(-2*(lik.mature.mat - fit.maturing$loglik), 1)#
+#
+1- pchisq(-2*(lik.mature.cont - fit.maturing$loglik), 1)
+1- pchisq(-2*(lik.mature.cont - fit.mature$loglik), 1)
+fit.cont
+fit.maturing
+fit.mature
+lik.mature.cont <- log(prod(dpois(chpts.sites[statuses == "mature"],#
+                           lambda=fit.control$estimate)))
+lik.mature.cont <- log(prod(dpois(chpts.sites[statuses == "mature"],#
+                           lambda=fit.cont$estimate)))
+1- pchisq(-2*(lik.mature.cont - fit.mature$loglik), 1)
