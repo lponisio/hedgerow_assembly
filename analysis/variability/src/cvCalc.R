@@ -4,6 +4,9 @@ corCv <- function(x){
   cv(x)*(1 + (1/4*length(x)))
 }
 
+
+## standard cv devides cv by 100 to avoid too large of numbers for the
+## lm
 cv.trait <- function(spec.dat,
                      byType,
                      trait,

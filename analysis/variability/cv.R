@@ -43,12 +43,26 @@ dprime.closeness.sd <- cv.trait(spec,
                                 standard.cv=FALSE,
                                 na.rm=TRUE)
 
+## sig
 occ.k.sd <- cv.trait(spec,
                      specs[specs$speciesType =="pollinator",],
                      trait="occ.date",
                      method= "time", time.col="assem",
                      abund.col="k",
-                     cv.function=sd, zero2na=TRUE, standard.cv=FALSE,
+                     cv.function=sd,
+                     zero2na=TRUE,
+                     standard.cv=FALSE,
+                     na.rm=TRUE)
+
+## not sig
+occ.k.cv <- cv.trait(spec,
+                     specs[specs$speciesType =="pollinator",],
+                     trait="occ.date",
+                     method= "time", time.col="assem",
+                     abund.col="k",
+                     cv.function=cv,
+                     zero2na=TRUE,
+                     standard.cv=FALSE,
                      na.rm=TRUE)
 
 
