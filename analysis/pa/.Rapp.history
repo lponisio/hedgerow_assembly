@@ -1,0 +1,201 @@
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/pa')#
+#
+load('../../data/networks/allSpecimens.Rdata')#
+f.path <- "../changePoint/cptPeel/baci"#
+load(file=file.path(f.path, "graphs.Rdata"))#
+#
+## total interactions#
+plant.tot.int <- lapply(nets, rowSums)#
+pol.tot.int <- lapply(nets, colSums)#
+#
+## degree#
+plant.degree <- lapply(nets, function(x)#
+                       apply(x, 1, function(x) sum(x >= 1)))#
+pol.degree <- lapply(nets, function(x)#
+                       apply(x, 2, function(x) sum(x >= 1)))#
+## ypr 1 #
+first.yrs <- spec[spec$ypr == 1,]#
+first.yrs <- unique(data.frame(Site=first.yrs$Site,#
+                  Year=first.yrs$Year))#
+first.yrs <- first.yrs[!apply(first.yrs, 1, function(x) any(is.na(x))),]#
+#
+ypr1 <- names(nets) %in%#
+                    paste(first.yrs$Site, first.yrs$Year, sep=".")#
+sites <- sapply(strsplit(names(nets), "[.]"), function(x) x[1])#
+years <- sapply(strsplit(names(nets), "[.]"), function(x) x[2])#
+#
+lapply(unique(sites), function(x){#
+  this.net <- nets[sites == x]#
+  lapply(this.net, function(y){#
+    browser()#
+  })#
+})
+y
+y[rowSums(y) >= 1,] <- 1
+head(y)
+y[,colSums(y) >= 1] <- 1
+head(y)
+rowSums(y) >= 1
+lapply(unique(sites), function(x){#
+  this.net <- nets[sites == x]#
+  lapply(this.net, function(y){#
+    browser()#
+   y[rowSums(y) >= 1,] <- 1#
+   y[,colSums(y) >= 1] <- 1#
+  })#
+})
+head(y)
+rowSums(y) >= 1
+y2 <- y#
+   y2[rowSums(y) >= 1,] <- 1#
+   y2[,colSums(y) >= 1] <- 1
+head(y2)
+rowSums(y)
+y >= 1
+rowSums(y >= 1)
+rowSums(y)
+y >= 1
+rowSums(y >= 1)
+rowSums(y)
+idential(rowSums(y >= 1), rowSums(y))
+idential(rowSums(y >= 1), rowSums(y))
+identical
+identical(rowSums(y >= 1), rowSums(y))
+apply(x, 1, function(x) sum(x >= 1))
+apply(y, 1, function(z) sum(z >= 1))
+Q
+lapply(unique(sites), function(x){#
+  this.net <- nets[sites == x]#
+  pres.sp <- lapply(this.net, function(y){#
+    y2 <- y#
+    y2[rowSums(y) >= 1,] <- 1#
+    y2[,colSums(y) >= 1] <- 1#
+    browser()#
+    y2*apply(y, 1, function(z) sum(z >= 1))#
+    return(y2)#
+  })#
+})
+head(y)
+apply(y, 1, function(z) sum(z >= 1))
+identical(apply(y, 1, function(z) sum(z >= 1)), rowSums(y))
+apply(y, 1, function(z) sum(z >= 1))
+probs <- y2*apply(y, 1, function(z) sum(z >= 1))
+probs
+probs
+Q
+lapply(unique(sites), function(x){#
+  this.net <- nets[sites == x]#
+  pres.sp <- lapply(this.net, function(y){#
+    y2 <- y#
+    y2[rowSums(y) >= 1,] <- 1#
+    y2[,colSums(y) >= 1] <- 1#
+    probs <- y2*apply(y, 1, function(z) sum(z >= 1))#
+    return(probs)#
+  })#
+  browser()#
+})
+Q
+lapply(unique(sites), function(x){#
+  this.net <- nets[sites == x]#
+  prob.plants <- lapply(this.net, function(y){#
+    y2 <- y#
+    y2[rowSums(y) >= 1,] <- 1#
+    y2[,colSums(y) >= 1] <- 1#
+    probs <- y2*apply(y, 1, function(z) sum(z >= 1))#
+    return(probs)#
+  })#
+  browser()#
+})
+prob.plants[[1]]
+prob.plants[[1]]
+?rmultinom
+Q
+lapply(unique(sites), function(x){#
+  this.net <- nets[sites == x]#
+  prob.plants <- lapply(this.net, function(y){#
+    y2 <- y#
+    y2[rowSums(y) >= 1,] <- 1#
+    y2[,colSums(y) >= 1] <- 1#
+    probs <- y2*apply(y, 1, function(z) sum(z >= 1))#
+    browser()#
+    sim.int <- rmultinom(N, sum(y >= 1))#
+    return(probs)#
+  })#
+  browser()#
+})
+N <- 2
+sim.int <- rmultinom(N, sum(y >= 1))
+sum(y >= 1)
+sum(y)
+y[y > 1] <- 1
+y
+Q
+N <- 2#
+lapply(unique(sites), function(x){#
+  this.net <- nets[sites == x]#
+  prob.plants <- lapply(this.net, function(y){#
+    y[y > 1] <- 1#
+    y2 <- y#
+    y2[rowSums(y) == 1,] <- 1#
+    y2[,colSums(y) == 1] <- 1#
+    probs <- y2*rowSums(y)#
+    browser()#
+    sim.int <- rmultinom(N, sum(y),)#
+    return(probs)#
+  })#
+})
+head(y)
+head(y2)
+head(probs)
+rowSums(y)
+probs <- y2*rowSums(y)
+probs
+y2 <- y#
+    y2[rowSums(y) != 0,] <- 1#
+    y2[,colSums(y) != 0] <- 1#
+    probs <- y2*rowSums(y)
+probs
+head(probs)
+sim.int <- rmultinom(N, sum(y), prob=probs)
+sim.int
+head(sim.int[[1]])
+head(sim.int[1])
+rmultinom(1, sum(y), prob=probs)
+sim.int <- rmultinom(1, sum(y), prob=probs)
+sim.int
+class(sim.int)
+dim(sim.int)
+dim(y)
+sim.int <- matrix(rmultinom(1, sum(y), prob=probs),#
+                      nrow=nrow(y))
+sim.int
+sum(y)
+head(sim.int)
+?sample
+Q
+N <- 2#
+lapply(unique(sites), function(x){#
+  this.net <- nets[sites == x]#
+  prob.plants <- lapply(this.net, function(y){#
+    y[y > 1] <- 1#
+    y2 <- y#
+    y2[rowSums(y) != 0,] <- 1#
+    y2[,colSums(y) != 0] <- 1#
+    return(y2)#
+  })#
+  browser()#
+})
+Q
+lapply(unique(sites), function(x){#
+  this.net <- nets[sites == x]#
+  pres.sp <- lapply(this.net, function(y){#
+    y[y > 1] <- 1#
+    y2 <- y#
+    y2[rowSums(y) != 0,] <- 1#
+    y2[,colSums(y) != 0] <- 1#
+    return(y2)#
+  })#
+  browser()#
+})
+pres.sp[[1]]
