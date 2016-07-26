@@ -40,7 +40,7 @@ prob.null.binary <- function(probs, fill, nrow, ncol) {
   return(interact)
 }
 
-lapply(unique(sites), function(x){
+getLik <- function(x){
   this.net <- nets[sites == x]
   pres.sp <- lapply(this.net, function(y){
     ## y[y > 1] <- 1
@@ -59,12 +59,18 @@ lapply(unique(sites), function(x){
   lik.years.pa <- numeric(length(these.years)-1)
   lik.years.rand <- numeric(length(these.years)-1)
   for(i in 2:length(these.years)){
-      prob.mat <- pres.sp[[i]]$pres.mat*pres.sp[[i-1]]$degree.plant
-      lik.years.pa[i-1] <- dmultinom(pres.sp[[i]]$y,
-                                     prob=prob.mat)
-      lik.years.rand[i-1] <- dmultinom(pres.sp[[i]]$y,
+    prob.mat <- pres.sp[[i]]$pres.mat*pres.sp[[i-1]]$degree.plant
+    lik.years.pa[i-1] <- dmultinom(pres.sp[[i]]$y,
+                                   prob=prob.mat)
+    lik.years.rand[i-1] <- dmultinom(pres.sp[[i]]$y,
                                      prob=pres.sp[[i]]$pres.mat)
-    }
+  }
   names(lik.years.pa) <- names(lik.years.rand) <- these.years[-1]
-  lik.ratio <- 2*(log(lik.years.pa) - log(lik.years.rand))
-})
+  lik.ratio <- pchisq(2*(log(lik.years.pa) - log(lik.years.rand)), 1,
+                      lower.tail=FALSE)
+  return(lik.ratio)
+}
+
+
+lik.pa.random <- lapply(unique(sites), getLik)
+names(lik.pa.random) <- unique(sites)

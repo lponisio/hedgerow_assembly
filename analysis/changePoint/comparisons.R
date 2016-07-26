@@ -56,10 +56,10 @@ lik.mature.cont <- log(prod(dpois(chpts.sites[statuses == "mature"],
                            lambda=fit.cont$estimate)))
 
 ## maturing is unlikely to be drawn from control
-1- pchisq(-2*(lik.cont.mat - fit.maturing$loglik), 1)
+pchisq(-2*(lik.cont.mat - fit.maturing$loglik), 1, lower.tail=FALSE)
 
 ## or mature
-1- pchisq(-2*(lik.mature.mat - fit.maturing$loglik), 1)
+pchisq(-2*(lik.mature.mat - fit.maturing$loglik), 1, lower.tail=FALSE)
 
 ## but mature could be draw from control
-1- pchisq(-2*(lik.mature.cont - fit.mature$loglik), 1)
+pchisq(-2*(lik.mature.cont - fit.mature$loglik), 1, lower.tail=FALSE)
