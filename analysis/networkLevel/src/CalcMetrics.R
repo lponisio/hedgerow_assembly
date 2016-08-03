@@ -48,7 +48,7 @@ calc.metric <- function(dat.web) {
                        wbinary=TRUE)$statistic["NODF"]
     mets <-  c(nodf,
                networklevel(dat.web, index="H2",
-                            H2_integer=TRUE))
+                            H2_integer=FALSE))
   }
   mod.met <- calc.mod(dat.web)
   return(c(mets, mod.met= mod.met))

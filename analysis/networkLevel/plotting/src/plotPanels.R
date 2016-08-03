@@ -1,6 +1,6 @@
 plot.panels <- function(){
   f <- function(){
-    col.lines <- brewer.pal(3, "Dark2")[2]
+    col.lines <- brewer.pal(4, "Greys")[3]
     col.fill <- add.alpha(col.lines, alpha=0.2)
     layout(matrix(1:3, ncol=1))
     par(oma=c(6, 7, 2, 1),
@@ -34,7 +34,7 @@ plot.panels <- function(){
     mtext("Specialization", 2, line=5, cex=1.5)
 
     axis(1, pretty(cor.dats$ypr), labels=pretty(cor.dats$ypr))
-    mtext("Years Post Restoration", 1, line=3.5, cex=1.5)
+    mtext("Year of assembly", 1, line=3.5, cex=1.5)
   }
   path <- 'figures'
   pdf.f(f, file=file.path(path,

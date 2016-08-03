@@ -29,8 +29,9 @@
   following restoration}
 \def\author{Lauren C.\ Ponisio$^1$, Marilia P. Gaiarsa$^2$, Claire Kremen$^1$}
 
-\def\runninghead{Coevolution and network structure}
-\def\keywords{evolution, nestedness, modularity, bipartite}
+\def\runninghead{Plant-pollinator network assembly}
+\def\keywords{community assembly, change points, specialization,
+  nestedness, modularity, bipartite, preferential attachment}
 
 \def\extras{
   \begin{itemize}
@@ -81,6 +82,7 @@
 \clearpage
 
 \begin{abstract}
+TO BE RE-WRITTEN
   The structure of networks is related to ability of communities to
   maintain function in the face of species extinction. Understanding
   network structure and how it relates to network disassembly,
@@ -208,7 +210,7 @@ in the genera \textit{Nomada} and \textit{Sphecodes}) by expert
 taxonomists.
 
 \subsection*{Change point analysis}
-
+\subsubsection*{Identifying change points}
 We employed a change point detection method \citep{peel2014detecting}
 to identify fundamental changes in large-scale pattern of interactions
 of plants and pollinators. A change point is caused by a merge, split,
@@ -263,6 +265,7 @@ total number of years each site was sampled as trails, and use a
 generalized linear model with Binomial error to test whether the
 probability of a change point occurring varied by site type.
 
+\subsubsection*{Characteristics of ``core'' and ``peripheral'' communities}
 To further elucidate the nature of the change points, we examine the
 characteristics of the species that contributed the reorganization of
 interactions. To do so, we first generate dendrograms using the GHRG
@@ -327,8 +330,6 @@ multivariate dispersion, ][]{anderson-2011-19,
 % site type as a fixed effect and year and site as random effects
 % \citep{lme4,lmetest}.
 
-
-
 \subsection*{Network structure}
 
 The changing points in network structure may contribute to the
@@ -370,6 +371,50 @@ below the extinction curve is used as a measure of network robustness.
 
 \section*{Results}
 \label{sec:results}
+\subsection*{Change point analysis}
+\subsubsection*{Identifying change points}
+
+
+\begin{figure}
+  \centering
+  \includegraphics[width=.8\textwidth]{../analysis/changePoint/plotting/networks.pdf}
+  \caption{XXX}
+  \label{fig:changePoints}
+\end{figure}
+\clearpage
+
+\subsubsection*{Characteristics of ``core'' and ``peripheral''
+  communities}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=.8\textwidth]{../analysis/changePoint/plotting/communities.pdf}
+  \caption{XXX}
+  \label{fig:communities}
+\end{figure}
+\clearpage
+
+\begin{figure}
+  \centering
+  \includegraphics[width=.7\textwidth]{../analysis/changePoint/plotting/figures/pcoa/pcoa.pdf}
+  \caption{XXX}
+  \label{fig:pcoa}
+\end{figure}
+\clearpage
+
+\subsection*{Network structure}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=.4\textwidth]{../analysis/networkLevel/figures/baci.pdf}
+  \caption{XXX}
+  \label{fig:baci}
+\end{figure}
+\clearpage
+
+\subsection*{Network robustness}
+
+%% no need for robustness figs bec not sig
 
 \section*{Discussion}
 \label{sec:discussion}

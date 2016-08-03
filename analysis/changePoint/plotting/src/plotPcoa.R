@@ -9,7 +9,7 @@ plot.beta.div <- function(comms, statuses, fig.path, method,
       pcoa.comm <-  cmdscale(vegdist(comm, method=method))
       plot(pcoa.comm[status == treatments[1],], asp=1,
            col=cols[1], pch=16, cex=1.5,
-           ylim=range(pcoa.comm[,2]) + c(0,0.2),
+           ylim=range(pcoa.comm[,2]) + c(-0.1,0.1),
            xlim=range(pcoa.comm[,1]),
            xlab='',
            ylab='',
@@ -35,8 +35,8 @@ plot.beta.div <- function(comms, statuses, fig.path, method,
     layout(matrix(1:2, ncol=1, byrow=TRUE))
     par(oma=c(2,7,1,1), mar=c(0.5,0,1,0.5),
         mgp=c(2,1,0), cex.axis=1.5)
-    cols <- c("darkolivegreen3",
-              "darkgoldenrod1")
+    cols <- c("darksalmon",
+              "black")
     for(i in 1:length(comms)){
       pcoa(comms[[i]], statuses[[i]], i=i,
            method=method)
