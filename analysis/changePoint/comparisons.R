@@ -3,8 +3,38 @@ setwd("~/Dropbox/hedgerow_assembly/analysis/changePoint")
 load('cptPeel/baci/graphs.Rdata')
 load('../../data/networks/allSpecimens.Rdata')
 library(MASS)
+library(nlme)
 dats <- read.csv('cptPeel/changing_points.csv')
+BACI.site <- c('Barger', 'Butler', 'Hrdy', 'MullerB', 'Sperandio')
+## **********************************************************
+## binomial 
+## **********************************************************
+count.samples <- aggregate(spec$Year, list(Site=spec$Site),
+                           FUN=function(x) length(unique(x)))
+count.samples$x <- count.samples$x - 1
 
+change.points.site <- tapply(dats$cp, dats$sites, length)
+
+chpt.trial <- data.frame(chpts=change.points.site,
+                         trials=count.samples$x[match(
+                           rownames(change.points.site),
+                           count.samples$Site)])
+
+chpt.trial$status <- spec$SiteStatus[match(rownames(chpt.trial), spec$Site)]
+chpt.trial$status[rownames(chpt.trial) %in% BACI.site] <- "maturing"
+
+## binomial model with change points as successes
+mod.chpt <- glm(cbind(chpt.trial$chpts, chpt.trial$trials - chpt.trial$chpts) ~
+    chpt.trial$status, family="binomial")
+summary(mod.chpt)
+
+## maturing has more successes than mature and controls, and mature
+## and controls have about the same
+
+## **********************************************************
+## poisson likelihood
+## maybe not quite right given the number of trails differs
+## **********************************************************
 counts <- table(dats[,-3])
 
 chpts.yrs <- colSums(counts)
@@ -21,7 +51,6 @@ counts <- rbind(counts, add.chpt)
 chpts.sites <- rowSums(counts)
 
 statuses <- spec$SiteStatus[match(names(chpts.sites), spec$Site)]
-BACI.site <- c('Barger', 'Butler', 'Hrdy', 'MullerB', 'Sperandio')
 statuses[names(chpts.sites) %in% BACI.site] <- "maturing"
 
 layout(matrix(1:3, nrow=1))

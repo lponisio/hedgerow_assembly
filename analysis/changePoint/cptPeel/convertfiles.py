@@ -11,7 +11,6 @@ cc.writeToFile('baci/Butler_2009_joint_s1-consensus.tree','gml')
 cc.writeToFile('baci/Butler_2015_joint_s1-consensus.tree','gml')
 
 ## three change points
-
 cc.writeToFile('baci/Hrdy_2007_joint_s1-consensus.tree','gml')
 cc.writeToFile('baci/Hrdy_2009_joint_s1-consensus.tree','gml')
 cc.writeToFile('baci/Hrdy_2011_joint_s1-consensus.tree','gml')

@@ -2,10 +2,13 @@ library(ape)
 library(vegan)
 library(FD)
 library(igraph)
+library(lme4)
+library(lmerTest)
 source('../networkLevel/src/misc.R')
 source('plotting/src/plotPcoa.R')
 load('../../data/networks/allSpecimens.Rdata')
 source('plotting/src/communities.R')
+source('src/calcCore.R')
 
 fig.path <- 'plotting/figures'
 f.path <- "cptPeel/baci"

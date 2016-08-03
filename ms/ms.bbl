@@ -1,4 +1,4 @@
-\begin{thebibliography}{5}
+\begin{thebibliography}{15}
 \expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
 
 \bibitem[{Alarc{\'o}n \emph{et~al.}(2008)Alarc{\'o}n, Waser \&
@@ -15,6 +15,51 @@ Albrecht, M., Riesen, M. \& Schmid, B. (2010).
   glacier foreland.
 \newblock \emph{Oikos}, 119, 1610--1624.
 
+\bibitem[{Anderson \emph{et~al.}(2011)Anderson, Crist, Chase, Vellend, Inouye,
+  Freestone, Sanders, Cornell, Comita, Davies \emph{et~al.}}]{anderson-2011-19}
+Anderson, M.J., Crist, T.O., Chase, J.M., Vellend, M., Inouye, B.D., Freestone,
+  A.L., Sanders, N.J., Cornell, H.V., Comita, L.S., Davies, K.F. \emph{et~al.}
+  (2011).
+\newblock Navigating the multiple meanings of $\beta$ diversity: a roadmap for
+  the practicing ecologist.
+\newblock \emph{Ecol. Lett.}, 14, 19--28.
+
+\bibitem[{Anderson \emph{et~al.}(2006)Anderson, Ellingsen \&
+  McArdle}]{anderson-2006-683}
+Anderson, M.J., Ellingsen, K.E. \& McArdle, B.H. (2006).
+\newblock Multivariate dispersion as a measure of beta diversity.
+\newblock \emph{Ecology Letters}, 9, 683--693.
+
+\bibitem[{Anderson \& Walsh(2013)}]{anderson-2013-557}
+Anderson, M.J. \& Walsh, D.C. (2013).
+\newblock Permanova, anosim, and the mantel test in the face of heterogeneous
+  dispersions: What null hypothesis are you testing?
+\newblock \emph{Ecol. Monogr.}, 83, 557--574.
+
+\bibitem[{Barab{\'a}si \& Albert(1999)}]{barabasi1999emergence}
+Barab{\'a}si, A.L. \& Albert, R. (1999).
+\newblock Emergence of scaling in random networks.
+\newblock \emph{science}, 286, 509--512.
+
+\bibitem[{Bascompte \emph{et~al.}(2003)Bascompte, Jordano, Meli\'an \&
+  Olesen}]{Bascompte2003}
+Bascompte, J., Jordano, P., Meli\'an, C.J. \& Olesen, J.M. (2003).
+\newblock The nested assembly of plant-animal mutualistic networks.
+\newblock \emph{Proc. Natl. Acad. Sci. USA}, 100, 9383--9387.
+
+\bibitem[{Bascompte \emph{et~al.}(2006)Bascompte, Jordano \&
+  Olesen}]{Bascompte2006}
+Bascompte, J., Jordano, P. \& Olesen, J.M. (2006).
+\newblock Asymmetric coevolutionary networks facilitate biodiversity
+  maintenance.
+\newblock \emph{Science}, 312, 431--433.
+
+\bibitem[{Bl{\"u}thgen \emph{et~al.}(2006)Bl{\"u}thgen, Menzel \&
+  Bl{\"u}thgen}]{bluthgen-2006-9}
+Bl{\"u}thgen, N., Menzel, F. \& Bl{\"u}thgen, N. (2006).
+\newblock Measuring specialization in species interaction networks.
+\newblock \emph{BMC Ecol.}, 6, 9.
+
 \bibitem[{D{\'\i}az-Castelazo \emph{et~al.}(2010)D{\'\i}az-Castelazo,
   Guimaraes~Jr, Jordano, Thompson, Marquis \& Rico-Gray}]{diaz2010changes}
 D{\'\i}az-Castelazo, C., Guimaraes~Jr, P.R., Jordano, P., Thompson, J.N.,
@@ -29,10 +74,27 @@ Fang, Q. \& Huang, S.Q. (2012).
   biodiversity hotspot over four years.
 \newblock \emph{PloS one}, 7, e32663.
 
+\bibitem[{Memmott \emph{et~al.}(2004)Memmott, Waser \& Price}]{Memmott2004}
+Memmott, J., Waser, N.M. \& Price, M.V. (2004).
+\newblock Tolerance of pollination networks to species extinctions.
+\newblock \emph{Proc. R. Soc. Lond. B}, 271, 2605--2611.
+
+\bibitem[{Olesen \emph{et~al.}(2007)Olesen, Bascompte, Dupont \&
+  Jordano}]{Olesen2007}
+Olesen, J.M., Bascompte, J., Dupont, Y. \& Jordano, P. (2007).
+\newblock The modularity of pollination networks.
+\newblock \emph{Proc. Natl. Acad. Sci. USA}, 104, 19891--19896.
+
 \bibitem[{Olesen \emph{et~al.}(2008)Olesen, Bascompte, Elberling \&
   Jordano}]{Olesen2008}
 Olesen, J.M., Bascompte, J., Elberling, H. \& Jordano, P. (2008).
 \newblock Temporal dynamics in a pollination network.
 \newblock \emph{Ecology}, 89, 1573.
+
+\bibitem[{Peel \& Clauset(2014)}]{peel2014detecting}
+Peel, L. \& Clauset, A. (2014).
+\newblock Detecting change points in the large-scale structure of evolving
+  networks.
+\newblock \emph{arXiv preprint arXiv:1403.0989}.
 
 \end{thebibliography}
