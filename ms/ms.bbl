@@ -1,4 +1,4 @@
-\begin{thebibliography}{15}
+\begin{thebibliography}{26}
 \expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
 
 \bibitem[{Alarc{\'o}n \emph{et~al.}(2008)Alarc{\'o}n, Waser \&
@@ -14,6 +14,14 @@ Albrecht, M., Riesen, M. \& Schmid, B. (2010).
 \newblock Plant--pollinator network assembly along the chronosequence of a
   glacier foreland.
 \newblock \emph{Oikos}, 119, 1610--1624.
+
+\bibitem[{Almeida-Neto \emph{et~al.}(2008)Almeida-Neto, Gumar\~{a}es,
+  Gumar{\~a}es, Loyola \& Ulrich}]{nodf}
+Almeida-Neto, M., Gumar\~{a}es, P., Gumar{\~a}es, P.R., Loyola, R.D. \& Ulrich,
+  W. (2008).
+\newblock A consistent metric for nestedness analysis in ecological systems:
+  reconciling concept and measurement.
+\newblock \emph{Oikos}, 117, 1227--1239.
 
 \bibitem[{Anderson \emph{et~al.}(2011)Anderson, Crist, Chase, Vellend, Inouye,
   Freestone, Sanders, Cornell, Comita, Davies \emph{et~al.}}]{anderson-2011-19}
@@ -60,6 +68,16 @@ Bl{\"u}thgen, N., Menzel, F. \& Bl{\"u}thgen, N. (2006).
 \newblock Measuring specialization in species interaction networks.
 \newblock \emph{BMC Ecol.}, 6, 9.
 
+\bibitem[{Cane(1987)}]{cane-1987-145}
+Cane, J.H. (1987).
+\newblock Estimation of bee size using intertegular span (apoidea).
+\newblock \emph{Journal of the Kansas Entomological Society}, pp. 145--147.
+
+\bibitem[{Csardi \& Nepusz(2006)}]{igraph}
+Csardi, G. \& Nepusz, T. (2006).
+\newblock The igraph software package for complex network research.
+\newblock \emph{InterJournal}, Complex Systems, 1695.
+
 \bibitem[{D{\'\i}az-Castelazo \emph{et~al.}(2010)D{\'\i}az-Castelazo,
   Guimaraes~Jr, Jordano, Thompson, Marquis \& Rico-Gray}]{diaz2010changes}
 D{\'\i}az-Castelazo, C., Guimaraes~Jr, P.R., Jordano, P., Thompson, J.N.,
@@ -74,10 +92,34 @@ Fang, Q. \& Huang, S.Q. (2012).
   biodiversity hotspot over four years.
 \newblock \emph{PloS one}, 7, e32663.
 
+\bibitem[{Galeano \emph{et~al.}(2009)Galeano, Pastor \& Iriondo}]{Galeano2009}
+Galeano, J., Pastor, J.M. \& Iriondo, J.M. (2009).
+\newblock Weighted-interaction nestedness estimator (wine): a new estimator to
+  calculate over frequency matrices.
+\newblock \emph{Environmental Modeling \& Software}, 24, 1342--1346.
+
+\bibitem[{Kremen \& M'Gonigle(2015)}]{kremen-2015-602}
+Kremen, C. \& M'Gonigle, L.K. (2015).
+\newblock Small-scale restoration in intensive agricultural landscapes supports
+  more specialized and less mobile pollinator species.
+\newblock \emph{J. Appl. Ecol.}, 52, 602--610.
+
 \bibitem[{Memmott \emph{et~al.}(2004)Memmott, Waser \& Price}]{Memmott2004}
 Memmott, J., Waser, N.M. \& Price, M.V. (2004).
 \newblock Tolerance of pollination networks to species extinctions.
 \newblock \emph{Proc. R. Soc. Lond. B}, 271, 2605--2611.
+
+\bibitem[{M'Gonigle \emph{et~al.}(2015)M'Gonigle, Ponisio, Cutler \&
+  Kremen}]{mgonigle-2015-x}
+M'Gonigle, L., Ponisio, L., Cutler, K. \& Kremen, C. (2015).
+\newblock Habitat restoration promotes pollinator persistence and colonization
+  in intensively-managed agriculture.
+\newblock \emph{Ecol. Appl.}, 25, 1557--1565.
+
+\bibitem[{Newman \& Girvan(2004)}]{Newman2004}
+Newman, M.E.J. \& Girvan, M. (2004).
+\newblock Finding and evaluating community structure in networks.
+\newblock \emph{Phys. Rev. E}, 69, 026113.
 
 \bibitem[{Olesen \emph{et~al.}(2007)Olesen, Bascompte, Dupont \&
   Jordano}]{Olesen2007}
@@ -96,5 +138,33 @@ Peel, L. \& Clauset, A. (2014).
 \newblock Detecting change points in the large-scale structure of evolving
   networks.
 \newblock \emph{arXiv preprint arXiv:1403.0989}.
+
+\bibitem[{Ponisio \emph{et~al.}(2015)Ponisio, M'Gonigle \&
+  Kremen}]{ponisio2015farm}
+Ponisio, L.C., M'Gonigle, L.K. \& Kremen, C. (2015).
+\newblock On-farm habitat restoration counters biotic homogenization in
+  intensively managed agriculture.
+\newblock \emph{Global change biology}.
+
+\bibitem[{Schleuter \emph{et~al.}(2010)Schleuter, Daufresne, Massol \&
+  Argillier}]{schleuter-2010-469}
+Schleuter, D., Daufresne, M., Massol, F. \& Argillier, C. (2010).
+\newblock A user's guide to functional diversity indices.
+\newblock \emph{Ecol. Monogr.}, 80, 469--484.
+
+\bibitem[{Vill{\'e}ger \emph{et~al.}(2008)Vill{\'e}ger, Mason \&
+  Mouillot}]{villeger-2008-2290}
+Vill{\'e}ger, S., Mason, N.W. \& Mouillot, D. (2008).
+\newblock New multidimensional functional diversity indices for a multifaceted
+  framework in functional ecology.
+\newblock \emph{Ecology}, 89, 2290--2301.
+
+\bibitem[{Williams \emph{et~al.}(2010)Williams, Crone, Minckley, Packer, Potts
+  \emph{et~al.}}]{williams-2010-2280}
+Williams, N.M., Crone, E.E., Minckley, R.L., Packer, L., Potts, S.G.
+  \emph{et~al.} (2010).
+\newblock Ecological and life-history traits predict bee species responses to
+  environmental disturbances.
+\newblock \emph{Biol. Conserv.}, 143, 2280--2291.
 
 \end{thebibliography}

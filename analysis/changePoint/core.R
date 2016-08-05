@@ -13,7 +13,33 @@ comm.mats.all <- lapply(site.cores$all, makeComm)
 comm.mats.yr <- lapply(site.cores$by.year, makeComm, by.year=TRUE)
 
 ## **********************************************************
-## perm anovas and dispersion
+## perm anovas and dispersion of species that always stayed of left at
+## least once
+## **********************************************************
+## plants
+plant.perm.all <- adonis(comm.mats.all$plant$comm ~
+                     comm.mats.all$plant$status,
+                     method=method)
+plant.perm.all
+
+plant.beta.all <- betadisper(vegdist(comm.mats.all$plant$comm,
+                                 method=method),
+                         group=comm.mats.all$plant$status)
+permutest(plant.beta.all, pairwise = TRUE,
+          permutations = 999)
+
+## pollinators
+pol.perm.all <- adonis(comm.mats.all$pollinator$comm ~
+                   comm.mats.all$pollinator$status,
+                   method=method)
+pol.perm.all
+pol.beta.all <- betadisper(vegdist(comm.mats.all$pollinator$comm,
+                               method=method),
+                       group=comm.mats.all$pollinator$status)
+permutest(pol.beta.all, pairwise = TRUE, permutations = 999)
+
+## **********************************************************
+## perm anovas and dispersion by year
 ## **********************************************************
 ## plants
 plant.perm <- adonis(comm.mats.yr$plant$comm ~

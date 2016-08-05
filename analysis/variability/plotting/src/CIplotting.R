@@ -6,12 +6,13 @@ plot.panel <- function(dats,
                        treatments,
                        col.lines,
                        col.fill,
-                       ylabel,
+                       ylabel="",
                        ag.col="SiteStatus",
                        plot.x=TRUE,
                        scaled=TRUE,
                        plot.y=TRUE,
-                       pchs=c(16, 16, 16)){
+                       pchs=c(16, 16, 16),
+                       dec=1){
   plotting.loop <- function(){
     for(i in 1:length(treatments)){
       print(treatments[i])
@@ -35,7 +36,7 @@ plot.panel <- function(dats,
       ##      pch=pchs[i])
       ## plots CI
       lines(x=sub.dd[,xs],
-            y=sub.dd[,y2],
+            y=sub.dd[,y1],
             col=col.lines[treatments[i]],
             lwd=2)
       lines(x=sub.dd[,xs],
@@ -56,7 +57,7 @@ plot.panel <- function(dats,
   }
   plot(NA,
        xlim=range(dats[, xs], na.rm=TRUE),
-       ylim=range(c(new.dd$phi,  new.dd$plo), na.rm=TRUE),
+       ylim=range(c(new.dd$phi,  new.dd$plo, y2), na.rm=TRUE),
        xlab="",
        ylab="",
        xaxt="n",
@@ -68,10 +69,10 @@ plot.panel <- function(dats,
   }
   if(plot.x){
     if(scaled){
-      axis(1, pretty(dats[,xs], 4),
-           labels= round((pretty(dats[,xs], 4)*
+      axis(1, pretty(dats[,xs], 5),
+           labels= round((pretty(dats[,xs], 5)*
              sd(dats[, "traits.ns"], na.rm=TRUE)) +
-             mean(dats[, "traits.ns"], na.rm=TRUE), 1))
+             mean(dats[, "traits.ns"], na.rm=TRUE), dec))
     } else{
       axis(1, pretty(dats[,xs], 4))
     }
@@ -85,7 +86,7 @@ plot.predict.div <- function(new.dd,
                              ylabel,
                              dats,
                              y1,
-                             y2=y1,
+                             y2=NA,
                              xs="",
                              legend.loc="bottomright",
                              legend.loc.year="topleft",
@@ -95,7 +96,10 @@ plot.predict.div <- function(new.dd,
                              scaled=TRUE,
                              treatments = c("control", "maturing",
                                "mature"),
-                             col.lines =  brewer.pal(3, "Dark2")[c(2, 1, 3)]){
+                             col.lines =  brewer.pal(3, "Dark2")[c(2,
+                             1, 3)],
+                             f.path = 'figures',
+                             dec=1){
   plot.ci <- function(){
     col.fill <- add.alpha(col.lines, alpha=0.2)
     names(col.lines) <- names(col.fill) <- treatments
@@ -107,7 +111,8 @@ plot.predict.div <- function(new.dd,
                col.lines,
                col.fill,
                ylabel,
-               scaled=scaled)
+               scaled=scaled,
+               dec=dec)
     mtext(xlabel, 1, line=3.5, cex=1.5, adj=x.adj)
     if(length(treatments) > 1){
       legend(legend.loc,
@@ -116,8 +121,7 @@ plot.predict.div <- function(new.dd,
              pch=16, bty="n", cex=1)
     }
   }
-  path <- 'figures'
-  pdf.f(plot.ci, file=file.path(path,
+  pdf.f(plot.ci, file=file.path(f.path,
                    sprintf("%s.pdf", paste(
                      gsub(" ", "", ylabel),
                      gsub(" ", "", xlabel),

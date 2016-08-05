@@ -39,11 +39,12 @@ agg.spec <- aggregate(list(abund=spec$GenusSpecies),
                       length)
 
 nets.all <- samp2site.spp(agg.spec$PlantGenusSpecies,
-                      agg.spec$GenusSpecies, agg.spec$abund, FUN=sum)
+                          agg.spec$GenusSpecies, agg.spec$abund, FUN=sum)
 
 all.specializations <- specieslevel(nets.all,
                                     index=c("proportional generality",
-                                    "d"))
+                                      "degree",
+                                      "d"))
 
 traits <- data.frame(GenusSpecies= unlist(sapply(all.specializations,
                        rownames)),
@@ -58,7 +59,7 @@ spec <- spec[!spec$SiteStatus %in% to.drop.status,]
 ## add various traits
 ## specialization
 spec$d <- traits$d[match(spec$GenusSpecies, traits$GenusSpecies)]
-
+spec$degree <- traits$degree[match(spec$GenusSpecies, traits$GenusSpecies)]
 ## occurence
 load('~/Dropbox/hedgerow/data_sets/matrices/net/bee.syr.RData')
 occ <- apply(mat, c(3,1), function(x){
@@ -68,7 +69,7 @@ occ <- apply(mat, c(3,1), function(x){
 
 findOcc <- function(x){
   out <- try(occ[x["GenusSpecies"], paste(x["Site"], x["SiteStatusBACI"],
-                                sep=":")], silent=TRUE)
+                                          sep=":")], silent=TRUE)
   if(inherits(out, "try-error")) out <- NA
   return(out)
 }
@@ -166,11 +167,11 @@ species.lev <- lapply(networks, function(x){
 })
 
 specializations  <-  mapply(function(a, b)
-  getSpec(species.lev = a,
-          names.net = b),
-  a = species.lev,
-  b = names(networks),
-  SIMPLIFY = FALSE)
+                            getSpec(species.lev = a,
+                                    names.net = b),
+                            a = species.lev,
+                            b = names(networks),
+                            SIMPLIFY = FALSE)
 
 specializations <- do.call(rbind, specializations)
 rownames(specializations) <- NULL
@@ -188,23 +189,23 @@ save(specializations, file=file.path(f.path, 'specializations.Rdata'))
 
 ## plants
 diff.gens.plants <- getVisitChange(0, 0.2, "proportional.generality",
-                            "PlantGenusSpecies", "GenusSpecies")
+                                   "PlantGenusSpecies", "GenusSpecies")
 
 diff.spec.plants <- getVisitChange(0.5, 1, "proportional.generality",
-                            "PlantGenusSpecies", "GenusSpecies")
+                                   "PlantGenusSpecies", "GenusSpecies")
 
 diff.all.plants <- getVisitChange(0, 1, "proportional.generality",
-                           "PlantGenusSpecies", "GenusSpecies")
+                                  "PlantGenusSpecies", "GenusSpecies")
 
 ## pollinators
 diff.gens.pol <- getVisitChange(0, 0.2, "proportional.generality",
-                            "GenusSpecies", "PlantGenusSpecies")
+                                "GenusSpecies", "PlantGenusSpecies")
 
 diff.spec.pol <- getVisitChange(0.5, 1, "proportional.generality",
-                            "GenusSpecies", "PlantGenusSpecies")
+                                "GenusSpecies", "PlantGenusSpecies")
 
 diff.all.pol <- getVisitChange(0, 1, "proportional.generality",
-                           "GenusSpecies", "PlantGenusSpecies")
+                               "GenusSpecies", "PlantGenusSpecies")
 
 f.path <- '../data/degree'
 save(diff.gens.plants, diff.spec.plants, diff.all.plants,
@@ -295,12 +296,12 @@ plant.col <- plant.diffs[plant.diffs$class == "colonist",]
 
 plant.col$earlyAbund <- veg.sum$abundance[veg.sum$status ==
                                           "early"][match(
-                                           plant.col$species,
-                                           veg.sum$species)]
+                                            plant.col$species,
+                                            veg.sum$species)]
 plant.col$lateAbund <- veg.sum$abundance[veg.sum$status ==
                                          "late"][match(
-                                          plant.col$species,
-                                          veg.sum$species)]
+                                           plant.col$species,
+                                           veg.sum$species)]
 
 plant.col$degree <- d.plant$all_late[match(plant.col$species,
                                            names(d.plant$all_late))]
@@ -323,13 +324,13 @@ networks.by.year <- breakNet(spec, 'Site', 'Year')
 plant.species <- sapply(networks.by.year, nrow)
 plant.species <- data.frame(richness=plant.species,
                             sites =
-                              sapply(strsplit(names(plant.species),
-                                              "_"),
-                                     function(x) x[1]),
+                            sapply(strsplit(names(plant.species),
+                                            "_"),
+                                   function(x) x[1]),
                             years =
-                              sapply(strsplit(names(plant.species),
-                                              "_"),
-                                     function(x) x[2]))
+                            sapply(strsplit(names(plant.species),
+                                            "_"),
+                                   function(x) x[2]))
 
 
 write.csv(plant.species, file.path(f.path, 'plants_change.csv'),

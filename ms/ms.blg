@@ -3,44 +3,44 @@ Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
 The top-level auxiliary file: ms.aux
 The style file: ecol_let.bst
 Database file #1: refs.bib
-You've used 15 entries,
+You've used 26 entries,
             2997 wiz_defined-function locations,
-            731 strings with 7132 characters,
-and the built_in function-call counts, 9460 in all, are:
-= -- 765
-> -- 470
-< -- 4
-+ -- 184
-- -- 165
-* -- 786
-:= -- 1542
-add.period$ -- 45
-call.type$ -- 15
-change.case$ -- 129
-chr.to.int$ -- 15
-cite$ -- 15
-duplicate$ -- 628
-empty$ -- 628
-format.name$ -- 218
-if$ -- 1778
+            798 strings with 9135 characters,
+and the built_in function-call counts, 16178 in all, are:
+= -- 1321
+> -- 772
+< -- 9
++ -- 306
+- -- 270
+* -- 1321
+:= -- 2627
+add.period$ -- 78
+call.type$ -- 26
+change.case$ -- 218
+chr.to.int$ -- 26
+cite$ -- 26
+duplicate$ -- 1083
+empty$ -- 1090
+format.name$ -- 360
+if$ -- 3064
 int.to.chr$ -- 1
 int.to.str$ -- 1
-missing$ -- 143
-newline$ -- 79
-num.names$ -- 60
-pop$ -- 243
+missing$ -- 241
+newline$ -- 134
+num.names$ -- 104
+pop$ -- 410
 preamble$ -- 1
-purify$ -- 114
+purify$ -- 192
 quote$ -- 0
-skip$ -- 167
+skip$ -- 303
 stack$ -- 0
-substring$ -- 507
-swap$ -- 355
-text.length$ -- 0
+substring$ -- 893
+swap$ -- 607
+text.length$ -- 1
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 135
+type$ -- 234
 warning$ -- 0
-while$ -- 70
+while$ -- 120
 width$ -- 0
-write$ -- 197
+write$ -- 339

@@ -5,7 +5,7 @@ load('../../data/networks/baci_networks_years.Rdata')
 N <- 999
 
 ## ************************************************************
-## individuals nulls
+## null models for networks
 ## ************************************************************
 nulls <- lapply(nets, vaznull, N=N)
 save(nulls, file='saved/nulls/all.Rdata')
@@ -13,11 +13,15 @@ save(nulls, file='saved/nulls/all.Rdata')
 ## ************************************************************
 ## calculate metrics and zscores
 ## ************************************************************
-load(file='saved/nulls/all.Rdata')
 
+load(file='saved/nulls/all.Rdata')
 mets <- lapply(nets, calc.metric)
 null.mets <- rapply(nulls, calc.metric, how="replace")
 null.mets <- lapply(null.mets, function(x) do.call(rbind, x))
+save(null.mets, file='saved/nullMets.Rdata')
+
+## ************************************************************
+
 load(file='saved/nullMets.Rdata')
 
 cor.mets <- mapply(function(a, b)
@@ -33,6 +37,7 @@ cor.dats <- prep.dat(cor.mets,  spec)
 ## ************************************************************
 ## niche overlap
 ## ************************************************************
+
 no <- t(sapply(nets, networklevel, index="niche overlap"))
 
 cor.dats$niche.overlap.pol <- no[, "niche.overlap.HL"][match(rownames(no),
@@ -87,7 +92,7 @@ summary(baci.mod.mod)
 save(baci.mod.mod, file='saved/mods/baci_mod.Rdata')
 
 ## h2
-baci.h2.mod <- lmer(zH2 ~ scale(ypr) +
+baci.h2.mod <- lmer(H2 ~ scale(ypr) +
                  (1|Site) + (1|Year),
                  data=cor.dats[!is.na(cor.dats$ypr),])
 summary(baci.h2.mod)

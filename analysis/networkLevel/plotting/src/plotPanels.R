@@ -26,7 +26,7 @@ plot.panels <- function(){
     ## diversity
     plot.panel(new.dd=h2.pi,
                dats=cor.dats,
-               y1="zH2",
+               y1="H2",
                xs="ypr",
                col.fill=col.fill,
                col.lines=col.lines,
