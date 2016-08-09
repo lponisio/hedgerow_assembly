@@ -117,61 +117,146 @@
 \end{abstract}
 
 Keywords: changing points, temporal networks, hedgerows, species
-interactions, preferential attachment
+interactions, preferential attachment, mutualisms
 
 \clearpage
 
 \section*{Introduction}
 \label{sec:introduction}
 
-Global change has created a severe biodiversity crisis
-\citep{barnosky2011has}. As species are lost, so are their
-interactions, causing further coextinction cascades
-\citep{dunn2009sixth}.  Mutualistic systems are particualrly at risk.
-Ecological restoration plays an increasingly important role in
-recovering biodiversity (CITATIONS). Because the structure of
-interaction networks is related to ability of communities to maintain
-function in the face of species extinction \citep{Memmott2004}, a key
-restoration aim is to facilitate assembly of robust networks. Little
-is known, however, about how restoration influences the assembly of
-interaction networks, or ecological network assembly more generally.
+%% introduce mutualisms, restoration, network assembly
+Global change has created a severe biodiversity crisis, and as species
+are lost, so are their interactions \citep{dunn2009sixth,
+  barnosky2011has}. Because mutualistic interactions are essential for
+maintaining the diversity their component guilds of species, these
+systems are particularly at risk from coextinction cascades. The
+nature of these coextinction cascades depends on the interaction
+patterns within a community \citep{Memmott2004, Rezende2007,
+  Bascompte2009}. Recovering the lost biodiversity and interactions
+through ecological restoration has become increasingly imperative, and
+a key restoration aim is to facilitate assembly of robust interaction
+networks \citep{menz-2010-4}. We know little, however, about how to
+re-assemble interacting communities through restoration, or the
+process of ecological network assembly more generally.
 
-To date, only two field studies have examined how networks assemble
-over time, often using space for time gradients. \cite{Olesen2008} was
-investigated day-to-day, temporal assembly of a plant-pollinator
-network within a season, taking advantage of the extreme seasonality
-of pollinator communities in Greenland.  \cite{Olesen2008} found that
-within a season, the network assembly was similar to preferential
-attachment. New species tended to interact with already well-connected
-species, likely because these species are either more abundant or more
-temporally persistent.
-
-
+%% most people think network assemble via preferential attachment, and
+%% there is some evidence of that. (other studies on mutualisms?)
 The mostly widely explored mechanism of network assembly, preferential
 attachment \citep{barabasi1999emergence}, predicts that a new species
 is more likely to interact with species that are already
 well-connected \citep[''the rich-get-richer''
-principle,][]{barabasi1999emergence}.
+principle,][]{barabasi1999emergence}. In pollination systems --- a
+particularly ubiquitous mutualism \citep{ollerton-2011-321,
+  klein-2007-303} --- some studies have found support for this
+mechanism of assembly. Investigating the day-to-day, temporal assembly
+of a plant-pollinator network within a season, \cite{Olesen2008} found
+that new species tended to interact with already well-connected
+species, likely because these species are either more abundant or more
+temporally persistent \citep{Olesen2008}. In addition, using a
+space-for-time substitution to study primary succession along a
+glacier foreland, \cite{albrecht2010plant} found some indication
+assembly was occurring through preferential attachment. Network
+nestedness, a pattern of interactions where a generalist core
+interacts with both specialist and generalist species, increased as
+the community aged \citep{albrecht2010plant}. Increasing nestedness
+could result from a process like preferential attachment where
+specialist species attach to the well-connected, generalist core.
 
-\item Studying primary succession along a glacier foreland,
-  \cite{albrecht2010plant} found a similar pattern where nestedness, a
-  pattern of interactions where a generalist core interacts with both
-  specialist and generalist species, increased as the community
-  aged. % Studying ``managed succession'' of a clear-cut pine forest,
-  % \cite{devoto2012understanding} found changes in network structure
-  % were explained by a combination of age, tree density and variation
-  % in tree diameter. 
-\item Even non-successional temporal dynamics suggest a stable core of
-  generalists persist despite high turnover of peripheral species
-  \citep{fang2012relative, diaz2010changes, alarcon2008year}.
-\item In contrast to the ordered network build-up described by
-  preferential attachment, assembly may be punctuated by significant
-  reorganizations of interactions. For example, as new species are
-  added, resident species change their interaction partners to
-  minimize competition, or become extinct. Such significant
-  reorganizations of interactions, or changing points, have been
-  observed in networks \citep{peel2014detecting}.
-\end{itemize}
+%% there are other ways to assemble that are not preferentia;
+%% attchment, particularly vis big reorganizations of interactions
+In contrast to the ordered network build-up described by preferential
+attachment, assembly can be punctuated by significant reorganizations
+of interactions \citep{peel2014detecting}. For example, as new species
+are added, resident species change their interaction partners to
+minimize competition, or become extinct. Such significant
+reorganizations of interactions, or changing points, have been
+observed in networks responding to abrupt shifts in the behavior of
+interacters \citep{peel2014detecting}. No studies, however, have
+examined whether changing points occur during ecological network
+assembly.
+
+%% restoration
+Understanding network assembly is particularly relevant to ecological
+restoration, which is essentially 'applied succession'
+\citep[e.g.,]{parker1997scale}. In pollination systems, the time since
+an area was restored has been shown to effect the structure of
+networks \citep{forup-2008-742, forup2008restoration,
+  devoto2012understanding}, suggesting interactions are evolving as the
+community develops. Understanding the mechanisms of network assembly
+will help to guide the restoration of particular communities.
+
+%% restoration of ecosystem services is really important, particularly
+%% in ag. but ag is a bad place for pollinators
+Facilitating effective restoration of networks is particularly
+imperative in areas where species interactions provide essential
+ecosystem services, such as crop pollination. In intensively managed
+agricultural landscapes, the demand for pollination services is the
+greatest \citep{kremen-2008-10}. However, honey bees, managed
+extensively around the world to provide crop pollination, are in
+global decline \citep{neumann-2010-1, van-engelsdorp-2009-e6481}. In
+addition, native pollinators, which have the capacity to provide
+sufficient crop pollination \citep{kremen-2002-16816,
+  winfree-2007-1105, kremen-2004-1109}, are in short supply because
+these landscapes make poor habitats for pollinator populations
+\citep{kremen-2002-16816}. To ensure provision the continued provision
+of ecosystem services and curb biodiversity loss, effective
+restoration of pollinators and their interactions in agricultural
+landscapes is critical.
+
+%% hedgerows!!  
+To promote pollinator services in agriculture, farmers are
+increasingly turning to the habitat restoration technique of planting
+strips of native plants along farm edges (hedgerows) to help provide
+habitat for pollinators without removing arable land from
+production. Hedgerows have been shown to augment the richness,
+abundance and trait diversity of pollinators in agricultural
+landscapes\citep{morandin-2013-829, mgonigle-2015-x, kremen-2015-602,
+  ponisio2015farm}. In addition, hedgerows promote the persistence and
+colonization of floral resource specialists
+\citep{mgonigle-2015-x}. Little is known however, about the assembly
+of the network following hedgerow restoration. 
+
+Using a long-term data-set of plant-pollinator communities assembling
+following hedgerow restoration in the highly simplified and
+intensively managed agricultural landscape of California's Central
+Valley, we explore the process of network development. We first
+determine whether the mechanism underlying network assembly is a
+smooth build up of interactions as would be predicted by preferential
+attachment, or punctuated by significant reorganizations of
+interactions (i.e., changing points). Even with changing points in
+interaction organization, networks could still be assembling via
+preferential attachment if the network reorganizations were primarily
+driven the by peripheral, temporally variable species while a stable,
+well-connected core of species still persists. We thus examine whether
+the species are most variable in their network position --- and thus
+important contributors network reorganizations --- are less persistent
+and connected species. %% interaction beta div, time beta div??
+Lastly, we examine whether networks are assembling toward predictable
+interaction patterns, and the ramifications for the robustness of the
+networks to species extinction and perturbation.  
+
+
+%% objectives
+% 1) Are hedgerows assembling by preferential attachment, or are there
+% more abrupt reorganizations of network structure?
+% 2) Who are the species responsible for interaction reorganizations?
+% how to incorporate this? 
+% 3) Are the changing points a product of turnover in species
+% composition, or are more substantial changes in the verticles of the
+% networks?
+% 4) Is the structure of interactions changing? Does this change the
+% robustness of the network to species extinction and/or perturbation?
+
+% Pollinators are one such key group of interactors: $75\%$ of all
+% crop species depend to some extent on pollinator visitation
+% \citep{klein-2007-303}, and animal-pollinated crops supply a large
+% proportion of essential nutrients to the human diet
+% \citep{eilers-2011-e21363}.
+
+% Even non-successional temporal dynamics suggest a stable core of
+% generalists persist despite high turnover of peripheral species
+% \citep{fang2012relative, diaz2010changes, alarcon2008year}.
+
 
 \section*{Materials \& Methods}
 \label{sec:methods}
@@ -264,9 +349,8 @@ tree reconstruction, we fit the GHRG model to the networks
 \citep{peel2014detecting}. This is accomplished by using a Markov
 Chain Monte Carlo (MCMC) procedure to first sample the posterior
 distribution of bipartitions, from which a consensus tree is derived
-\citep{peel2014detecting}. ADD NEWMAN PAPER. We used $\beta$
-distributions with the hyperparameters $\alpha=\beta=1$ to define
-priors for $p_r$.
+\citep{peel2014detecting}. We used $\beta$ distributions with the
+hyperparameters $\alpha=\beta=1$ to define priors for $p_r$.
 
 Once the GHRG model has been fit to the networks, we determine whether
 a change point occurred between two time slices. To detect a change
@@ -290,34 +374,41 @@ probability of a change point occurring varied by site type. For the
 non-assembling hedgerows and weedy field margins, only sites with five
 or greater years of sampling was included in this analysis.
 
-% \subsubsection*{Characteristics of species that contribute to change
-%   points}
+\subsubsection*{Characteristics of species that contribute to change
+  points}
 
-% To further elucidate the nature of the change points, we examine the
-% characteristics of the species that contributed the reorganization of
-% interactions. Some species remain in relativly similar network
-% positions through time, whereas others are more variable in their role
-% and thus contribute more strongly to network reorganization. If
-% assembly is following according to a mechanism of preferential
-% attachment, the more persistnet species with the higest degree would
-% be most stable in their network position ???
+To further elucidate the nature of the change points, we examine the
+characteristics of the species that contributed the reorganization of
+interactions. Some species remain in relatively similar network
+positions through time, whereas others are more variable in their role
+and thus contribute more strongly to network reorganization. We test
+the that more persistent species with the highest degree are the most
+stable in their network position, as would be expected is the networks
+were assembling via preferential attachment.
 
-% We test the hypothesis that the species that occupy the most stable
-% positions in the network are the most temporally persistent and or
-% generalized \citep{fang2012relative}.
-
-% We calculate species persistence as the proportion of the surveys a
-% pollinator was observed. Species observed consistently within and
-% between years are thus maximally persistent. Species degree is based
-% on plant-pollinator interaction observations from a more extensive
-% data-set from Yolo County (approx.~ 18000 interaction records) that
-% included both the data included in this study and additional data from
-% sites where we collected flower visitors using the same methods
-% \citep{mgonigle-2015-x, ponisio2015farm}.
-
+We calculate species persistence as the proportion of the surveys a
+pollinator was observed. Species observed consistently within and
+between years are thus maximally persistent. Weighted species degree
+is calculated from interaction observations observed in more extensive
+data-set from Yolo County (approx.~ 18000 interaction records) that
+included both the data included in this study and additional data from
+sites where we collected flower visitors using the same methods
+\citep{mgonigle-2015-x, ponisio2015farm}.%% does this make sense to
+                                %% calculate from an independent data set?
+To represent the the variability of species within networks, we
+computed the coefficient of variation of weighted closeness at each
+site through time. Closeness describes the centrality of a species in
+the network by calculating path lengths to other vertices (species) in
+the graph. We used linear mixed models to test whether the variability
+of species closeness values was related to the persistence or degree
+of that species. We included random effects for species, as well as
+site. We focused on the pollinator species because the hedgerow
+flowers are planted and thus are not directly assembling. Because
+degree and persistence were strongly correlated, ($\rho = 0.84$,
+$p$-value $<$ $2*10^{-16}$), each explanatory variable was included in
+the model separately.
 
 \subsection*{Temporal changes in interaction patterns}
-
 The changing points in network structure may contribute to the
 reorganization of the assembling networks into predictable interaction
 patterns. Pollination networks exhibit two main topologies ---
@@ -339,24 +430,118 @@ would lead to an increase in the network-level specialization
 nestedness or specialization changed linearly with assembly, we used
 linear mixed models with the descriptive network metrics as the
 response variable, year of assembly as the explanatory variable, and
-random effects of site and year. We use NODF (weighted or unweighted)
-to evaluate network nestedness \citep{nodf}. NODF evaluates whether
-species with fewer partners interact with subsets of partners with
-which more connected species interact \citep{nodf}. We used a
-hierarchical clustering algorithm to estimate modularity
-\citep{Newman2004, igraph}.
+random effects of site and year.
 
-We calculated standardized $z$-scores so that network metrics could be
-compared between communities. The $z$-scores were calculated by
-generating an ensemble of $999$ randomly assembled communities,
+We use NODF (weighted or unweighted) to evaluate network nestedness
+\citep{nodf}. NODF evaluates whether species with fewer partners
+interact with subsets of partners with which more connected species
+interact \citep{nodf}. To estimate modularity, we use a hierarchical
+clustering algorithm \citep{Newman2004, igraph}.  We calculated
+standardized $z$-scores so that nestedness and modularity metrics
+could be compared between communities. The $z$-scores were calculated
+by generating an ensemble of $999$ randomly assembled communities,
 subtracting the mean of the statistic calculated across these
 communities from the observed value, and then dividing by the standard
 deviation. To assemble random communities, we reshuffled the
 interactions between species but fixed the total number of
 interactions, species and the distribution of the interaction
-frequencies \citep{Galeano2009}.
+frequencies \citep{Galeano2009}. Lastly, Network specialization was
+measured using H2, which estimate the deviation of the observed
+interaction frequency between plants and pollinators from a null
+expectation where all partners interact in proportion to their
+abundances \citep{bluthgen-2006-9}. It ranges from 0 for generalized
+networks to 1 for specialized networks.
 
-\subsection*{Core and peripherial communities}
+\subsection*{Network robustness}
+
+Lastly, we test the changes in interaction patterns associated with
+network assembly affect the robustness. First, following
+\cite{Memmott2004}, we simulate the extinction of plant species the
+subsequent extinction cascades of pollinator species. Because the
+reproduction of plant species if facilitated by active restoration
+efforts, it is unlikely the extinction of pollinators would effect
+plant populations in the hedgerows. However, plants ceasing to bloom,
+for example in response to drought, will likely effect the pollinators
+that depend on them. Plants species were eliminated based on their
+degree or abundance, and the number of pollinators that secondarily
+went extinct is calculated. The area below the extinction curve is
+used as a measure of network robustness \citep{Memmott2004}.
+
+%% Marilia add perturbation methods here
+
+\section*{Results}
+\label{sec:results}
+\subsection*{Change point analysis}
+\subsubsection*{Identifying change points}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=.8\textwidth]{../analysis/changePoint/plotting/networks.pdf}
+  \caption{XXX}
+  \label{fig:changePoints}
+\end{figure}
+\clearpage
+
+\subsubsection*{Characteristics of species that contribute to change
+  points}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=.8\textwidth]{../analysis/variability/figures/cv/occ_degree.pdf}
+  \caption{XXX}
+  \label{fig:cv}
+\end{figure}
+\clearpage
+
+
+\subsection*{Network structure}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=.4\textwidth]{../analysis/networkLevel/figures/baci.pdf}
+  \caption{XXX}
+  \label{fig:baci}
+\end{figure}
+\clearpage
+
+\subsection*{Network robustness}
+
+
+
+\section*{Discussion}
+\label{sec:discussion}
+
+\section*{Acknowledgments}
+\label{sec:acknowledge}
+
+We would like to thank Leto Peel and Aaron Clauset for their
+invaluable discussions and for help with the change point analysis.
+We thank the growers and land owners that allowed us to work on their
+property.  We also greatly appreciate the identification assistance of
+expert taxonomists Martin Hauser, Robbin Thorp and Jason Gibbs.  This
+work was supported by funding from the Army Research Office
+(W911NF-11-1-0361 to CK), the Natural Resources Conservation Service
+(CIG-69-3A75-12-253, CIG-69-3A75-9-142, CIG-68-9104-6-101 and
+WLF-69-7482-6-277 to The Xerces Society), the National Science
+Foundation (DEB-0919128 to CK), The U.S.  Department of Agriculture
+(USDA-NIFA 2012-51181-20105 to Michigan State University).  Funding
+for LCP was provided by an NSF Graduate Research Fellowship and the
+USDA NIFA Graduate Fellowship. FUNDING FOR MARILLIA.
+
+\bibliographystyle{ecol_let}
+
+\bibliography{refs}
+
+
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-PDF-mode: t
+%%% End:
+
+
+% \subsection*{Core and peripherial communities}
 
 % To classify species as we first generate dendrograms using the GHRG
 % model before and after each change point.  We then determined which
@@ -386,7 +571,7 @@ frequencies \citep{Galeano2009}.
 % renter;][]{williams-2010-2280} as described in more detail in
 % \cite{kremen-2015-602}.  Each trait has the same weight in trait
 % diversity metric estimation \citep{villeger-2008-2290,
-%   schleuter-2010-469}.
+% schleuter-2010-469}.
 
 % To characterize the functional diversity of the bee species in core
 % and peripherial communities, we computed three metrics that capture
@@ -408,110 +593,3 @@ frequencies \citep{Galeano2009}.
 % diversity metrics as response variables in linear mixed models with
 % site type as a fixed effect and year and site as random effects
 % \citep{lme4,lmetest}.
-
-
-\subsection*{Network robustness}
-
-Lastly, we test the changes in interaction patterns associated with
-network assembly affect the robustness of the network to species
-loss. Following \cite{Memmott2004}, we simulate the extinction of
-plant species the subsequent extinction cascades of pollinator
-species. Because the reproduction of plant species if facilitated by
-active restoration efforts, it is unlikely the extinction of
-pollinators would effect plant populations in the hedgerows. However,
-plants ceasing to bloom, for example in response to drought, will
-likely effect the pollinators that depend on them. Plants species were
-eliminated based on their degree or abundance, and the number of
-pollinators that secondarily went extinct is calculated. The area
-below the extinction curve is used as a measure of network robustness.
-
-
-\section*{Results}
-\label{sec:results}
-\subsection*{Change point analysis}
-\subsubsection*{Identifying change points}
-
-\begin{figure}
-  \centering
-  \includegraphics[width=.8\textwidth]{../analysis/changePoint/plotting/networks.pdf}
-  \caption{XXX}
-  \label{fig:changePoints}
-\end{figure}
-\clearpage
-
-\subsubsection*{Characteristics of species that contribute to change
-  points}
-
-\begin{figure}
-  \centering
-  \includegraphics[width=.8\textwidth]{../analysis/variability/figures/cv/occ_degree.pdf}
-  \caption{XXX}
-  \label{fig:cv}
-\end{figure}
-\clearpage
-
-
-% \subsubsection*{Characteristics of ``core'' and ``peripheral''
-%   communities}
-
-% \begin{figure}
-%   \centering
-%   \includegraphics[width=.8\textwidth]{../analysis/changePoint/plotting/communities.pdf}
-%   \caption{XXX}
-%   \label{fig:communities}
-% \end{figure}
-% \clearpage
-
-\begin{figure}
-  \centering
-  \includegraphics[width=.7\textwidth]{../analysis/changePoint/plotting/figures/pcoa/pcoa.pdf}
-  \caption{XXX}
-  \label{fig:pcoa}
-\end{figure}
-\clearpage
-
-\subsection*{Network structure}
-
-\begin{figure}
-  \centering
-  \includegraphics[width=.4\textwidth]{../analysis/networkLevel/figures/baci.pdf}
-  \caption{XXX}
-  \label{fig:baci}
-\end{figure}
-\clearpage
-
-\subsection*{Network robustness}
-
-%% no need for robustness figs bec not sig
-
-\section*{Discussion}
-\label{sec:discussion}
-
-\section*{Acknowledgments}
-\label{sec:acknowledge}
-
-We would like to thank Leto Peel and Aaron Clauset for their
-invaluable discussions and for help with the change point analysis.
-We thank the growers and land owners that allowed us to work on their
-property.  We also appreciate the identification assistance of expert
-taxonomists Martin Hauser, Robbin Thorp and Jason Gibbs.  This work
-was supported by funding from the Army Research Office
-(W911NF-11-1-0361 to CK), the Natural Resources Conservation Service
-(CIG-69-3A75-12-253, CIG-69-3A75-9-142, CIG-68-9104-6-101 and
-WLF-69-7482-6-277 to The Xerces Society), the National Science
-Foundation (DEB-0919128 to CK), The U.S.  Department of Agriculture
-(USDA-NIFA 2012-51181-20105 to Michigan State University).  Funding
-for LCP was provided by an NSF Graduate Research Fellowship and the
-USDA NIFA Graduate Fellowship. FUNDING FOR MARILLIA.
-
-\bibliographystyle{ecol_let}
-
-\bibliography{refs}
-
-
-\end{document}
-
-%%% Local Variables:
-%%% mode: latex
-%%% TeX-PDF-mode: t
-%%% End:

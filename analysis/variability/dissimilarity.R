@@ -15,14 +15,18 @@ load('../../data/networks/expanded_networks.Rdata')
 
 sites <- sapply(strsplit(names(nets), "[.]"), function(x) x[1])
 
-specs.agg <- aggregate(k  ~ GenusSpecies, data=specs, mean)
+specs.agg <- aggregate(list(k=specs$k,
+                            closeness=specs$weighted.closeness),
+                       list(GenusSpecies=specs$GenusSpecies), mean,
+                       na.rm=TRUE)
+
 plants <- getDis(sites, 1, nets, specs.agg, traits, spec)
 pols <- getDis(sites, 2, nets, specs.agg, traits, spec)
 
 ## dipersion of interaction parteners by core/periphery (continuus
 ## metric) (categoric metric didn'et make sense bec so few had values
 ## > 1)
-mod.pols <- lmer(Dist~k + (1|Site) + (1|GenusSpecies),
+mod.pols <- lmer(Dist ~ k + (1|Site) + (1|GenusSpecies),
                  data=pols)
 
 ## only two species with k >1
@@ -45,14 +49,25 @@ mod.plants.d <- lmer(Dist~d + (1|Site) + (1|GenusSpecies),
 mod.pols.occ <- lmer(Dist~occ.date + (1|Site) + (1|GenusSpecies),
                      data=pols)
 
+## closeness
+mod.pols.close <- lmer(Dist~ closeness + (1|Site) + (1|GenusSpecies),
+                 data=pols)
+
+mod.plants.close <- lmer(Dist~ closeness + (1|Site) + (1|GenusSpecies),
+                   data=plants)
+
+
+
 summary(mod.pols)
 summary(mod.pols.d)
 summary(mod.pols.occ)
+summary(mod.pols.close)
 
 summary(mod.plants)
 summary(mod.plants.d)
+summary(mod.plants.close)
 
 
 save(pols, plants, mod.pols,
-     mod.plants, mod.plants.d,
+     mod.plants, mod.plants.d, mod.plants.close, mod.pols.close,
      mod.pols.d, file="saved/dissMods.Rdata")

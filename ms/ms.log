@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.5.24)  4 AUG 2016 16:02
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.5.24)  9 AUG 2016 16:11
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -467,133 +467,94 @@ LaTeX Font Info:    Font shape `OT1/ppl/bx/n' in size <10.95> not available
 ]
 LaTeX Font Info:    Font shape `OT1/ppl/bx/n' in size <17.28> not available
 (Font)              Font shape `OT1/ppl/b/n' tried instead on input line 124.
-LaTeX Font Info:    Try loading font information for OMS+ppl on input line 127.
+ [3
 
- (/usr/local/texlive/2015/texmf-dist/tex/latex/psnfss/omsppl.fd
-File: omsppl.fd 
-)
-LaTeX Font Info:    Font shape `OMS/ppl/m/n' in size <12> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 127.
-
-Overfull \hbox (18.183pt too wide) in paragraph at lines 141--148
-[][][]\OT1/ppl/m/n/12 Olesen \OT1/ppl/m/it/12 et al.[][] \OT1/ppl/m/n/12 ([][]2
-008[][]) was in-ves-ti-gated day-to-day, tem-po-ral as-sem-bly of a plant-polli
-nator
+] [4]
+Overfull \hbox (11.21146pt too wide) in paragraph at lines 219--237
+[]\OT1/ppl/m/n/12 Using a long-term data-set of plant-pollinator com-mu-ni-ties
+ as-sem-bling fol-low-ing hedgerow
  []
 
-
-Overfull \hbox (1.81522pt too wide) in paragraph at lines 156--159
-\OT1/ppl/m/n/12 sist de-spite high turnover of pe-riph-eral species ([][]Fang &
- Huang[][], [][]2012[][]; [][]D[]^^Paz-Castelazo
- []
-
-[3
-
-]
 LaTeX Font Info:    Font shape `OT1/ppl/bx/n' in size <14.4> not available
-(Font)              Font shape `OT1/ppl/b/n' tried instead on input line 171.
+(Font)              Font shape `OT1/ppl/b/n' tried instead on input line 264.
+[5]
 LaTeX Font Info:    Font shape `U/msa/m/n' will be
-(Font)              scaled to size 12.50409pt on input line 192.
+(Font)              scaled to size 12.50409pt on input line 285.
 LaTeX Font Info:    Font shape `U/msa/m/n' will be
-(Font)              scaled to size 9.37807pt on input line 192.
+(Font)              scaled to size 9.37807pt on input line 285.
 LaTeX Font Info:    Font shape `U/msa/m/n' will be
-(Font)              scaled to size 7.29405pt on input line 192.
+(Font)              scaled to size 7.29405pt on input line 285.
 LaTeX Font Info:    Font shape `U/msb/m/n' will be
-(Font)              scaled to size 12.50409pt on input line 192.
+(Font)              scaled to size 12.50409pt on input line 285.
 LaTeX Font Info:    Font shape `U/msb/m/n' will be
-(Font)              scaled to size 9.37807pt on input line 192.
+(Font)              scaled to size 9.37807pt on input line 285.
 LaTeX Font Info:    Font shape `U/msb/m/n' will be
-(Font)              scaled to size 7.29405pt on input line 192.
- [4] [5]
+(Font)              scaled to size 7.29405pt on input line 285.
+ [6]
 Missing character: There is no Ã in font pplr7t!
 Missing character: There is no — in font pplr7t!
- [6] [7]
-Overfull \hbox (17.49934pt too wide) in paragraph at lines 333--335
-[]\OT1/ppl/m/n/12 Lastly, we ex-plored the func-tional di-ver-sity of the core 
-and pe-riph-eral pol-li-na-tor species 
- []
-
-[8] [9] [10]
-<../analysis/changePoint/plotting/networks.pdf, id=177, 578.16pt x 785.93625pt>
+ [7] [8] [9] [10] [11]
+<../analysis/changePoint/plotting/networks.pdf, id=226, 578.16pt x 785.93625pt>
 File: ../analysis/changePoint/plotting/networks.pdf Graphic file (type pdf)
 <use ../analysis/changePoint/plotting/networks.pdf>
 Package pdftex.def Info: ../analysis/changePoint/plotting/networks.pdf used on 
-input line 433.
+input line 479.
 (pdftex.def)             Requested size: 375.80544pt x 510.85251pt.
- [11] [12 <../analysis/changePoint/plotting/networks.pdf>]
-<../analysis/variability/figures/cv/occ_degree.pdf, id=242, 447.6725pt x 216.81
+ [12] [13 <../analysis/changePoint/plotting/networks.pdf>]
+<../analysis/variability/figures/cv/occ_degree.pdf, id=293, 447.6725pt x 216.81
 pt>
 File: ../analysis/variability/figures/cv/occ_degree.pdf Graphic file (type pdf)
 
  <use ../analysis/variability/figures/cv/occ_degree.pdf>
 Package pdftex.def Info: ../analysis/variability/figures/cv/occ_degree.pdf used
- on input line 444.
+ on input line 490.
 (pdftex.def)             Requested size: 375.80544pt x 182.00998pt.
- [13
-
- <../analysis/variability/figures/cv/occ_degree.pdf>]
-<../analysis/changePoint/plotting/communities.pdf, id=258, 578.16pt x 785.93625
-pt>
-File: ../analysis/changePoint/plotting/communities.pdf Graphic file (type pdf)
- <use ../analysis/changePoint/plotting/communities.pdf>
-Package pdftex.def Info: ../analysis/changePoint/plotting/communities.pdf used 
-on input line 456.
-(pdftex.def)             Requested size: 375.80544pt x 510.85251pt.
  [14
 
-] [15 <../analysis/changePoint/plotting/communities.pdf>]
-<../analysis/changePoint/plotting/figures/pcoa/pcoa.pdf, id=562, 289.08pt x 361
-.35pt>
-File: ../analysis/changePoint/plotting/figures/pcoa/pcoa.pdf Graphic file (type
- pdf)
- <use ../analysis/changePoint/plotting/figures/pcoa/pcoa.pdf>
-Package pdftex.def Info: ../analysis/changePoint/plotting/figures/pcoa/pcoa.pdf
- used on input line 464.
-(pdftex.def)             Requested size: 328.82707pt x 411.05557pt.
- [16 <../analysis/changePoint/plotting/figures/pcoa/pcoa.pdf>]
-<../analysis/networkLevel/figures/baci.pdf, id=574, 361.35pt x 867.24pt>
+ <../analysis/variability/figures/cv/occ_degree.pdf>]
+<../analysis/networkLevel/figures/baci.pdf, id=308, 361.35pt x 867.24pt>
 File: ../analysis/networkLevel/figures/baci.pdf Graphic file (type pdf)
 
 <use ../analysis/networkLevel/figures/baci.pdf>
 Package pdftex.def Info: ../analysis/networkLevel/figures/baci.pdf used on inpu
-t line 474.
+t line 501.
 (pdftex.def)             Requested size: 187.89914pt x 450.95418pt.
- [17
+ [15
 
+] [16 <../analysis/networkLevel/figures/baci.pdf>] (./ms.bbl [17
 
-] [18 <../analysis/networkLevel/figures/baci.pdf>] (./ms.bbl [19
-
-] [20] [21])
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 509.
- [22]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 509.
+] [18] [19] [20])
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 536.
+ [21]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 536.
  (./ms.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 509.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 509.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 536.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 536.
 Package rerunfilecheck Info: File `ms.out' has not changed.
 (rerunfilecheck)             Checksum: D41D8CD98F00B204E9800998ECF8427E;0.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 509.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 536.
  ) 
 Here is how much of TeX's memory you used:
- 7349 strings out of 493089
- 106225 string characters out of 6134842
- 191683 words of memory out of 5000000
- 10609 multiletter control sequences out of 15000+600000
- 35470 words of font info for 96 fonts, out of 8000000 for 9000
+ 7344 strings out of 493089
+ 106039 string characters out of 6134842
+ 192208 words of memory out of 5000000
+ 10606 multiletter control sequences out of 15000+600000
+ 35213 words of font info for 95 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 29i,8n,43p,240b,481s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 29i,8n,43p,268b,502s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/local/texlive/2015/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/local/t
-exlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/local/tex
-live/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmss8.pfb></usr/local/texli
-ve/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texliv
-e/2015/texmf-dist/fonts/type1/public/mathpazo/fplmri.pfb></usr/local/texlive/20
-15/texmf-dist/fonts/type1/urw/palatino/uplb8a.pfb></usr/local/texlive/2015/texm
-f-dist/fonts/type1/urw/palatino/uplr8a.pfb></usr/local/texlive/2015/texmf-dist/
-fonts/type1/urw/palatino/uplri8a.pfb>
-Output written on ms.pdf (22 pages, 3098479 bytes).
+exlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/local/te
+xlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/local/texl
+ive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmss8.pfb></usr/local/texliv
+e/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive
+/2015/texmf-dist/fonts/type1/public/mathpazo/fplmri.pfb></usr/local/texlive/201
+5/texmf-dist/fonts/type1/urw/palatino/uplb8a.pfb></usr/local/texlive/2015/texmf
+-dist/fonts/type1/urw/palatino/uplr8a.pfb></usr/local/texlive/2015/texmf-dist/f
+onts/type1/urw/palatino/uplri8a.pfb>
+Output written on ms.pdf (21 pages, 1397244 bytes).
 PDF statistics:
- 658 PDF objects out of 1000 (max. 8388607)
- 440 compressed objects within 5 object streams
- 77 named destinations out of 1000 (max. 500000)
- 26 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 400 PDF objects out of 1000 (max. 8388607)
+ 332 compressed objects within 4 object streams
+ 81 named destinations out of 1000 (max. 500000)
+ 16 words of extra memory for PDF output out of 10000 (max. 10000000)
 

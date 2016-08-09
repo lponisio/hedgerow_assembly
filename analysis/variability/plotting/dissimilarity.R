@@ -31,7 +31,7 @@ plot.predict.div(new.dd=plants.k.pi,
                  dats=plants,
                  xs="k",
                  y1="Dist",
-                 xlabel="Plant network position",
+                 xlabel="Plant network position (k)",
                  legend.loc="topright",
                  height=5,
                  width=5,
@@ -40,6 +40,36 @@ plot.predict.div(new.dd=plants.k.pi,
                  treatments="all",
                  col.lines="black")
 
+
+## ************************************************************
+## interaction dispersion, closeness, plants
+## ************************************************************
+
+dd.plants.closeness <- expand.grid(closeness=seq(
+                             from= min(plants$closeness),
+                             to= max(plants$closeness),
+                             length=10),
+                           SiteStatus= c("all"),
+                           Dist= 0)
+
+plants.closeness.pi <- predict.int(mod= mod.plants.close,
+                           dd=dd.plants.closeness,
+                           y="Dist",
+                           family="gaussian")
+
+plot.predict.div(new.dd=plants.closeness.pi,
+                 ylabel="Interaction dispersion",
+                 dats=plants,
+                 xs="closeness",
+                 y1="Dist",
+                 xlabel="Plant closeness",
+                 legend.loc="topright",
+                 height=5,
+                 width=5,
+                 x.adj=0.5,
+                 scaled=FALSE,
+                 treatments="all",
+                 col.lines="black")
 
 
 ## ************************************************************
@@ -96,7 +126,7 @@ plot.predict.div(new.dd=pols.k.pi,
                  dats=pols,
                  xs="k",
                  y1="Dist",
-                 xlabel="Pollinator network position",
+                 xlabel="Pollinator network position (k)",
                  legend.loc="topright",
                  height=5,
                  width=5,
@@ -130,6 +160,40 @@ plot.predict.div(new.dd=pols.d.pi,
                  xs="d",
                  y1="Dist",
                  xlabel="Pollinator specialization",
+                 legend.loc="topright",
+                 height=5,
+                 width=5,
+                 x.adj=0.5,
+                 scaled=FALSE,
+                 treatments="all",
+                 col.lines="black")
+
+
+
+
+## ************************************************************
+## interaction dispersion, closeness, pols
+## ************************************************************
+
+dd.pols.closeness <- expand.grid(closeness=seq(
+                           from= min(pols$closeness),
+                           to= max(pols$closeness),
+                           length=10),
+                         SiteStatus= c("all"),
+                         ## SiteStatus= c("control", "maturing", "mature"),
+                         Dist= 0)
+
+pols.closeness.pi <- predict.int(mod= mod.pols.close,
+                         dd=dd.pols.closeness,
+                         y="Dist",
+                         family="gaussian")
+
+plot.predict.div(new.dd=pols.closeness.pi,
+                 ylabel="Interaction dispersion",
+                 dats=pols,
+                 xs="closeness",
+                 y1="Dist",
+                 xlabel="Pollinator closeness",
                  legend.loc="topright",
                  height=5,
                  width=5,

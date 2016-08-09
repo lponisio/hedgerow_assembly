@@ -41,9 +41,9 @@ calcDis <- function(site, ind, nets, spec){
                                  unlist(sapply(pp, names)), "[.]"),
                                  function(x) x[2])))
     out.dist$SiteStatus <- spec$SiteStatus[match(paste(out.dist$Site,
-                                                 out.dist$Year),
-                                           paste(spec$Site,
-                                                 spec$Year))]
+                                                       out.dist$Year),
+                                                 paste(spec$Site,
+                                                       spec$Year))]
     rownames(out.dist) <- NULL
     return(out.dist)
   }
@@ -54,9 +54,14 @@ getDis <- function(sites, ind, nets, specs.agg, traits, spec){
   pp <- lapply(unique(sites), calcDis, ind=ind, nets, spec)
   pp <- pp[!sapply(pp, function(x) all(is.na(x)))]
   pp <- do.call(rbind, pp)
-  pp$k <- specs.agg$k[match(pp$GenusSpecies, specs.agg$GenusSpecies)]
-  pp$d <- traits$d[match(pp$GenusSpecies, traits$GenusSpecies)]
-  pp$occ.date <- traits$occ.date[match(pp$GenusSpecies, traits$GenusSpecies)]
+  pp$k <- specs.agg$k[match(pp$GenusSpecies,
+                            specs.agg$GenusSpecies)]
+  pp$closeness <- specs.agg$closeness[match(pp$GenusSpecies,
+                                            specs.agg$GenusSpecies)]
+  pp$d <- traits$d[match(pp$GenusSpecies,
+                         traits$GenusSpecies)]
+  pp$occ.date <- traits$occ.date[match(pp$GenusSpecies,
+                                       traits$GenusSpecies)]
   pp$core <- "core"
   pp$core[pp$k <= 1] <- "peripheral"
   return(pp)

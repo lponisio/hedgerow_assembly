@@ -29,9 +29,8 @@ itd <- cv.trait(spec, byYear, trait="ITD",
 ## ************************************************************
 ## coefficient of variation of degree thingy through time
 ## ************************************************************
-
-## ************************************************************
 ## dprime
+## ************************************************************
 ## not sig
 dprime.k.sd <- cv.trait(spec,
                         specs[specs$speciesType =="pollinator",],
@@ -69,6 +68,7 @@ summary(dprime.closeness.cv$lm.nss)
 
 ## ************************************************************
 ## occurrence
+## ************************************************************
 ## sig
 occ.k.sd <- cv.trait(spec,
                      specs[specs$speciesType =="pollinator",],
@@ -117,6 +117,7 @@ cor.test(occ.k.sd$data$traits.ns, occ.k.sd$data$spec)
 
 ## ************************************************************
 ## degree
+## ************************************************************
 ## sig
 degree.k.sd <- cv.trait(spec,
                         specs[specs$speciesType =="pollinator",],
