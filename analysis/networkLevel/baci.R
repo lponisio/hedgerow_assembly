@@ -3,36 +3,12 @@ setwd('~/Dropbox/hedgerow_assembly/analysis/networkLevel')
 source('src/initialize.R')
 load('../../data/networks/baci_networks_years.Rdata')
 N <- 999
-
-## ************************************************************
-## null models for networks
-## ************************************************************
-nulls <- lapply(nets, vaznull, N=N)
-save(nulls, file='saved/nulls/all.Rdata')
-
 ## ************************************************************
 ## calculate metrics and zscores
 ## ************************************************************
+mets <- lapply(nets, network.metrics, N)
 
-load(file='saved/nulls/all.Rdata')
-mets <- lapply(nets, calc.metric)
-null.mets <- rapply(nulls, calc.metric, how="replace")
-null.mets <- lapply(null.mets, function(x) do.call(rbind, x))
-save(null.mets, file='saved/nullMets.Rdata')
-
-## ************************************************************
-
-load(file='saved/nullMets.Rdata')
-
-cor.mets <- mapply(function(a, b)
-                   cor.metrics(true.stat= a,
-                               null.stat= b,
-                               N=N),
-                   a=mets,
-                   b=null.mets,
-                   SIMPLIFY=FALSE)
-
-cor.dats <- prep.dat(cor.mets,  spec)
+cor.dats <- prep.dat(mets,  spec)
 
 ## ************************************************************
 ## niche overlap
@@ -49,32 +25,10 @@ cor.dats$niche.overlap.plants <- no[, "niche.overlap.LL"][match(rownames(no),
 
 save(cor.dats, file='saved/corMets.Rdata')
 
-## distribution is niche overlap
-
-dis.mats <- lapply(lapply(nets, t), vegdist, method="chao")
-
-layout(matrix(1:6, nrow=2))
-cols <- rainbow(length(unique(cor.dats$Year)))
-lapply(unique(cor.dats$Site), function(x){
-  this.mats <- dis.mats[cor.dats$Site == x]
-  plot(NA, ylim=c(0,10), xlim=c(0,1.5),
-       ylab="Frequency",
-       xlab="Niche Overlap",
-       main= x)
-  for(i in 1:length(this.mats)){
-    points(density(this.mats[[i]]), col=cols[i], type="l", lwd=2)
-  }
-})
-
-plot(NA, ylim=c(0,1), xlim=c(0,1), xaxt="n", yaxt="n", ylab="", xlab="")
-legend("center", col=cols, lwd="2",
-       legend=sort(unique(cor.dats$Year)),
-       bty="n")
-
-
 ## ************************************************************
 ## effect of years post restoration
 ## ************************************************************
+
 load(file='saved/corMets.Rdata')
 
 ## nestedness
@@ -114,3 +68,28 @@ save(baci.no.plant.mod, file='saved/mods/baci_no_plant.Rdata')
 
 
 source('plotting/baci.R')
+
+
+
+
+## distribution is niche overlap
+
+dis.mats <- lapply(lapply(nets, t), vegdist, method="chao")
+
+layout(matrix(1:6, nrow=2))
+cols <- rainbow(length(unique(cor.dats$Year)))
+lapply(unique(cor.dats$Site), function(x){
+  this.mats <- dis.mats[cor.dats$Site == x]
+  plot(NA, ylim=c(0,10), xlim=c(0,1.5),
+       ylab="Frequency",
+       xlab="Niche Overlap",
+       main= x)
+  for(i in 1:length(this.mats)){
+    points(density(this.mats[[i]]), col=cols[i], type="l", lwd=2)
+  }
+})
+
+plot(NA, ylim=c(0,1), xlim=c(0,1), xaxt="n", yaxt="n", ylab="", xlab="")
+legend("center", col=cols, lwd="2",
+       legend=sort(unique(cor.dats$Year)),
+       bty="n")

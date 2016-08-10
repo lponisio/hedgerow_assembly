@@ -45,8 +45,9 @@ calc.metric <- function(dat.web, H2_integer=FALSE) {
                        weighted=TRUE,
                        wbinary=TRUE)$statistic["NODF"]
     mets <-  c(nodf,
-               networklevel(dat.web, index="H2",
-                            H2_integer=H2_integer))
+               networklevel(dat.web,
+                      index=c("H2", "connectance", "weighted connectance"),
+                      H2_integer=H2_integer))
   }
   mod.met <- calc.mod(dat.web)
   return(c(mets, mod.met= mod.met))
@@ -138,41 +139,19 @@ network.metrics <- function (dat.web, N) {
         zvalues <- zvals(out.mets)
         ## compute p-values
         pvalues <- pvals(out.mets, N)
-        return(cbind(true.stat, zvalues, pvalues))
+        out <- c(true.stat, zvalues, pvalues)
+        names(out) <- c("NODF", "H2", "connectance", "weighted connectance",
+                        "modularityG", "modularityR","modularityD",
+                        "zNODF", "zH2", "zcon", "zWcon",
+                        "zmodG", "zmodR", "zmodD",
+                        "pNODF", "pH2", "pcon", "pWcon",
+                        "pmodG", "pmodR", "pmodD")
+        return(out)
       }
     }
   }
-  return(matrix(rep(NA,4*3), ncol=3)) 
+  return(rep(NA,5*3))
 }
-
-##  function that computes summary statistics on simulated null matrices
-##  (nulls simulated from web N times)
-cor.metrics <- function (true.stat, null.stat, N) {
-  ## calculate pvalues
-  pvals <- function(stats, nnull){
-    colSums(stats >= stats[rep(1, nrow(stats)),])/(nnull + 1)
-  }
-  ## calculate zvalues two different ways
-  zvals <-function(stats){
-    z.sd <- (stats[1,] -
-             apply(stats, 2, mean, na.rm = TRUE))/
-               apply(stats, 2, sd, na.rm = TRUE)
-    z.sd[is.infinite(z.sd)] <- NA
-    return(z.sd)
-  }
-  out.mets <- rbind(true.stat, null.stat)
-  ## compute z scores
-  zvalues <- zvals(out.mets)
-  ## compute p-values
-  pvalues <- pvals(out.mets, N)
-  out <- c(true.stat, zvalues, pvalues)
-  names(out) <- c("NODF", "H2",
-                      "modularityG", "modularityR","modularityD",
-                      "zNODF", "zH2", "zmodG", "zmodR", "zmodD",
-                      "pNODF", "pH2", "pmodG", "pmodR", "pmodD")
-  return(out)
-}
-
 
 prep.dat <- function(cor.stats, spec.dat){
   dats <- do.call(rbind, cor.stats)
@@ -190,3 +169,34 @@ prep.dat <- function(cor.stats, spec.dat){
   rownames(out) <- NULL
   return(out)
 }
+
+
+
+## ##  function that computes summary statistics on simulated null matrices
+## ##  (nulls simulated from web N times)
+## cor.metrics <- function (true.stat, null.stat, N) {
+##   ## calculate pvalues
+##   pvals <- function(stats, nnull){
+##     colSums(stats >= stats[rep(1, nrow(stats)),])/(nnull + 1)
+##   }
+##   ## calculate zvalues two different ways
+##   zvals <-function(stats){
+##     z.sd <- (stats[1,] -
+##              apply(stats, 2, mean, na.rm = TRUE))/
+##                apply(stats, 2, sd, na.rm = TRUE)
+##     z.sd[is.infinite(z.sd)] <- NA
+##     return(z.sd)
+##   }
+##   out.mets <- rbind(true.stat, null.stat)
+##   ## compute z scores
+##   zvalues <- zvals(out.mets)
+##   ## compute p-values
+##   pvalues <- pvals(out.mets, N)
+##   out <- c(true.stat, zvalues, pvalues)
+##   names(out) <- c("NODF", "H2",
+##                       "modularityG", "modularityR","modularityD",
+##                       "zNODF", "zH2", "zmodG", "zmodR", "zmodD",
+##                       "pNODF", "pH2", "pmodG", "pmodR", "pmodD")
+##   return(out)
+## }
+
