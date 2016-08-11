@@ -28,11 +28,11 @@ nodf.pi <- predict.int(mod= baci.nodf.mod,
 ## ************************************************************
 load(file='saved/mods/baci_mod.Rdata')
 
-dd.mod <- cbind(dd, zmodD=0)
+dd.mod <- cbind(dd, zmod.met.D=0)
 
 mod.pi <- predict.int(mod= baci.mod.mod,
                         dd=dd.mod,
-                        y="zmodD",
+                        y="zmod.met.D",
                       family="gaussian")
 
 ## ************************************************************
@@ -68,7 +68,20 @@ dd.nopol <- cbind(dd, niche.overlap.pol =0)
 nopol.pi <- predict.int(mod= baci.no.pol.mod,
                         dd=dd.nopol,
                         y="niche.overlap.pol",
-                        family="gaussian")                        
+                        family="gaussian")
+
+## ************************************************************
+## connectance
+## ************************************************************
+load(file='saved/mods/baci_conn.Rdata')
+
+dd.conn <- cbind(dd, connectance =0)
+conn.pi <- predict.int(mod= baci.conn.mod,
+                        dd=dd.conn,
+                        y="connectance",
+                        family="gaussian")
+
+
 ## ************************************************************
 ## all panels
 ## ************************************************************

@@ -4,7 +4,7 @@ source('src/initialize.R')
 load('../../data/networks/all_networks_years.Rdata')
 
 ## either "abund" or "degree"
-extinction.method <- "degree"
+extinction.method <- "abund"
 
 ## **********************************************************
 ## robustness

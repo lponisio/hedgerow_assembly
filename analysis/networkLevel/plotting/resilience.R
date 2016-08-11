@@ -2,7 +2,7 @@ rm(list=ls())
 setwd('~/Dropbox/hedgerow_assembly/analysis/networkLevel')
 source('plotting/src/predictIntervals.R')
 source('plotting/src/CIplotting.R')
-source('plotting/src/plotPanels.R')
+source('plotting/src/plotPanels_resilence.R')
 source('src/initialize.R')
 
 ## ************************************************************
@@ -60,3 +60,4 @@ plot.predict.ypr(new.dd=ypr.pi.alg,
                  y1="AlgCon",
                  extinction.method="perturb")
 
+plot.panels()

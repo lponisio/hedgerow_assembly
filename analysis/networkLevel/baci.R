@@ -3,27 +3,28 @@ setwd('~/Dropbox/hedgerow_assembly/analysis/networkLevel')
 source('src/initialize.R')
 load('../../data/networks/baci_networks_years.Rdata')
 N <- 999
-## ************************************************************
-## calculate metrics and zscores
-## ************************************************************
-mets <- lapply(nets, network.metrics, N)
 
-cor.dats <- prep.dat(mets,  spec)
+## ## ************************************************************
+## ## calculate metrics and zscores
+## ## ************************************************************
+## mets <- lapply(nets, network.metrics, N)
 
-## ************************************************************
-## niche overlap
-## ************************************************************
+## cor.dats <- prep.dat(mets,  spec)
 
-no <- t(sapply(nets, networklevel, index="niche overlap"))
+## ## ************************************************************
+## ## niche overlap
+## ## ************************************************************
 
-cor.dats$niche.overlap.pol <- no[, "niche.overlap.HL"][match(rownames(no),
-                                     paste(cor.dats$Site,
-                                     cor.dats$Year, sep="."))]
-cor.dats$niche.overlap.plants <- no[, "niche.overlap.LL"][match(rownames(no),
-                                     paste(cor.dats$Site,
-                                     cor.dats$Year, sep="."))]
+## no <- t(sapply(nets, networklevel, index="niche overlap"))
 
-save(cor.dats, file='saved/corMets.Rdata')
+## cor.dats$niche.overlap.pol <- no[, "niche.overlap.HL"][match(rownames(no),
+##                                      paste(cor.dats$Site,
+##                                      cor.dats$Year, sep="."))]
+## cor.dats$niche.overlap.plants <- no[, "niche.overlap.LL"][match(rownames(no),
+##                                      paste(cor.dats$Site,
+##                                      cor.dats$Year, sep="."))]
+
+## save(cor.dats, file='saved/corMets.Rdata')
 
 ## ************************************************************
 ## effect of years post restoration
@@ -39,7 +40,7 @@ summary(baci.nodf.mod)
 save(baci.nodf.mod, file='saved/mods/baci_nodf.Rdata')
 
 ## modularity
-baci.mod.mod <- lmer(zmodD ~ scale(ypr) +
+baci.mod.mod <- lmer(zmod.met.D ~ scale(ypr) +
                  (1|Site) + (1|Year),
                  data=cor.dats[!is.na(cor.dats$ypr),])
 summary(baci.mod.mod)
@@ -51,6 +52,20 @@ baci.h2.mod <- lmer(H2 ~ scale(ypr) +
                  data=cor.dats[!is.na(cor.dats$ypr),])
 summary(baci.h2.mod)
 save(baci.h2.mod, file='saved/mods/baci_h2.Rdata')
+
+## connectance
+baci.conn.mod <- lmer(connectance ~ scale(ypr) +
+                 (1|Site) + (1|Year),
+                 data=cor.dats[!is.na(cor.dats$ypr),])
+summary(baci.conn.mod)
+save(baci.conn.mod, file='saved/mods/baci_conn.Rdata')
+
+## weighted connectance
+baci.wconn.mod <- lmer(weighted.connectance ~ scale(ypr) +
+                 (1|Site) + (1|Year),
+                 data=cor.dats[!is.na(cor.dats$ypr),])
+summary(baci.wconn.mod)
+save(baci.wconn.mod, file='saved/mods/baci_wconn.Rdata')
 
 ## niche overlap pollinators
 baci.no.pol.mod <- lmer(niche.overlap.pol ~ scale(ypr) +
@@ -68,8 +83,6 @@ save(baci.no.plant.mod, file='saved/mods/baci_no_plant.Rdata')
 
 
 source('plotting/baci.R')
-
-
 
 
 ## distribution is niche overlap

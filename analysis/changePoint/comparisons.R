@@ -9,31 +9,48 @@ BACI.site <- c('Barger', 'Butler', 'Hrdy', 'MullerB', 'Sperandio')
 ## **********************************************************
 ## binomial 
 ## **********************************************************
-count.samples <- aggregate(spec$Year, list(Site=spec$Site),
+chpt.trial <- aggregate(spec$Year, list(Site=spec$Site),
                            FUN=function(x) length(unique(x)))
-count.samples$x <- count.samples$x - 1
+chpt.trial$x <- chpt.trial$x - 1
+
+chpt.trial <- chpt.trial[chpt.trial$x >= 4,]
 
 change.points.site <- tapply(dats$cp, dats$sites, length)
 
-chpt.trial <- data.frame(chpts=change.points.site,
-                         trials=count.samples$x[match(
-                           rownames(change.points.site),
-                           count.samples$Site)])
+chpt.trial$chpts <- change.points.site[match(chpt.trial$Site,
+                                                rownames(change.points.site))]
+chpt.trial$chpts[is.na(chpt.trial$chpts)] <- 0
+colnames(chpt.trial) <- c("Site", "trial", "chpts")
 
-chpt.trial$status <- spec$SiteStatus[match(rownames(chpt.trial), spec$Site)]
-chpt.trial$status[rownames(chpt.trial) %in% BACI.site] <- "maturing"
+chpt.trial$status <- spec$SiteStatus[match(chpt.trial$Site, spec$Site)]
+chpt.trial$status[chpt.trial$Site %in% BACI.site] <- "maturing"
 
 ## binomial model with change points as successes
-mod.chpt <- glm(cbind(chpt.trial$chpts, chpt.trial$trials - chpt.trial$chpts) ~
+mod.chpt <- glm(cbind(chpt.trial$chpts, chpt.trial$trial - chpt.trial$chpts) ~
     chpt.trial$status, family="binomial")
 summary(mod.chpt)
+
+exp(cbind(coef(mod.chpt), confint(mod.chpt)))  
+
+# controls with change points
+nrow(chpt.trial[chpt.trial$status == "control" &
+                chpt.trial$chpts != 0,])/
+  nrow(chpt.trial[chpt.trial$status == "control",])
+
+nrow(chpt.trial[chpt.trial$status == "mature" &
+                chpt.trial$chpts != 0,])/
+  nrow(chpt.trial[chpt.trial$status == "mature",])
+
+nrow(chpt.trial[chpt.trial$chpts != 0,])/
+  nrow(chpt.trial)
+
 
 ## maturing has more successes than mature and controls, and mature
 ## and controls have about the same
 
 ## **********************************************************
 ## poisson likelihood
-## maybe not quite right given the number of trails differs
+## maybe not quite right given the number of trials differs
 ## **********************************************************
 counts <- table(dats[,-3])
 

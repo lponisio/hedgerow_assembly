@@ -32,8 +32,10 @@ calc.metric <- function(dat.web, H2_integer=FALSE) {
                                                                 weights=
                                                                 weights)),
                           weights=weights)
-    return(c(greedy, random.walk, dendro))
-  }
+    return(c(G=greedy,
+             R=random.walk,
+             D=dendro))
+  } 
 
   dat.web <- as.matrix(empty(dat.web))
   ## matrix of all the same number
@@ -46,8 +48,8 @@ calc.metric <- function(dat.web, H2_integer=FALSE) {
                        wbinary=TRUE)$statistic["NODF"]
     mets <-  c(nodf,
                networklevel(dat.web,
-                      index=c("H2", "connectance", "weighted connectance"),
-                      H2_integer=H2_integer))
+                            index=c("H2", "connectance", "weighted connectance"),
+                            H2_integer=H2_integer))
   }
   mod.met <- calc.mod(dat.web)
   return(c(mets, mod.met= mod.met))
@@ -137,15 +139,17 @@ network.metrics <- function (dat.web, N) {
         out.mets <- cbind(true.stat, null.stat)
         ## compute z scores
         zvalues <- zvals(out.mets)
+        names(zvalues) <- paste("z", names(true.stat), sep="")
         ## compute p-values
         pvalues <- pvals(out.mets, N)
+        names(pvalues) <- paste("p", names(true.stat), sep="")
         out <- c(true.stat, zvalues, pvalues)
-        names(out) <- c("NODF", "H2", "connectance", "weighted connectance",
-                        "modularityG", "modularityR","modularityD",
-                        "zNODF", "zH2", "zcon", "zWcon",
-                        "zmodG", "zmodR", "zmodD",
-                        "pNODF", "pH2", "pcon", "pWcon",
-                        "pmodG", "pmodR", "pmodD")
+        ## names(out) <- c("NODF", "connectance", "weighted.connectance", "H2",
+        ##                 "modularityG", "modularityR","modularityD",
+        ##                 "zNODF", "zcon", "zWcon", "zH2",
+        ##                 "zmodG", "zmodR", "zmodD",
+        ##                 "pNODF", "pcon", "pWcon", "pH2",
+        ##                 "pmodG", "pmodR", "pmodD")
         return(out)
       }
     }
@@ -157,9 +161,9 @@ prep.dat <- function(cor.stats, spec.dat){
   dats <- do.call(rbind, cor.stats)
   out <- data.frame(dats)
   out$Site <- sapply(strsplit(names(cor.stats), "\\."),
-                 function(x) x[1])
+                     function(x) x[1])
   out$Year <-  sapply(strsplit(names(cor.stats), "\\."),
-                 function(x) x[2])
+                      function(x) x[2])
   out$SiteStatus <- spec.dat$SiteStatus[match(paste(out$Site, out$Year),
                                               paste(spec.dat$Site,
                                                     spec.dat$Year))]

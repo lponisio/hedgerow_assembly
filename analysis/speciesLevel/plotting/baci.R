@@ -29,11 +29,11 @@ nodf.pi <- predict.int(mod= baci.nodf.mod,
 ## ************************************************************
 load(file='saved/mods/baci_mod.Rdata')
 
-dd.mod <- cbind(dd, zmodD=0)
+dd.mod <- cbind(dd, zmod.met.D=0)
 
 mod.pi <- predict.int(mod= baci.mod.mod,
                         dd=dd.mod,
-                        y="zmodD",
+                        y="zmod.met.D",
                         family="gaussian")
 
 ## plot.predict.ypr(new.dd=mod.pi,
@@ -46,17 +46,31 @@ mod.pi <- predict.int(mod= baci.mod.mod,
 ## ************************************************************
 load(file='saved/mods/baci_h2.Rdata')
 
-dd.h2 <- cbind(dd, zH2=0)
+dd.h2 <- cbind(dd, H2=0)
 
 h2.pi <- predict.int(mod= baci.h2.mod,
                         dd=dd.h2,
-                        y="zH2",
+                        y="H2",
                         family="gaussian")
 
 ## plot.predict.ypr(new.dd=h2.pi,
 ##                  ylabel="Specialization",
 ##                  dats=cor.dats,
 ##                  y1="zH2")
+
+
+## ************************************************************
+## connectance
+## ************************************************************
+load(file='saved/mods/baci_conn.Rdata')
+
+dd.conn <- cbind(dd, connectance=0)
+
+conn.pi <- predict.int(mod= baci.conn.mod,
+                        dd=dd.conn,
+                        y="connectance",
+                        family="gaussian")
+
 ## ************************************************************
 ## plotting
 ## ************************************************************

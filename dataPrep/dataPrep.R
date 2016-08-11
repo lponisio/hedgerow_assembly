@@ -18,19 +18,46 @@ spec <- dd
 
 ## subset to net specimens
 spec <- spec[spec$NetPan == 'net',]
-
-## subset to just bees and syrphids
-spec <- spec[spec$Family == 'Syrphidae' |
-             spec$BeeNonbee == 'bee',]
-
 ## create species column
 spec$PlantGenusSpecies <-  fix.white.space(paste(spec$PlantGenus,
                                                  spec$PlantSpecies))
 
 ## drop pollinators and plants without identifications
-spec <-  spec[spec$Species != '',]
 spec <-  spec[spec$PlantGenusSpecies != '',]
+
+to.drop.status <- c("forb", "natural")
+spec <- spec[!spec$SiteStatus %in% to.drop.status,]
+
+
+tot.spec <- nrow(spec)
+
+nrow(spec[spec$Family == 'Syrphidae',])/tot.spec
+nrow(spec[spec$BeeNonbee == 'bee',])/tot.spec
+
+## subset to just bees and syrphids
+spec <- spec[spec$Family == 'Syrphidae' |
+             spec$BeeNonbee == 'bee',]
+
+spec <-  spec[spec$Species != '',]
 spec$SiteStatus[spec$SiteStatus == "restored"] <- "maturing"
+
+
+## total specimens
+nrow(spec)
+
+## total species
+length(unique(spec$GenusSpecies))
+
+## sampling dates
+length(unique(paste(spec$Site, spec$Date)))
+
+## families and genera
+length(unique(spec$Family))
+length(unique(spec$Genus))
+
+## interactions
+length(unique(paste(spec$GenusSpecies, spec$PlantGenusSpecies)))
+
 
 ## create a giant network to calculate specialization
 agg.spec <- aggregate(list(abund=spec$GenusSpecies),
@@ -51,10 +78,31 @@ traits <- data.frame(GenusSpecies= unlist(sapply(all.specializations,
                      do.call(rbind, all.specializations))
 rownames(traits) <- NULL
 
+site.table <- aggregate(list(Samples=spec$Date),
+                        list(Year=spec$Year, Site=spec$Site),
+          function(x) length(unique(x)))
 
-## drop forb and natural sites 
-to.drop.status <- c("forb", "natural")
-spec <- spec[!spec$SiteStatus %in% to.drop.status,]
+ms.table <- samp2site.spp(site=site.table$Site,
+                          spp=site.table$Year,
+                          abund=site.table$Samples,
+                          FUN=sum)
+ms.table <- cbind(spec$SiteStatus[match(rownames(ms.table),
+                                             spec$Site)], ms.table)
+colnames(ms.table) <- c("Site type", colnames(ms.table)[-1])
+
+ms.table <- ms.table[order(ms.table[, "Site type"], decreasing=TRUE),]
+
+ms.table[, "Site type"][ms.table[, "Site type"] == "maturing"] <-
+  "Assembling HR"
+
+ms.table[, "Site type"][ms.table[, "Site type"] == "mature"] <-
+  "Non-assembling HR"
+
+ms.table[, "Site type"][ms.table[, "Site type"] == "control"] <-
+  "Non-assembling FM"
+
+write.table(ms.table, file="~/Dropbox/hedgerow_assembly/ms/tables/samples.txt",
+            sep=" & ")
 
 ## add various traits
 ## specialization

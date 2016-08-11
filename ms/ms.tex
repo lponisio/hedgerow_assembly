@@ -14,9 +14,14 @@
 \usepackage[normalem]{ulem} 
 \usepackage{hyperref}
 \usepackage[parfill]{parskip}
+\usepackage{graphicx}
+\usepackage{longtable}
+\usepackage{times}
+\usepackage{textcomp}
 \usepackage{xr}
-\usepackage{paralist}
-\usepackage{xr}
+\usepackage{etoolbox}
+\usepackage{filecontents}
+\usepackage{url}
 \externaldocument{SI}
 \hypersetup{colorlinks=true, linkcolor=black, citecolor=black}
 \RequirePackage{lineno}
@@ -266,9 +271,9 @@ networks to species extinction and perturbation.
 
 We surveyed plant-pollinator interaction networks of assembling
 hedgerows (N=5), as well as in two types of non-assembling communities
-to serve as controls: unrestored, weedy field margins (N=XX) and
+to serve as controls: unrestored, weedy field margins (N=19) and
 established hedgerows (greater than 10 years since planting,
-N=XX). The sites were located in the Central Valley of California in
+N=29). The sites were located in the Central Valley of California in
 Yolo, Colusa and Solano Counties. This area is comprised of
 intensively managed agriculture -- primarily monocultures of
 conventional row crops, vineyards and orchards. Hedgerows we planted
@@ -289,9 +294,10 @@ monoculture.
 Monitoring began in 2006 and continued through 2015. Sampling of the
 assembling hedgerows began the year before the area was restored. For
 logistical reasons, no sampling of assembling hedgerows was conducted
-in 2010. Sites were sampled between two and five times per year (Table
-XX). In each round of sampling, the order in which sites were sampled
-was randomized. Surveys were conducted under sunny conditions when the
+in 2010. Sites were sampled between two and five times per year
+(Tables S1-S3). In each round of
+sampling, the order in which sites were sampled was
+randomized. Surveys were conducted under sunny conditions when the
 temperature was above $21^{\circ}\mathrm{C}$ and wind speed was below
 $2.5$ meters/second.
 
@@ -302,7 +308,7 @@ collected because their abundance is determined largely by the
 placement of hives throughout the region by bee-keepers. All other
 insect flower visitors that touched the reproductive parts of the
 flower were collected; however, here we focus only on wild bees and
-syrphids (representing XX and XX percent of records, respectively),
+syrphids (representing 49 and 19 percent of records, respectively),
 the most abundant and effective pollinators in the system (C. Kremen,
 A. Klein and L. Morandin, unpublished data). Bee and syrphid specimens
 were identified to species (or morpho-species for some bee specimens
@@ -362,7 +368,8 @@ for more gradual changes, and four was the maximum possible with our
 maximum of nine years of data. Lastly, to calculate a $p$-value for
 the Bayes factors, we use parametric bootstrapping to numerically
 estimate the null distribution \citep{peel2014detecting}. The change
-point analysis was carried out using code published online by L.~Peel.
+point analysis was carried out using code published online by
+L.~Peel. Analyses we conducted in Python 3.4.
 
 We next test whether the change points occurring in maturing hedgerows
 were a component of the assembly process or a product of environmental
@@ -372,7 +379,8 @@ total number of years each site was sampled as trails, and use a
 generalized linear model with Binomial error to test whether the
 probability of a change point occurring varied by site type. For the
 non-assembling hedgerows and weedy field margins, only sites with five
-or greater years of sampling was included in this analysis.
+or greater years of sampling was included in this analysis. All
+statistical analysis were conducted in R 3.2.3 \citep{R}.
 
 \subsubsection*{Characteristics of species that contribute to change
   points}
@@ -394,21 +402,25 @@ data-set from Yolo County (approx.~ 18000 interaction records) that
 included both the data included in this study and additional data from
 sites where we collected flower visitors using the same methods
 \citep{mgonigle-2015-x, ponisio2015farm}.%% does this make sense to
-                                %% calculate from an independent data set?
+%% calculate from an independent data set?
 To represent the the variability of species within networks, we
 computed the coefficient of variation of weighted closeness at each
 site through time. Closeness describes the centrality of a species in
 the network by calculating path lengths to other vertices (species) in
 the graph. We used linear mixed models to test whether the variability
 of species closeness values was related to the persistence or degree
-of that species. We included random effects for species, as well as
-site. We focused on the pollinator species because the hedgerow
-flowers are planted and thus are not directly assembling. Because
-degree and persistence were strongly correlated, ($\rho = 0.84$,
-$p$-value $<$ $2*10^{-16}$), each explanatory variable was included in
-the model separately.
+of that species \citep{lme4, lmetest}. We included random effects for
+species, as well as site. We focused on the pollinator species because
+the hedgerow flowers are planted and thus are not directly
+assembling. Because degree and persistence were strongly correlated,
+($\rho = 0.84$, $p$-value $<$ $2*10^{-16}$), each explanatory variable
+was included in the model separately. Because a linear increase in
+closeness, as might be expected with assembly by preferential
+attachment, would lead to a high variability in closeness scores, we
+also test whether closeness increases through time.
 
-\subsection*{Temporal changes in interaction patterns}
+\section*{Temporal changes in interaction patterns}
+\subsection*{Network structure}
 The changing points in network structure may contribute to the
 reorganization of the assembling networks into predictable interaction
 patterns. Pollination networks exhibit two main topologies ---
@@ -454,8 +466,8 @@ networks to 1 for specialized networks.
 
 \subsection*{Network robustness}
 
-Lastly, we test the changes in interaction patterns associated with
-network assembly affect the robustness. First, following
+Lastly, we test whether the changes in interaction patterns associated
+with network assembly affect the robustness. First, following
 \cite{Memmott2004}, we simulate the extinction of plant species the
 subsequent extinction cascades of pollinator species. Because the
 reproduction of plant species if facilitated by active restoration
@@ -471,13 +483,47 @@ used as a measure of network robustness \citep{Memmott2004}.
 
 \section*{Results}
 \label{sec:results}
+
+Over eight years and $747$ samples, we collected and identified
+$19,547$ wild bees and syrphids comprising $173$ species from $50$
+genera. We observed $1,521$ unique interactions between plants and
+pollinators.
+
 \subsection*{Change point analysis}
 \subsubsection*{Identifying change points}
+
+The majority ($76\%$) of the sites tests underwent at least one
+significant reorganization of interactions (Fig.~
+\ref{fig:changePoints}). There were no consistent trends as to when
+change points occurred within assembling hedgerows or across all sites,
+except many site had changing points between year 2009 and 2011 (Fig.~
+\ref{fig:changePoints}). In California, 2011 marked the beginning of a
+multi year drought. In the assembling hedgerows were not sampled in
+2010, so disentangling whether the changing points are due to skipping
+a year of assembly or the drought is not impossible.
+
+All five of the assembling hedgerows experienced changing points,
+whereas only $40\%$ and $81\%$ of non-assembling hedgerows and field
+margins, respectively, underwent significant interaction
+reorganizations. Assembling hedgerows experienced significantly more
+changing points than the non-assembling networks (difference in the
+odds ratios between assembling and non-assembling networks $\pm$
+$95\%$ CI, $3.316 \pm 1.314 8.572$, $p$-value= $0.0117$). Network
+assembly following restoration is thus punctuated by more interaction
+reorganizations than would be expected by environmental shifts that
+would effect assembling and non-assembling networks equally.
 
 \begin{figure}
   \centering
   \includegraphics[width=.8\textwidth]{../analysis/changePoint/plotting/networks.pdf}
-  \caption{XXX}
+  \caption{The network structure and changing points (vertical red
+    lines) in assembling hedgerows and a representative sample of
+    non-assembling hedgerows and weedy field margins. In each network,
+    plants and pollinators are represented by green and yellow
+    circles, respectively, weighted by their degree. Each species has
+    has a consistent position in the network across years. In the
+    assembling hedgerows, colored circles in the corner of each
+    network represent the years post restoration.}
   \label{fig:changePoints}
 \end{figure}
 \clearpage
@@ -485,27 +531,79 @@ used as a measure of network robustness \citep{Memmott2004}.
 \subsubsection*{Characteristics of species that contribute to change
   points}
 
+In contradiction to the predictions of assembly by preferential
+attachment, both pollinator persistence and degree were positively
+related to network position variability. (ADD STATS IF KEEPING
+RESULT).
+
 \begin{figure}
   \centering
   \includegraphics[width=.8\textwidth]{../analysis/variability/figures/cv/occ_degree.pdf}
-  \caption{XXX}
+  \caption{The coefficient of variation of network position, as
+    represented by closeness, plotted against pollinator persistence
+    and degree. Points represents means for each species across sites.
+    The solid line indicates the mean slope estimate and the dashed
+    lines are the $95\%$ confidence intervals around the estimate. }
   \label{fig:cv}
 \end{figure}
 \clearpage
 
-
+\section*{Temporal changes in interaction patterns}
 \subsection*{Network structure}
+Network nestedness significantly increased with assembly (estimate of
+the slope of nestedness through time $\pm$ standard error of the
+estimate, $1.834 \pm 0.6142$, $p$-value=$0.022$, Fig.~
+\ref{fig:baci}).  Modularity decreased (Fig.~ \ref{fig:baci}), though
+the slope was not significantly different from zero (estimate of the
+slope of modularity through time $\pm$ standard error of the estimate,
+$-0.524$ $\pm$ $0.295$, $p$-value=$0.124$). Specialization remained
+relatively constant (estimate of the slope of specialization through time
+$\pm$ standard error of the estimate, $0.003$ $\pm$ $0.015$,
+$p$-value=$0.827$).
+
 
 \begin{figure}
   \centering
-  \includegraphics[width=.4\textwidth]{../analysis/networkLevel/figures/baci.pdf}
-  \caption{XXX}
+  \includegraphics[width=.7\textwidth]{../analysis/networkLevel/figures/baci.pdf}
+  \caption{The change in nestedness, modularity, specialization and
+    connectance as the networks assemble. The left panels represent
+    $z$-scores. Scores greater than $\sim 2$ or less than $\sim -2$
+    are significantly more or less structured than randomly assembled
+    networks. Points are the value for each site at each year of
+    assembly. The solid line indicates the mean slope estimate and the
+    dashed lines are the $95\%$ confidence intervals around the
+    estimate.}
   \label{fig:baci}
 \end{figure}
 \clearpage
 
 \subsection*{Network robustness}
+Assembly did not effect the robustness of the networks to species
+extinction when species where removed incrementally by degree
+(estimate of the slope of robustness through time $\pm$ standard error
+of the estimate, $6*10^{-5} \pm 4*10^{-3}$, $p$-value=$0.987$) or
+abundance ($0.001 \pm 0.003$, $p$-value=$0.65$, Fig.~ \ref{fig:rob}).
 
+In contrast, the robustness of networks to perturbation, as measured
+by the algebraic connectivity of the network, increased as the network
+assembled (estimate of the slope of robustness through time $\pm$
+standard error of the estimate, $0.6814 \pm 0.272$, $p$-value=$0.042$,
+Fig.~ \ref{fig:rob}).
+
+\begin{figure}
+  \centering
+  \includegraphics[width=.7\textwidth]{../analysis/networkLevel/figures/robustness.pdf}
+  \caption{The robustness of networks to species extinction and
+    perturbation. The robustness to species extinction is measured by
+    incrementally removing species by degree, through removing
+    species by abundance did not yield qualitatively different
+    results. Points are the value for each site at each year of
+    assembly. The solid line indicates the mean slope estimate and the
+    dashed lines are the $95\%$ confidence intervals around the
+    estimate.}
+  \label{fig:rob}
+\end{figure}
+\clearpage
 
 
 \section*{Discussion}
@@ -532,13 +630,6 @@ USDA NIFA Graduate Fellowship. FUNDING FOR MARILLIA.
 
 \bibliography{refs}
 
-
-\end{document}
-
-%%% Local Variables:
-%%% mode: latex
-%%% TeX-PDF-mode: t
-%%% End:
 
 
 % \subsection*{Core and peripherial communities}
@@ -593,3 +684,11 @@ USDA NIFA Graduate Fellowship. FUNDING FOR MARILLIA.
 % diversity metrics as response variables in linear mixed models with
 % site type as a fixed effect and year and site as random effects
 % \citep{lme4,lmetest}.
+
+
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-PDF-mode: t
+%%% End:
