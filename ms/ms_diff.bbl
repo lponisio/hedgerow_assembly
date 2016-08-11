@@ -1,0 +1,283 @@
+\begin{thebibliography}{43}
+\expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
+
+\bibitem[{Alarc{\'o}n \emph{et~al.}(2008)Alarc{\'o}n, Waser \&
+  Ollerton}]{alarcon2008year}
+Alarc{\'o}n, R., Waser, N.M. \& Ollerton, J. (2008).
+\newblock Year-to-year variation in the topology of a plant--pollinator
+  interaction network.
+\newblock \emph{Oikos}, 117, 1796--1807.
+
+\bibitem[{Albrecht \emph{et~al.}(2010)Albrecht, Riesen \&
+  Schmid}]{albrecht2010plant}
+Albrecht, M., Riesen, M. \& Schmid, B. (2010).
+\newblock Plant--pollinator network assembly along the chronosequence of a
+  glacier foreland.
+\newblock \emph{Oikos}, 119, 1610--1624.
+
+\bibitem[{Almeida-Neto \emph{et~al.}(2008)Almeida-Neto, Gumar\~{a}es,
+  Gumar{\~a}es, Loyola \& Ulrich}]{nodf}
+Almeida-Neto, M., Gumar\~{a}es, P., Gumar{\~a}es, P.R., Loyola, R.D. \& Ulrich,
+  W. (2008).
+\newblock A consistent metric for nestedness analysis in ecological systems:
+  reconciling concept and measurement.
+\newblock \emph{Oikos}, 117, 1227--1239.
+
+\bibitem[{Anderson \emph{et~al.}(2011)Anderson, Crist, Chase, Vellend, Inouye,
+  Freestone, Sanders, Cornell, Comita, Davies \emph{et~al.}}]{anderson-2011-19}
+Anderson, M.J., Crist, T.O., Chase, J.M., Vellend, M., Inouye, B.D., Freestone,
+  A.L., Sanders, N.J., Cornell, H.V., Comita, L.S., Davies, K.F. \emph{et~al.}
+  (2011).
+\newblock Navigating the multiple meanings of $\beta$ diversity: a roadmap for
+  the practicing ecologist.
+\newblock \emph{Ecol. Lett.}, 14, 19--28.
+
+\bibitem[{Anderson \emph{et~al.}(2006)Anderson, Ellingsen \&
+  McArdle}]{anderson-2006-683}
+Anderson, M.J., Ellingsen, K.E. \& McArdle, B.H. (2006).
+\newblock Multivariate dispersion as a measure of beta diversity.
+\newblock \emph{Ecology Letters}, 9, 683--693.
+
+\bibitem[{Anderson \& Walsh(2013)}]{anderson-2013-557}
+Anderson, M.J. \& Walsh, D.C. (2013).
+\newblock Permanova, anosim, and the mantel test in the face of heterogeneous
+  dispersions: What null hypothesis are you testing?
+\newblock \emph{Ecol. Monogr.}, 83, 557--574.
+
+\bibitem[{Barab{\'a}si \& Albert(1999)}]{barabasi1999emergence}
+Barab{\'a}si, A.L. \& Albert, R. (1999).
+\newblock Emergence of scaling in random networks.
+\newblock \emph{science}, 286, 509--512.
+
+\bibitem[{Barnosky \emph{et~al.}(2011)Barnosky, Matzke, Tomiya, Wogan, Swartz,
+  Quental, Marshall, McGuire, Lindsey, Maguire \emph{et~al.}}]{barnosky2011has}
+Barnosky, A.D., Matzke, N., Tomiya, S., Wogan, G.O., Swartz, B., Quental, T.B.,
+  Marshall, C., McGuire, J.L., Lindsey, E.L., Maguire, K.C. \emph{et~al.}
+  (2011).
+\newblock Has the earth/'s sixth mass extinction already arrived?
+\newblock \emph{Nature}, 471, 51--57.
+
+\bibitem[{Bascompte \emph{et~al.}(2003)Bascompte, Jordano, Meli\'an \&
+  Olesen}]{Bascompte2003}
+Bascompte, J., Jordano, P., Meli\'an, C.J. \& Olesen, J.M. (2003).
+\newblock The nested assembly of plant-animal mutualistic networks.
+\newblock \emph{Proc. Natl. Acad. Sci. USA}, 100, 9383--9387.
+
+\bibitem[{Bascompte \emph{et~al.}(2006)Bascompte, Jordano \&
+  Olesen}]{Bascompte2006}
+Bascompte, J., Jordano, P. \& Olesen, J.M. (2006).
+\newblock Asymmetric coevolutionary networks facilitate biodiversity
+  maintenance.
+\newblock \emph{Science}, 312, 431--433.
+
+\bibitem[{Bascompte \& Stouffer(2009)}]{Bascompte2009}
+Bascompte, J. \& Stouffer, D.B. (2009).
+\newblock The assembly and disassembly of ecological networks.
+\newblock \emph{Phil. Trans. R. Soc. B}, 364, 1781.
+
+\bibitem[{Bates \emph{et~al.}(2014)Bates, Maechler, Bolker \& Walker}]{lme4}
+Bates, D., Maechler, M., Bolker, B. \& Walker, S. (2014).
+\newblock \emph{lme4: Linear mixed-effects models using Eigen and S4}.
+\newblock R package version 1.1-7.
+
+\bibitem[{Bl{\"u}thgen \emph{et~al.}(2006)Bl{\"u}thgen, Menzel \&
+  Bl{\"u}thgen}]{bluthgen-2006-9}
+Bl{\"u}thgen, N., Menzel, F. \& Bl{\"u}thgen, N. (2006).
+\newblock Measuring specialization in species interaction networks.
+\newblock \emph{BMC Ecol.}, 6, 9.
+
+\bibitem[{Csardi \& Nepusz(2006)}]{igraph}
+Csardi, G. \& Nepusz, T. (2006).
+\newblock The igraph software package for complex network research.
+\newblock \emph{InterJournal}, Complex Systems, 1695.
+
+\bibitem[{Devoto \emph{et~al.}(2012)Devoto, Bailey, Craze \&
+  Memmott}]{devoto2012understanding}
+Devoto, M., Bailey, S., Craze, P. \& Memmott, J. (2012).
+\newblock Understanding and planning ecological restoration of
+  plant--pollinator networks.
+\newblock \emph{Ecology letters}, 15, 319--328.
+
+\bibitem[{D{\'\i}az-Castelazo \emph{et~al.}(2010)D{\'\i}az-Castelazo,
+  Guimaraes~Jr, Jordano, Thompson, Marquis \& Rico-Gray}]{diaz2010changes}
+D{\'\i}az-Castelazo, C., Guimaraes~Jr, P.R., Jordano, P., Thompson, J.N.,
+  Marquis, R.J. \& Rico-Gray, V. (2010).
+\newblock Changes of a mutualistic network over time: reanalysis over a 10-year
+  period.
+\newblock \emph{Ecology}, 91, 793--801.
+
+\bibitem[{Dunn \emph{et~al.}(2009)Dunn, Harris, Colwell, Koh \&
+  Sodhi}]{dunn2009sixth}
+Dunn, R.R., Harris, N.C., Colwell, R.K., Koh, L.P. \& Sodhi, N.S. (2009).
+\newblock The sixth mass coextinction: are most endangered species parasites
+  and mutualists?
+\newblock \emph{Proceedings of the Royal Society of London B: Biological
+  Sciences}, 276, 3037--3045.
+
+\bibitem[{van Engelsdorp \emph{et~al.}(2009)van Engelsdorp, Evans, Saegerman,
+  Mullin, Haubruge, Nguyen, Frazier, Frazier, Cox-Foster, Chen, Underwood,
+  Tarpy \& Pettis}]{van-engelsdorp-2009-e6481}
+van Engelsdorp, D., Evans, J., Saegerman, C., Mullin, C., Haubruge, E., Nguyen,
+  B., Frazier, M., Frazier, J., Cox-Foster, D., Chen, Y., Underwood, R., Tarpy,
+  D. \& Pettis, J. (2009).
+\newblock Colony collapse disorder: A descriptive study.
+\newblock \emph{Plos One}, 4, 1--17.
+
+\bibitem[{Fang \& Huang(2012)}]{fang2012relative}
+Fang, Q. \& Huang, S.Q. (2012).
+\newblock Relative stability of core groups in pollination networks in a
+  biodiversity hotspot over four years.
+\newblock \emph{PloS one}, 7, e32663.
+
+\bibitem[{Forup \emph{et~al.}(2008{\natexlab{a}})Forup, Henson, Craze \&
+  Memmott}]{forup-2008-742}
+Forup, M., Henson, K., Craze, P. \& Memmott, J. (2008{\natexlab{a}}).
+\newblock The restoration of ecological interactions: plant-pollinator networks
+  on ancient and restored heathlands.
+\newblock \emph{J. Appl. Ecol.}, 45, 742--752.
+
+\bibitem[{Forup \emph{et~al.}(2008{\natexlab{b}})Forup, Henson, Craze \&
+  Memmott}]{forup2008restoration}
+Forup, M.L., Henson, K.S., Craze, P.G. \& Memmott, J. (2008{\natexlab{b}}).
+\newblock The restoration of ecological interactions: plant--pollinator
+  networks on ancient and restored heathlands.
+\newblock \emph{Journal of Applied Ecology}, 45, 742--752.
+
+\bibitem[{Galeano \emph{et~al.}(2009)Galeano, Pastor \& Iriondo}]{Galeano2009}
+Galeano, J., Pastor, J.M. \& Iriondo, J.M. (2009).
+\newblock Weighted-interaction nestedness estimator (wine): a new estimator to
+  calculate over frequency matrices.
+\newblock \emph{Environmental Modeling \& Software}, 24, 1342--1346.
+
+\bibitem[{Klein \emph{et~al.}(2007)Klein, Vaissi\`{e}re, Cane,
+  Steffan-Dewenter, Cunningham, Kremen \& Tscharntke}]{klein-2007-303}
+Klein, A., Vaissi\`{e}re, B., Cane, J., Steffan-Dewenter, I., Cunningham, S.,
+  Kremen, C. \& Tscharntke, T. (2007).
+\newblock Importance of pollinators in changing landscapes for world crops.
+\newblock \emph{Proc. R. Soc. B}, 274, 303--313.
+
+\bibitem[{Kremen(2008)}]{kremen-2008-10}
+Kremen, C. (2008).
+\newblock \emph{Bee Pollinators in Agricultural Ecosystems}, New York: Oxford
+  University Press, chap. Crop Pollination Services From Wild Bees, pp. 10--26.
+
+\bibitem[{Kremen \& M'Gonigle(2015)}]{kremen-2015-602}
+Kremen, C. \& M'Gonigle, L.K. (2015).
+\newblock Small-scale restoration in intensive agricultural landscapes supports
+  more specialized and less mobile pollinator species.
+\newblock \emph{J. Appl. Ecol.}, 52, 602--610.
+
+\bibitem[{Kremen \emph{et~al.}(2004)Kremen, Williams, Bugg, Fay \&
+  Thorp}]{kremen-2004-1109}
+Kremen, C., Williams, N., Bugg, R., Fay, J. \& Thorp, R. (2004).
+\newblock The area requirements of an ecosystem service: crop pollination by
+  native bee communities in {California}.
+\newblock \emph{Ecol. Lett.}, 7, 1109--1119.
+
+\bibitem[{Kremen \emph{et~al.}(2002)Kremen, Williams \&
+  Thorp}]{kremen-2002-16816}
+Kremen, C., Williams, N. \& Thorp, R. (2002).
+\newblock Crop pollination from native bees at risk from agricultural
+  intensification.
+\newblock \emph{Proc. Natl. Acad. Sci. U.S.A.}, 99, 16812--16816.
+
+\bibitem[{Kuznetsova \emph{et~al.}(2014)Kuznetsova, {Bruun Brockhoff} \& {Haubo
+  Bojesen Christensen}}]{lmetest}
+Kuznetsova, A., {Bruun Brockhoff}, P. \& {Haubo Bojesen Christensen}, R.
+  (2014).
+\newblock \emph{{lmerTest}: Tests for random and fixed effects for linear mixed
+  effect models (lmer objects of lme4 package).}
+\newblock R package version 2.0-11.
+
+\bibitem[{Memmott \emph{et~al.}(2004)Memmott, Waser \& Price}]{Memmott2004}
+Memmott, J., Waser, N.M. \& Price, M.V. (2004).
+\newblock Tolerance of pollination networks to species extinctions.
+\newblock \emph{Proc. R. Soc. Lond. B}, 271, 2605--2611.
+
+\bibitem[{Menz \emph{et~al.}(2010)Menz, Phillips, Winfree, Kremen, Aizen,
+  Johnson \& Dixon}]{menz-2010-4}
+Menz, M., Phillips, R., Winfree, R., Kremen, C., Aizen, M., Johnson, S. \&
+  Dixon, K. (2010).
+\newblock Reconnecting plants and pollinators: challenges in the restoration of
+  pollination mutualisms.
+\newblock \emph{Trends Plant Sci.}, 16, 4--12.
+
+\bibitem[{M'Gonigle \emph{et~al.}(2015)M'Gonigle, Ponisio, Cutler \&
+  Kremen}]{mgonigle-2015-x}
+M'Gonigle, L., Ponisio, L., Cutler, K. \& Kremen, C. (2015).
+\newblock Habitat restoration promotes pollinator persistence and colonization
+  in intensively-managed agriculture.
+\newblock \emph{Ecol. Appl.}, 25, 1557--1565.
+
+\bibitem[{Morandin \& Kremen(2013)}]{morandin-2013-829}
+Morandin, L. \& Kremen, C. (2013).
+\newblock Hedgerow restoration promotes pollinator populations and exports
+  native bees to adjacent fields.
+\newblock \emph{Ecol. Appl.}, 23, 829--839.
+
+\bibitem[{Neumann \& Carreck(2010)}]{neumann-2010-1}
+Neumann, P. \& Carreck, N.L. (2010).
+\newblock Honey bee colony losses.
+\newblock \emph{J. Api. Res.}, 49, 1--6.
+
+\bibitem[{Newman \& Girvan(2004)}]{Newman2004}
+Newman, M.E.J. \& Girvan, M. (2004).
+\newblock Finding and evaluating community structure in networks.
+\newblock \emph{Phys. Rev. E}, 69, 026113.
+
+\bibitem[{Olesen \emph{et~al.}(2007)Olesen, Bascompte, Dupont \&
+  Jordano}]{Olesen2007}
+Olesen, J.M., Bascompte, J., Dupont, Y. \& Jordano, P. (2007).
+\newblock The modularity of pollination networks.
+\newblock \emph{Proc. Natl. Acad. Sci. USA}, 104, 19891--19896.
+
+\bibitem[{Olesen \emph{et~al.}(2008)Olesen, Bascompte, Elberling \&
+  Jordano}]{Olesen2008}
+Olesen, J.M., Bascompte, J., Elberling, H. \& Jordano, P. (2008).
+\newblock Temporal dynamics in a pollination network.
+\newblock \emph{Ecology}, 89, 1573.
+
+\bibitem[{Ollerton \emph{et~al.}(2011)Ollerton, Winfree \&
+  Tarrant}]{ollerton-2011-321}
+Ollerton, J., Winfree, R. \& Tarrant, S. (2011).
+\newblock How many flowering plants are pollinated by animals?
+\newblock \emph{Oikos}, 120, 321--326.
+
+\bibitem[{Parker(1997)}]{parker1997scale}
+Parker, V.T. (1997).
+\newblock The scale of successional models and restoration objectives.
+\newblock \emph{Restoration ecology}, 5, 301--306.
+
+\bibitem[{Peel \& Clauset(2014)}]{peel2014detecting}
+Peel, L. \& Clauset, A. (2014).
+\newblock Detecting change points in the large-scale structure of evolving
+  networks.
+\newblock \emph{arXiv preprint arXiv:1403.0989}.
+
+\bibitem[{Ponisio \emph{et~al.}(2015)Ponisio, M'Gonigle \&
+  Kremen}]{ponisio2015farm}
+Ponisio, L.C., M'Gonigle, L.K. \& Kremen, C. (2015).
+\newblock On-farm habitat restoration counters biotic homogenization in
+  intensively managed agriculture.
+\newblock \emph{Global change biology}.
+
+\bibitem[{{R Core Team}(2015)}]{R}
+{R Core Team} (2015).
+\newblock \emph{R: A Language and Environment for Statistical Computing}.
+\newblock R Foundation for Statistical Computing, Vienna, Austria.
+
+\bibitem[{Rezende \emph{et~al.}(2007)Rezende, Lavabre, Guimar{\~a}es, Jordano
+  \& Bascompte}]{Rezende2007}
+Rezende, E.L., Lavabre, J.E., Guimar{\~a}es, P.R., Jordano, P. \& Bascompte, J.
+  (2007).
+\newblock Non-random coextinctions in phylogenetically structured mutualistic
+  networks.
+\newblock \emph{Nature}, 448, 925--928.
+
+\bibitem[{Winfree \emph{et~al.}(2007)Winfree, Williams, Dushoff \&
+  Kremen}]{winfree-2007-1105}
+Winfree, R., Williams, N., Dushoff, J. \& Kremen, C. (2007).
+\newblock Native bees provide insurance against ongoing honey bee losses.
+\newblock \emph{Ecol. Lett.}, 10, 1105--1113.
+
+\end{thebibliography}
