@@ -21,7 +21,7 @@ colnames(status.table)<- c("Site", "SiteStatus")
 
 all.alg.Con <- t(do.call(cbind.data.frame, lapply(nets, algCone)))
 all.alg.Con <- as.data.frame(cbind(sites,years, all.alg.Con))
-colnames(all.alg.Con) <- c("Site", "Year","Ncomp", "AlgCon")
+colnames(all.alg.Con) <- c("Site", "Year","Ncomp", "AlgCon", "EigenRatio")
 
 ## add status
 all.alg.Con.status <- merge(x=all.alg.Con,
@@ -41,6 +41,8 @@ all.alg.Con.status$ypr[!all.alg.Con.status$Site %in% baci.sites] <- NA
 ## change AlgCon to numeric (it is a factor for some reason..)
 all.alg.Con.status$AlgCon <- as.numeric(as.character(
   all.alg.Con.status$AlgCon))
+all.alg.Con.status$EigenRatio <- as.numeric(as.character(
+  all.alg.Con.status$EigenRatio))
 
 alg.con.mod <- lmer(AlgCon ~ SiteStatus +
                     (1|Site) + (1|Year),    
@@ -48,11 +50,17 @@ alg.con.mod <- lmer(AlgCon ~ SiteStatus +
 
 summary(alg.con.mod)
 
-
+# Algebrain connectivity x Ypr
 alg.con.mod.ypr <- lmer(AlgCon ~ ypr +
                         (1|Site) + (1|Year),    
                         data=all.alg.Con.status)
 summary(alg.con.mod.ypr)
 
+# Eigenvalue ratio  x Ypr
+EigenRatio.mod.ypr <- lmer(EigenRatio ~ ypr +
+                          (1|Site) + (1|Year),    
+                        data=all.alg.Con.status)
+summary(EigenRatio.mod.ypr)
+
 save(alg.con.mod.ypr, all.alg.Con.status,
-     file="saved/mods/AlgCon.Rdata")
+     file="saved/mods/AlgCon2.Rdata")

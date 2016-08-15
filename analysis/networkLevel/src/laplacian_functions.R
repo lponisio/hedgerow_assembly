@@ -22,6 +22,7 @@ algCone<-function(int.mat){
   lapmat<-toLap(int.mat)
   ## getting the biggest non zero eigenvalue
   ## calculates all eigenvalues
+  #browser()
   eigens=eigen(lapmat, only.values=TRUE)$values## gets rid of the
   ## number of zeroes and returns the number of components (= the
   ## number of zeroes)
@@ -29,5 +30,7 @@ algCone<-function(int.mat){
   ## iguais a zero
   re.eigen<-Re(round(eigens, 4)) ## geting the real parts and rounding
   alg.conn<-max(re.eigen)##  Algebraic connectivity
-  return(list=c(comps,alg.conn))
+  min.eigen<-min(re.eigen[which(re.eigen!=0)])##  getting the minimum eigen that is not zero
+  eigen.ratio<-round(alg.conn/min.eigen, 4)
+  return(list=c(comps,alg.conn,eigen.ratio))
 }
