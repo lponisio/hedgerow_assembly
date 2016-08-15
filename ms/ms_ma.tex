@@ -360,7 +360,7 @@ variable, and random effects of site and year.
 \subsection*{Network robustness}
 Lastly, we test the changes in interaction patterns associated with
 network assembly affect the robustness of the network to species
-loss. Following \cite{Memmott2004}, we simulate the extinction of
+loss and to cascading effects. Following \cite{Memmott2004}, we simulate the extinction of
 plant species the subsequent extinction cascades of pollinator
 species. Because the reproduction of plant species if facilitated by
 active restoration efforts, it is unlikely the extinction of
@@ -370,7 +370,7 @@ likely affect the pollinators that depend on them. Plants species were
 eliminated based on their degree or abundance, and the number of
 pollinators that secondarily went extinct is calculated. The area
 below the extinction curve is used as a measure of network robustness. %Maybe cite the R function we used here?
-
+We also explored how the robustness to cascading effects changed as community assembled, using algebraic connectivity--- the second smallest eigenvalue of the Laplacian matrix \citep{fiedler1973algebraic}--- as a proxy for network robustness (e.g. Gaiarsa et al., submitted). Algebraic connectivity was first used to describe spectral properties of complex graphs other than ecological networks, and it is related to how difficult it is to turn a network into completely disconnected groups of nodes, or species \citep{fiedler1973algebraic, costa2007characterization}, and also to flows in . The larger the algebraic connectivity, the more robust a network is to perturbations (e.g. Gaiarsa et al., submitted). 
 
 \section*{Results}
 \label{sec:results}
