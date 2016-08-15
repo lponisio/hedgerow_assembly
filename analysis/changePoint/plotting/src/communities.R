@@ -10,12 +10,12 @@ plotNet <- function(){
       cols <- c(rep("darkolivegreen", length(rownames(g))),
                 rep("gold", length(colnames(g))))
       V(gs)$color <- cols
-      importance <-  (c(rowSums(g) +0.1, colSums(g) + 0.1)/sum(g))*20
+      importance <-  (c(rowSums(g) +0.1, colSums(g) + 0.1)/sum(g))*50
       v.labs <- names(importance)
       v.labs[importance < 5] = ""
       V(gs)$size <- importance
       
-      E(gs)$width <- (E(gs)$weight/sum(E(gs)$weight))*20
+      E(gs)$width <- (E(gs)$weight/sum(E(gs)$weight))*40
       gs$layout <- layout_in_circle
       plot.igraph(gs, vertex.label="")
       ## ## vertex.label.cex=importance/10,
