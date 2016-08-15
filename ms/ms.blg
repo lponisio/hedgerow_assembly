@@ -3,44 +3,47 @@ Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
 The top-level auxiliary file: ms.aux
 The style file: ecol_let.bst
 Database file #1: refs.bib
-You've used 37 entries,
+Warning--I didn't find a database entry for "fiedler1973algebraic"
+Warning--I didn't find a database entry for "costa2007characterization"
+You've used 38 entries,
             2997 wiz_defined-function locations,
-            861 strings with 11047 characters,
-and the built_in function-call counts, 23300 in all, are:
-= -- 1854
-> -- 1194
+            868 strings with 11216 characters,
+and the built_in function-call counts, 23836 in all, are:
+= -- 1895
+> -- 1220
 < -- 13
-+ -- 478
-- -- 420
-* -- 1920
-:= -- 3794
-add.period$ -- 110
-call.type$ -- 37
-change.case$ -- 322
-chr.to.int$ -- 36
-cite$ -- 37
-duplicate$ -- 1549
-empty$ -- 1535
-format.name$ -- 541
-if$ -- 4387
++ -- 488
+- -- 429
+* -- 1963
+:= -- 3884
+add.period$ -- 113
+call.type$ -- 38
+change.case$ -- 330
+chr.to.int$ -- 37
+cite$ -- 38
+duplicate$ -- 1590
+empty$ -- 1571
+format.name$ -- 553
+if$ -- 4487
 int.to.chr$ -- 2
 int.to.str$ -- 1
-missing$ -- 355
-newline$ -- 188
-num.names$ -- 148
-pop$ -- 623
+missing$ -- 364
+newline$ -- 193
+num.names$ -- 152
+pop$ -- 638
 preamble$ -- 1
-purify$ -- 287
+purify$ -- 294
 quote$ -- 0
-skip$ -- 422
+skip$ -- 433
 stack$ -- 0
-substring$ -- 1188
-swap$ -- 880
+substring$ -- 1202
+swap$ -- 903
 text.length$ -- 2
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 330
+type$ -- 339
 warning$ -- 0
-while$ -- 167
+while$ -- 171
 width$ -- 0
-write$ -- 479
+write$ -- 492
+(There were 2 warnings)

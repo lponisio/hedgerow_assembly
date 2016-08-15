@@ -1,4 +1,4 @@
-\begin{thebibliography}{37}
+\begin{thebibliography}{38}
 \expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
 
 \bibitem[{Albrecht \emph{et~al.}(2010)Albrecht, Riesen \&
@@ -69,6 +69,11 @@ Devoto, M., Bailey, S., Craze, P. \& Memmott, J. (2012).
 \newblock Understanding and planning ecological restoration of
   plant--pollinator networks.
 \newblock \emph{Ecology letters}, 15, 319--328.
+
+\bibitem[{Dormann \emph{et~al.}(2008)Dormann, Gruber \& Fr{\"u}nd}]{bipartite}
+Dormann, C., Gruber, B. \& Fr{\"u}nd, J. (2008).
+\newblock Introducing the bipartite package: analysing ecological networks.
+\newblock \emph{R News}, 8, 8.
 
 \bibitem[{Dunn \emph{et~al.}(2009)Dunn, Harris, Colwell, Koh \&
   Sodhi}]{dunn2009sixth}

@@ -444,23 +444,57 @@ interaction frequency between plants and pollinators from a null
 expectation where all partners interact in proportion to their
 abundances \citep{bluthgen-2006-9}. It ranges from 0 for generalized
 networks to 1 for specialized networks.
+\subsection*{Network structure}
+
+The changing points in network structure may contribute to the
+reorganization of the assembling networks into predictable interaction
+patterns. Pollination networks exhibit two main structural patterns
+--- modularity \citep[e.g.,][]{Olesen2007} and nestedness
+\citep[e.g.,][]{Bascompte2006, Bascompte2003}. In modular community
+interactions are insular, occurring within separate groups or
+``modules'' more often than between modules. Communities in the
+network may fragment as the network assembles, enhancing
+modularity. Conversely, nested networks are like pyramid of
+interactions, where there are some species that interact with many
+species, other species that interact with a subset of those species,
+and so on. If species entering the network tend to interact with the
+generalist base of the network pyramid, nestedness would increase
+through time. Alternatively, if the network is accumulating specialist
+species or if species are beginning to limit their interaction niche
+breath as the network assembles, this would lead to an increase in the
+network-level specialization \citep{bluthgen-2006-9} and nestedness
+would decrease through time. To test whether network modularity,
+nestedness or specialization changed linearly with assembly, we used
+linear mixed models with the descriptive network metrics as the
+response variable, year of assembly as the explanatory variable, and
+random effects of site and year.
 
 \subsection*{Network robustness}
+Lastly, we test the changes in interaction patterns associated with
+network assembly affect the robustness of the network to species loss
+and to cascading effects. Following \cite{Memmott2004}, we simulate
+the extinction of plant species the subsequent extinction cascades of
+pollinator species. Because the reproduction of plant species if
+facilitated by active restoration efforts, it is unlikely the
+extinction of pollinators would affect plant populations in the
+hedgerows. However, plants ceasing to bloom, for example in response
+to drought, will likely affect the pollinators that depend on
+them. Plants species were eliminated based on their degree or
+abundance, and the number of pollinators that secondarily went extinct
+is calculated. The area below the extinction curve is used as a
+measure of network robustness \citep{bipartite}.
 
-Lastly, we test whether the changes in interaction patterns associated
-with network assembly affect the robustness. First, following
-\cite{Memmott2004}, we simulate the extinction of plant species the
-subsequent extinction cascades of pollinator species. Because the
-reproduction of plant species if facilitated by active restoration
-efforts, it is unlikely the extinction of pollinators would effect
-plant populations in the hedgerows. However, plants ceasing to bloom,
-for example in response to drought, will likely effect the pollinators
-that depend on them. Plants species were eliminated based on their
-degree or abundance, and the number of pollinators that secondarily
-went extinct is calculated. The area below the extinction curve is
-used as a measure of network robustness \citep{Memmott2004}.
-
-%% Marilia add perturbation methods here
+We also explored how the robustness to cascading effects changed as
+community assembled, using algebraic connectivity--- the second
+smallest eigenvalue of the Laplacian matrix
+\citep{fiedler1973algebraic}--- as a proxy for network robustness
+(e.g. Gaiarsa et al., submitted). Algebraic connectivity was first
+used to describe spectral properties of complex graphs other than
+ecological networks, and it is related to how difficult it is to turn
+a network into completely disconnected groups of nodes, or species
+\citep{fiedler1973algebraic, costa2007characterization}, and also to
+flows in . The larger the algebraic connectivity, the more robust a
+network is to perturbations (e.g. Gaiarsa et al., submitted).
 
 \section*{Results}
 \label{sec:results}
