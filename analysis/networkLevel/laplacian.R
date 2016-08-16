@@ -43,6 +43,8 @@ all.alg.Con.status$AlgCon <- as.numeric(as.character(
   all.alg.Con.status$AlgCon))
 all.alg.Con.status$EigenRatio <- as.numeric(as.character(
   all.alg.Con.status$EigenRatio))
+all.alg.Con.status$Ncomp <- as.numeric(as.character(
+  all.alg.Con.status$Ncomp))
 
 alg.con.mod <- lmer(AlgCon ~ SiteStatus +
                     (1|Site) + (1|Year),    
@@ -51,16 +53,19 @@ alg.con.mod <- lmer(AlgCon ~ SiteStatus +
 summary(alg.con.mod)
 
 # Algebrain connectivity x Ypr
-alg.con.mod.ypr <- lmer(AlgCon ~ ypr +
+alg.con.mod.ypr <- lmer(AlgCon ~ ypr + 
                         (1|Site) + (1|Year),    
                         data=all.alg.Con.status)
 summary(alg.con.mod.ypr)
 
 # Eigenvalue ratio  x Ypr
-EigenRatio.mod.ypr <- lmer(EigenRatio ~ ypr +
+EigenRatio.mod.ypr <- lmer(EigenRatio ~ ypr +  Ncomp +
                           (1|Site) + (1|Year),    
                         data=all.alg.Con.status)
 summary(EigenRatio.mod.ypr)
 
-save(alg.con.mod.ypr, all.alg.Con.status,
+save(alg.con.mod.ypr, all.alg.Con.status, EigenRatio.mod.ypr,
      file="saved/mods/AlgCon2.Rdata")
+
+
+## look at correlation between AlgCon and species richness

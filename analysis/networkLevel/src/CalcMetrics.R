@@ -1,6 +1,7 @@
-## used wine nestedness calculator and null model
 
-calc.metric <- function(dat.web, H2_integer=FALSE) {
+calc.metric <- function(dat.web, H2_integer=FALSE,
+                        networkLevel.mets= c("H2", "connectance",
+                          "weighted connectance")) {
   ## calculates modularity
   calc.mod <- function(dat.web){ 
     ## converts a p-a matrix to a graph for modularity computation 
@@ -48,7 +49,7 @@ calc.metric <- function(dat.web, H2_integer=FALSE) {
                        wbinary=TRUE)$statistic["NODF"]
     mets <-  c(nodf,
                networklevel(dat.web,
-                            index=c("H2", "connectance", "weighted connectance"),
+                            index= networkLevel.mets,
                             H2_integer=H2_integer))
   }
   mod.met <- calc.mod(dat.web)
@@ -144,12 +145,6 @@ network.metrics <- function (dat.web, N) {
         pvalues <- pvals(out.mets, N)
         names(pvalues) <- paste("p", names(true.stat), sep="")
         out <- c(true.stat, zvalues, pvalues)
-        ## names(out) <- c("NODF", "connectance", "weighted.connectance", "H2",
-        ##                 "modularityG", "modularityR","modularityD",
-        ##                 "zNODF", "zcon", "zWcon", "zH2",
-        ##                 "zmodG", "zmodR", "zmodD",
-        ##                 "pNODF", "pcon", "pWcon", "pH2",
-        ##                 "pmodG", "pmodR", "pmodD")
         return(out)
       }
     }
