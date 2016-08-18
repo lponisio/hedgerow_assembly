@@ -10,7 +10,7 @@ plotNet <- function(){
       cols <- c(rep("darkolivegreen", length(rownames(g))),
                 rep("gold", length(colnames(g))))
       V(gs)$color <- cols
-      importance <-  (c(rowSums(g) +0.1, colSums(g) + 0.1)/sum(g))*50
+      importance <-  (c(rowSums(g) +0.1, colSums(g) + 0.1)/sum(g))*100
       v.labs <- names(importance)
       v.labs[importance < 5] = ""
       V(gs)$size <- importance

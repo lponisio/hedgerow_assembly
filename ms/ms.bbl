@@ -1,4 +1,4 @@
-\begin{thebibliography}{38}
+\begin{thebibliography}{41}
 \expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
 
 \bibitem[{Albrecht \emph{et~al.}(2010)Albrecht, Riesen \&
@@ -58,6 +58,12 @@ Bl{\"u}thgen, N., Menzel, F. \& Bl{\"u}thgen, N. (2006).
 \newblock Measuring specialization in species interaction networks.
 \newblock \emph{BMC Ecol.}, 6, 9.
 
+\bibitem[{Costa \emph{et~al.}(2007)Costa, Rodrigues, Travieso \&
+  Villas~Boas}]{costa2007characterization}
+Costa, L.d.F., Rodrigues, F.A., Travieso, G. \& Villas~Boas, P.R. (2007).
+\newblock Characterization of complex networks: A survey of measurements.
+\newblock \emph{Advances in physics}, 56, 167--242.
+
 \bibitem[{Csardi \& Nepusz(2006)}]{igraph}
 Csardi, G. \& Nepusz, T. (2006).
 \newblock The igraph software package for complex network research.
@@ -91,6 +97,19 @@ van Engelsdorp, D., Evans, J., Saegerman, C., Mullin, C., Haubruge, E., Nguyen,
   D. \& Pettis, J. (2009).
 \newblock Colony collapse disorder: A descriptive study.
 \newblock \emph{Plos One}, 4, 1--17.
+
+\bibitem[{Fiedler(1973)}]{fiedler1973algebraic}
+Fiedler, M. (1973).
+\newblock Algebraic connectivity of graphs.
+\newblock \emph{Czechoslovak mathematical journal}, 23, 298--305.
+
+\bibitem[{Fortuna \emph{et~al.}(2010)Fortuna, Stouffer, Olesen, Jordano,
+  Mouillot, Krasnov, Poulin \& Bascompte}]{Fortuna2010}
+Fortuna, M.A., Stouffer, D.B., Olesen, J.M., Jordano, P., Mouillot, D.,
+  Krasnov, B.R., Poulin, R. \& Bascompte, J. (2010).
+\newblock Nestedness versus modularity in ecological networks: two sides of the
+  same coin?
+\newblock \emph{Journal of Animal Ecology}, 79, 811--817.
 
 \bibitem[{Forup \emph{et~al.}(2008{\natexlab{a}})Forup, Henson, Craze \&
   Memmott}]{forup-2008-742}
