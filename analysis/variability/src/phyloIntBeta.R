@@ -90,7 +90,7 @@ plot.box <- function(ylabel,
                      dats,
                      y1){
   plot.ci <- function(){
-    col.lines <- brewer.pal(3, "Dark2")
+    col.lines <-  brewer.pal(4, "Greys")[c(2,3,4)]
     col.fill <- add.alpha(col.lines, alpha=0.2)
     layout(matrix(1, ncol=1))
     par(oma=c(1, 5, 2, 1),
@@ -102,7 +102,7 @@ plot.box <- function(ylabel,
     mtext(c("Non-assembling \n field margin",
               "Assembling \n  hedgerow",
                      "Non-assembling \n hedgerow"),
-          side = 1, line= 3, at = 1:3)
+          side = 1, line= 2, at = 1:3)
     axis(2, pretty(dats[,y1]), labels=pretty(dats[,y1]))
     mtext(ylabel, 2, line=3.5, cex=1.5)
   }

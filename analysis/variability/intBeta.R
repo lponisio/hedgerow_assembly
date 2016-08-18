@@ -24,9 +24,20 @@ save(phylo.int, file="saved/phyloInt.Rdata")
 
 ## linear model of phylo int by years between samples
 load(file="saved/phyloInt.Rdata")
-phylo.int.mod <- lmer(PhyloInt ~ Dist*SiteStatus +
+phylo.int.mod <- lmer(PhyloInt ~ SiteStatus +
                       (1|Site),
                       data=phylo.int$phylo.int)
+summary(phylo.int.mod)
+
+## for comparing maturing and mature
+## phylo.int$phylo.int$SiteStatus <-
+##   factor(phylo.int$phylo.int$SiteStatus,
+##          levels=c("mature", "control", "maturing"))
+## phylo.int.mod <- lmer(PhyloInt ~ SiteStatus +
+##                       (1|Site),
+##                       data=phylo.int$phylo.int)
+## summary(phylo.int.mod)
+
 
 plot.box(ylabel="Node turnover",
                  dats=phylo.int$phylo.int,
