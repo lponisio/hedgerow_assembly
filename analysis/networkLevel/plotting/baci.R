@@ -52,7 +52,7 @@ h2.pi <- predict.int(mod= baci.h2.mod,
 ## ************************************************************
 load(file='saved/mods/baci_no_plant.Rdata')
 
-dd.nop <- cbind(dd, niche.overlap.plants =0)
+dd.nop <- cbind(dd, niche.overlap.LL =0)
 
 nop.pi <- predict.int(mod= baci.no.plant.mod,
                         dd=dd.nop,
@@ -64,7 +64,7 @@ nop.pi <- predict.int(mod= baci.no.plant.mod,
 ## ************************************************************
 load(file='saved/mods/baci_no_pol.Rdata')
 
-dd.nopol <- cbind(dd, niche.overlap.pol =0)
+dd.nopol <- cbind(dd, niche.overlap.HL =0)
 nopol.pi <- predict.int(mod= baci.no.pol.mod,
                         dd=dd.nopol,
                         y="niche.overlap.pol",
@@ -80,6 +80,31 @@ conn.pi <- predict.int(mod= baci.conn.mod,
                         dd=dd.conn,
                         y="connectance",
                         family="gaussian")
+
+## ************************************************************
+## plant richness
+## ************************************************************
+load(file='saved/mods/baci_rich_ll.Rdata')
+
+dd.rich.ll <- cbind(dd, number.of.species.LL =0)
+rich.ll.pi <- predict.int(mod= baci.rich.ll.mod,
+                        dd=dd.rich.ll,
+                        y="number.of.species.LL",
+                        family="poisson")
+
+
+
+## ************************************************************
+## pol richness
+## ************************************************************
+load(file='saved/mods/baci_rich_hl.Rdata')
+
+dd.rich.hl <- cbind(dd, number.of.species.HL =0)
+rich.hl.pi <- predict.int(mod= baci.rich.hl.mod,
+                        dd=dd.rich.hl,
+                        y="number.of.species.HL",
+                        family="poisson")
+
 
 
 ## ************************************************************

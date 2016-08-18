@@ -82,16 +82,24 @@ plotDend <- function(){
   ##               Source = 'source', Target = 'target',
   ##               Value = 'value', NodeID = 'name',
   ##               fontSize = 12,  nodeWidth = 30, units = 'TWh')
+  colors_link <- c('green', 'blue')
+  colors_link_array <- paste0("[", paste0("'", colors_link,"'",
+                                          collapse = ','), "]")
+
+  colors_node <- c('yellow', 'lightblue', 'red', 'black', 'brown')
+  colors_node_array <- paste0("[", paste0("'", colors_node,"'",
+                                          collapse = ','), "]")
 
   plot(gvisSankey(links, from="source", 
                   to="target", weight="value",
                   options=list(
                     height=250,
-                    sankey="{link: {color: { fill: '#d799ae' } },
+                    sankey="{link: {colors: { fill: ['#a6cee3', '#1f78b4',    '#b2df8a',     '#33a02c'] },
+    colorMode: 'gradient'},
                         node: { width: 4, 
-                                color: { fill: '#a61d4c' },
+                                colors: { fill:  ['#a6cee3', '#1f78b4',    '#b2df8a',     '#33a02c'] },
                                 label: { fontName: 'Times-Roman',
-                                         fontSize: 14,
+                                         fontSize: 1,
                                          color: '#871b47',
                                          bold: true,
                                          italic: true }}}"
@@ -101,12 +109,16 @@ plotDend <- function(){
     comm.tree <- this.tree[[j]]
     l <- layout_with_fr(comm.tree)
     ceb <- cebs[[j]]
-
-    plot(ceb, comm.tree, vertex.label="",
+    colors <-  c('#a6cee3', '#b2df8a', '#fb9a99', '#fdbf6f',
+                  '#cab2d6', '#ffff99', '#1f78b4', '#33a02c')
+    plot(ceb, comm.tree,
+         vertex.label="",
          edge.width=0.4,
          vertex.size=4,
          edge.arrow.mode=0,
-         layout=l) 
+         layout=l, palette=colors,
+         mark.border = "white",
+         mark.col="white") 
   }
 }
 ## ap <- c(rep("P", length(rownames(nets1))),rep("A", length(colnames(nets1))))

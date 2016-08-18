@@ -1,6 +1,6 @@
 plot.panels <- function(){
   f <- function(){
-    col.lines <- brewer.pal(3, "Dark2")[2]
+    col.lines <-  brewer.pal(4, "Greys")[3]
     col.fill <- add.alpha(col.lines, alpha=0.2)
     layout(matrix(1:2, ncol=2))
     par(oma=c(6, 7, 2, 1),

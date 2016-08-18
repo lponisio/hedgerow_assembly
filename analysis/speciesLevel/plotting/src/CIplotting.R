@@ -60,7 +60,7 @@ plot.predict.ypr <- function(new.dd,
                              extinction.method,
                              agg.col="Site"){
   plot.ci <- function(){
-    col.lines <-  brewer.pal(3, 'Dark2')[2]
+    col.lines <-  brewer.pal(4, "Greys")[3]
     col.fill <- add.alpha(col.lines, alpha=0.2)
     layout(matrix(1, ncol=1))
     par(oma=c(6, 5, 2, 1),

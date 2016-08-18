@@ -1,7 +1,8 @@
 
 calc.metric <- function(dat.web, H2_integer=FALSE,
                         networkLevel.mets= c("H2", "connectance",
-                          "weighted connectance")) {
+                          "weighted connectance", "niche overlap",
+                          "number of species")) {
   ## calculates modularity
   calc.mod <- function(dat.web){ 
     ## converts a p-a matrix to a graph for modularity computation 

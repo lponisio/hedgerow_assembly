@@ -67,5 +67,16 @@ summary(EigenRatio.mod.ypr)
 save(alg.con.mod.ypr, all.alg.Con.status, EigenRatio.mod.ypr,
      file="saved/mods/AlgCon2.Rdata")
 
-
 ## look at correlation between AlgCon and species richness
+
+net.mets <- sapply(nets, function(x) sum(dim(empty(x))))
+
+all.alg.Con.status$tot.rich <- net.mets[match(names(net.mets),
+                                              paste(all.alg.Con.status$Site,
+                                                    all.alg.Con.status$Year,
+                                                    sep="."))]
+
+cor.test(all.alg.Con.status$tot.rich, all.alg.Con.status$AlgCon)
+
+cor.test(all.alg.Con.status$tot.rich[!is.na(all.alg.Con.status$ypr)],
+         all.alg.Con.status$AlgCon[!is.na(all.alg.Con.status$ypr)])

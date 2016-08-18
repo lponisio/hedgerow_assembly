@@ -70,6 +70,7 @@ plot.beta.div(list(comm.mats.yr$pollinator$comm,
                    comm.mats.yr$plant$status),
               fig.path,
               method= method)
+
 ## **********************************************************
 ## who are the core species? Species that are never in the core?
 ## pollinators
@@ -80,8 +81,6 @@ stayed.pol <-
 count.stayed.pol <- table(stayed.pol)
 count.stayed.pol <- count.stayed.pol[count.stayed.pol != 0]
 always.stayed.pol <- count.stayed.pol[count.stayed.pol == 5]
-
-hist(count.stayed.pol, breaks=0:5)
 
 left.pol <-
   site.cores$all$pollinator$GenusSpecies[site.cores$all$pollinator$comm ==

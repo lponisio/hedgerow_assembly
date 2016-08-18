@@ -93,11 +93,16 @@ plot.box <- function(ylabel,
     col.lines <- brewer.pal(3, "Dark2")
     col.fill <- add.alpha(col.lines, alpha=0.2)
     layout(matrix(1, ncol=1))
-    par(oma=c(2, 5, 2, 1),
-        mar=c(0.5, 0, 0.5, 1))
+    par(oma=c(1, 5, 2, 1),
+        mar=c(2, 0, 0.5, 1))
     boxplot(dats[,y1]~ dats$SiteStatus,
             col=col.lines,
-            names=c("Unrestored", "Maturing", "Mature"))
+             axes = F)
+    axis(1, at= 1:3, labels= c("", "", ""), lty= 1, las= .8)
+    mtext(c("Non-assembling \n field margin",
+              "Assembling \n  hedgerow",
+                     "Non-assembling \n hedgerow"),
+          side = 1, line= 3, at = 1:3)
     axis(2, pretty(dats[,y1]), labels=pretty(dats[,y1]))
     mtext(ylabel, 2, line=3.5, cex=1.5)
   }
@@ -106,6 +111,6 @@ plot.box <- function(ylabel,
                    sprintf("%s.pdf", paste(
                      gsub(" ", "", ylabel),
                      "box", sep="_"))),
-        width=5, height=4)
+        width=6, height=4)
 
 }
