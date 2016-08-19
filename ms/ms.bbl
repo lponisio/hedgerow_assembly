@@ -1,5 +1,12 @@
-\begin{thebibliography}{41}
+\begin{thebibliography}{50}
 \expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
+
+\bibitem[{Alarc{\'o}n \emph{et~al.}(2008)Alarc{\'o}n, Waser \&
+  Ollerton}]{alarcon2008year}
+Alarc{\'o}n, R., Waser, N.M. \& Ollerton, J. (2008).
+\newblock Year-to-year variation in the topology of a plant--pollinator
+  interaction network.
+\newblock \emph{Oikos}, 117, 1796--1807.
 
 \bibitem[{Albrecht \emph{et~al.}(2010)Albrecht, Riesen \&
   Schmid}]{albrecht2010plant}
@@ -58,6 +65,12 @@ Bl{\"u}thgen, N., Menzel, F. \& Bl{\"u}thgen, N. (2006).
 \newblock Measuring specialization in species interaction networks.
 \newblock \emph{BMC Ecol.}, 6, 9.
 
+\bibitem[{Burkle \& Alarc{\'o}n(2011)}]{Burkle2011}
+Burkle, L.A. \& Alarc{\'o}n, R. (2011).
+\newblock The future of plant-pollinator diversity: Understanding interaction
+  networks across time, space, and global change.
+\newblock \emph{American Journal of Botany}, 98, 528.
+
 \bibitem[{Costa \emph{et~al.}(2007)Costa, Rodrigues, Travieso \&
   Villas~Boas}]{costa2007characterization}
 Costa, L.d.F., Rodrigues, F.A., Travieso, G. \& Villas~Boas, P.R. (2007).
@@ -75,6 +88,14 @@ Devoto, M., Bailey, S., Craze, P. \& Memmott, J. (2012).
 \newblock Understanding and planning ecological restoration of
   plant--pollinator networks.
 \newblock \emph{Ecology letters}, 15, 319--328.
+
+\bibitem[{D{\'\i}az-Castelazo \emph{et~al.}(2010)D{\'\i}az-Castelazo,
+  Guimaraes~Jr, Jordano, Thompson, Marquis \& Rico-Gray}]{diaz2010changes}
+D{\'\i}az-Castelazo, C., Guimaraes~Jr, P.R., Jordano, P., Thompson, J.N.,
+  Marquis, R.J. \& Rico-Gray, V. (2010).
+\newblock Changes of a mutualistic network over time: reanalysis over a 10-year
+  period.
+\newblock \emph{Ecology}, 91, 793--801.
 
 \bibitem[{Dormann \emph{et~al.}(2008)Dormann, Gruber \& Fr{\"u}nd}]{bipartite}
 Dormann, C., Gruber, B. \& Fr{\"u}nd, J. (2008).
@@ -98,18 +119,16 @@ van Engelsdorp, D., Evans, J., Saegerman, C., Mullin, C., Haubruge, E., Nguyen,
 \newblock Colony collapse disorder: A descriptive study.
 \newblock \emph{Plos One}, 4, 1--17.
 
+\bibitem[{Fang \& Huang(2012)}]{fang2012relative}
+Fang, Q. \& Huang, S.Q. (2012).
+\newblock Relative stability of core groups in pollination networks in a
+  biodiversity hotspot over four years.
+\newblock \emph{PloS one}, 7, e32663.
+
 \bibitem[{Fiedler(1973)}]{fiedler1973algebraic}
 Fiedler, M. (1973).
 \newblock Algebraic connectivity of graphs.
 \newblock \emph{Czechoslovak mathematical journal}, 23, 298--305.
-
-\bibitem[{Fortuna \emph{et~al.}(2010)Fortuna, Stouffer, Olesen, Jordano,
-  Mouillot, Krasnov, Poulin \& Bascompte}]{Fortuna2010}
-Fortuna, M.A., Stouffer, D.B., Olesen, J.M., Jordano, P., Mouillot, D.,
-  Krasnov, B.R., Poulin, R. \& Bascompte, J. (2010).
-\newblock Nestedness versus modularity in ecological networks: two sides of the
-  same coin?
-\newblock \emph{Journal of Animal Ecology}, 79, 811--817.
 
 \bibitem[{Forup \emph{et~al.}(2008{\natexlab{a}})Forup, Henson, Craze \&
   Memmott}]{forup-2008-742}
@@ -255,6 +274,48 @@ Rezende, E.L., Lavabre, J.E., Guimar{\~a}es, P.R., Jordano, P. \& Bascompte, J.
 \newblock Non-random coextinctions in phylogenetically structured mutualistic
   networks.
 \newblock \emph{Nature}, 448, 925--928.
+
+\bibitem[{Santamar{\'\i}a \& Rodr{\'\i}guez-Giron{\'e}s(2007)}]{Santamaria2007}
+Santamar{\'\i}a, L. \& Rodr{\'\i}guez-Giron{\'e}s, M.A. (2007).
+\newblock Linkage rules for plant--pollinator networks: Trait complementarity
+  or exploitation barriers?
+\newblock \emph{PLoS Biol.}, 5, e31.
+
+\bibitem[{Stang \emph{et~al.}(2009)Stang, Klinkhamer, Waser, Stang \& van
+  der}]{Stang2009}
+Stang, M., Klinkhamer, P., Waser, N.M., Stang, I. \& van der, M.E. (2009).
+\newblock Size-specific interaction patterns and size matching in a
+  plant-pollinator interaction web.
+\newblock \emph{Ann. Bot.}, 103.
+
+\bibitem[{Stang \emph{et~al.}(2006)Stang, Klinkhamer \& Van
+  Der~Meijden}]{Stang2006}
+Stang, M., Klinkhamer, P.G. \& Van Der~Meijden, E. (2006).
+\newblock Size constraints and flower abundance determine the number of
+  interactions in a plant--flower visitor web.
+\newblock \emph{Oikos}, 112, 111--121.
+
+\bibitem[{Valdovinos \emph{et~al.}(2013)Valdovinos, Moisset~de Espan{\'e}s,
+  Flores \& Ramos-Jiliberto}]{valdovinos2013adaptive}
+Valdovinos, F.S., Moisset~de Espan{\'e}s, P., Flores, J.D. \& Ramos-Jiliberto,
+  R. (2013).
+\newblock Adaptive foraging allows the maintenance of biodiversity of
+  pollination networks.
+\newblock \emph{Oikos}, 122, 907--917.
+
+\bibitem[{V\'azquez \emph{et~al.}(2009)V\'azquez, Bl{\"u}thgen, Cagnolo \&
+  Chacoff}]{Vazquez2009}
+V\'azquez, D.P., Bl{\"u}thgen, N., Cagnolo, L. \& Chacoff, N.P. (2009).
+\newblock Uniting pattern and process in plant-animal mutualistic networks: a
+  review.
+\newblock \emph{Annals of Botany}, 103, 1445--1457.
+
+\bibitem[{V{\'a}zquez \emph{et~al.}(2009)V{\'a}zquez, Chacoff \&
+  Cagnolo}]{Vazquez2009evaluating}
+V{\'a}zquez, D.P., Chacoff, N.P. \& Cagnolo, L. (2009).
+\newblock Evaluating multiple determinants of the structure of plant-animal
+  mutualistic networks.
+\newblock \emph{Ecology}, 90, 2039--2046.
 
 \bibitem[{Winfree \emph{et~al.}(2007)Winfree, Williams, Dushoff \&
   Kremen}]{winfree-2007-1105}

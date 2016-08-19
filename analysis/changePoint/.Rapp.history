@@ -1,1435 +1,78 @@
 rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/networkLevel')#
-source('src/initialize.R')#
-load('../../data/networks/baci_networks_years.Rdata')#
-N <- 999
-load(file='saved/corMets.Rdata')
-?networklevel
+setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
+source('plotting/src/initialize.R')#
+#
+sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
+sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
+all.poss.yrs <- 2006:2015#
+#
+for(i in unique(sites.trees)){#
+  print(i)#
+  net <- nets[sites == i]#
+  yrs <- sapply(strsplit(names(net), "[.]"), function(x) x[2])#
+  names(net) <- yrs#
+  arr <- simplify2array(net)#
+  all.years <-  apply(arr, c(1,2), sum)#
+  plant.sums <- rowSums(all.years)#
+  pol.sums <- colSums(all.years)#
+  this.tree <- tree.graphs[sites.trees == i]#
+  pdf.f(plotNet,#
+        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
+        width=18, height=4)#
+  pdf.f(plotDend,#
+        file=file.path(fig.path, sprintf("%s_communities.pdf", i)),#
+        width=10, height=4)#
+}
 rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/networkLevel')#
-source('src/initialize.R')#
-load('../../data/networks/baci_networks_years.Rdata')#
-N <- 99#
+setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
+source('plotting/src/initialize.R')#
 #
-## ## ************************************************************#
-## ## calculate metrics and zscores#
-## ## ************************************************************#
-mets <- lapply(nets, network.metrics, N)#
+sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
+sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
+all.poss.yrs <- 2006:2015#
 #
-cor.dats <- prep.dat(mets,  spec)#
-#
-save(cor.dats, file='saved/corMets.Rdata')
-head(cor.dats)
-baci.rich.mod <- lmer(number.of.species.HL ~ scale(ypr) +#
-                 (1|Site) + (1|Year),#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.rich.mod)
-## species richness pol#
-baci.rich.hl.mod <- lmer(number.of.species.HL ~ scale(ypr) +#
-                 (1|Site) + (1|Year),#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.rich.hl.mod)#
-save(baci.rich.hl.mod, file='saved/mods/baci_rich_hl.Rdata')#
-## species richness plants#
-baci.rich.ll.mod <- lmer(number.of.species.HL ~ scale(ypr) +#
-                 (1|Site) + (1|Year),#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.rich.ll.mod)#
-save(baci.rich.ll.mod, file='saved/mods/baci_rich_ll.Rdata')
-## species richness plants#
-baci.rich.ll.mod <- lmer(number.of.species.LL ~ scale(ypr) +#
-                 (1|Site) + (1|Year),#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.rich.ll.mod)#
-save(baci.rich.ll.mod, file='saved/mods/baci_rich_ll.Rdata')
-cor.dats$tot.rich <- cor.dats$number.of.species.LL +#
-  cor.dats$number.of.species.HL
-## total species richness#
-baci.rich.tot.mod <- lmer(tot.rich ~ scale(ypr) +#
-                 (1|Site) + (1|Year),#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.rich.tot.mod)#
-save(baci.rich.tot.mod, file='saved/mods/baci_rich_tot.Rdata')
-?networklevel
-## species richness pol#
-baci.rich.hl.mod <- glmer(number.of.species.HL ~ scale(ypr) +#
-                 (1|Site) + (1|Year), family="poisson",#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.rich.hl.mod)#
-save(baci.rich.hl.mod, file='saved/mods/baci_rich_hl.Rdata')#
-#
-## species richness plants#
-baci.rich.ll.mod <- glmer(number.of.species.LL ~ scale(ypr) +#
-                 (1|Site) + (1|Year), family="poisson",#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.rich.ll.mod)#
-save(baci.rich.ll.mod, file='saved/mods/baci_rich_ll.Rdata')#
-#
-## total species richness#
-baci.rich.tot.mod <- glmer(tot.rich ~ scale(ypr) +#
-                 (1|Site) + (1|Year), family="poisson",#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.rich.tot.mod)#
-save(baci.rich.tot.mod, file='saved/mods/baci_rich_tot.Rdata')
-library(RColorBrewer)#
-library(lme4)#
-library(lmerTest)#
-source('plotting/src/predictIntervals.R')#
-source('plotting/src/CIplotting.R')#
-source('plotting/src/plotPanels.R')#
-source('src/misc.R')#
-load(file='saved/corMets.Rdata')#
-#
-dd <- expand.grid(ypr=seq(from= min(cor.dats$ypr, na.rm=TRUE),#
-                          to= max(cor.dats$ypr, na.rm=TRUE),#
-                          length=10))#
-#
-## ************************************************************#
-## nodf#
-## ************************************************************#
-load(file='saved/mods/baci_nodf.Rdata')#
-#
-dd.nodf <- cbind(dd, zNODF=0)#
-#
-nodf.pi <- predict.int(mod= baci.nodf.mod,#
-                        dd=dd.nodf,#
-                        y="zNODF",#
-                       family="gaussian")#
-## ************************************************************#
-## modularity#
-## ************************************************************#
-load(file='saved/mods/baci_mod.Rdata')#
-dd.mod <- cbind(dd, zmod.met.D=0)#
-mod.pi <- predict.int(mod= baci.mod.mod,#
-                        dd=dd.mod,#
-                        y="zmod.met.D",#
-                      family="gaussian")#
-## ************************************************************#
-## specialization#
-## ************************************************************#
-load(file='saved/mods/baci_h2.Rdata')#
-dd.h2 <- cbind(dd, H2=0)#
-h2.pi <- predict.int(mod= baci.h2.mod,#
-                        dd=dd.h2,#
-                        y="H2",#
-                        family="gaussian")#
-## ************************************************************#
-## niche overlap - Plants#
-## ************************************************************#
-load(file='saved/mods/baci_no_plant.Rdata')#
-#
-dd.nop <- cbind(dd, niche.overlap.plants =0)#
-#
-nop.pi <- predict.int(mod= baci.no.plant.mod,#
-                        dd=dd.nop,#
-                        y="niche.overlap.plants",#
-                        family="gaussian")#
-## ************************************************************#
-## niche overlap - Polinators#
-## ************************************************************#
-load(file='saved/mods/baci_no_pol.Rdata')#
-#
-dd.nopol <- cbind(dd, niche.overlap.pol =0)#
-nopol.pi <- predict.int(mod= baci.no.pol.mod,#
-                        dd=dd.nopol,#
-                        y="niche.overlap.pol",#
-                        family="gaussian")#
-#
-## ************************************************************#
-## connectance#
-## ************************************************************#
-load(file='saved/mods/baci_conn.Rdata')#
-#
-dd.conn <- cbind(dd, connectance =0)#
-conn.pi <- predict.int(mod= baci.conn.mod,#
-                        dd=dd.conn,#
-                        y="connectance",#
-                        family="gaussian")#
-#
-## ************************************************************#
-## richness#
-## ************************************************************#
-load(file='saved/mods/baci_rich_tot.Rdata')#
-#
-dd.rich <- cbind(dd, tot.rich =0)#
-rich.pi <- predict.int(mod= baci.tich.tot.mod,#
-                        dd=dd.rich,#
-                        y="tot.rich",#
-                        family="poisson")#
-#
-## ************************************************************#
-## all panels#
-## ************************************************************#
-plot.panels()
-library(RColorBrewer)#
-library(lme4)#
-library(lmerTest)#
-source('plotting/src/predictIntervals.R')#
-source('plotting/src/CIplotting.R')#
-source('plotting/src/plotPanels.R')#
-source('src/misc.R')#
-load(file='saved/corMets.Rdata')#
-#
-dd <- expand.grid(ypr=seq(from= min(cor.dats$ypr, na.rm=TRUE),#
-                          to= max(cor.dats$ypr, na.rm=TRUE),#
-                          length=10))#
-#
-## ************************************************************#
-## nodf#
-## ************************************************************#
-load(file='saved/mods/baci_nodf.Rdata')#
-#
-dd.nodf <- cbind(dd, zNODF=0)#
-#
-nodf.pi <- predict.int(mod= baci.nodf.mod,#
-                        dd=dd.nodf,#
-                        y="zNODF",#
-                       family="gaussian")#
-## ************************************************************#
-## modularity#
-## ************************************************************#
-load(file='saved/mods/baci_mod.Rdata')#
-dd.mod <- cbind(dd, zmod.met.D=0)#
-mod.pi <- predict.int(mod= baci.mod.mod,#
-                        dd=dd.mod,#
-                        y="zmod.met.D",#
-                      family="gaussian")#
-## ************************************************************#
-## specialization#
-## ************************************************************#
-load(file='saved/mods/baci_h2.Rdata')#
-dd.h2 <- cbind(dd, H2=0)#
-h2.pi <- predict.int(mod= baci.h2.mod,#
-                        dd=dd.h2,#
-                        y="H2",#
-                        family="gaussian")#
-## ************************************************************#
-## niche overlap - Plants#
-## ************************************************************#
-load(file='saved/mods/baci_no_plant.Rdata')#
-#
-dd.nop <- cbind(dd, niche.overlap.plants =0)#
-#
-nop.pi <- predict.int(mod= baci.no.plant.mod,#
-                        dd=dd.nop,#
-                        y="niche.overlap.plants",#
-                        family="gaussian")#
-## ************************************************************#
-## niche overlap - Polinators#
-## ************************************************************#
-load(file='saved/mods/baci_no_pol.Rdata')#
-#
-dd.nopol <- cbind(dd, niche.overlap.pol =0)#
-nopol.pi <- predict.int(mod= baci.no.pol.mod,#
-                        dd=dd.nopol,#
-                        y="niche.overlap.pol",#
-                        family="gaussian")#
-#
-## ************************************************************#
-## connectance#
-## ************************************************************#
-load(file='saved/mods/baci_conn.Rdata')#
-#
-dd.conn <- cbind(dd, connectance =0)#
-conn.pi <- predict.int(mod= baci.conn.mod,#
-                        dd=dd.conn,#
-                        y="connectance",#
-                        family="gaussian")#
-#
-## ************************************************************#
-## richness#
-## ************************************************************#
-load(file='saved/mods/baci_rich_tot.Rdata')#
-#
-dd.rich <- cbind(dd, tot.rich =0)#
-rich.pi <- predict.int(mod= baci.rich.tot.mod,#
-                        dd=dd.rich,#
-                        y="tot.rich",#
-                        family="poisson")#
-#
-## ************************************************************#
-## all panels#
-## ************************************************************#
-plot.panels()
-save(cor.dats, file='saved/corMets.Rdata')
-library(RColorBrewer)#
-library(lme4)#
-library(lmerTest)#
-source('plotting/src/predictIntervals.R')#
-source('plotting/src/CIplotting.R')#
-source('plotting/src/plotPanels.R')#
-source('src/misc.R')#
-load(file='saved/corMets.Rdata')#
-#
-dd <- expand.grid(ypr=seq(from= min(cor.dats$ypr, na.rm=TRUE),#
-                          to= max(cor.dats$ypr, na.rm=TRUE),#
-                          length=10))#
-#
-## ************************************************************#
-## nodf#
-## ************************************************************#
-load(file='saved/mods/baci_nodf.Rdata')#
-#
-dd.nodf <- cbind(dd, zNODF=0)#
-#
-nodf.pi <- predict.int(mod= baci.nodf.mod,#
-                        dd=dd.nodf,#
-                        y="zNODF",#
-                       family="gaussian")#
-## ************************************************************#
-## modularity#
-## ************************************************************#
-load(file='saved/mods/baci_mod.Rdata')#
-dd.mod <- cbind(dd, zmod.met.D=0)#
-mod.pi <- predict.int(mod= baci.mod.mod,#
-                        dd=dd.mod,#
-                        y="zmod.met.D",#
-                      family="gaussian")#
-## ************************************************************#
-## specialization#
-## ************************************************************#
-load(file='saved/mods/baci_h2.Rdata')#
-dd.h2 <- cbind(dd, H2=0)#
-h2.pi <- predict.int(mod= baci.h2.mod,#
-                        dd=dd.h2,#
-                        y="H2",#
-                        family="gaussian")#
-## ************************************************************#
-## niche overlap - Plants#
-## ************************************************************#
-load(file='saved/mods/baci_no_plant.Rdata')#
-#
-dd.nop <- cbind(dd, niche.overlap.plants =0)#
-#
-nop.pi <- predict.int(mod= baci.no.plant.mod,#
-                        dd=dd.nop,#
-                        y="niche.overlap.plants",#
-                        family="gaussian")#
-## ************************************************************#
-## niche overlap - Polinators#
-## ************************************************************#
-load(file='saved/mods/baci_no_pol.Rdata')#
-#
-dd.nopol <- cbind(dd, niche.overlap.pol =0)#
-nopol.pi <- predict.int(mod= baci.no.pol.mod,#
-                        dd=dd.nopol,#
-                        y="niche.overlap.pol",#
-                        family="gaussian")#
-#
-## ************************************************************#
-## connectance#
-## ************************************************************#
-load(file='saved/mods/baci_conn.Rdata')#
-#
-dd.conn <- cbind(dd, connectance =0)#
-conn.pi <- predict.int(mod= baci.conn.mod,#
-                        dd=dd.conn,#
-                        y="connectance",#
-                        family="gaussian")#
-#
-## ************************************************************#
-## richness#
-## ************************************************************#
-load(file='saved/mods/baci_rich_tot.Rdata')#
-#
-dd.rich <- cbind(dd, tot.rich =0)#
-rich.pi <- predict.int(mod= baci.rich.tot.mod,#
-                        dd=dd.rich,#
-                        y="tot.rich",#
-                        family="poisson")#
-#
-## ************************************************************#
-## all panels#
-## ************************************************************#
-plot.panels()
-dd.rich
-rich.pi
-cor.dats$tot.rich
-colnames(cor.dats)
+for(i in unique(sites.trees)){#
+  print(i)#
+  net <- nets[sites == i]#
+  yrs <- sapply(strsplit(names(net), "[.]"), function(x) x[2])#
+  names(net) <- yrs#
+  arr <- simplify2array(net)#
+  all.years <-  apply(arr, c(1,2), sum)#
+  plant.sums <- rowSums(all.years)#
+  pol.sums <- colSums(all.years)#
+  this.tree <- tree.graphs[sites.trees == i]#
+  pdf.f(plotNet,#
+        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
+        width=18, height=4)#
+  pdf.f(plotDend,#
+        file=file.path(fig.path, sprintf("%s_communities.pdf", i)),#
+        width=10, height=4)#
+}
 rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/networkLevel')#
-source('src/initialize.R')#
-load('../../data/networks/baci_networks_years.Rdata')#
-N <- 99
-load(file='saved/corMets.Rdata')
-cor.dats$tot.rich <- cor.dats$number.of.species.LL +#
-  cor.dats$number.of.species.HL#
-#
-save(cor.dats, file='saved/corMets.Rdata')
-library(RColorBrewer)#
-library(lme4)#
-library(lmerTest)#
-source('plotting/src/predictIntervals.R')#
-source('plotting/src/CIplotting.R')#
-source('plotting/src/plotPanels.R')#
-source('src/misc.R')#
-load(file='saved/corMets.Rdata')#
-#
-dd <- expand.grid(ypr=seq(from= min(cor.dats$ypr, na.rm=TRUE),#
-                          to= max(cor.dats$ypr, na.rm=TRUE),#
-                          length=10))#
-#
-## ************************************************************#
-## nodf#
-## ************************************************************#
-load(file='saved/mods/baci_nodf.Rdata')#
-#
-dd.nodf <- cbind(dd, zNODF=0)#
-#
-nodf.pi <- predict.int(mod= baci.nodf.mod,#
-                        dd=dd.nodf,#
-                        y="zNODF",#
-                       family="gaussian")#
-## ************************************************************#
-## modularity#
-## ************************************************************#
-load(file='saved/mods/baci_mod.Rdata')#
-dd.mod <- cbind(dd, zmod.met.D=0)#
-mod.pi <- predict.int(mod= baci.mod.mod,#
-                        dd=dd.mod,#
-                        y="zmod.met.D",#
-                      family="gaussian")#
-## ************************************************************#
-## specialization#
-## ************************************************************#
-load(file='saved/mods/baci_h2.Rdata')#
-dd.h2 <- cbind(dd, H2=0)#
-h2.pi <- predict.int(mod= baci.h2.mod,#
-                        dd=dd.h2,#
-                        y="H2",#
-                        family="gaussian")#
-## ************************************************************#
-## niche overlap - Plants#
-## ************************************************************#
-load(file='saved/mods/baci_no_plant.Rdata')#
-#
-dd.nop <- cbind(dd, niche.overlap.plants =0)#
-#
-nop.pi <- predict.int(mod= baci.no.plant.mod,#
-                        dd=dd.nop,#
-                        y="niche.overlap.plants",#
-                        family="gaussian")#
-## ************************************************************#
-## niche overlap - Polinators#
-## ************************************************************#
-load(file='saved/mods/baci_no_pol.Rdata')#
-#
-dd.nopol <- cbind(dd, niche.overlap.pol =0)#
-nopol.pi <- predict.int(mod= baci.no.pol.mod,#
-                        dd=dd.nopol,#
-                        y="niche.overlap.pol",#
-                        family="gaussian")#
-#
-## ************************************************************#
-## connectance#
-## ************************************************************#
-load(file='saved/mods/baci_conn.Rdata')#
-#
-dd.conn <- cbind(dd, connectance =0)#
-conn.pi <- predict.int(mod= baci.conn.mod,#
-                        dd=dd.conn,#
-                        y="connectance",#
-                        family="gaussian")#
-#
-## ************************************************************#
-## richness#
-## ************************************************************#
-load(file='saved/mods/baci_rich_tot.Rdata')#
-#
-dd.rich <- cbind(dd, tot.rich =0)#
-rich.pi <- predict.int(mod= baci.rich.tot.mod,#
-                        dd=dd.rich,#
-                        y="tot.rich",#
-                        family="poisson")#
-#
-## ************************************************************#
-## all panels#
-## ************************************************************#
-plot.panels()
-colnames(cor.dats)
-library(RColorBrewer)#
-library(lme4)#
-library(lmerTest)#
-source('plotting/src/predictIntervals.R')#
-source('plotting/src/CIplotting.R')#
-source('plotting/src/plotPanels.R')#
-source('src/misc.R')#
-load(file='saved/corMets.Rdata')#
-#
-dd <- expand.grid(ypr=seq(from= min(cor.dats$ypr, na.rm=TRUE),#
-                          to= max(cor.dats$ypr, na.rm=TRUE),#
-                          length=10))#
-#
-## ************************************************************#
-## nodf#
-## ************************************************************#
-load(file='saved/mods/baci_nodf.Rdata')#
-#
-dd.nodf <- cbind(dd, zNODF=0)#
-#
-nodf.pi <- predict.int(mod= baci.nodf.mod,#
-                        dd=dd.nodf,#
-                        y="zNODF",#
-                       family="gaussian")#
-## ************************************************************#
-## modularity#
-## ************************************************************#
-load(file='saved/mods/baci_mod.Rdata')#
-dd.mod <- cbind(dd, zmod.met.D=0)#
-mod.pi <- predict.int(mod= baci.mod.mod,#
-                        dd=dd.mod,#
-                        y="zmod.met.D",#
-                      family="gaussian")#
-## ************************************************************#
-## specialization#
-## ************************************************************#
-load(file='saved/mods/baci_h2.Rdata')#
-dd.h2 <- cbind(dd, H2=0)#
-h2.pi <- predict.int(mod= baci.h2.mod,#
-                        dd=dd.h2,#
-                        y="H2",#
-                        family="gaussian")#
-## ************************************************************#
-## niche overlap - Plants#
-## ************************************************************#
-load(file='saved/mods/baci_no_plant.Rdata')#
-#
-dd.nop <- cbind(dd, niche.overlap.plants =0)#
-#
-nop.pi <- predict.int(mod= baci.no.plant.mod,#
-                        dd=dd.nop,#
-                        y="niche.overlap.plants",#
-                        family="gaussian")#
-## ************************************************************#
-## niche overlap - Polinators#
-## ************************************************************#
-load(file='saved/mods/baci_no_pol.Rdata')#
-#
-dd.nopol <- cbind(dd, niche.overlap.pol =0)#
-nopol.pi <- predict.int(mod= baci.no.pol.mod,#
-                        dd=dd.nopol,#
-                        y="niche.overlap.pol",#
-                        family="gaussian")#
-#
-## ************************************************************#
-## connectance#
-## ************************************************************#
-load(file='saved/mods/baci_conn.Rdata')#
-#
-dd.conn <- cbind(dd, connectance =0)#
-conn.pi <- predict.int(mod= baci.conn.mod,#
-                        dd=dd.conn,#
-                        y="connectance",#
-                        family="gaussian")#
-#
-## ************************************************************#
-## plant richness#
-## ************************************************************#
-load(file='saved/mods/baci_rich_ll.Rdata')#
-#
-dd.rich.ll <- cbind(dd, number.of.species.LL =0)#
-rich.ll.pi <- predict.int(mod= baci.rich.ll.mod,#
-                        dd=dd.rich,#
-                        y="number.of.species.LL",#
-                        family="poisson")#
-## ************************************************************#
-## pol richness#
-## ************************************************************#
-load(file='saved/mods/baci_rich_hl.Rdata')#
-#
-dd.rich.hl <- cbind(dd, number.of.species.HL =0)#
-rich.hl.pi <- predict.int(mod= baci.rich.hl.mod,#
-                        dd=dd.rich,#
-                        y="number.of.species.HL",#
-                        family="poisson")#
-## ************************************************************#
-## all panels#
-## ************************************************************#
-plot.panels()
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/networkLevel')#
-source('src/initialize.R')#
-load('../../data/networks/baci_networks_years.Rdata')#
-N <- 99#
-#
-## ## ************************************************************#
-## ## calculate metrics and zscores#
-## ## ************************************************************#
-## mets <- lapply(nets, network.metrics, N)#
-#
-## cor.dats <- prep.dat(mets,  spec)#
-#
-## cor.dats$tot.rich <- cor.dats$number.of.species.LL +#
-##   cor.dats$number.of.species.HL#
-#
-## save(cor.dats, file='saved/corMets.Rdata')#
-#
-## ************************************************************#
-## effect of years post restoration#
-## ************************************************************#
-#
-load(file='saved/corMets.Rdata')#
-cor.dats$tot.rich <- cor.dats$number.of.species.LL +#
-  cor.dats$number.of.species.HL#
-## nestedness#
-baci.nodf.mod <- lmer(zNODF ~ scale(ypr) +#
-                 (1|Site) + (1|Year),#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.nodf.mod)#
-save(baci.nodf.mod, file='saved/mods/baci_nodf.Rdata')#
-#
-## modularity#
-baci.mod.mod <- lmer(zmod.met.D ~ scale(ypr) +#
-                 (1|Site) + (1|Year),#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.mod.mod)#
-save(baci.mod.mod, file='saved/mods/baci_mod.Rdata')#
-#
-## h2#
-baci.h2.mod <- lmer(H2 ~ scale(ypr) +#
-                 (1|Site) + (1|Year),#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.h2.mod)#
-save(baci.h2.mod, file='saved/mods/baci_h2.Rdata')#
-## species richness pol#
-baci.rich.hl.mod <- glmer(number.of.species.HL ~ scale(ypr) +#
-                 (1|Site) + (1|Year), family="poisson",#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.rich.hl.mod)#
-save(baci.rich.hl.mod, file='saved/mods/baci_rich_hl.Rdata')#
-#
-## species richness plants#
-baci.rich.ll.mod <- glmer(number.of.species.LL ~ scale(ypr) +#
-                 (1|Site) + (1|Year), family="poisson",#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.rich.ll.mod)#
-save(baci.rich.ll.mod, file='saved/mods/baci_rich_ll.Rdata')#
-#
-## total species richness#
-baci.rich.tot.mod <- glmer(tot.rich ~ scale(ypr) +#
-                 (1|Site) + (1|Year), family="poisson",#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.rich.tot.mod)#
-save(baci.rich.tot.mod, file='saved/mods/baci_rich_tot.Rdata')#
-#
-## connectance#
-baci.conn.mod <- lmer(connectance ~ scale(ypr) +#
-                 (1|Site) + (1|Year),#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.conn.mod)#
-save(baci.conn.mod, file='saved/mods/baci_conn.Rdata')#
-#
-## weighted connectance#
-baci.wconn.mod <- lmer(weighted.connectance ~ scale(ypr) +#
-                 (1|Site) + (1|Year),#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.wconn.mod)#
-save(baci.wconn.mod, file='saved/mods/baci_wconn.Rdata')#
-#
-## niche overlap pollinators#
-baci.no.pol.mod <- lmer(niche.overlap.pol ~ scale(ypr) +#
-                 (1|Site) + (1|Year),#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.no.pol.mod)#
-save(baci.no.pol.mod, file='saved/mods/baci_no_pol.Rdata')#
-#
-## niche overlap plants#
-baci.no.plant.mod <- lmer(niche.overlap.plants ~ scale(ypr) +#
-                 (1|Site) + (1|Year),#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.no.plant.mod)#
-save(baci.no.plant.mod, file='saved/mods/baci_no_plant.Rdata')#
-source('plotting/baci.R')#
-## distribution is niche overlap#
-#
-dis.mats <- lapply(lapply(nets, t), vegdist, method="chao")#
-#
-layout(matrix(1:6, nrow=2))#
-cols <- rainbow(length(unique(cor.dats$Year)))#
-lapply(unique(cor.dats$Site), function(x){#
-  this.mats <- dis.mats[cor.dats$Site == x]#
-  plot(NA, ylim=c(0,10), xlim=c(0,1.5),#
-       ylab="Frequency",#
-       xlab="Niche Overlap",#
-       main= x)#
-  for(i in 1:length(this.mats)){#
-    points(density(this.mats[[i]]), col=cols[i], type="l", lwd=2)#
-  }#
-})#
-#
-plot(NA, ylim=c(0,1), xlim=c(0,1), xaxt="n", yaxt="n", ylab="", xlab="")#
-legend("center", col=cols, lwd="2",#
-       legend=sort(unique(cor.dats$Year)),#
-       bty="n")
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/networkLevel')#
-source('src/initialize.R')#
-load('../../data/networks/baci_networks_years.Rdata')#
-N <- 99#
-#
-## ## ************************************************************#
-## ## calculate metrics and zscores#
-## ## ************************************************************#
-## mets <- lapply(nets, network.metrics, N)#
-#
-## cor.dats <- prep.dat(mets,  spec)#
-#
-## cor.dats$tot.rich <- cor.dats$number.of.species.LL +#
-##   cor.dats$number.of.species.HL#
-#
-## save(cor.dats, file='saved/corMets.Rdata')#
-#
-## ************************************************************#
-## effect of years post restoration#
-## ************************************************************#
-#
-load(file='saved/corMets.Rdata')#
-cor.dats$tot.rich <- cor.dats$number.of.species.LL +#
-  cor.dats$number.of.species.HL#
-## nestedness#
-baci.nodf.mod <- lmer(zNODF ~ scale(ypr) +#
-                 (1|Site) + (1|Year),#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.nodf.mod)#
-save(baci.nodf.mod, file='saved/mods/baci_nodf.Rdata')#
-#
-## modularity#
-baci.mod.mod <- lmer(zmod.met.D ~ scale(ypr) +#
-                 (1|Site) + (1|Year),#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.mod.mod)#
-save(baci.mod.mod, file='saved/mods/baci_mod.Rdata')#
-#
-## h2#
-baci.h2.mod <- lmer(H2 ~ scale(ypr) +#
-                 (1|Site) + (1|Year),#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.h2.mod)#
-save(baci.h2.mod, file='saved/mods/baci_h2.Rdata')#
-## species richness pol#
-baci.rich.hl.mod <- glmer(number.of.species.HL ~ scale(ypr) +#
-                 (1|Site) + (1|Year), family="poisson",#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.rich.hl.mod)#
-save(baci.rich.hl.mod, file='saved/mods/baci_rich_hl.Rdata')#
-#
-## species richness plants#
-baci.rich.ll.mod <- glmer(number.of.species.LL ~ scale(ypr) +#
-                 (1|Site) + (1|Year), family="poisson",#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.rich.ll.mod)#
-save(baci.rich.ll.mod, file='saved/mods/baci_rich_ll.Rdata')#
-#
-## total species richness#
-baci.rich.tot.mod <- glmer(tot.rich ~ scale(ypr) +#
-                 (1|Site) + (1|Year), family="poisson",#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.rich.tot.mod)#
-save(baci.rich.tot.mod, file='saved/mods/baci_rich_tot.Rdata')#
-#
-## connectance#
-baci.conn.mod <- lmer(connectance ~ scale(ypr) +#
-                 (1|Site) + (1|Year),#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.conn.mod)#
-save(baci.conn.mod, file='saved/mods/baci_conn.Rdata')#
-#
-## weighted connectance#
-baci.wconn.mod <- lmer(weighted.connectance ~ scale(ypr) +#
-                 (1|Site) + (1|Year),#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.wconn.mod)#
-save(baci.wconn.mod, file='saved/mods/baci_wconn.Rdata')#
-#
-## niche overlap pollinators#
-baci.no.pol.mod <- lmer(niche.overlap.HL ~ scale(ypr) +#
-                 (1|Site) + (1|Year),#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.no.pol.mod)#
-save(baci.no.pol.mod, file='saved/mods/baci_no_pol.Rdata')#
-#
-## niche overlap plants#
-baci.no.plant.mod <- lmer(niche.overlap.LL ~ scale(ypr) +#
-                 (1|Site) + (1|Year),#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.no.plant.mod)#
-save(baci.no.plant.mod, file='saved/mods/baci_no_plant.Rdata')#
-source('plotting/baci.R')#
-## distribution is niche overlap#
-#
-dis.mats <- lapply(lapply(nets, t), vegdist, method="chao")#
-#
-layout(matrix(1:6, nrow=2))#
-cols <- rainbow(length(unique(cor.dats$Year)))#
-lapply(unique(cor.dats$Site), function(x){#
-  this.mats <- dis.mats[cor.dats$Site == x]#
-  plot(NA, ylim=c(0,10), xlim=c(0,1.5),#
-       ylab="Frequency",#
-       xlab="Niche Overlap",#
-       main= x)#
-  for(i in 1:length(this.mats)){#
-    points(density(this.mats[[i]]), col=cols[i], type="l", lwd=2)#
-  }#
-})#
-#
-plot(NA, ylim=c(0,1), xlim=c(0,1), xaxt="n", yaxt="n", ylab="", xlab="")#
-legend("center", col=cols, lwd="2",#
-       legend=sort(unique(cor.dats$Year)),#
-       bty="n")
-library(RColorBrewer)#
-library(lme4)#
-library(lmerTest)#
-source('plotting/src/predictIntervals.R')#
-source('plotting/src/CIplotting.R')#
-source('plotting/src/plotPanels.R')#
-source('src/misc.R')#
-load(file='saved/corMets.Rdata')#
-#
-dd <- expand.grid(ypr=seq(from= min(cor.dats$ypr, na.rm=TRUE),#
-                          to= max(cor.dats$ypr, na.rm=TRUE),#
-                          length=10))#
-#
-## ************************************************************#
-## nodf#
-## ************************************************************#
-load(file='saved/mods/baci_nodf.Rdata')#
-#
-dd.nodf <- cbind(dd, zNODF=0)#
-#
-nodf.pi <- predict.int(mod= baci.nodf.mod,#
-                        dd=dd.nodf,#
-                        y="zNODF",#
-                       family="gaussian")#
-## ************************************************************#
-## modularity#
-## ************************************************************#
-load(file='saved/mods/baci_mod.Rdata')#
-dd.mod <- cbind(dd, zmod.met.D=0)#
-mod.pi <- predict.int(mod= baci.mod.mod,#
-                        dd=dd.mod,#
-                        y="zmod.met.D",#
-                      family="gaussian")#
-## ************************************************************#
-## specialization#
-## ************************************************************#
-load(file='saved/mods/baci_h2.Rdata')#
-dd.h2 <- cbind(dd, H2=0)#
-h2.pi <- predict.int(mod= baci.h2.mod,#
-                        dd=dd.h2,#
-                        y="H2",#
-                        family="gaussian")#
-## ************************************************************#
-## niche overlap - Plants#
-## ************************************************************#
-load(file='saved/mods/baci_no_plant.Rdata')#
-#
-dd.nop <- cbind(dd, niche.overlap.LL =0)#
-#
-nop.pi <- predict.int(mod= baci.no.plant.mod,#
-                        dd=dd.nop,#
-                        y="niche.overlap.plants",#
-                        family="gaussian")#
-## ************************************************************#
-## niche overlap - Polinators#
-## ************************************************************#
-load(file='saved/mods/baci_no_pol.Rdata')#
-#
-dd.nopol <- cbind(dd, niche.overlap.HL =0)#
-nopol.pi <- predict.int(mod= baci.no.pol.mod,#
-                        dd=dd.nopol,#
-                        y="niche.overlap.pol",#
-                        family="gaussian")#
-#
-## ************************************************************#
-## connectance#
-## ************************************************************#
-load(file='saved/mods/baci_conn.Rdata')#
-#
-dd.conn <- cbind(dd, connectance =0)#
-conn.pi <- predict.int(mod= baci.conn.mod,#
-                        dd=dd.conn,#
-                        y="connectance",#
-                        family="gaussian")#
-#
-## ************************************************************#
-## plant richness#
-## ************************************************************#
-load(file='saved/mods/baci_rich_ll.Rdata')#
-#
-dd.rich.ll <- cbind(dd, number.of.species.LL =0)#
-rich.ll.pi <- predict.int(mod= baci.rich.ll.mod,#
-                        dd=dd.rich,#
-                        y="number.of.species.LL",#
-                        family="poisson")#
-## ************************************************************#
-## pol richness#
-## ************************************************************#
-load(file='saved/mods/baci_rich_hl.Rdata')#
-#
-dd.rich.hl <- cbind(dd, number.of.species.HL =0)#
-rich.hl.pi <- predict.int(mod= baci.rich.hl.mod,#
-                        dd=dd.rich,#
-                        y="number.of.species.HL",#
-                        family="poisson")#
-## ************************************************************#
-## all panels#
-## ************************************************************#
-plot.panels()
-library(RColorBrewer)#
-library(lme4)#
-library(lmerTest)#
-source('plotting/src/predictIntervals.R')#
-source('plotting/src/CIplotting.R')#
-source('plotting/src/plotPanels.R')#
-source('src/misc.R')#
-load(file='saved/corMets.Rdata')#
-#
-dd <- expand.grid(ypr=seq(from= min(cor.dats$ypr, na.rm=TRUE),#
-                          to= max(cor.dats$ypr, na.rm=TRUE),#
-                          length=10))#
-#
-## ************************************************************#
-## nodf#
-## ************************************************************#
-load(file='saved/mods/baci_nodf.Rdata')#
-#
-dd.nodf <- cbind(dd, zNODF=0)#
-#
-nodf.pi <- predict.int(mod= baci.nodf.mod,#
-                        dd=dd.nodf,#
-                        y="zNODF",#
-                       family="gaussian")#
-## ************************************************************#
-## modularity#
-## ************************************************************#
-load(file='saved/mods/baci_mod.Rdata')#
-dd.mod <- cbind(dd, zmod.met.D=0)#
-mod.pi <- predict.int(mod= baci.mod.mod,#
-                        dd=dd.mod,#
-                        y="zmod.met.D",#
-                      family="gaussian")#
-## ************************************************************#
-## specialization#
-## ************************************************************#
-load(file='saved/mods/baci_h2.Rdata')#
-dd.h2 <- cbind(dd, H2=0)#
-h2.pi <- predict.int(mod= baci.h2.mod,#
-                        dd=dd.h2,#
-                        y="H2",#
-                        family="gaussian")#
-## ************************************************************#
-## niche overlap - Plants#
-## ************************************************************#
-load(file='saved/mods/baci_no_plant.Rdata')#
-#
-dd.nop <- cbind(dd, niche.overlap.LL =0)#
-#
-nop.pi <- predict.int(mod= baci.no.plant.mod,#
-                        dd=dd.nop,#
-                        y="niche.overlap.plants",#
-                        family="gaussian")#
-## ************************************************************#
-## niche overlap - Polinators#
-## ************************************************************#
-load(file='saved/mods/baci_no_pol.Rdata')#
-#
-dd.nopol <- cbind(dd, niche.overlap.HL =0)#
-nopol.pi <- predict.int(mod= baci.no.pol.mod,#
-                        dd=dd.nopol,#
-                        y="niche.overlap.pol",#
-                        family="gaussian")#
-#
-## ************************************************************#
-## connectance#
-## ************************************************************#
-load(file='saved/mods/baci_conn.Rdata')#
-#
-dd.conn <- cbind(dd, connectance =0)#
-conn.pi <- predict.int(mod= baci.conn.mod,#
-                        dd=dd.conn,#
-                        y="connectance",#
-                        family="gaussian")#
-#
-## ************************************************************#
-## plant richness#
-## ************************************************************#
-load(file='saved/mods/baci_rich_ll.Rdata')#
-#
-dd.rich.ll <- cbind(dd, number.of.species.LL =0)#
-rich.ll.pi <- predict.int(mod= baci.rich.ll.mod,#
-                        dd=dd.ll.rich,#
-                        y="number.of.species.LL",#
-                        family="poisson")#
-## ************************************************************#
-## pol richness#
-## ************************************************************#
-load(file='saved/mods/baci_rich_hl.Rdata')#
-#
-dd.rich.hl <- cbind(dd, number.of.species.HL =0)#
-rich.hl.pi <- predict.int(mod= baci.rich.hl.mod,#
-                        dd=dd.hl.rich,#
-                        y="number.of.species.HL",#
-                        family="poisson")#
-## ************************************************************#
-## all panels#
-## ************************************************************#
-plot.panels()
-library(RColorBrewer)#
-library(lme4)#
-library(lmerTest)#
-source('plotting/src/predictIntervals.R')#
-source('plotting/src/CIplotting.R')#
-source('plotting/src/plotPanels.R')#
-source('src/misc.R')#
-load(file='saved/corMets.Rdata')#
-#
-dd <- expand.grid(ypr=seq(from= min(cor.dats$ypr, na.rm=TRUE),#
-                          to= max(cor.dats$ypr, na.rm=TRUE),#
-                          length=10))#
-#
-## ************************************************************#
-## nodf#
-## ************************************************************#
-load(file='saved/mods/baci_nodf.Rdata')#
-#
-dd.nodf <- cbind(dd, zNODF=0)#
-#
-nodf.pi <- predict.int(mod= baci.nodf.mod,#
-                        dd=dd.nodf,#
-                        y="zNODF",#
-                       family="gaussian")#
-## ************************************************************#
-## modularity#
-## ************************************************************#
-load(file='saved/mods/baci_mod.Rdata')#
-dd.mod <- cbind(dd, zmod.met.D=0)#
-mod.pi <- predict.int(mod= baci.mod.mod,#
-                        dd=dd.mod,#
-                        y="zmod.met.D",#
-                      family="gaussian")#
-## ************************************************************#
-## specialization#
-## ************************************************************#
-load(file='saved/mods/baci_h2.Rdata')#
-dd.h2 <- cbind(dd, H2=0)#
-h2.pi <- predict.int(mod= baci.h2.mod,#
-                        dd=dd.h2,#
-                        y="H2",#
-                        family="gaussian")#
-## ************************************************************#
-## niche overlap - Plants#
-## ************************************************************#
-load(file='saved/mods/baci_no_plant.Rdata')#
-#
-dd.nop <- cbind(dd, niche.overlap.LL =0)#
-#
-nop.pi <- predict.int(mod= baci.no.plant.mod,#
-                        dd=dd.nop,#
-                        y="niche.overlap.plants",#
-                        family="gaussian")#
-## ************************************************************#
-## niche overlap - Polinators#
-## ************************************************************#
-load(file='saved/mods/baci_no_pol.Rdata')#
-#
-dd.nopol <- cbind(dd, niche.overlap.HL =0)#
-nopol.pi <- predict.int(mod= baci.no.pol.mod,#
-                        dd=dd.nopol,#
-                        y="niche.overlap.pol",#
-                        family="gaussian")#
-#
-## ************************************************************#
-## connectance#
-## ************************************************************#
-load(file='saved/mods/baci_conn.Rdata')#
-#
-dd.conn <- cbind(dd, connectance =0)#
-conn.pi <- predict.int(mod= baci.conn.mod,#
-                        dd=dd.conn,#
-                        y="connectance",#
-                        family="gaussian")#
-#
-## ************************************************************#
-## plant richness#
-## ************************************************************#
-load(file='saved/mods/baci_rich_ll.Rdata')#
-#
-dd.rich.ll <- cbind(dd, number.of.species.LL =0)#
-rich.ll.pi <- predict.int(mod= baci.rich.ll.mod,#
-                        dd=dd.rich.ll,#
-                        y="number.of.species.LL",#
-                        family="poisson")#
-## ************************************************************#
-## pol richness#
-## ************************************************************#
-load(file='saved/mods/baci_rich_hl.Rdata')#
-#
-dd.rich.hl <- cbind(dd, number.of.species.HL =0)#
-rich.hl.pi <- predict.int(mod= baci.rich.hl.mod,#
-                        dd=dd.rich.hl,#
-                        y="number.of.species.HL",#
-                        family="poisson")#
-## ************************************************************#
-## all panels#
-## ************************************************************#
-plot.panels()
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/networkLevel')#
-source('src/initialize.R')#
-load('../../data/networks/baci_networks_years.Rdata')#
-N <- 99#
-#
-## ## ************************************************************#
-## ## calculate metrics and zscores#
-## ## ************************************************************#
-## mets <- lapply(nets, network.metrics, N)#
-#
-## cor.dats <- prep.dat(mets,  spec)#
-#
-## cor.dats$tot.rich <- cor.dats$number.of.species.LL +#
-##   cor.dats$number.of.species.HL#
-#
-## save(cor.dats, file='saved/corMets.Rdata')#
-#
-## ************************************************************#
-## effect of years post restoration#
-## ************************************************************#
-#
-load(file='saved/corMets.Rdata')#
-cor.dats$tot.rich <- cor.dats$number.of.species.LL +#
-  cor.dats$number.of.species.HL#
-## nestedness#
-baci.nodf.mod <- lmer(zNODF ~ scale(ypr) +#
-                 (1|Site) + (1|Year),#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.nodf.mod)#
-save(baci.nodf.mod, file='saved/mods/baci_nodf.Rdata')#
-#
-## modularity#
-baci.mod.mod <- lmer(zmod.met.D ~ scale(ypr) +#
-                 (1|Site) + (1|Year),#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.mod.mod)#
-save(baci.mod.mod, file='saved/mods/baci_mod.Rdata')#
-#
-## h2#
-baci.h2.mod <- lmer(H2 ~ scale(ypr) +#
-                 (1|Site) + (1|Year),#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.h2.mod)#
-save(baci.h2.mod, file='saved/mods/baci_h2.Rdata')#
-## species richness pol#
-baci.rich.hl.mod <- glmer(number.of.species.HL ~ scale(ypr) +#
-                 (1|Site) + (1|Year), family="poisson",#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.rich.hl.mod)#
-save(baci.rich.hl.mod, file='saved/mods/baci_rich_hl.Rdata')#
-#
-## species richness plants#
-baci.rich.ll.mod <- glmer(number.of.species.LL ~ scale(ypr) +#
-                 (1|Site) + (1|Year), family="poisson",#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.rich.ll.mod)#
-save(baci.rich.ll.mod, file='saved/mods/baci_rich_ll.Rdata')#
-#
-## total species richness#
-baci.rich.tot.mod <- glmer(tot.rich ~ scale(ypr) +#
-                 (1|Site) + (1|Year), family="poisson",#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.rich.tot.mod)#
-save(baci.rich.tot.mod, file='saved/mods/baci_rich_tot.Rdata')#
-#
-## connectance#
-baci.conn.mod <- lmer(connectance ~ scale(ypr) +#
-                 (1|Site) + (1|Year),#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.conn.mod)#
-save(baci.conn.mod, file='saved/mods/baci_conn.Rdata')#
-#
-## weighted connectance#
-baci.wconn.mod <- lmer(weighted.connectance ~ scale(ypr) +#
-                 (1|Site) + (1|Year),#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.wconn.mod)#
-save(baci.wconn.mod, file='saved/mods/baci_wconn.Rdata')#
-#
-## niche overlap pollinators#
-baci.no.pol.mod <- lmer(niche.overlap.HL ~ scale(ypr) +#
-                 (1|Site) + (1|Year),#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.no.pol.mod)#
-save(baci.no.pol.mod, file='saved/mods/baci_no_pol.Rdata')#
-#
-## niche overlap plants#
-baci.no.plant.mod <- lmer(niche.overlap.LL ~ scale(ypr) +#
-                 (1|Site) + (1|Year),#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.no.plant.mod)#
-save(baci.no.plant.mod, file='saved/mods/baci_no_plant.Rdata')#
-source('plotting/baci.R')#
-## distribution is niche overlap#
-#
-dis.mats <- lapply(lapply(nets, t), vegdist, method="chao")#
-#
-layout(matrix(1:6, nrow=2))#
-cols <- rainbow(length(unique(cor.dats$Year)))#
-lapply(unique(cor.dats$Site), function(x){#
-  this.mats <- dis.mats[cor.dats$Site == x]#
-  plot(NA, ylim=c(0,10), xlim=c(0,1.5),#
-       ylab="Frequency",#
-       xlab="Niche Overlap",#
-       main= x)#
-  for(i in 1:length(this.mats)){#
-    points(density(this.mats[[i]]), col=cols[i], type="l", lwd=2)#
-  }#
-})#
-#
-plot(NA, ylim=c(0,1), xlim=c(0,1), xaxt="n", yaxt="n", ylab="", xlab="")#
-legend("center", col=cols, lwd="2",#
-       legend=sort(unique(cor.dats$Year)),#
-       bty="n")
-rm(list=ls())#
-setwd('~/Dropbox/workshop/analysis/structural')#
-source('src/initialize.R')#
-N <- 999
-load(file='saved/mets.Rdata')#
-cor.mets <- mapply(function(a, b)#
-                   cor.metrics(true.stat= a,#
-                               null.stat= b,#
-                               N=N),#
-                   a=mets,#
-                   b=null.mets,#
-                   SIMPLIFY=FALSE)#
-#
-cor.dats <- prep.dat(cor.mets, site.info)#
-save(cor.dats, file='saved/corMets.Rdata')
-cor.dats
-mets
-nets
-dd.HL <- lapply(nets, colSums)#
-dd.LL <- lapply(nets, rowSums)
-dd.HL
-prep.dat
-dats.HL <- data.frame(do.call(rbind, dd.HL),#
-                      site.type = rep(names(dd.HL), sapply(dd.HL, length)))
-dats.HL <- data.frame(do.call(rbind, dd.HL),#
-                      site.type = rep(names(dd.HL),#
-                        each=sapply(dd.HL, length)))
-dats.HL <- data.frame(do.call(rbind, dd.HL),#
-                      site.type = rep(names(dd.HL),#
-                        by=sapply(dd.HL, length)))
-do.call(rbind, dd.HL)
-dd.HL <- lapply(nets, colSums)#
-dd.LL <- lapply(nets, rowSums)
-dd.HL
-do.call(rbind, dd.HL)
-dd.HL
-lapply(dd.HL, class)
-lapply(dd.HL, length)
-dats.HL <- data.frame(do.call(c, dd.HL),#
-                      site.type = rep(names(dd.HL),#
-                        by=sapply(dd.HL, length)))
-dats.HL <- data.frame(do.call(c, dd.HL),#
-                      site.type = rep(names(dd.HL),#
-                        each=sapply(dd.HL, length)))
-sapply(dd.HL, length)
-names(dd.HL)
-rep(names(dd.HL),#
-                        each=sapply(dd.HL, length))
-rep(names(dd.HL),#
-                        by=sapply(dd.HL, length))
-sapply(dd.HL, length)
-rep(names(dd.HL),#
-                        by=sapply(dd.HL, length))
-rep(names(dd.HL),#
-                        each=sapply(dd.HL, length)))
-rep(names(dd.HL),#
-                        each=sapply(dd.HL, length))
-rep(names(dd.HL),#
-                        sapply(dd.HL, length))
-dats.HL <- data.frame(do.call(c, dd.HL),#
-                      site.type = rep(names(dd.HL),#
-                        sapply(dd.HL, length)))
-dats.HL
-dats.HL <- data.frame(GenusSpecies=do.call(c, dd.HL),#
-                      site.type = rep(names(dd.HL),#
-                        sapply(dd.HL, length)),#
-                      species="herbivore")
-c(dd.HL, dd.LL)
-length(unlist(dd.HL))
-dd.HL <- lapply(nets, colSums)#
-dd.LL <- lapply(nets, rowSums)
-dats.HL <- data.frame(GenusSpecies=do.call(c, c(dd.HL, dd.LL)),#
-                      site.type = c(rep(names(dd.HL),#
-                        sapply(dd.HL, length)),#
-                        rep(names(dd.LL),#
-                        sapply(dd.LL, length))),#
-                      species= rep(c("herbivore", "plant"),#
-                        c(length(unlist(dd.HL)), length(unlist(dd.LL)))))
-head(dats.HL)
-dats.degree <- data.frame(degree=do.call(c, c(dd.HL, dd.LL)),#
-                      site.type = c(rep(names(dd.HL),#
-                        sapply(dd.HL, length)),#
-                        rep(names(dd.LL),#
-                        sapply(dd.LL, length))),#
-                      species= rep(c("herbivore", "plant"),#
-                        c(length(unlist(dd.HL)), length(unlist(dd.LL)))))
-dats.degree$GenusSpecies <- sapply(strsplit(names(dats.degree), "[.]"),#
-                 function(x) x[2])
-dats.degree$GenusSpecies <- sapply(strsplit(rownames(dats.degree), "[.]"),#
-                 function(x) x[2])
-head(dats.degree)
-dd.HL <- lapply(nets, colSums)#
-dd.LL <- lapply(nets, rowSums)#
-#
-dats.degree <- data.frame(degree=do.call(c, c(dd.HL, dd.LL)),#
-                          site.type = c(rep(names(dd.HL),#
-                            sapply(dd.HL, length)),#
-                            rep(names(dd.LL),#
-                                sapply(dd.LL, length))),#
-                          species= rep(c("herbivore", "plant"),#
-                            c(length(unlist(dd.HL)), length(unlist(dd.LL)))))#
-#
-dats.degree$GenusSpecies <- sapply(strsplit(rownames(dats.degree), "[.]"),#
-                                   function(x) x[2])#
-#
-dats.degree$Site <- sapply(strsplit(dats.degree$site.type, "_"),#
-                           function(x) x[1])#
-dats.degree$Type <- sapply(strsplit(dats.degree$site.type, "_"),#
-                           function(x) x[2])
-dats.degree$site.type
-dats.degree$Site <- sapply(strsplit(dats.degree$site.type, "[_]"),#
-                           function(x) x[1])
-class(dats.degree$site.type)
-dats.degree$Site <- sapply(strsplit(as.character(dats.degree$site.type), "_"),#
-                           function(x) x[1])
-dats.degree$Site <-#
- sapply(strsplit(as.character(dats.degree$site.type),#
-                 "_"), function(x) x[1])#
-dats.degree$Type <-#
- sapply(strsplit(as.character(dats.degree$site.type),#
-                 "_"), function(x) x[2])
-head(dats.degree)
-rownames(dat.degree) <- NULL
-rownames(dats.degree) <- NULL
-head(dats.degree)
-dats.degree <- merge(dats.degree, site.info, by.x="Site", by.y="siteCode")
-head(dats.degree)
-dats.degree.con <- dats.degree[dats.degree$Type == "conmat",]
-rm(list=ls())#
-library(lme4)#
-library(lmerTest)#
-setwd('~/Dropbox/hedgerow_assembly/analysis/networkLevel')#
-#
-load('../../data/networks/allSpecimens.Rdata')#
-f.path <- "../changePoint/cptPeel/baci"#
-load(file=file.path(f.path, "graphs.Rdata"))#
-#
-source('src/laplacian_functions.R')#
-#
-fig.path <- '../speciesLevel/Figures'#
-sites <- sapply(strsplit(names(nets), "[.]"), function(x) x[1])#
-years <- sapply(strsplit(names(nets), "[.]"), function(x) x[2])#
-#
-status.table <- table(spec$Site, spec$SiteStatus)#
-status.table <- as.data.frame(cbind(rownames(status.table),#
-                                    colnames(status.table)[apply(status.table,#
-                                                            1, which.max)]))#
-colnames(status.table)<- c("Site", "SiteStatus")#
-#
-all.alg.Con <- t(do.call(cbind.data.frame, lapply(nets, algCone)))#
-all.alg.Con <- as.data.frame(cbind(sites,years, all.alg.Con))#
-colnames(all.alg.Con) <- c("Site", "Year","Ncomp", "AlgCon", "EigenRatio")#
-#
-## add status#
-all.alg.Con.status <- merge(x=all.alg.Con,#
-                            y= status.table,#
-                            by.x="Site",#
-                            by.y="Site")#
-#
-## add ypr#
-all.alg.Con.status$ypr <- spec$ypr[match(paste(all.alg.Con.status$Site,#
-                                               all.alg.Con.status$Year),#
-                                         paste(spec$Site, spec$Year))]#
-#
-baci.sites <- c("MullerB", "Sperandio", "Barger", "Butler", "Hrdy")#
-#
-all.alg.Con.status$ypr[!all.alg.Con.status$Site %in% baci.sites] <- NA#
-#
-## change AlgCon to numeric (it is a factor for some reason..)#
-all.alg.Con.status$AlgCon <- as.numeric(as.character(#
-  all.alg.Con.status$AlgCon))#
-all.alg.Con.status$EigenRatio <- as.numeric(as.character(#
-  all.alg.Con.status$EigenRatio))#
-all.alg.Con.status$Ncomp <- as.numeric(as.character(#
-  all.alg.Con.status$Ncomp))#
-#
-alg.con.mod <- lmer(AlgCon ~ SiteStatus +#
-                    (1|Site) + (1|Year),    #
-                    data=all.alg.Con.status)#
-#
-summary(alg.con.mod)#
-#
-# Algebrain connectivity x Ypr#
-alg.con.mod.ypr <- lmer(AlgCon ~ ypr + #
-                        (1|Site) + (1|Year),    #
-                        data=all.alg.Con.status)#
-summary(alg.con.mod.ypr)#
-#
-# Eigenvalue ratio  x Ypr#
-EigenRatio.mod.ypr <- lmer(EigenRatio ~ ypr +  Ncomp +#
-                          (1|Site) + (1|Year),    #
-                        data=all.alg.Con.status)#
-summary(EigenRatio.mod.ypr)#
-#
-save(alg.con.mod.ypr, all.alg.Con.status, EigenRatio.mod.ypr,#
-     file="saved/mods/AlgCon2.Rdata")
-load(file='saved/corMets.Rdata')
-cor.mets
-cor.dats
-head(cor.dats)
-all.alg.Con.status
-colnames(all.alg.Con.status)
-all.alg.Con.status$tot.rich <-#
-  cor.dats$tot.rich[match(paste(cor.dats$Site,#
-                                cor.dats$Year),#
-                          paste(all.alg.Con.status$Site,#
-                                all.alg.Con.status$Year))]
-all.alg.Con.status$tot.rich <-#
-  cor.dats$tot.rich[match(paste(all.alg.Con.status$Site,#
-                                all.alg.Con.status$Year),#
-                          paste(cor.dats$Site,#
-                                cor.dats$Year))]
-all.alg.Con.stats$tot.rich
-all.alg.Con.status$tot.rich
-names(nets)
-net.mets <- networklevel(nets, index="number of species")
-?networklevel
-net.mets <- lapply(nets, networklevel, index="number of species")
-net.mets
-net.mets <- lapply(nets, function(x) sum(dim(x)))
-net.mets <- lapply(nets, function(x) sum(dim(x)))
-net.mets
-net.mets <- lapply(nets, function(x) sum(dim(empty(x))))
-net.mets
-net.mets <- sapply(nets, function(x) sum(dim(empty(x))))
-net.mets
-all.alg.Con.status$tot.rich <- net.mets[match(names(net.mets),#
-                                              paste(all.alg.Con.status$Site,#
-                                                    all.alg.Con.status$Year))]
-all.alg.Con.status$tot.rich
-names(net.mets)
-paste(all.alg.Con.status$Site,#
-                                                    all.alg.Con.status$Year
-)
-all.alg.Con.status$tot.rich <- net.mets[match(names(net.mets),#
-                                              paste(all.alg.Con.status$Site,#
-                                                    all.alg.Con.status$Year,#
-                                                    sep="."))]
-all.alg.Con.status$tot.rich
-cor.test(all.alg.Con.status$tot.rich, all.alg.Con.status$AlgCon)
-cor.test(all.alg.Con.status$tot.rich[!is.na(all.alg.Con.status$ypr)],#
-         all.alg.Con.status$AlgCon[!is.na(all.alg.Con.status$ypr)])
+setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
+source('plotting/src/initialize.R')#
+#
+sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
+sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
+all.poss.yrs <- 2006:2015#
+#
+for(i in unique(sites.trees)){#
+  print(i)#
+  net <- nets[sites == i]#
+  yrs <- sapply(strsplit(names(net), "[.]"), function(x) x[2])#
+  names(net) <- yrs#
+  arr <- simplify2array(net)#
+  all.years <-  apply(arr, c(1,2), sum)#
+  plant.sums <- rowSums(all.years)#
+  pol.sums <- colSums(all.years)#
+  this.tree <- tree.graphs[sites.trees == i]#
+  pdf.f(plotNet,#
+        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
+        width=18, height=4)#
+  pdf.f(plotDend,#
+        file=file.path(fig.path, sprintf("%s_communities.pdf", i)),#
+        width=10, height=4)#
+}
 rm(list=ls())#
 setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
 source('plotting/src/initialize.R')#
@@ -1502,6 +145,7 @@ plot.beta.div(list(comm.mats.yr$pollinator$comm,#
                    comm.mats.yr$plant$status),#
               fig.path,#
               method= method)#
+#
 ## **********************************************************#
 ## who are the core species? Species that are never in the core?#
 ## pollinators#
@@ -1513,785 +157,133 @@ count.stayed.pol <- table(stayed.pol)#
 count.stayed.pol <- count.stayed.pol[count.stayed.pol != 0]#
 always.stayed.pol <- count.stayed.pol[count.stayed.pol == 5]#
 #
-hist(count.stayed.pol, breaks=0:5)#
-#
 left.pol <-#
   site.cores$all$pollinator$GenusSpecies[site.cores$all$pollinator$comm ==#
                                          "left"]#
 count.left.pol <- table(left.pol)#
 count.left.pol <- count.left.pol[count.left.pol != 0]#
-always.left.pol <- count.left.pol[count.left.pol == 5]
-count.stayed.pol
-hist(count.stayed.pol, breaks=0:5)
-always.stayed.pol
+always.left.pol <- count.left.pol[count.left.pol == 5]#
+#
+## plants#
+stayed.plant <-#
+  site.cores$all$plant$GenusSpecies[site.cores$all$plant$comm ==#
+                                    "stayed"]#
+count.stayed.plant <- table(stayed.plant)#
+count.stayed.plant <- count.stayed.plant[count.stayed.plant != 0]#
+always.stayed.plant <- count.stayed.plant[count.stayed.plant == 5]
 always.left.pol
-always.left.pol
-always.left.pol
-count.left.pol
-always.left.pol
-always.stayed.pol
-always.left.pol
 rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-source('plotting/src/initialize.R')#
+setwd("~/Dropbox/hedgerow_assembly/analysis/changePoint")#
+load('cptPeel/baci/graphs.Rdata')#
+load('../../data/networks/allSpecimens.Rdata')#
+library(MASS)#
+library(nlme)#
+dats <- read.csv('cptPeel/changing_points.csv')#
+BACI.site <- c('Barger', 'Butler', 'Hrdy', 'MullerB', 'Sperandio')#
+## **********************************************************#
+## binomial #
+## **********************************************************#
+chpt.trial <- aggregate(spec$Year, list(Site=spec$Site),#
+                           FUN=function(x) length(unique(x)))#
+chpt.trial$x <- chpt.trial$x - 1#
 #
-sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
-sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
-all.poss.yrs <- 2006:2015#
+chpt.trial <- chpt.trial[chpt.trial$x >= 4,]#
 #
-for(i in unique(sites.trees)){#
-  print(i)#
-  net <- nets[sites == i]#
-  yrs <- sapply(strsplit(names(net), "[.]"), function(x) x[2])#
-  names(net) <- yrs#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  this.tree <- tree.graphs[sites.trees == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_communities.pdf", i)),#
-        width=10, height=4)#
-}
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-source('plotting/src/initialize.R')#
+change.points.site <- tapply(dats$cp, dats$sites, length)#
 #
-sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
-sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
-all.poss.yrs <- 2006:2015#
+chpt.trial$chpts <- change.points.site[match(chpt.trial$Site,#
+                                                rownames(change.points.site))]#
+chpt.trial$chpts[is.na(chpt.trial$chpts)] <- 0#
+colnames(chpt.trial) <- c("Site", "trial", "chpts")#
 #
-for(i in unique(sites.trees)){#
-  print(i)#
-  net <- nets[sites == i]#
-  yrs <- sapply(strsplit(names(net), "[.]"), function(x) x[2])#
-  names(net) <- yrs#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  this.tree <- tree.graphs[sites.trees == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_communities.pdf", i)),#
-        width=10, height=4)#
-}
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-source('plotting/src/initialize.R')#
+chpt.trial$status <- spec$SiteStatus[match(chpt.trial$Site, spec$Site)]#
+chpt.trial$status[chpt.trial$Site %in% BACI.site] <- "maturing"#
 #
-sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
-sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
-all.poss.yrs <- 2006:2015#
+## binomial model with change points as successes#
+mod.chpt <- glm(cbind(chpt.trial$chpts, chpt.trial$trial - chpt.trial$chpts) ~#
+    chpt.trial$status, family="binomial")#
+summary(mod.chpt)#
 #
-for(i in unique(sites.trees)){#
-  print(i)#
-  net <- nets[sites == i]#
-  yrs <- sapply(strsplit(names(net), "[.]"), function(x) x[2])#
-  names(net) <- yrs#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  this.tree <- tree.graphs[sites.trees == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_communities.pdf", i)),#
-        width=10, height=4)#
-}
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-source('plotting/src/initialize.R')#
+exp(cbind(coef(mod.chpt), confint(mod.chpt)))  #
 #
-sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
-sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
-all.poss.yrs <- 2006:2015#
+# controls with change points#
+nrow(chpt.trial[chpt.trial$status == "control" &#
+                chpt.trial$chpts != 0,])/#
+  nrow(chpt.trial[chpt.trial$status == "control",])#
 #
-for(i in unique(sites.trees)){#
-  print(i)#
-  net <- nets[sites == i]#
-  yrs <- sapply(strsplit(names(net), "[.]"), function(x) x[2])#
-  names(net) <- yrs#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  this.tree <- tree.graphs[sites.trees == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_communities.pdf", i)),#
-        width=10, height=4)#
-}
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-source('plotting/src/initialize.R')#
+nrow(chpt.trial[chpt.trial$status == "mature" &#
+                chpt.trial$chpts != 0,])/#
+  nrow(chpt.trial[chpt.trial$status == "mature",])#
 #
-sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
-sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
-all.poss.yrs <- 2006:2015#
+nrow(chpt.trial[chpt.trial$chpts != 0,])/#
+  nrow(chpt.trial)#
+## maturing has more successes than mature and controls, and mature#
+## and controls have about the same#
 #
-for(i in unique(sites.trees)){#
-  print(i)#
-  net <- nets[sites == i]#
-  yrs <- sapply(strsplit(names(net), "[.]"), function(x) x[2])#
-  names(net) <- yrs#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  this.tree <- tree.graphs[sites.trees == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_communities.pdf", i)),#
-        width=10, height=4)#
-}
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-source('plotting/src/initialize.R')#
+## **********************************************************#
+## poisson likelihood#
+## maybe not quite right given the number of trials differs#
+## **********************************************************#
+counts <- table(dats[,-3])#
 #
-sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
-sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
-all.poss.yrs <- 2006:2015#
+chpts.yrs <- colSums(counts)#
+barplot(chpts.yrs)#
 #
-for(i in unique(sites.trees)){#
-  print(i)#
-  net <- nets[sites == i]#
-  yrs <- sapply(strsplit(names(net), "[.]"), function(x) x[2])#
-  names(net) <- yrs#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  this.tree <- tree.graphs[sites.trees == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_communities.pdf", i)),#
-        width=10, height=4)#
-}
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-source('plotting/src/initialize.R')#
+sites <- unique(sapply(strsplit(names(graphs), "_"), function(x)#
+                       x[1]))#
+no.chpt <- sites[!sites %in% rownames(counts)]#
+add.chpt <- matrix(0, nrow=length(no.chpt), ncol=ncol(counts))#
+rownames(add.chpt) <- no.chpt#
 #
-sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
-sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
-all.poss.yrs <- 2006:2015#
+counts <- rbind(counts, add.chpt)#
 #
-for(i in unique(sites.trees)){#
-  print(i)#
-  net <- nets[sites == i]#
-  yrs <- sapply(strsplit(names(net), "[.]"), function(x) x[2])#
-  names(net) <- yrs#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  this.tree <- tree.graphs[sites.trees == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_communities.pdf", i)),#
-        width=10, height=4)#
-}
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-source('plotting/src/initialize.R')#
+chpts.sites <- rowSums(counts)#
 #
-sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
-sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
-all.poss.yrs <- 2006:2015#
+statuses <- spec$SiteStatus[match(names(chpts.sites), spec$Site)]#
+statuses[names(chpts.sites) %in% BACI.site] <- "maturing"#
 #
-for(i in unique(sites.trees)){#
-  print(i)#
-  net <- nets[sites == i]#
-  yrs <- sapply(strsplit(names(net), "[.]"), function(x) x[2])#
-  names(net) <- yrs#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  this.tree <- tree.graphs[sites.trees == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_communities.pdf", i)),#
-        width=10, height=4)#
-}
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-source('plotting/src/initialize.R')#
+layout(matrix(1:3, nrow=1))#
+cont <- hist(chpts.sites[statuses == "control"], prob=TRUE,#
+     main="Unrestored", ylim=c(0,1),  xlim=c(0,4),#
+     breaks=0:4)#
+maturing <- hist(chpts.sites[statuses == "maturing"], prob=TRUE,#
+     main="Maturing", ylim=c(0,1), xlim=c(0,4),#
+     breaks=0:4)#
+mature <- hist(chpts.sites[statuses == "mature"], prob=TRUE,#
+     main="Mature", ylim=c(0,1), xlim=c(0,4),#
+     breaks=0:4)#
 #
-sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
-sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
-all.poss.yrs <- 2006:2015#
+## fit poisson distributions to data#
+fit.cont <- fitdistr(chpts.sites[statuses == "control"],#
+                     densfun="Poisson")#
+fit.cont#
+fit.maturing <- fitdistr(chpts.sites[statuses == "maturing"],#
+                     densfun="Poisson")#
+fit.maturing#
+fit.mature <- fitdistr(chpts.sites[statuses == "mature"],#
+                     densfun="Poisson")#
+fit.mature#
 #
-for(i in unique(sites.trees)){#
-  print(i)#
-  net <- nets[sites == i]#
-  yrs <- sapply(strsplit(names(net), "[.]"), function(x) x[2])#
-  names(net) <- yrs#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  this.tree <- tree.graphs[sites.trees == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_communities.pdf", i)),#
-        width=10, height=4)#
-}
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-source('plotting/src/initialize.R')#
+## likelihood ratio text of fit of control model on maturing data,#
+## mature model on maturing data#
+lik.cont.mat <- log(prod(dpois(chpts.sites[statuses == "maturing"],#
+                           lambda=fit.cont$estimate)))#
+lik.mature.mat <- log(prod(dpois(chpts.sites[statuses == "maturing"],#
+                           lambda=fit.mature$estimate)))#
+lik.mature.cont <- log(prod(dpois(chpts.sites[statuses == "mature"],#
+                           lambda=fit.cont$estimate)))#
 #
-sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
-sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
-all.poss.yrs <- 2006:2015#
+## maturing is unlikely to be drawn from control#
+pchisq(-2*(lik.cont.mat - fit.maturing$loglik), 1, lower.tail=FALSE)#
 #
-for(i in unique(sites.trees)){#
-  print(i)#
-  net <- nets[sites == i]#
-  yrs <- sapply(strsplit(names(net), "[.]"), function(x) x[2])#
-  names(net) <- yrs#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  this.tree <- tree.graphs[sites.trees == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_communities.pdf", i)),#
-        width=10, height=4)#
-}
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-source('plotting/src/initialize.R')#
+## or mature#
+pchisq(-2*(lik.mature.mat - fit.maturing$loglik), 1, lower.tail=FALSE)#
 #
-sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
-sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
-all.poss.yrs <- 2006:2015#
-#
-for(i in unique(sites.trees)){#
-  print(i)#
-  net <- nets[sites == i]#
-  yrs <- sapply(strsplit(names(net), "[.]"), function(x) x[2])#
-  names(net) <- yrs#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  this.tree <- tree.graphs[sites.trees == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_communities.pdf", i)),#
-        width=10, height=4)#
-}
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-source('plotting/src/initialize.R')#
-#
-sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
-sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
-all.poss.yrs <- 2006:2015#
-#
-for(i in unique(sites.trees)){#
-  print(i)#
-  net <- nets[sites == i]#
-  yrs <- sapply(strsplit(names(net), "[.]"), function(x) x[2])#
-  names(net) <- yrs#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  this.tree <- tree.graphs[sites.trees == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_communities.pdf", i)),#
-        width=10, height=4)#
-}
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-source('plotting/src/initialize.R')#
-#
-sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
-sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
-all.poss.yrs <- 2006:2015#
-#
-for(i in unique(sites.trees)){#
-  print(i)#
-  net <- nets[sites == i]#
-  yrs <- sapply(strsplit(names(net), "[.]"), function(x) x[2])#
-  names(net) <- yrs#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  this.tree <- tree.graphs[sites.trees == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_communities.pdf", i)),#
-        width=10, height=4)#
-}
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-source('plotting/src/initialize.R')#
-#
-sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
-sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
-all.poss.yrs <- 2006:2015#
-#
-for(i in unique(sites.trees)){#
-  print(i)#
-  net <- nets[sites == i]#
-  yrs <- sapply(strsplit(names(net), "[.]"), function(x) x[2])#
-  names(net) <- yrs#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  this.tree <- tree.graphs[sites.trees == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_communities.pdf", i)),#
-        width=10, height=4)#
-}
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-source('plotting/src/initialize.R')#
-#
-sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
-sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
-all.poss.yrs <- 2006:2015#
-#
-for(i in unique(sites.trees)){#
-  print(i)#
-  net <- nets[sites == i]#
-  yrs <- sapply(strsplit(names(net), "[.]"), function(x) x[2])#
-  names(net) <- yrs#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  this.tree <- tree.graphs[sites.trees == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_communities.pdf", i)),#
-        width=10, height=4)#
-}
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-source('plotting/src/initialize.R')#
-#
-sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
-sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
-all.poss.yrs <- 2006:2015#
-#
-for(i in unique(sites.trees)){#
-  print(i)#
-  net <- nets[sites == i]#
-  yrs <- sapply(strsplit(names(net), "[.]"), function(x) x[2])#
-  names(net) <- yrs#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  this.tree <- tree.graphs[sites.trees == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_communities.pdf", i)),#
-        width=10, height=4)#
-}
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-source('plotting/src/initialize.R')#
-#
-sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
-sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
-all.poss.yrs <- 2006:2015#
-#
-for(i in unique(sites.trees)){#
-  print(i)#
-  net <- nets[sites == i]#
-  yrs <- sapply(strsplit(names(net), "[.]"), function(x) x[2])#
-  names(net) <- yrs#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  this.tree <- tree.graphs[sites.trees == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_communities.pdf", i)),#
-        width=10, height=4)#
-}
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-source('plotting/src/initialize.R')#
-#
-sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
-sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
-all.poss.yrs <- 2006:2015#
-#
-for(i in unique(sites.trees)){#
-  print(i)#
-  net <- nets[sites == i]#
-  yrs <- sapply(strsplit(names(net), "[.]"), function(x) x[2])#
-  names(net) <- yrs#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  this.tree <- tree.graphs[sites.trees == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_communities.pdf", i)),#
-        width=10, height=4)#
-}
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-source('plotting/src/initialize.R')#
-#
-sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
-sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
-all.poss.yrs <- 2006:2015#
-#
-for(i in unique(sites.trees)){#
-  print(i)#
-  net <- nets[sites == i]#
-  yrs <- sapply(strsplit(names(net), "[.]"), function(x) x[2])#
-  names(net) <- yrs#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  this.tree <- tree.graphs[sites.trees == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_communities.pdf", i)),#
-        width=10, height=4)#
-}
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-source('plotting/src/initialize.R')#
-#
-sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
-sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
-all.poss.yrs <- 2006:2015#
-#
-for(i in unique(sites.trees)){#
-  print(i)#
-  net <- nets[sites == i]#
-  yrs <- sapply(strsplit(names(net), "[.]"), function(x) x[2])#
-  names(net) <- yrs#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  this.tree <- tree.graphs[sites.trees == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_communities.pdf", i)),#
-        width=10, height=4)#
-}
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-source('plotting/src/initialize.R')#
-#
-sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
-sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
-all.poss.yrs <- 2006:2015#
-#
-for(i in unique(sites.trees)){#
-  print(i)#
-  net <- nets[sites == i]#
-  yrs <- sapply(strsplit(names(net), "[.]"), function(x) x[2])#
-  names(net) <- yrs#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  this.tree <- tree.graphs[sites.trees == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_communities.pdf", i)),#
-        width=10, height=4)#
-}
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-source('plotting/src/initialize.R')#
-#
-sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
-sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
-all.poss.yrs <- 2006:2015#
-#
-for(i in unique(sites.trees)){#
-  print(i)#
-  net <- nets[sites == i]#
-  yrs <- sapply(strsplit(names(net), "[.]"), function(x) x[2])#
-  names(net) <- yrs#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  this.tree <- tree.graphs[sites.trees == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_communities.pdf", i)),#
-        width=10, height=4)#
-}
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-source('plotting/src/initialize.R')#
-#
-sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
-sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
-all.poss.yrs <- 2006:2015#
-#
-for(i in unique(sites.trees)){#
-  print(i)#
-  net <- nets[sites == i]#
-  yrs <- sapply(strsplit(names(net), "[.]"), function(x) x[2])#
-  names(net) <- yrs#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  this.tree <- tree.graphs[sites.trees == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_communities.pdf", i)),#
-        width=10, height=4)#
-}
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-source('plotting/src/initialize.R')#
-#
-sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
-sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
-all.poss.yrs <- 2006:2015#
-#
-for(i in unique(sites.trees)){#
-  print(i)#
-  net <- nets[sites == i]#
-  yrs <- sapply(strsplit(names(net), "[.]"), function(x) x[2])#
-  names(net) <- yrs#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  this.tree <- tree.graphs[sites.trees == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_communities.pdf", i)),#
-        width=10, height=4)#
-}
-class(ceb)
-plot.communities
-?plot
-methods(ceb)
-?plot_dendrogram
-Q
-QQ
-\rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-source('plotting/src/initialize.R')#
-#
-sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
-sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
-all.poss.yrs <- 2006:2015#
-#
-for(i in unique(sites.trees)){#
-  print(i)#
-  net <- nets[sites == i]#
-  yrs <- sapply(strsplit(names(net), "[.]"), function(x) x[2])#
-  names(net) <- yrs#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  this.tree <- tree.graphs[sites.trees == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_communities.pdf", i)),#
-        width=10, height=4)#
-}
-?plot_dendrogram
-karate <- make_graph("Zachary")#
-wc <- cluster_walktrap(karate)#
-modularity(wc)#
-membership(wc)#
-plot(wc, karate)
-\rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-source('plotting/src/initialize.R')#
-#
-sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
-sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
-all.poss.yrs <- 2006:2015#
-#
-for(i in unique(sites.trees)){#
-  print(i)#
-  net <- nets[sites == i]#
-  yrs <- sapply(strsplit(names(net), "[.]"), function(x) x[2])#
-  names(net) <- yrs#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  this.tree <- tree.graphs[sites.trees == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_communities.pdf", i)),#
-        width=10, height=4)#
-}
-\rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-source('plotting/src/initialize.R')#
-#
-sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
-sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
-all.poss.yrs <- 2006:2015#
-#
-for(i in unique(sites.trees)){#
-  print(i)#
-  net <- nets[sites == i]#
-  yrs <- sapply(strsplit(names(net), "[.]"), function(x) x[2])#
-  names(net) <- yrs#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  this.tree <- tree.graphs[sites.trees == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_communities.pdf", i)),#
-        width=10, height=4)#
-}
-\rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-source('plotting/src/initialize.R')#
-#
-sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
-sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
-all.poss.yrs <- 2006:2015#
-#
-for(i in unique(sites.trees)){#
-  print(i)#
-  net <- nets[sites == i]#
-  yrs <- sapply(strsplit(names(net), "[.]"), function(x) x[2])#
-  names(net) <- yrs#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  this.tree <- tree.graphs[sites.trees == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_communities.pdf", i)),#
-        width=10, height=4)#
-}
-\rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-source('plotting/src/initialize.R')#
-#
-sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
-sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
-all.poss.yrs <- 2006:2015#
-#
-for(i in unique(sites.trees)){#
-  print(i)#
-  net <- nets[sites == i]#
-  yrs <- sapply(strsplit(names(net), "[.]"), function(x) x[2])#
-  names(net) <- yrs#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  this.tree <- tree.graphs[sites.trees == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_communities.pdf", i)),#
-        width=10, height=4)#
-}
-\rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
-source('plotting/src/initialize.R')#
-#
-sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
-sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
-all.poss.yrs <- 2006:2015#
-#
-for(i in unique(sites.trees)){#
-  print(i)#
-  net <- nets[sites == i]#
-  yrs <- sapply(strsplit(names(net), "[.]"), function(x) x[2])#
-  names(net) <- yrs#
-  arr <- simplify2array(net)#
-  all.years <-  apply(arr, c(1,2), sum)#
-  plant.sums <- rowSums(all.years)#
-  pol.sums <- colSums(all.years)#
-  this.tree <- tree.graphs[sites.trees == i]#
-  pdf.f(plotNet,#
-        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
-        width=18, height=4)#
-  pdf.f(plotDend,#
-        file=file.path(fig.path, sprintf("%s_communities.pdf", i)),#
-        width=10, height=4)#
-}
-800+300
+## but mature could be draw from control#
+pchisq(-2*(lik.mature.cont - fit.mature$loglik), 1, lower.tail=FALSE)
+nrow(chpt.trial[chpt.trial$status == "control" &#
+                chpt.trial$chpts != 0,])/#
+  nrow(chpt.trial[chpt.trial$status == "control",])
+nrow(chpt.trial[chpt.trial$status == "mature" &#
+                chpt.trial$chpts != 0,])/#
+  nrow(chpt.trial[chpt.trial$status == "mature",])
