@@ -3,45 +3,136 @@ setwd('~/Dropbox/hedgerow_assembly/analysis/variability')
 source('src/initialize.R')
 
 ## ************************************************************
-## coefficient of variation of abundance through time
-## ************************************************************
-byYear <- aggregate(list(Abund=spec$GenusSpecies),
-                    list(GenusSpecies= spec$GenusSpecies,
-                         Date=spec$Date,
-                         SiteStatus= spec$SiteStatus,
-                         Site=spec$Site), length)
-
-dprime <- cv.trait(spec, byYear, trait="d",
-                   method= "time",
-                   time.col="Date",
-                   abund.col="Abund")
-
-degree <- cv.trait(spec, byYear, trait="degree",
-                   method= "time",
-                   time.col="Date",
-                   abund.col="Abund")
-
-itd <- cv.trait(spec, byYear, trait="ITD",
-                method= "time",
-                time.col="Date",
-                abund.col="Abund")
-
-## ************************************************************
 ## coefficient of variation of degree thingy through time
+## ************************************************************
+## ************************************************************
+## occurrence
+## ************************************************************
+## pollinators and k
+## not sig
+occ.k.cv <- cv.trait(spec,
+                     specs[specs$speciesType =="pollinator",],
+                     trait="occ.date",
+                     method= "time", time.col="assem",
+                     abund.col="k",
+                     cv.function=cv,
+                     zero2na=TRUE,
+                     standard.cv=FALSE,
+                     na.rm=TRUE)
+summary(occ.k.cv$lm.nss)
+
+## plants and k
+## medium sig
+plants.occ.k.cv <- cv.trait(spec,
+                            specs[specs$speciesType =="plant",],
+                            trait="occ.plant.date",
+                            method= "time", time.col="assem",
+                            abund.col="k",
+                            cv.function=cv,
+                            zero2na=TRUE,
+                            standard.cv=FALSE,
+                            na.rm=TRUE,
+                            species.type="PlantGenusSpecies")
+summary(plants.occ.k.cv$lm.nss)
+
+## pollinators and closeness
+## medium sig
+occ.closeness.cv <- cv.trait(spec,
+                             specs[specs$speciesType =="pollinator",],
+                             trait="occ.date",
+                             method= "time", time.col="assem",
+                             abund.col="weighted.closeness",
+                             cv.function=cv,
+                             zero2na=TRUE,
+                             standard.cv=FALSE,
+                             na.rm=TRUE)
+summary(occ.closeness.cv$lm.nss)
+
+## plants and closeness
+## not sig
+plants.occ.closeness.cv <- cv.trait(spec,
+                                    specs[specs$speciesType =="plant",],
+                                    trait="occ.plant.date",
+                                    method= "time", time.col="assem",
+                                    abund.col="weighted.closeness",
+                                    cv.function=cv,
+                                    zero2na=TRUE,
+                                    standard.cv=FALSE,
+                                    na.rm=TRUE,
+                                    species.type="PlantGenusSpecies")
+summary(plants.occ.closeness.cv$lm.nss)
+
+## ************************************************************
+## degree
+## ************************************************************
+## pollinators and k
+## not sig
+degree.k.cv <- cv.trait(spec,
+                        specs[specs$speciesType =="pollinator",],
+                        trait="degree",
+                        method= "time", time.col="assem",
+                        abund.col="k",
+                        cv.function=cv,
+                        zero2na=TRUE,
+                        standard.cv=FALSE,
+                        na.rm=TRUE)
+summary(degree.k.cv$lm.nss)
+
+## plants and k
+## not sig
+plants.degree.k.cv <- cv.trait(spec,
+                               specs[specs$speciesType =="plant",],
+                               trait="plant.degree",
+                               method= "time", time.col="assem",
+                               abund.col="k",
+                               cv.function=cv,
+                               zero2na=TRUE,
+                               standard.cv=FALSE,
+                               na.rm=TRUE,
+                               species.type="PlantGenusSpecies")
+summary(plants.degree.k.cv$lm.nss)
+
+## pollinators and closeness
+## sig
+degree.closeness.cv <- cv.trait(spec,
+                                specs[specs$speciesType =="pollinator",],
+                                trait="degree",
+                                method= "time", time.col="assem",
+                                abund.col="weighted.closeness",
+                                cv.function=cv,
+                                zero2na=TRUE,
+                                standard.cv=FALSE,
+                                na.rm=TRUE)
+summary(degree.closeness.cv$lm.nss)
+
+## plants and closeness
+## not sig!
+plants.degree.closeness.cv <- cv.trait(spec,
+                                       specs[specs$speciesType =="plant",],
+                                       trait="plant.degree",
+                                       method= "time", time.col="assem",
+                                       abund.col="weighted.closeness",
+                                       cv.function=cv,
+                                       zero2na=TRUE,
+                                       standard.cv=FALSE,
+                                       na.rm=TRUE,
+                                       species.type="PlantGenusSpecies")
+summary(plants.degree.closeness.cv$lm.nss)
+
+
+## check correlation of degree and occ 
+occ.k.sd$data$degree <-
+  degree$data$traits.ns[match(occ.k.sd$data$GenusSpecies,
+                              degree$data$GenusSpecies)]
+
+plot(occ.k.sd$data$traits.ns ~ occ.k.sd$data$degree)
+
+cor.test(occ.k.sd$data$traits.ns, occ.k.sd$data$degree)
+
+
 ## ************************************************************
 ## dprime
 ## ************************************************************
-## not sig
-dprime.k.sd <- cv.trait(spec,
-                        specs[specs$speciesType =="pollinator",],
-                        trait="d",
-                        method= "time", time.col="assem",
-                        abund.col="k",
-                        cv.function=sd,
-                        zero2na=TRUE, standard.cv=FALSE,
-                        na.rm=TRUE)
-summary(dprime.k.sd$lm.nss)
-
 ## not sig
 dprime.k.cv <- cv.trait(spec,
                         specs[specs$speciesType =="pollinator",],
@@ -66,127 +157,38 @@ dprime.closeness.cv <- cv.trait(spec,
                                 na.rm=TRUE)
 summary(dprime.closeness.cv$lm.nss)
 
-## ************************************************************
-## occurrence
-## ************************************************************
-## pollinators
-## sig
-occ.k.sd <- cv.trait(spec,
-                     specs[specs$speciesType =="pollinator",],
-                     trait="occ.date",
-                     method= "time", time.col="assem",
-                     abund.col="k",
-                     cv.function=sd,
-                     zero2na=TRUE,
-                     standard.cv=FALSE,
-                     na.rm=TRUE)
-summary(occ.k.sd$lm.nss)
-
-## plants
-plant.occ.k.sd <- cv.trait(spec,
-                     specs[specs$speciesType =="plant",],
-                     trait="occ.plant.date",
-                     method= "time", time.col="assem",
-                     abund.col="k",
-                     cv.function=sd,
-                     zero2na=TRUE,
-                     standard.cv=FALSE,
-                     na.rm=TRUE)
-summary(plant.occ.k.sd$lm.nss)
-
-
-## not sig
-occ.k.cv <- cv.trait(spec,
-                     specs[specs$speciesType =="pollinator",],
-                     trait="occ.date",
-                     method= "time", time.col="assem",
-                     abund.col="k",
-                     cv.function=cv,
-                     zero2na=TRUE,
-                     standard.cv=FALSE,
-                     na.rm=TRUE)
-summary(occ.k.cv$lm.nss)
-
-## medium sig
-occ.closeness.cv <- cv.trait(spec,
-                     specs[specs$speciesType =="pollinator",],
-                     trait="occ.date",
-                     method= "time", time.col="assem",
-                     abund.col="weighted.closeness",
-                     cv.function=cv,
-                     zero2na=TRUE,
-                     standard.cv=FALSE,
-                     na.rm=TRUE)
-summary(occ.closeness.cv$lm.nss)
-
-
-## check correlation of dprime and occ
-occ.k.sd$data$spec <-
-  dprime$data$traits.ns[match(occ.k.sd$data$GenusSpecies,
-                              dprime$data$GenusSpecies)]
-
-plot(occ.k.sd$data$traits.ns ~ occ.k.sd$data$spec)
-
-cor.test(occ.k.sd$data$traits.ns, occ.k.sd$data$spec)
 
 ## ************************************************************
-## degree
+## coefficient of variation of abundance through time
 ## ************************************************************
-## sig
-degree.k.sd <- cv.trait(spec,
-                        specs[specs$speciesType =="pollinator",],
-                        trait="degree",
-                        method= "time",
-                        time.col="assem",
-                        abund.col="k",
-                        cv.function=sd,
-                        zero2na=TRUE,
-                        standard.cv=FALSE,
-                        na.rm=TRUE)
-summary(degree.k.sd$lm.nss)
+byYear <- aggregate(list(Abund=spec$GenusSpecies),
+                    list(GenusSpecies= spec$GenusSpecies,
+                         Date=spec$Date,
+                         SiteStatus= spec$SiteStatus,
+                         Site=spec$Site), length)
 
-## not sig
-degree.k.cv <- cv.trait(spec,
-                        specs[specs$speciesType =="pollinator",],
-                        trait="degree",
-                        method= "time", time.col="assem",
-                        abund.col="k",
-                        cv.function=cv,
-                        zero2na=TRUE,
-                        standard.cv=FALSE,
-                        na.rm=TRUE)
-summary(degree.k.cv$lm.nss)
+dprime <- cv.trait(spec, byYear, trait="d",
+                   method= "time",
+                   time.col="Date",
+                   abund.col="Abund")
 
-## sig
-degree.closeness.cv <- cv.trait(spec,
-                        specs[specs$speciesType =="pollinator",],
-                        trait="degree",
-                        method= "time", time.col="assem",
-                        abund.col="weighted.closeness",
-                        cv.function=cv,
-                        zero2na=TRUE,
-                        standard.cv=FALSE,
-                        na.rm=TRUE)
-summary(degree.closeness.cv$lm.nss)
+degree <- cv.trait(spec, byYear, trait="degree",
+                   method= "time",
+                   time.col="Date",
+                   abund.col="Abund")
 
-
-## check correlation of degree and occ 
-occ.k.sd$data$degree <-
-  degree$data$traits.ns[match(occ.k.sd$data$GenusSpecies,
-                              degree$data$GenusSpecies)]
-
-plot(occ.k.sd$data$traits.ns ~ occ.k.sd$data$degree)
-
-cor.test(occ.k.sd$data$traits.ns, occ.k.sd$data$degree)
-
-
+itd <- cv.trait(spec, byYear, trait="ITD",
+                method= "time",
+                time.col="Date",
+                abund.col="Abund")
 
 ## ************************************************************
 ## save
 save(itd, dprime, degree,
-     dprime.k.sd, dprime.k.cv, dprime.closeness.cv,
-     occ.k.sd, occ.k.cv, occ.closeness.cv,
-     degree.k.sd, degree.k.cv, degree.closeness.cv,
+     dprime.k.cv, dprime.closeness.cv,
+     occ.k.cv, occ.closeness.cv,
+     plants.occ.k.cv, plants.occ.closeness.cv,
+     plants.degree.k.cv, plants.degree.closeness.cv,
      file="saved/contMods.Rdata")
 
 ## ************************************************************

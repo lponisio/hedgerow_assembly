@@ -4,7 +4,7 @@ corCv <- function(x){
   cv(x)*(1 + (1/4*length(x)))
 }
 
-
+## cv.function can be corCv, cv, or sd
 ## standard cv devides cv by 100 to avoid too large of numbers for the
 ## lm
 cv.trait <- function(spec.dat,
@@ -18,7 +18,7 @@ cv.trait <- function(spec.dat,
                      cv.function=corCv,
                      zero2na =FALSE,
                      standard.cv=TRUE,
-                     species.type,...){
+                     species.type="GenusSpecies",...){
   byStatus <- split(byType, byType$SiteStatus)
   bySite <- lapply(byStatus, function(x) {split(x, x$Site)})
   bySite <- unlist(bySite, recursive=FALSE)
@@ -44,11 +44,11 @@ cv.trait <- function(spec.dat,
   rownames(dats) <- NULL
   if(cont){
     dats$traits.ns <- spec.dat[,trait][match(dats$GenusSpecies,
-                                             spec.dat$GenusSpecies)]
+                                             spec.dat[, species.type])]
     dats$traits <- scale(dats$traits.ns)
   } else{
     dats$traits <- spec.dat[,trait][match(dats$GenusSpecies,
-                                          spec.dat$GenusSpecies)]
+                                          spec.dat[, species.type])]
   }
   lm.cv <- lmer(cv ~ SiteStatus*traits + (1|Site) + (1|GenusSpecies),
                 data=dats[!is.na(dats$cv),])

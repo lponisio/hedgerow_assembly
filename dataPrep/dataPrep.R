@@ -110,7 +110,7 @@ write.table(ms.table, file="~/Dropbox/hedgerow_assembly/ms/tables/samples.txt",
 spec$d <- traits$d[match(spec$GenusSpecies, traits$GenusSpecies)]
 spec$degree <- traits$degree[match(spec$GenusSpecies,
                                    traits$GenusSpecies)]
-spec$degree <- traits$plant.degree[match(spec$PlantGenusSpecies,
+spec$plant.degree <- traits$degree[match(spec$PlantGenusSpecies,
                                    traits$GenusSpecies)]
 
 ## occurence
