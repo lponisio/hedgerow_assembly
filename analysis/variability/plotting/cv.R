@@ -8,36 +8,121 @@ source('../networkLevel/src/misc.R', chdir = TRUE)
 load('saved/contMods.Rdata')
 
 ## ************************************************************
-## itd abundance
+## persistence k
 ## ************************************************************
-
-dd.itd <- expand.grid(traits=seq(
-                           from= min(itd$data$traits, na.rm=TRUE),
-                           to= max(itd$data$traits, na.rm=TRUE),
+occ.k.cv$data$SiteStatus <- "all"
+dd.occ <- expand.grid(traits=seq(
+                           from= min(occ.k.cv$data$traits, na.rm=TRUE),
+                           to= max(occ.k.cv$data$traits, na.rm=TRUE),
                            length=10),
-                         SiteStatus= c("control", "maturing", "mature"),
+                      SiteStatus="all",
                          cv= 0)
 
-itd.pi <- predict.int(mod= itd$lm,
-                        dd=dd.itd,
+occ.pi.k <- predict.int(mod= occ.k.cv$lm.nss,
+                        dd=dd.occ,
                         y="cv",
                         family="gaussian")
 
-plot.predict.div(new.dd=itd.pi,
-                 ylabel="Coefficient of variation",
-                 dats=itd$data,
+plot.predict.div(new.dd=occ.pi.k,
+                 ylabel="Network position variability (k)",
+                 dats=occ.k.cv$data, 
                  xs="traits",
                  y1="cv",
-                 xlabel="Body size",
+                 xlabel="Pollinator persistence",
                  legend.loc="bottomright",
                  height=5,
                  width=5,
                  x.adj=0.5,
+                 treatments="all",
+                 col.lines="black",
                  f.path='figures/cv')
+
+## ************************************************************
+## persistence closeness
+## ************************************************************
+occ.closeness.cv$data$SiteStatus <- "all"
+occ.pi.close <- predict.int(mod= occ.closeness.cv$lm.nss,
+                        dd=dd.occ,
+                        y="cv",
+                        family="gaussian")
+
+plot.predict.div(new.dd=occ.pi.close,
+                 ylabel="Network closeness variability",
+                 dats=occ.closeness.cv$data,
+                 xs="traits",
+                 y1="cv",
+                 xlabel="Pollinator persistence",
+                 legend.loc="bottomright",
+                 height=5,
+                 width=5,
+                 x.adj=0.5,
+                 treatments="all",
+                 col.lines="black",
+                 f.path='figures/cv')
+
+## ************************************************************
+## degree k
+## ************************************************************
+degree.k.cv$data$SiteStatus <- "all"
+dd.degree <- expand.grid(traits=seq(
+                           from= min(degree.k.cv$data$traits, na.rm=TRUE),
+                           to= max(degree.k.cv$data$traits, na.rm=TRUE),
+                           length=10),
+                         ## SiteStatus= c("control", "maturing",
+                      ## "mature"),
+                      SiteStatus="all",
+                         cv= 0)
+
+degree.pi <- predict.int(mod= degree.k.cv$lm.nss,
+                        dd=dd.degree,
+                        y="cv",
+                        family="gaussian")
+
+plot.predict.div(new.dd=degree.pi,
+                 ylabel="Network position variability (k)",
+                 dats=degree.k.cv$data, 
+                 xs="traits",
+                 y1="cv",
+                 xlabel="Pollinator degree",
+                 legend.loc="bottomright",
+                 height=5,
+                 width=5,
+                 x.adj=0.5,
+                 treatments="all",
+                 col.lines="black",
+                 f.path='figures/cv')
+
+## ************************************************************
+## degree closeness
+## ************************************************************
+degree.closeness.cv$data$SiteStatus <- "all"
+degree.pi <- predict.int(mod= degree.closeness.cv$lm.nss,
+                        dd=dd.degree,
+                        y="cv",
+                        family="gaussian")
+
+## plot.predict.div(new.dd=degree.pi,
+##                  ylabel="Network closeness variability",
+##                  dats=degree.closeness.cv$data,
+##                  xs="traits",
+##                  y1="cv",
+##                  xlabel="Pollinator degree",
+##                  legend.loc="bottomright",
+##                  height=5,
+##                  width=5,
+##                  x.adj=0.5,
+##                  treatments="all",
+##                  col.lines="black",
+##                  f.path='figures/cv',
+##                  dec=0)
+
+plot.panels()
+
+
 
 
 ## ************************************************************
-## dprime abundance
+## dprime network position - k
 ## ************************************************************
 
 dd.dprime <- expand.grid(traits=seq(
@@ -47,35 +132,14 @@ dd.dprime <- expand.grid(traits=seq(
                          SiteStatus= c("control", "maturing", "mature"),
                          cv= 0)
 
-dprime.pi <- predict.int(mod= dprime$lm,
-                        dd=dd.dprime,
-                        y="cv",
-                        family="gaussian")
-
-plot.predict.div(new.dd=dprime.pi,
-                 ylabel="Coefficient of variation",
-                 dats=dprime$data,
-                 xs="traits",
-                 y1="cv",
-                 xlabel="Specialization",
-                 legend.loc="bottomright",
-                 height=5,
-                 width=5,
-                 x.adj=0.5,
-                 f.path='figures/cv')
-
-## ************************************************************
-## dprime network position - k
-## ************************************************************
-
-dprime.pi <- predict.int(mod= dprime.k.sd$lm,
+dprime.pi <- predict.int(mod= dprime.k.cv$lm,
                         dd=dd.dprime,
                         y="cv",
                         family="gaussian")
 
 plot.predict.div(new.dd=dprime.pi,
                  ylabel="Network position variability",
-                 dats=dprime.k.sd$data,
+                 dats=dprime.k.cv$data,
                  xs="traits",
                  y1="cv",
                  xlabel="Specialization",
@@ -106,115 +170,55 @@ plot.predict.div(new.dd=dprime.pi.cl,
                  x.adj=0.5,
                  f.path='figures/cv')
 
+
 ## ************************************************************
-## persistence k
+## itd abundance
 ## ************************************************************
-occ.k.sd$data$SiteStatus <- "all"
-dd.occ <- expand.grid(traits=seq(
-                           from= min(occ.k.sd$data$traits, na.rm=TRUE),
-                           to= max(occ.k.sd$data$traits, na.rm=TRUE),
+
+dd.itd <- expand.grid(traits=seq(
+                           from= min(itd$data$traits, na.rm=TRUE),
+                           to= max(itd$data$traits, na.rm=TRUE),
                            length=10),
-                         ## SiteStatus= c("control", "maturing",
-                      ## "mature"),
-                      SiteStatus="all",
+                         SiteStatus= c("control", "maturing", "mature"),
                          cv= 0)
 
-occ.pi <- predict.int(mod= occ.k.sd$lm.nss,
-                        dd=dd.occ,
+itd.pi <- predict.int(mod= itd$lm,
+                        dd=dd.itd,
                         y="cv",
                         family="gaussian")
 
-plot.predict.div(new.dd=occ.pi,
-                 ylabel="Network position variability (k)",
-                 dats=occ.k.sd$data, 
+plot.predict.div(new.dd=itd.pi,
+                 ylabel="Coefficient of variation",
+                 dats=itd$data,
                  xs="traits",
                  y1="cv",
-                 xlabel="Pollinator persistence",
+                 xlabel="Body size",
                  legend.loc="bottomright",
                  height=5,
                  width=5,
                  x.adj=0.5,
-                 treatments="all",
-                 col.lines="black",
                  f.path='figures/cv')
 
+
+
+
 ## ************************************************************
-## persistence closeness
+## dprime abundance
 ## ************************************************************
-occ.closeness.cv$data$SiteStatus <- "all"
-occ.pi <- predict.int(mod= occ.closeness.cv$lm.nss,
-                        dd=dd.occ,
+
+dprime.pi <- predict.int(mod= dprime$lm,
+                        dd=dd.dprime,
                         y="cv",
                         family="gaussian")
 
-plot.predict.div(new.dd=occ.pi,
-                 ylabel="Network closeness variability",
-                 dats=occ.closeness.cv$data,
+plot.predict.div(new.dd=dprime.pi,
+                 ylabel="Coefficient of variation",
+                 dats=dprime$data,
                  xs="traits",
                  y1="cv",
-                 xlabel="Pollinator persistence",
+                 xlabel="Specialization",
                  legend.loc="bottomright",
                  height=5,
                  width=5,
                  x.adj=0.5,
-                 treatments="all",
-                 col.lines="black",
                  f.path='figures/cv')
-
-## ************************************************************
-## degree k
-## ************************************************************
-degree.k.cv$data$SiteStatus <- "all"
-dd.degree <- expand.grid(traits=seq(
-                           from= min(degree.k.cv$data$traits, na.rm=TRUE),
-                           to= max(degree.k.cv$data$traits, na.rm=TRUE),
-                           length=10),
-                         ## SiteStatus= c("control", "maturing",
-                      ## "mature"),
-                      SiteStatus="all",
-                         cv= 0)
-
-degree.pi <- predict.int(mod= degree.k.sd$lm.nss,
-                        dd=dd.degree,
-                        y="cv",
-                        family="gaussian")
-
-plot.predict.div(new.dd=degree.pi,
-                 ylabel="Network position variability (k)",
-                 dats=degree.k.cv$data, 
-                 xs="traits",
-                 y1="cv",
-                 xlabel="Pollinator degree",
-                 legend.loc="bottomright",
-                 height=5,
-                 width=5,
-                 x.adj=0.5,
-                 treatments="all",
-                 col.lines="black",
-                 f.path='figures/cv')
-
-## ************************************************************
-## degree closeness
-## ************************************************************
-degree.closeness.cv$data$SiteStatus <- "all"
-degree.pi <- predict.int(mod= degree.closeness.cv$lm.nss,
-                        dd=dd.degree,
-                        y="cv",
-                        family="gaussian")
-
-plot.predict.div(new.dd=degree.pi,
-                 ylabel="Network closeness variability",
-                 dats=degree.closeness.cv$data,
-                 xs="traits",
-                 y1="cv",
-                 xlabel="Pollinator degree",
-                 legend.loc="bottomright",
-                 height=5,
-                 width=5,
-                 x.adj=0.5,
-                 treatments="all",
-                 col.lines="black",
-                 f.path='figures/cv',
-                 dec=0)
-
-plot.panels()
