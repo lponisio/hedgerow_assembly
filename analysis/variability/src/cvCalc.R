@@ -17,7 +17,8 @@ cv.trait <- function(spec.dat,
                      status.order=c("control", "maturing", "mature"),
                      cv.function=corCv,
                      zero2na =FALSE,
-                     standard.cv=TRUE,...){
+                     standard.cv=TRUE,
+                     species.type,...){
   byStatus <- split(byType, byType$SiteStatus)
   bySite <- lapply(byStatus, function(x) {split(x, x$Site)})
   bySite <- unlist(bySite, recursive=FALSE)

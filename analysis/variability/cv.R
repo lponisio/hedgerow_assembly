@@ -69,6 +69,7 @@ summary(dprime.closeness.cv$lm.nss)
 ## ************************************************************
 ## occurrence
 ## ************************************************************
+## pollinators
 ## sig
 occ.k.sd <- cv.trait(spec,
                      specs[specs$speciesType =="pollinator",],
@@ -80,6 +81,19 @@ occ.k.sd <- cv.trait(spec,
                      standard.cv=FALSE,
                      na.rm=TRUE)
 summary(occ.k.sd$lm.nss)
+
+## plants
+plant.occ.k.sd <- cv.trait(spec,
+                     specs[specs$speciesType =="plant",],
+                     trait="occ.plant.date",
+                     method= "time", time.col="assem",
+                     abund.col="k",
+                     cv.function=sd,
+                     zero2na=TRUE,
+                     standard.cv=FALSE,
+                     na.rm=TRUE)
+summary(plant.occ.k.sd$lm.nss)
+
 
 ## not sig
 occ.k.cv <- cv.trait(spec,

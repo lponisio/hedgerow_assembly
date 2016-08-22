@@ -1,3 +1,114 @@
+this.plant
+this.plant[match(rownames(site.date),#
+                   paste(count.plant.occ$Site,#
+                                   count.plant.occ$SiteStatus,#
+                             sep=":"))]
+this.plant$count[match(rownames(site.date),#
+                   paste(count.plant.occ$Site,#
+                                   count.plant.occ$SiteStatus,#
+                             sep=":"))]
+this.plant$count[paste(count.plant.occ$Site,#
+                                   count.plant.occ$SiteStatus,#
+                             sep=":"),#
+                         rownames(site.date))]
+this.plant$count[match(paste(count.plant.occ$Site,#
+                                   count.plant.occ$SiteStatus,#
+                             sep=":"),#
+                         rownames(site.date))]
+plant.occ <- list(rep(site.date,#
+                      length(unique(count.plant.occ$PlantGenusSpecies)))
+)
+plant.occ[[1]]
+plant.occ <- list()
+Q
+plants <- unique(count.plant.occ$PlantGenusSpecies)#
+plant.occ <- list()#
+for(i in 1:length(plants)){#
+  browser()#
+  this.plant <- count.plant.occ[count.plant.occ$PlantGenusSpecies ==#
+                             plants[i],]#
+  site.date[match(paste(count.plant.occ$Site,#
+                                   count.plant.occ$SiteStatus,#
+                             sep=":"),#
+                             rownames(site.date))] <-#
+  this.plant$count[match(paste(count.plant.occ$Site,#
+                                   count.plant.occ$SiteStatus,#
+                             sep=":"),#
+                         rownames(site.date))]#
+}
+this.plant <- count.plant.occ[count.plant.occ$PlantGenusSpecies ==#
+                             plants[i],]
+this.plant
+plant.occ[[i]] <- site.date
+plant.occ[[i]][match(paste(count.plant.occ$Site,#
+                                   count.plant.occ$SiteStatus,#
+                             sep=":"),#
+                             rownames(site.date))] <-#
+  this.plant$count[match(paste(count.plant.occ$Site,#
+                                   count.plant.occ$SiteStatus,#
+                             sep=":"),#
+                         rownames(site.date))]
+match(paste(count.plant.occ$Site,#
+                                   count.plant.occ$SiteStatus,#
+                             sep=":"),#
+                             rownames(site.date))
+plant.occ[[i]][match(paste(count.plant.occ$Site,#
+                                   count.plant.occ$SiteStatus,#
+                             sep=":"),#
+                             rownames(site.date))]
+this.plant$count[match(paste(count.plant.occ$Site,#
+                                   count.plant.occ$SiteStatus,#
+                             sep=":"),#
+                         rownames(site.date))]
+plant.occ[[i]][match(rownames(site.date),#
+                       paste(count.plant.occ$Site,#
+                                   count.plant.occ$SiteStatus,#
+                             sep=":"))] <-#
+  this.plant$count[match(paste(count.plant.occ$Site,#
+                                   count.plant.occ$SiteStatus,#
+                             sep=":"),#
+                         rownames(site.date))]
+match(rownames(site.date),#
+                       paste(count.plant.occ$Site,#
+                                   count.plant.occ$SiteStatus,#
+                             sep=":"))
+rownames(site.date)
+paste(count.plant.occ$Site,#
+                                   count.plant.occ$SiteStatus,#
+                             sep=":")
+plant.occ[[i]][match(rownames(site.date),#
+                       paste(count.plant.occ$Site,#
+                                   count.plant.occ$SiteStatus,#
+                             sep=":")
+)]
+plant.occ[[i]][match(rownames(site.date),#
+                       paste(count.plant.occ$Site,#
+                                   count.plant.occ$SiteStatus,#
+                             sep=":"))]
+Q
+rm(list=ls())#
+library(vegan)#
+library(fields)#
+library(bipartite)#
+#
+setwd('~/Dropbox/Yosemite/data')#
+source('speciesIDs/src/AssignSpecies.R')#
+#
+setwd('~/Dropbox/Yosemite/data/relational/relational')#
+source('../src/relational_prep.R')#
+source('../src/relational_make.R')#
+source('../src/make_traditional.R')#
+sr.sched <- read.csv('tables/conditions.csv')#
+spec <- read.csv('traditional/specimens-complete.csv')#
+veg <- read.csv('traditional/veg-complete.csv')#
+ref <- read.csv('../original/YoseReference.csv')#
+#
+setwd('~/Dropbox/Yosemite/analysis/data')#
+source('src/misc.R')#
+traits <-  read.csv('functionalTraits/bees.csv')
+sr.shed
+sr.sched
+head(sr.sched)
 rm(list=ls())#
 setwd('~/Dropbox/hedgerow_assembly/dataPrep')#
 load('~/Dropbox/hedgerow/data_sets/traditional/specimens-complete.RData')#
@@ -13,156 +124,46 @@ bee.trait <-#
 syr.trait <-#
   read.csv(file.path(trait.dir, 'syr.csv'),#
            row.names=1)#
+#
 spec <- dd#
+#
+## subset to net specimens#
 spec <- spec[spec$NetPan == 'net',]#
-#
-## spec <- spec[spec$Family == 'Syrphidae' |#
-##              spec$BeeNonbee == 'bee',]#
-#
 ## create species column#
 spec$PlantGenusSpecies <-  fix.white.space(paste(spec$PlantGenus,#
                                                  spec$PlantSpecies))#
 #
 ## drop pollinators and plants without identifications#
-spec <-  spec[spec$Species != '',]#
 spec <-  spec[spec$PlantGenusSpecies != '',]#
-spec$SiteStatus[spec$SiteStatus == "restored"] <- "maturing"#
-#
-## create a giant network to calculate specialization#
-agg.spec <- aggregate(list(abund=spec$GenusSpecies),#
-                      list(GenusSpecies=spec$GenusSpecies,#
-                           PlantGenusSpecies=spec$PlantGenusSpecies),#
-                      length)#
-#
-nets.all <- samp2site.spp(agg.spec$PlantGenusSpecies,#
-                      agg.spec$GenusSpecies, agg.spec$abund)
-head(nets.all)
-load('~/Dropbox/hedgerow/data_sets/matrices/net/bee.RData')
-ls()
-ehad(dd)
-hed(dd)
-head(dd)
-load('~/Dropbox/hedgerow/data_sets/matrices/net/bee.syr.RData')
-head(dd)
-rm(list=ls())
-load('~/Dropbox/hedgerow/data_sets/matrices/net/bee.syr.RData')
-ls()
-head(mat)
-mat
-dim(mat)
-dimnames(mat)
-apply(mat, c(1,3, mean))
-apply(mat, c(1,3), mean)
-apply(mat, c(1,2), mean)
-apply(mat, c(3,2), mean)
-apply(mat, c(3,2), mean, na.rm=TRUE)
-apply(mat, c(3,1, 2), mean, na.rm=TRUE)
-apply(mat, c(3,1), mean, na.rm=TRUE)
-apply(mat, c(3,1), function(x) length(x > 0)/length(!is.na(x)), na.rm=TRUE)
-apply(mat, c(3,1), function(x) length(x > 0)/length(!is.na(x)))
-apply(mat, c(3,1), function(x) length(x > 0 & !is.na(x))/length(!is.na(x)))
-apply(mat, c(3,1), function(x) length(!is.na(x)))
-apply(mat, c(3,1), mean, na.rm=TRUE)
-apply(mat, c(3,1), count, na.rm=TRUE)
-library(plyr)
-apply(mat, c(3,1), count, na.rm=TRUE)
-apply(mat, c(3,1), count)
-apply(mat, c(3,1), function(x) sum(x > 0))
-apply(mat, c(3,1), function(x) sum(x > 0, na.rm=TRUE))
-apply(mat, c(3,1), function(x) sum(x, na.rm=TRUE))
-apply(mat, c(3,1), function(x) sum(x > 0, na.rm=TRUE))
-apply(mat, c(3,1), function(x) sum(x >= 0, na.rm=TRUE))
-apply(mat, c(3,1), function(x) sum(x > 0, na.rm=TRUE)/sum(x >= 0, na.rm=TRUE))
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/dataPrep')#
-load('~/Dropbox/hedgerow/data_sets/traditional/specimens-complete.RData')#
-load("/Users/lcp/Dropbox/hedgerow_network/data/veg/veg.Rdata")#
-source('src/misc.R')#
-source('src/prepNets.R')#
-library(bipartite)#
-#
-trait.dir <- '~/Dropbox/hedgerow/data_sets/traditional/functional_traits'#
-bee.trait <-#
-  read.csv(file.path(trait.dir, 'bee.csv'),#
-           row.names=1)#
-syr.trait <-#
-  read.csv(file.path(trait.dir, 'syr.csv'),#
-           row.names=1)#
-spec <- dd#
-spec <- spec[spec$NetPan == 'net',]#
-#
-## spec <- spec[spec$Family == 'Syrphidae' |#
-##              spec$BeeNonbee == 'bee',]#
-#
-## create species column#
-spec$PlantGenusSpecies <-  fix.white.space(paste(spec$PlantGenus,#
-                                                 spec$PlantSpecies))#
-#
-## drop pollinators and plants without identifications#
-spec <-  spec[spec$Species != '',]#
-spec <-  spec[spec$PlantGenusSpecies != '',]#
-spec$SiteStatus[spec$SiteStatus == "restored"] <- "maturing"#
-#
-## create a giant network to calculate specialization#
-agg.spec <- aggregate(list(abund=spec$GenusSpecies),#
-                      list(GenusSpecies=spec$GenusSpecies,#
-                           PlantGenusSpecies=spec$PlantGenusSpecies),#
-                      length)#
-#
-nets.all <- samp2site.spp(agg.spec$PlantGenusSpecies,#
-                      agg.spec$GenusSpecies, agg.spec$abund)#
-#
-all.specializations <- specieslevel(nets.all,#
-                                    index=c("proportional generality",#
-                                    "d"))#
-#
-traits <- data.frame(GenusSpecies= unlist(sapply(all.specializations,#
-                       rownames)),#
-                     do.call(rbind, all.specializations))#
-rownames(traits) <- NULL#
-#
-write.csv(traits, file="../data/traits.csv", row.names=FALSE)#
 #
 to.drop.status <- c("forb", "natural")#
 spec <- spec[!spec$SiteStatus %in% to.drop.status,]#
+tot.spec <- nrow(spec)#
 #
-spec$d <- traits$d[match(spec$GenusSpecies, traits$GenusSpecies)]#
+nrow(spec[spec$Family == 'Syrphidae',])/tot.spec#
+nrow(spec[spec$BeeNonbee == 'bee',])/tot.spec#
 #
-## occurence#
-load('~/Dropbox/hedgerow/data_sets/matrices/net/bee.syr.RData')#
-occ <- apply(mat, c(3,1), function(x){#
-  sum(x > 0, na.rm=TRUE)/sum(x >= 0, na.rm=TRUE)#
-})
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/dataPrep')#
-load('~/Dropbox/hedgerow/data_sets/traditional/specimens-complete.RData')#
-load("/Users/lcp/Dropbox/hedgerow_network/data/veg/veg.Rdata")#
-source('src/misc.R')#
-source('src/prepNets.R')#
-library(bipartite)#
-#
-trait.dir <- '~/Dropbox/hedgerow/data_sets/traditional/functional_traits'#
-bee.trait <-#
-  read.csv(file.path(trait.dir, 'bee.csv'),#
-           row.names=1)#
-syr.trait <-#
-  read.csv(file.path(trait.dir, 'syr.csv'),#
-           row.names=1)#
-spec <- dd#
-spec <- spec[spec$NetPan == 'net',]#
-#
+## subset to just bees and syrphids#
 spec <- spec[spec$Family == 'Syrphidae' |#
              spec$BeeNonbee == 'bee',]#
 #
-## create species column#
-spec$PlantGenusSpecies <-  fix.white.space(paste(spec$PlantGenus,#
-                                                 spec$PlantSpecies))#
-#
-## drop pollinators and plants without identifications#
 spec <-  spec[spec$Species != '',]#
-spec <-  spec[spec$PlantGenusSpecies != '',]#
 spec$SiteStatus[spec$SiteStatus == "restored"] <- "maturing"#
+## total specimens#
+nrow(spec)#
 #
+## total species#
+length(unique(spec$GenusSpecies))#
+#
+## sampling dates#
+length(unique(paste(spec$Site, spec$Date)))#
+#
+## families and genera#
+length(unique(spec$Family))#
+length(unique(spec$Genus))#
+#
+## interactions#
+length(unique(paste(spec$GenusSpecies, spec$PlantGenusSpecies)))#
 ## create a giant network to calculate specialization#
 agg.spec <- aggregate(list(abund=spec$GenusSpecies),#
                       list(GenusSpecies=spec$GenusSpecies,#
@@ -170,53 +171,2156 @@ agg.spec <- aggregate(list(abund=spec$GenusSpecies),#
                       length)#
 #
 nets.all <- samp2site.spp(agg.spec$PlantGenusSpecies,#
-                      agg.spec$GenusSpecies, agg.spec$abund)#
+                          agg.spec$GenusSpecies, agg.spec$abund, FUN=sum)#
 #
 all.specializations <- specieslevel(nets.all,#
                                     index=c("proportional generality",#
-                                    "d"))#
+                                      "degree",#
+                                      "d"))#
 #
 traits <- data.frame(GenusSpecies= unlist(sapply(all.specializations,#
                        rownames)),#
                      do.call(rbind, all.specializations))#
 rownames(traits) <- NULL#
 #
-write.csv(traits, file="../data/traits.csv", row.names=FALSE)#
+site.table <- aggregate(list(Samples=spec$Date),#
+                        list(Year=spec$Year, Site=spec$Site),#
+          function(x) length(unique(x)))#
 #
-to.drop.status <- c("forb", "natural")#
-spec <- spec[!spec$SiteStatus %in% to.drop.status,]#
+## sampling table for manuscript#
+ms.table <- samp2site.spp(site=site.table$Site,#
+                          spp=site.table$Year,#
+                          abund=site.table$Samples,#
+                          FUN=sum)#
+ms.table <- cbind(spec$SiteStatus[match(rownames(ms.table),#
+                                             spec$Site)], ms.table)#
+colnames(ms.table) <- c("Site type", colnames(ms.table)[-1])#
 #
+ms.table <- ms.table[order(ms.table[, "Site type"], decreasing=TRUE),]#
+#
+ms.table[, "Site type"][ms.table[, "Site type"] == "maturing"] <-#
+  "Assembling HR"#
+#
+ms.table[, "Site type"][ms.table[, "Site type"] == "mature"] <-#
+  "Non-assembling HR"#
+#
+ms.table[, "Site type"][ms.table[, "Site type"] == "control"] <-#
+  "Non-assembling FM"#
+#
+write.table(ms.table, file="~/Dropbox/hedgerow_assembly/ms/tables/samples.txt",#
+            sep=" & ")#
+#
+## add various traits#
+## specialization#
 spec$d <- traits$d[match(spec$GenusSpecies, traits$GenusSpecies)]#
+spec$degree <- traits$degree[match(spec$GenusSpecies,#
+                                   traits$GenusSpecies)]#
 #
 ## occurence#
 load('~/Dropbox/hedgerow/data_sets/matrices/net/bee.syr.RData')#
 occ <- apply(mat, c(3,1), function(x){#
   sum(x > 0, na.rm=TRUE)/sum(x >= 0, na.rm=TRUE)#
-})
-occ
-rownames(occ)
-colnames(occ)
+})#
+findOcc <- function(x){#
+  out <- try(occ[x["GenusSpecies"], paste(x["Site"], x["SiteStatusBACI"],#
+                                          sep=":")], silent=TRUE)#
+  if(inherits(out, "try-error")) out <- NA#
+  return(out)#
+}#
+#
+spec$occ.date <- apply(spec, 1, findOcc)#
+traits$occ.date <- spec$occ.date[match(traits$GenusSpecies,#
+                                       spec$GenusSpecies)]#
+## plant occurrence#
+site.date <- mat[,,1]
+site.date <- mat[,,1]
+site.date
+comm.mat2sample <-  function (z) {#
+  temp <- data.frame(expand.grid(dimnames(z))[1:2],#
+                     as.vector(as.matrix(z)))#
+  temp <- temp[sort.list(temp[, 1]), ]#
+  data.frame(Site = temp[, 1], Abund = temp[, 3],#
+             GenusSpecies = temp[, 2])#
+}
+comm.mat2sample(site.date)
+long.site.date <- comm.mat2sample(site.date)
+long.site.date
+head(long.site.date)
+comm.mat2sample <-  function (z) {#
+  temp <- data.frame(expand.grid(dimnames(z))[1:2],#
+                     as.vector(as.matrix(z)))#
+  temp <- temp[sort.list(temp[, 1]), ]#
+  data.frame(Site = temp[, 1], Samp = temp[, 3],#
+             Date = temp[, 2])#
+}
+long.site.date <- comm.mat2sample(site.date)
+head(long.site.date)
+long.site.date <- long.site.date[!is.na(Samp),]
+long.site.date <- long.site.date[!is.na(long.site.date$Samp),]
+long.site.date
+## abundance of each species for all site-date combinations#
+make.by.species <- function(spec, sr.sched,#
+                            type="PlantGenusSpecies"){#
+  ## number of species at each site-date#
+  all.sp <- aggregate(list(Abund=spec[, type]),#
+                      list(Site=spec$Site,#
+                           Date=spec$Date,#
+                           GenusSpecies=spec[,type]),#
+                      length)#
+  ## all site-date species combinations#
+  sp <- expand.grid(#
+    SiteDate = unique(paste(sr.sched$Site,#
+      sr.sched$Date,#
+      sep=';')),#
+    GenusSpecies=unique(spec[,type]),#
+    Abund=0)#
+#
+  ## fill in the matrix of all combinations#
+  sp$Abund[match(paste(all.sp$Site,#
+                       all.sp$Date,#
+                       all.sp$GenusSpecies,#
+                       sep=';'),#
+                 paste(sp$SiteDate,#
+                       sp$GenusSpecies,#
+                       sep=';'))] <-#
+                         all.sp$Abund#
+  ## occurrence#
+  sp$Occ <- sp$Abund#
+  sp$Occ[sp$Occ > 1] <- 1#
+  ## create site, date, genus etc. columns#
+  sp$Site <- sapply(strsplit(as.character(sp$SiteDate), ";"),#
+                    function(x) x[1])#
+  sp$Date <- as.Date(sapply(strsplit(as.character(sp$SiteDate), ";"),#
+                            function(x) x[2]))#
+  sp$Genus <- sapply(strsplit(as.character(sp$GenusSpecies), " "),#
+                     function(x) x[1])#
+  sp$Year <- format(sp$Date, '%Y')#
+  sp$SiteStatus <- spec$SiteStatus[match(sp$Site,#
+                                         spec$Site)]#
+  sp$SiteStatus <- factor(sp$SiteStatus,#
+                          levels=c("LOW", "MOD", "HIGH"))#
+  sp$FirePerim <- spec$FirePerim[match(sp$Site,#
+                                       spec$Site)]#
+  traits.2.keep <- c(keep.trait, "PolSpec", "YoseSpec")#
+  sp <- cbind(sp, spec[, traits.2.keep][match(paste(sp$GenusSpecies),#
+                                              paste(spec[,type])),])#
+  apis <- sp[sp$GenusSpecies == "Apis mellifera",]#
+  ## create honeybee abundance column#
+  sp$HBabund <- apis$Abund[match(#
+    sp$SiteDate,#
+    apis$SiteDate)]#
+  ## doy columns#
+  sp$doy <- as.numeric(strftime(sp$Date, format="%j"))#
+  sp$Site <- as.factor(sp$Site)#
+  ## drop site-date column#
+  sp <- sp[,-1]#
+#
+  ## make a site by date by species arrary#
+  d <- data.frame(pollinator=spec[,type],#
+                  site=spec$Site,#
+                  date=spec$Date)#
+  null.mat <- tapply(rep(0, nrow(sr.sched)),#
+                     list(sites=paste(sr.sched$Site),#
+                          dates=sr.sched$Date), sum)#
+  pollinator.id <- id(d$pollinator)#
+  mats <- make.mats(pollinator.id,#
+                    null.mat,#
+                    pollinator=as.vector(d$pollinator), #
+                    var1=as.vector(d$site),#
+                    var2=d$date)#
+  sites <- rownames(mats[[1]])#
+  dates <- colnames(mats[[1]])#
+  species <- names(mats)#
+  mat <- array(unlist(mats),#
+               dim=c(dim(mats[[1]]),#
+                 length(mats)))#
+  dimnames(mat) <- list(site=sites,#
+                        date=dates,#
+                        species=species)#
+#
+  write.csv(sp, file=file.path(path.dir, 'sp.csv'),#
+            row.names=FALSE)#
+  save(sp, file= file.path(path.dir, 'sp.Rdata'))#
+  save(mat, file= file.path(path.dir, 'sp_array.Rdata'))#
+}
+## abundance of each species for all site-date combinations#
+make.by.species <- function(spec, sr.sched,#
+                            type="PlantGenusSpecies"){#
+browser()#
+  ## number of species at each site-date#
+  all.sp <- aggregate(list(Abund=spec[, type]),#
+                      list(Site=spec$Site,#
+                           Date=spec$Date,#
+                           GenusSpecies=spec[,type]),#
+                      length)#
+  ## all site-date species combinations#
+  sp <- expand.grid(#
+    SiteDate = unique(paste(sr.sched$Site,#
+      sr.sched$Date,#
+      sep=';')),#
+    GenusSpecies=unique(spec[,type]),#
+    Abund=0)#
+#
+  ## fill in the matrix of all combinations#
+  sp$Abund[match(paste(all.sp$Site,#
+                       all.sp$Date,#
+                       all.sp$GenusSpecies,#
+                       sep=';'),#
+                 paste(sp$SiteDate,#
+                       sp$GenusSpecies,#
+                       sep=';'))] <-#
+                         all.sp$Abund#
+  ## occurrence#
+  sp$Occ <- sp$Abund#
+  sp$Occ[sp$Occ > 1] <- 1#
+  ## create site, date, genus etc. columns#
+  sp$Site <- sapply(strsplit(as.character(sp$SiteDate), ";"),#
+                    function(x) x[1])#
+  sp$Date <- as.Date(sapply(strsplit(as.character(sp$SiteDate), ";"),#
+                            function(x) x[2]))#
+  sp$Genus <- sapply(strsplit(as.character(sp$GenusSpecies), " "),#
+                     function(x) x[1])#
+  sp$Year <- format(sp$Date, '%Y')#
+  sp$SiteStatus <- spec$SiteStatus[match(sp$Site,#
+                                         spec$Site)]#
+  sp$SiteStatus <- factor(sp$SiteStatus,#
+                          levels=c("LOW", "MOD", "HIGH"))#
+  sp$FirePerim <- spec$FirePerim[match(sp$Site,#
+                                       spec$Site)]#
+  traits.2.keep <- c(keep.trait, "PolSpec", "YoseSpec")#
+  sp <- cbind(sp, spec[, traits.2.keep][match(paste(sp$GenusSpecies),#
+                                              paste(spec[,type])),])#
+  apis <- sp[sp$GenusSpecies == "Apis mellifera",]#
+  ## create honeybee abundance column#
+  sp$HBabund <- apis$Abund[match(#
+    sp$SiteDate,#
+    apis$SiteDate)]#
+  ## doy columns#
+  sp$doy <- as.numeric(strftime(sp$Date, format="%j"))#
+  sp$Site <- as.factor(sp$Site)#
+  ## drop site-date column#
+  sp <- sp[,-1]#
+#
+  ## make a site by date by species arrary#
+  d <- data.frame(pollinator=spec[,type],#
+                  site=spec$Site,#
+                  date=spec$Date)#
+  null.mat <- tapply(rep(0, nrow(sr.sched)),#
+                     list(sites=paste(sr.sched$Site),#
+                          dates=sr.sched$Date), sum)#
+  pollinator.id <- id(d$pollinator)#
+  mats <- make.mats(pollinator.id,#
+                    null.mat,#
+                    pollinator=as.vector(d$pollinator), #
+                    var1=as.vector(d$site),#
+                    var2=d$date)#
+  sites <- rownames(mats[[1]])#
+  dates <- colnames(mats[[1]])#
+  species <- names(mats)#
+  mat <- array(unlist(mats),#
+               dim=c(dim(mats[[1]]),#
+                 length(mats)))#
+  dimnames(mat) <- list(site=sites,#
+                        date=dates,#
+                        species=species)#
+#
+  write.csv(sp, file=file.path(path.dir, 'sp.csv'),#
+            row.names=FALSE)#
+  save(sp, file= file.path(path.dir, 'sp.Rdata'))#
+  save(mat, file= file.path(path.dir, 'sp_array.Rdata'))#
+}
+make.by.species(spec, long.site.date)
+Q
+make.by.species(spec, long.site.date)
+all.sp <- aggregate(list(Abund=spec[, type]),#
+                      list(Site=spec$Site,#
+                           Date=spec$Date,#
+                           GenusSpecies=spec[,type]),#
+                      length)
+all.sp
+sp <- expand.grid(#
+    SiteDate = unique(paste(sr.sched$Site,#
+      sr.sched$Date,#
+      sep=';')),#
+    GenusSpecies=unique(spec[,type]),#
+    Abund=0)
+sp
+sp$Occ <- sp$Abund#
+  sp$Occ[sp$Occ > 1] <- 1
+sp$Site <- sapply(strsplit(as.character(sp$SiteDate), ";"),#
+                    function(x) x[1])#
+  sp$Date <- as.Date(sapply(strsplit(as.character(sp$SiteDate), ";"),#
+                            function(x) x[2]))#
+  sp$Genus <- sapply(strsplit(as.character(sp$GenusSpecies), " "),#
+                     function(x) x[1])#
+  sp$Year <- format(sp$Date, '%Y')#
+  sp$SiteStatus <- spec$SiteStatus[match(sp$Site,#
+                                         spec$Site)]
+head(sp)
+sp$Site
 spec$Site
-colnames(occ)
-head(spec)
-findOcc <- function(x){#
-  mat[x$GenusSpecies, paste(x$Site, x$SiteStatusBACI, sep=":")]#
+sp$SiteStatus <- spec$SiteStatus[match(sp$Site,#
+                                         paste(spec$Site,#
+                                               spec$SiteStatusBACI,#
+                                               sep=":")]
+sp$SiteStatus <- spec$SiteStatus[match(sp$Site,#
+                                         paste(spec$Site,#
+                                               spec$SiteStatusBACI,#
+                                               sep=":"))]
+head(sp)
+spec$Site,#
+                                               spec$SiteStatusBACI
+spec$SiteType <- ifelse(spec$SiteStatus == "mature" |#
+                        spec$SiteStatus == "maturing",#
+                        "hedgerow", "control")
+spec$SiteType
+sp$SiteStatus <- spec$SiteStatus[match(sp$Site,#
+                                       paste(spec$Site,#
+                                             spec$SiteType,#
+                                               sep=":"))]
+Q
+## abundance of each species for all site-date combinations#
+make.by.species <- function(spec, sr.sched,#
+                            type="PlantGenusSpecies"){#
+  ## number of species at each site-date#
+  all.sp <- aggregate(list(Abund=spec[, type]),#
+                      list(Site=spec$Site,#
+                           Date=spec$Date,#
+                           GenusSpecies=spec[,type]),#
+                      length)#
+  ## all site-date species combinations#
+  sp <- expand.grid(#
+    SiteDate = unique(paste(sr.sched$Site,#
+      sr.sched$Date,#
+      sep=';')),#
+    GenusSpecies=unique(spec[,type]),#
+    Abund=0)#
+#
+  ## fill in the matrix of all combinations#
+  sp$Abund[match(paste(all.sp$Site,#
+                       all.sp$Date,#
+                       all.sp$GenusSpecies,#
+                       sep=';'),#
+                 paste(sp$SiteDate,#
+                       sp$GenusSpecies,#
+                       sep=';'))] <-#
+                         all.sp$Abund#
+  ## occurrence#
+  sp$Occ <- sp$Abund#
+  sp$Occ[sp$Occ > 1] <- 1#
+  ## create site, date, genus etc. columns#
+  sp$Site <- sapply(strsplit(as.character(sp$SiteDate), ";"),#
+                    function(x) x[1])#
+  sp$Date <- as.Date(sapply(strsplit(as.character(sp$SiteDate), ";"),#
+                            function(x) x[2]))#
+  sp$Genus <- sapply(strsplit(as.character(sp$GenusSpecies), " "),#
+                     function(x) x[1])#
+  sp$Year <- format(sp$Date, '%Y')#
+#
+  spec$SiteType <- ifelse(spec$SiteStatus == "mature" |#
+                          spec$SiteStatus == "maturing",#
+                          "hedgerow", "control")#
+  sp$SiteStatus <- spec$SiteStatus[match(sp$Site,#
+                                         paste(spec$Site,#
+                                               spec$SiteType,#
+                                               sep=":"))]#
+browser()#
+  ## drop site-date column#
+  sp <- sp[,-1]#
+#
+  ## make a site by date by species arrary#
+  d <- data.frame(pollinator=spec[,type],#
+                  site=spec$Site,#
+                  date=spec$Date)#
+  null.mat <- tapply(rep(0, nrow(sr.sched)),#
+                     list(sites=paste(sr.sched$Site),#
+                          dates=sr.sched$Date), sum)#
+  pollinator.id <- id(d$pollinator)#
+  mats <- make.mats(pollinator.id,#
+                    null.mat,#
+                    pollinator=as.vector(d$pollinator), #
+                    var1=as.vector(d$site),#
+                    var2=d$date)#
+  sites <- rownames(mats[[1]])#
+  dates <- colnames(mats[[1]])#
+  species <- names(mats)#
+  mat <- array(unlist(mats),#
+               dim=c(dim(mats[[1]]),#
+                 length(mats)))#
+  dimnames(mat) <- list(site=sites,#
+                        date=dates,#
+                        species=species)#
+#
+  write.csv(sp, file=file.path(path.dir, 'sp.csv'),#
+            row.names=FALSE)#
+  save(sp, file= file.path(path.dir, 'sp.Rdata'))#
+  save(mat, file= file.path(path.dir, 'sp_array.Rdata'))#
 }#
 #
-spec$occ.date <- apply(spec, 1, findOcc)
-findOcc <- function(x){#
-  mat[x["GenusSpecies"], paste(x["Site"], x["SiteStatusBACI"], sep=":")]#
+make.by.species(spec, long.site.date)
+## abundance of each species for all site-date combinations#
+make.by.species <- function(spec, sr.sched,#
+                            type="PlantGenusSpecies"){#
+browser()#
+  ## number of species at each site-date#
+  all.sp <- aggregate(list(Abund=spec[, type]),#
+                      list(Site=spec$Site,#
+                           Date=spec$Date,#
+                           GenusSpecies=spec[,type]),#
+                      length)#
+  ## all site-date species combinations#
+  sp <- expand.grid(#
+    SiteDate = unique(paste(sr.sched$Site,#
+      sr.sched$Date,#
+      sep=';')),#
+    GenusSpecies=unique(spec[,type]),#
+    Abund=0)#
+#
+  ## fill in the matrix of all combinations#
+  sp$Abund[match(paste(all.sp$Site,#
+                       all.sp$Date,#
+                       all.sp$GenusSpecies,#
+                       sep=';'),#
+                 paste(sp$SiteDate,#
+                       sp$GenusSpecies,#
+                       sep=';'))] <-#
+                         all.sp$Abund#
+  ## occurrence#
+  sp$Occ <- sp$Abund#
+  sp$Occ[sp$Occ > 1] <- 1#
+  ## create site, date, genus etc. columns#
+  sp$Site <- sapply(strsplit(as.character(sp$SiteDate), ";"),#
+                    function(x) x[1])#
+  sp$Date <- as.Date(sapply(strsplit(as.character(sp$SiteDate), ";"),#
+                            function(x) x[2]))#
+  sp$Genus <- sapply(strsplit(as.character(sp$GenusSpecies), " "),#
+                     function(x) x[1])#
+  sp$Year <- format(sp$Date, '%Y')#
+#
+  spec$SiteType <- ifelse(spec$SiteStatus == "mature" |#
+                          spec$SiteStatus == "maturing",#
+                          "hedgerow", "control")#
+  sp$SiteStatus <- spec$SiteStatus[match(sp$Site,#
+                                         paste(spec$Site,#
+                                               spec$SiteType,#
+                                               sep=":"))]#
+browser()#
+  ## drop site-date column#
+  sp <- sp[,-1]#
+#
+  ## make a site by date by species arrary#
+  d <- data.frame(pollinator=spec[,type],#
+                  site=spec$Site,#
+                  date=spec$Date)#
+  null.mat <- tapply(rep(0, nrow(sr.sched)),#
+                     list(sites=paste(sr.sched$Site),#
+                          dates=sr.sched$Date), sum)#
+  pollinator.id <- id(d$pollinator)#
+  mats <- make.mats(pollinator.id,#
+                    null.mat,#
+                    pollinator=as.vector(d$pollinator), #
+                    var1=as.vector(d$site),#
+                    var2=d$date)#
+  sites <- rownames(mats[[1]])#
+  dates <- colnames(mats[[1]])#
+  species <- names(mats)#
+  mat <- array(unlist(mats),#
+               dim=c(dim(mats[[1]]),#
+                 length(mats)))#
+  dimnames(mat) <- list(site=sites,#
+                        date=dates,#
+                        species=species)#
+#
+  write.csv(sp, file=file.path(path.dir, 'sp.csv'),#
+            row.names=FALSE)#
+  save(sp, file= file.path(path.dir, 'sp.Rdata'))#
+  save(mat, file= file.path(path.dir, 'sp_array.Rdata'))#
 }#
 #
-spec$occ.date <- apply(spec, 1, findOcc)
+make.by.species(spec, long.site.date)
+all.sp <- aggregate(list(Abund=spec[, type]),#
+                      list(Site=spec$Site,#
+                           Date=spec$Date,#
+                           GenusSpecies=spec[,type]),#
+                      length)
+sp <- expand.grid(#
+    SiteDate = unique(paste(sr.sched$Site,#
+      sr.sched$Date,#
+      sep=';')),#
+    GenusSpecies=unique(spec[,type]),#
+    Abund=0)
+sp$Abund[match(paste(all.sp$Site,#
+                       all.sp$Date,#
+                       all.sp$GenusSpecies,#
+                       sep=';'),#
+                 paste(sp$SiteDate,#
+                       sp$GenusSpecies,#
+                       sep=';'))] <-#
+                         all.sp$Abund
+all.sp$Site
+head(sp)
+spec$SiteType <- ifelse(spec$SiteStatus == "mature" |#
+                          spec$SiteStatus == "maturing",#
+                          "hedgerow", "control")#
+  spec$Site <- paste(spec$Site, spec$SiteType, sep=":")
+all.sp <- aggregate(list(Abund=spec[, type]),#
+                      list(Site=spec$Site,#
+                           Date=spec$Date,#
+                           GenusSpecies=spec[,type]),#
+                      length)
+all.sp
+head(all.sp)
+sp <- expand.grid(#
+    SiteDate = unique(paste(sr.sched$Site,#
+      sr.sched$Date,#
+      sep=';')),#
+    GenusSpecies=unique(spec[,type]),#
+    Abund=0)
+sp$Abund[match(paste(all.sp$Site,#
+                       all.sp$Date,#
+                       all.sp$GenusSpecies,#
+                       sep=';'),#
+                 paste(sp$SiteDate,#
+                       sp$GenusSpecies,#
+                       sep=';'))] <-#
+                         all.sp$Abund
+all.sp$Site
+all.sp$Date
+all.sp$GenusSpecies
+sp$SiteDate
+all.sp$Date
+sp$SiteDate
+paste(all.sp$Site,#
+                       all.sp$Date,#
+                       all.sp$GenusSpecies,#
+                       sep=';')
+head(paste(all.sp$Site,#
+                       all.sp$Date,#
+                       all.sp$GenusSpecies,#
+                       sep=';'))
+head(paste(sp$SiteDate,#
+                       sp$GenusSpecies,#
+                       sep=';')))
+head(paste(sp$SiteDate,#
+                       sp$GenusSpecies,#
+                       sep=';'))
+head(sp)
+match(paste(all.sp$Site,#
+                       all.sp$Date,#
+                       all.sp$GenusSpecies,#
+                       sep=';'),#
+                 paste(sp$SiteDate,#
+                       sp$GenusSpecies,#
+                       sep=';'))
+Q
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/dataPrep')#
+load('~/Dropbox/hedgerow/data_sets/traditional/specimens-complete.RData')#
+load("/Users/lcp/Dropbox/hedgerow_network/data/veg/veg.Rdata")#
+source('src/misc.R')#
+source('src/prepNets.R')#
+library(bipartite)#
+#
+trait.dir <- '~/Dropbox/hedgerow/data_sets/traditional/functional_traits'#
+bee.trait <-#
+  read.csv(file.path(trait.dir, 'bee.csv'),#
+           row.names=1)#
+syr.trait <-#
+  read.csv(file.path(trait.dir, 'syr.csv'),#
+           row.names=1)#
+#
+spec <- dd#
+#
+## subset to net specimens#
+spec <- spec[spec$NetPan == 'net',]#
+## create species column#
+spec$PlantGenusSpecies <-  fix.white.space(paste(spec$PlantGenus,#
+                                                 spec$PlantSpecies))#
+#
+## drop pollinators and plants without identifications#
+spec <-  spec[spec$PlantGenusSpecies != '',]#
+#
+to.drop.status <- c("forb", "natural")#
+spec <- spec[!spec$SiteStatus %in% to.drop.status,]#
+tot.spec <- nrow(spec)#
+#
+nrow(spec[spec$Family == 'Syrphidae',])/tot.spec#
+nrow(spec[spec$BeeNonbee == 'bee',])/tot.spec#
+#
+## subset to just bees and syrphids#
+spec <- spec[spec$Family == 'Syrphidae' |#
+             spec$BeeNonbee == 'bee',]#
+#
+spec <-  spec[spec$Species != '',]#
+spec$SiteStatus[spec$SiteStatus == "restored"] <- "maturing"#
+## total specimens#
+nrow(spec)#
+#
+## total species#
+length(unique(spec$GenusSpecies))#
+#
+## sampling dates#
+length(unique(paste(spec$Site, spec$Date)))#
+#
+## families and genera#
+length(unique(spec$Family))#
+length(unique(spec$Genus))#
+#
+## interactions#
+length(unique(paste(spec$GenusSpecies, spec$PlantGenusSpecies)))#
+## create a giant network to calculate specialization#
+agg.spec <- aggregate(list(abund=spec$GenusSpecies),#
+                      list(GenusSpecies=spec$GenusSpecies,#
+                           PlantGenusSpecies=spec$PlantGenusSpecies),#
+                      length)#
+#
+nets.all <- samp2site.spp(agg.spec$PlantGenusSpecies,#
+                          agg.spec$GenusSpecies, agg.spec$abund, FUN=sum)#
+#
+all.specializations <- specieslevel(nets.all,#
+                                    index=c("proportional generality",#
+                                      "degree",#
+                                      "d"))#
+#
+traits <- data.frame(GenusSpecies= unlist(sapply(all.specializations,#
+                       rownames)),#
+                     do.call(rbind, all.specializations))#
+rownames(traits) <- NULL#
+#
+site.table <- aggregate(list(Samples=spec$Date),#
+                        list(Year=spec$Year, Site=spec$Site),#
+                        function(x) length(unique(x)))#
+#
+## sampling table for manuscript#
+ms.table <- samp2site.spp(site=site.table$Site,#
+                          spp=site.table$Year,#
+                          abund=site.table$Samples,#
+                          FUN=sum)#
+ms.table <- cbind(spec$SiteStatus[match(rownames(ms.table),#
+                                        spec$Site)], ms.table)#
+colnames(ms.table) <- c("Site type", colnames(ms.table)[-1])#
+#
+ms.table <- ms.table[order(ms.table[, "Site type"], decreasing=TRUE),]#
+#
+ms.table[, "Site type"][ms.table[, "Site type"] == "maturing"] <-#
+  "Assembling HR"#
+#
+ms.table[, "Site type"][ms.table[, "Site type"] == "mature"] <-#
+  "Non-assembling HR"#
+#
+ms.table[, "Site type"][ms.table[, "Site type"] == "control"] <-#
+  "Non-assembling FM"#
+#
+write.table(ms.table, file="~/Dropbox/hedgerow_assembly/ms/tables/samples.txt",#
+            sep=" & ")#
+#
+## add various traits#
+## specialization#
+spec$d <- traits$d[match(spec$GenusSpecies, traits$GenusSpecies)]#
+spec$degree <- traits$degree[match(spec$GenusSpecies,#
+                                   traits$GenusSpecies)]#
+#
+## occurence#
+load('~/Dropbox/hedgerow/data_sets/matrices/net/bee.syr.RData')#
+occ <- apply(mat, c(3,1), function(x){#
+  sum(x > 0, na.rm=TRUE)/sum(x >= 0, na.rm=TRUE)#
+})#
 findOcc <- function(x){#
-  mat[x[,"GenusSpecies"], paste(x[,"Site"], x[,"SiteStatusBACI"], sep=":")]#
+  out <- try(occ[x["GenusSpecies"], paste(x["Site"], x["SiteStatusBACI"],#
+                                          sep=":")], silent=TRUE)#
+  if(inherits(out, "try-error")) out <- NA#
+  return(out)#
 }#
 #
-spec$occ.date <- apply(spec, 1, findOcc)
+spec$occ.date <- apply(spec, 1, findOcc)#
+traits$occ.date <- spec$occ.date[match(traits$GenusSpecies,#
+                                       spec$GenusSpecies)]#
+## plant occurrence#
+site.date <- mat[,,1]#
+long.site.date <- comm.mat2sample(site.date)#
+long.site.date <- long.site.date[!is.na(long.site.date$Samp),]#
+## abundance of each species for all site-date combinations#
+make.by.species <- function(spec, sr.sched,#
+                            type="PlantGenusSpecies"){#
+  spec$SiteType <- ifelse(spec$SiteStatus == "mature" |#
+                          spec$SiteStatus == "maturing",#
+                          "hedgerow", "control")#
+  spec$Site <- paste(spec$Site, spec$SiteType, sep=":")#
+  ## number of species at each site-date#
+  all.sp <- aggregate(list(Abund=spec[, type]),#
+                      list(Site=spec$Site,#
+                           Date=spec$Date,#
+                           GenusSpecies=spec[,type]),#
+                      length)#
+  ## all site-date species combinations#
+  sp <- expand.grid(#
+    SiteDate = unique(paste(sr.sched$Site,#
+      sr.sched$Date,#
+      sep=';')),#
+    GenusSpecies=unique(spec[,type]),#
+    Abund=0)#
+browser()#
+  ## fill in the matrix of all combinations#
+  sp$Abund[match(paste(all.sp$Site,#
+                       all.sp$Date,#
+                       all.sp$GenusSpecies,#
+                       sep=';'),#
+                 paste(sp$SiteDate,#
+                       sp$GenusSpecies,#
+                       sep=';'))] <-#
+                         all.sp$Abund#
+  ## occurrence#
+  sp$Occ <- sp$Abund#
+  sp$Occ[sp$Occ > 1] <- 1#
+  ## create site, date, genus etc. columns#
+  sp$Site <- sapply(strsplit(as.character(sp$SiteDate), ";"),#
+                    function(x) x[1])#
+  sp$Date <- as.Date(sapply(strsplit(as.character(sp$SiteDate), ";"),#
+                            function(x) x[2]))#
+  sp$Genus <- sapply(strsplit(as.character(sp$GenusSpecies), " "),#
+                     function(x) x[1])#
+  sp$Year <- format(sp$Date, '%Y')#
+#
+  spec$SiteType <- ifelse(spec$SiteStatus == "mature" |#
+                          spec$SiteStatus == "maturing",#
+                          "hedgerow", "control")#
+  sp$SiteStatus <- spec$SiteStatus[match(sp$Site,#
+                                         paste(spec$Site,#
+                                               spec$SiteType,#
+                                               sep=":"))]#
+  ## drop site-date column#
+  sp <- sp[,-1]#
+#
+  ## make a site by date by species arrary#
+  d <- data.frame(pollinator=spec[,type],#
+                  site=spec$Site,#
+                  date=spec$Date)#
+  null.mat <- tapply(rep(0, nrow(sr.sched)),#
+                     list(sites=paste(sr.sched$Site),#
+                          dates=sr.sched$Date), sum)#
+  pollinator.id <- id(d$pollinator)#
+  mats <- make.mats(pollinator.id,#
+                    null.mat,#
+                    pollinator=as.vector(d$pollinator), #
+                    var1=as.vector(d$site),#
+                    var2=d$date)#
+  sites <- rownames(mats[[1]])#
+  dates <- colnames(mats[[1]])#
+  species <- names(mats)#
+  mat <- array(unlist(mats),#
+               dim=c(dim(mats[[1]]),#
+                 length(mats)))#
+  dimnames(mat) <- list(site=sites,#
+                        date=dates,#
+                        species=species)#
+#
+  write.csv(sp, file=file.path(path.dir, 'sp.csv'),#
+            row.names=FALSE)#
+  save(sp, file= file.path(path.dir, 'sp.Rdata'))#
+  save(mat, file= file.path(path.dir, 'sp_array.Rdata'))#
+}#
+#
+make.by.species(spec, long.site.date)
+Q
+make.by.species(spec, long.site.date)
+sp$Abund[match(paste(all.sp$Site,#
+                       all.sp$Date,#
+                       all.sp$GenusSpecies,#
+                       sep=';'),#
+                 paste(sp$SiteDate,#
+                       sp$GenusSpecies,#
+                       sep=';'))] <-#
+                         all.sp$Abund
+match(paste(all.sp$Site,#
+                       all.sp$Date,#
+                       all.sp$GenusSpecies,#
+                       sep=';'),#
+                 paste(sp$SiteDate,#
+                       sp$GenusSpecies,#
+                       sep=';'))
+long.site.date
+all.sp
+head(all.sp)
+head(sp)
+match(paste(all.sp$Site,#
+                       all.sp$Date,#
+                       all.sp$GenusSpecies,#
+                       sep=';'),#
+                 paste(sp$SiteDate,#
+                       sp$GenusSpecies,#
+                       sep=';'))]
+match(paste(all.sp$Site,#
+                       all.sp$Date,#
+                       all.sp$GenusSpecies,#
+                       sep=';'),#
+                 paste(sp$SiteDate,#
+                       sp$GenusSpecies,#
+                       sep=';'))
+match(  paste(sp$SiteDate,#
+                       sp$GenusSpecies,#
+                       sep=';'), paste(all.sp$Site,#
+                       all.sp$Date,#
+                       all.sp$GenusSpecies,#
+                       sep=';'))
+match(sp$SiteDate, paste(all.sp$Site,#
+                       all.sp$Date, sep=";")
+)
+sp$SiteDate
+paste(all.sp$Site,#
+                       all.sp$Date, sep=";")
+make.by.species(spec, long.site.date)
+head(sp)
+sp$Abund[match(paste(all.sp$Site,#
+                       all.sp$Date,#
+                       all.sp$GenusSpecies,#
+                       sep=';'),#
+                 paste(sp$SiteDate,#
+                       sp$GenusSpecies,#
+                       sep=';'))] <-#
+                         all.sp$Abund
+match.dates <- match(paste(all.sp$Site,#
+                       all.sp$Date,#
+                       all.sp$GenusSpecies,#
+                       sep=';'),#
+                 paste(sp$SiteDate,#
+                       sp$GenusSpecies,#
+                       sep=';'))]
+match.dates <- match(paste(all.sp$Site,#
+                       all.sp$Date,#
+                       all.sp$GenusSpecies,#
+                       sep=';'),#
+                 paste(sp$SiteDate,#
+                       sp$GenusSpecies,#
+                       sep=';'))
+match.dates
+sr.sched
+site.date <- mat[,,1]#
+long.site.date <- comm.mat2sample(site.date)#
+## abundance of each species for all site-date combinations#
+make.by.species <- function(spec, sr.sched,#
+                            type="PlantGenusSpecies"){#
+  spec$SiteType <- ifelse(spec$SiteStatus == "mature" |#
+                          spec$SiteStatus == "maturing",#
+                          "hedgerow", "control")#
+  spec$Site <- paste(spec$Site, spec$SiteType, sep=":")#
+  ## number of species at each site-date#
+  all.sp <- aggregate(list(Abund=spec[, type]),#
+                      list(Site=spec$Site,#
+                           Date=spec$Date,#
+                           GenusSpecies=spec[,type]),#
+                      length)#
+  ## all site-date species combinations#
+  sp <- expand.grid(#
+    SiteDate = unique(paste(sr.sched$Site,#
+      sr.sched$Date,#
+      sep=';')),#
+    GenusSpecies=unique(spec[,type]),#
+    Abund=0)#
+browser()#
+  ## fill in the matrix of all combinations#
+  match.dates <- match(paste(all.sp$Site,#
+                       all.sp$Date,#
+                       all.sp$GenusSpecies,#
+                       sep=';'),#
+                 paste(sp$SiteDate,#
+                       sp$GenusSpecies,#
+                       sep=';'))#
+#
+  sp$Abund[match(paste(all.sp$Site,#
+                       all.sp$Date,#
+                       all.sp$GenusSpecies,#
+                       sep=';'),#
+                 paste(sp$SiteDate,#
+                       sp$GenusSpecies,#
+                       sep=';'))] <-#
+                         all.sp$Abund#
+  match(  paste(sp$SiteDate,#
+                       sp$GenusSpecies,#
+                       sep=';'), paste(all.sp$Site,#
+                       all.sp$Date,#
+                       all.sp$GenusSpecies,#
+                       sep=';'))#
+  ## occurrence#
+  sp$Occ <- sp$Abund#
+  sp$Occ[sp$Occ > 1] <- 1#
+  ## create site, date, genus etc. columns#
+  sp$Site <- sapply(strsplit(as.character(sp$SiteDate), ";"),#
+                    function(x) x[1])#
+  sp$Date <- as.Date(sapply(strsplit(as.character(sp$SiteDate), ";"),#
+                            function(x) x[2]))#
+  sp$Genus <- sapply(strsplit(as.character(sp$GenusSpecies), " "),#
+                     function(x) x[1])#
+  sp$Year <- format(sp$Date, '%Y')#
+#
+  spec$SiteType <- ifelse(spec$SiteStatus == "mature" |#
+                          spec$SiteStatus == "maturing",#
+                          "hedgerow", "control")#
+  sp$SiteStatus <- spec$SiteStatus[match(sp$Site,#
+                                         paste(spec$Site,#
+                                               spec$SiteType,#
+                                               sep=":"))]#
+  ## drop site-date column#
+  sp <- sp[,-1]#
+#
+  ## make a site by date by species arrary#
+  d <- data.frame(pollinator=spec[,type],#
+                  site=spec$Site,#
+                  date=spec$Date)#
+  null.mat <- tapply(rep(0, nrow(sr.sched)),#
+                     list(sites=paste(sr.sched$Site),#
+                          dates=sr.sched$Date), sum)#
+  pollinator.id <- id(d$pollinator)#
+  mats <- make.mats(pollinator.id,#
+                    null.mat,#
+                    pollinator=as.vector(d$pollinator), #
+                    var1=as.vector(d$site),#
+                    var2=d$date)#
+  sites <- rownames(mats[[1]])#
+  dates <- colnames(mats[[1]])#
+  species <- names(mats)#
+  mat <- array(unlist(mats),#
+               dim=c(dim(mats[[1]]),#
+                 length(mats)))#
+  dimnames(mat) <- list(site=sites,#
+                        date=dates,#
+                        species=species)#
+#
+  write.csv(sp, file=file.path(path.dir, 'sp.csv'),#
+            row.names=FALSE)#
+  save(sp, file= file.path(path.dir, 'sp.Rdata'))#
+  save(mat, file= file.path(path.dir, 'sp_array.Rdata'))#
+}#
+#
+make.by.species(spec, long.site.date)
+sp$Abund[match(paste(all.sp$Site,#
+                       all.sp$Date,#
+                       all.sp$GenusSpecies,#
+                       sep=';'),#
+                 paste(sp$SiteDate,#
+                       sp$GenusSpecies,#
+                       sep=';'))] <-#
+                         all.sp$Abund
+head(sp)
+head(sr.sched)
+sr.sched
+## plant occurrence#
+site.date <- mat[,,1]#
+long.site.date <- comm.mat2sample(site.date)#
+## abundance of each species for all site-date combinations#
+make.by.species <- function(spec, sr.sched,#
+                            type="PlantGenusSpecies"){#
+  spec$SiteType <- ifelse(spec$SiteStatus == "mature" |#
+                          spec$SiteStatus == "maturing",#
+                          "hedgerow", "control")#
+  spec$Site <- paste(spec$Site, spec$SiteType, sep=":")#
+  ## number of species at each site-date#
+  all.sp <- aggregate(list(Abund=spec[, type]),#
+                      list(Site=spec$Site,#
+                           Date=spec$Date,#
+                           GenusSpecies=spec[,type]),#
+                      length)#
+  ## all site-date species combinations#
+  sp <- expand.grid(#
+    SiteDate = unique(paste(sr.sched$Site,#
+      sr.sched$Date,#
+      sep=';')),#
+    GenusSpecies=unique(spec[,type]),#
+    Abund=0)#
+browser()#
+  ## fill in the matrix of all combinations#
+  match.dates <- match(paste(all.sp$Site,#
+                       all.sp$Date,#
+                       all.sp$GenusSpecies,#
+                       sep=';'),#
+                 paste(sp$SiteDate,#
+                       sp$GenusSpecies,#
+                       sep=';'))#
+#
+  sp$Abund[match(paste(all.sp$Site,#
+                       all.sp$Date,#
+                       all.sp$GenusSpecies,#
+                       sep=';'),#
+                 paste(sp$SiteDate,#
+                       sp$GenusSpecies,#
+                       sep=';'))] <-#
+                         all.sp$Abund#
+  match(  paste(sp$SiteDate,#
+                       sp$GenusSpecies,#
+                       sep=';'), paste(all.sp$Site,#
+                       all.sp$Date,#
+                       all.sp$GenusSpecies,#
+                       sep=';'))#
+  ## occurrence#
+  sp$Occ <- sp$Abund#
+  sp$Occ[sp$Occ > 1] <- 1#
+  ## create site, date, genus etc. columns#
+  sp$Site <- sapply(strsplit(as.character(sp$SiteDate), ";"),#
+                    function(x) x[1])#
+  sp$Date <- as.Date(sapply(strsplit(as.character(sp$SiteDate), ";"),#
+                            function(x) x[2]))#
+  sp$Genus <- sapply(strsplit(as.character(sp$GenusSpecies), " "),#
+                     function(x) x[1])#
+  sp$Year <- format(sp$Date, '%Y')#
+#
+  spec$SiteType <- ifelse(spec$SiteStatus == "mature" |#
+                          spec$SiteStatus == "maturing",#
+                          "hedgerow", "control")#
+  sp$SiteStatus <- spec$SiteStatus[match(sp$Site,#
+                                         paste(spec$Site,#
+                                               spec$SiteType,#
+                                               sep=":"))]#
+  ## drop site-date column#
+  sp <- sp[,-1]#
+#
+  ## make a site by date by species arrary#
+  d <- data.frame(pollinator=spec[,type],#
+                  site=spec$Site,#
+                  date=spec$Date)#
+  null.mat <- tapply(rep(0, nrow(sr.sched)),#
+                     list(sites=paste(sr.sched$Site),#
+                          dates=sr.sched$Date), sum)#
+  pollinator.id <- id(d$pollinator)#
+  mats <- make.mats(pollinator.id,#
+                    null.mat,#
+                    pollinator=as.vector(d$pollinator), #
+                    var1=as.vector(d$site),#
+                    var2=d$date)#
+  sites <- rownames(mats[[1]])#
+  dates <- colnames(mats[[1]])#
+  species <- names(mats)#
+  mat <- array(unlist(mats),#
+               dim=c(dim(mats[[1]]),#
+                 length(mats)))#
+  dimnames(mat) <- list(site=sites,#
+                        date=dates,#
+                        species=species)#
+#
+  write.csv(sp, file=file.path(path.dir, 'sp.csv'),#
+            row.names=FALSE)#
+  save(sp, file= file.path(path.dir, 'sp.Rdata'))#
+  save(mat, file= file.path(path.dir, 'sp_array.Rdata'))#
+}#
+#
+make.by.species(spec, long.site.date)
+Q
+## plant occurrence#
+site.date <- mat[,,1]#
+long.site.date <- comm.mat2sample(site.date)#
+## abundance of each species for all site-date combinations#
+make.by.species <- function(spec, sr.sched,#
+                            type="PlantGenusSpecies"){#
+  spec$SiteType <- ifelse(spec$SiteStatus == "mature" |#
+                          spec$SiteStatus == "maturing",#
+                          "hedgerow", "control")#
+  spec$Site <- paste(spec$Site, spec$SiteType, sep=":")#
+  ## number of species at each site-date#
+  all.sp <- aggregate(list(Abund=spec[, type]),#
+                      list(Site=spec$Site,#
+                           Date=spec$Date,#
+                           GenusSpecies=spec[,type]),#
+                      length)#
+  ## all site-date species combinations#
+  sp <- expand.grid(#
+    SiteDate = unique(paste(sr.sched$Site,#
+      sr.sched$Date,#
+      sep=';')),#
+    GenusSpecies=unique(spec[,type]),#
+    Abund=0)#
+browser()#
+  ## fill in the matrix of all combinations#
+  match.dates <- match(paste(all.sp$Site,#
+                       all.sp$Date,#
+                       all.sp$GenusSpecies,#
+                       sep=';'),#
+                 paste(sp$SiteDate,#
+                       sp$GenusSpecies,#
+                       sep=';'))#
+#
+  sp$Abund[match(paste(all.sp$Site,#
+                       all.sp$Date,#
+                       all.sp$GenusSpecies,#
+                       sep=';'),#
+                 paste(sp$SiteDate,#
+                       sp$GenusSpecies,#
+                       sep=';'))] <-#
+                         all.sp$Abund#
+  match(  paste(sp$SiteDate,#
+                       sp$GenusSpecies,#
+                       sep=';'), paste(all.sp$Site,#
+                       all.sp$Date,#
+                       all.sp$GenusSpecies,#
+                       sep=';'))#
+  ## occurrence#
+  sp$Occ <- sp$Abund#
+  sp$Occ[sp$Occ > 1] <- 1#
+  ## create site, date, genus etc. columns#
+  sp$Site <- sapply(strsplit(as.character(sp$SiteDate), ";"),#
+                    function(x) x[1])#
+  sp$Date <- as.Date(sapply(strsplit(as.character(sp$SiteDate), ";"),#
+                            function(x) x[2]))#
+  sp$Genus <- sapply(strsplit(as.character(sp$GenusSpecies), " "),#
+                     function(x) x[1])#
+  sp$Year <- format(sp$Date, '%Y')#
+#
+  spec$SiteType <- ifelse(spec$SiteStatus == "mature" |#
+                          spec$SiteStatus == "maturing",#
+                          "hedgerow", "control")#
+  sp$SiteStatus <- spec$SiteStatus[match(sp$Site,#
+                                         paste(spec$Site,#
+                                               spec$SiteType,#
+                                               sep=":"))]#
+  ## drop site-date column#
+  sp <- sp[,-1]#
+#
+  ## make a site by date by species arrary#
+  d <- data.frame(pollinator=spec[,type],#
+                  site=spec$Site,#
+                  date=spec$Date)#
+  null.mat <- tapply(rep(0, nrow(sr.sched)),#
+                     list(sites=paste(sr.sched$Site),#
+                          dates=sr.sched$Date), sum)#
+  pollinator.id <- id(d$pollinator)#
+  mats <- make.mats(pollinator.id,#
+                    null.mat,#
+                    pollinator=as.vector(d$pollinator), #
+                    var1=as.vector(d$site),#
+                    var2=d$date)#
+  sites <- rownames(mats[[1]])#
+  dates <- colnames(mats[[1]])#
+  species <- names(mats)#
+  mat <- array(unlist(mats),#
+               dim=c(dim(mats[[1]]),#
+                 length(mats)))#
+  dimnames(mat) <- list(site=sites,#
+                        date=dates,#
+                        species=species)#
+#
+  write.csv(sp, file=file.path(path.dir, 'sp.csv'),#
+            row.names=FALSE)#
+  save(sp, file= file.path(path.dir, 'sp.Rdata'))#
+  save(mat, file= file.path(path.dir, 'sp_array.Rdata'))#
+}#
+#
+make.by.species(spec, long.site.date)
+match.dates <- match(paste(all.sp$Site,#
+                       all.sp$Date,#
+                       all.sp$GenusSpecies,#
+                       sep=';'),#
+                 paste(sp$SiteDate,#
+                       sp$GenusSpecies,#
+                       sep=';'))
+match.dates
+Q
+site.date <- mat[,,1]#
+long.site.date <- comm.mat2sample(site.date)#
+long.site.date$Site <- lapply(strsplit(long.site.date$Site,#
+                                       ":"))[1]
+long.site.date$Site <- lapply(strsplit(long.site.date$Site,#
+                                       ":"), function(x) x[1])
+strsplit(long.site.date$Site,":")
+long.site.date$Site <- lapply(strsplit(#
+  as.character(long.site.date$Site),":"), function(x) x[1])
+long.site.date
+## abundance of each species for all site-date combinations#
+make.by.species <- function(spec, sr.sched,#
+                            type="PlantGenusSpecies"){#
+  ## number of species at each site-date#
+  all.sp <- aggregate(list(Abund=spec[, type]),#
+                      list(Site=spec$Site,#
+                           Date=spec$Date,#
+                           GenusSpecies=spec[,type]),#
+                      length)#
+  ## all site-date species combinations#
+  sp <- expand.grid(#
+    SiteDate = unique(paste(sr.sched$Site,#
+      sr.sched$Date,#
+      sep=';')),#
+    GenusSpecies=unique(spec[,type]),#
+    Abund=0)#
+browser()#
+  ## fill in the matrix of all combinations#
+  match.dates <- match(paste(all.sp$Site,#
+                       all.sp$Date,#
+                       all.sp$GenusSpecies,#
+                       sep=';'),#
+                 paste(sp$SiteDate,#
+                       sp$GenusSpecies,#
+                       sep=';'))#
+#
+  sp$Abund[match(paste(all.sp$Site,#
+                       all.sp$Date,#
+                       all.sp$GenusSpecies,#
+                       sep=';'),#
+                 paste(sp$SiteDate,#
+                       sp$GenusSpecies,#
+                       sep=';'))] <-#
+                         all.sp$Abund#
+  match(  paste(sp$SiteDate,#
+                       sp$GenusSpecies,#
+                       sep=';'), paste(all.sp$Site,#
+                       all.sp$Date,#
+                       all.sp$GenusSpecies,#
+                       sep=';'))#
+  ## occurrence#
+  sp$Occ <- sp$Abund#
+  sp$Occ[sp$Occ > 1] <- 1#
+  ## create site, date, genus etc. columns#
+  sp$Site <- sapply(strsplit(as.character(sp$SiteDate), ";"),#
+                    function(x) x[1])#
+  sp$Date <- as.Date(sapply(strsplit(as.character(sp$SiteDate), ";"),#
+                            function(x) x[2]))#
+  sp$Genus <- sapply(strsplit(as.character(sp$GenusSpecies), " "),#
+                     function(x) x[1])#
+  sp$Year <- format(sp$Date, '%Y')#
+#
+  spec$SiteType <- ifelse(spec$SiteStatus == "mature" |#
+                          spec$SiteStatus == "maturing",#
+                          "hedgerow", "control")#
+  sp$SiteStatus <- spec$SiteStatus[match(sp$Site,#
+                                         paste(spec$Site,#
+                                               spec$SiteType,#
+                                               sep=":"))]#
+  ## drop site-date column#
+  sp <- sp[,-1]#
+#
+  ## make a site by date by species arrary#
+  d <- data.frame(pollinator=spec[,type],#
+                  site=spec$Site,#
+                  date=spec$Date)#
+  null.mat <- tapply(rep(0, nrow(sr.sched)),#
+                     list(sites=paste(sr.sched$Site),#
+                          dates=sr.sched$Date), sum)#
+  pollinator.id <- id(d$pollinator)#
+  mats <- make.mats(pollinator.id,#
+                    null.mat,#
+                    pollinator=as.vector(d$pollinator), #
+                    var1=as.vector(d$site),#
+                    var2=d$date)#
+  sites <- rownames(mats[[1]])#
+  dates <- colnames(mats[[1]])#
+  species <- names(mats)#
+  mat <- array(unlist(mats),#
+               dim=c(dim(mats[[1]]),#
+                 length(mats)))#
+  dimnames(mat) <- list(site=sites,#
+                        date=dates,#
+                        species=species)#
+#
+  write.csv(sp, file=file.path(path.dir, 'sp.csv'),#
+            row.names=FALSE)#
+  save(sp, file= file.path(path.dir, 'sp.Rdata'))#
+  save(mat, file= file.path(path.dir, 'sp_array.Rdata'))#
+}#
+#
+make.by.species(spec, long.site.date)
+match.dates <- match(paste(all.sp$Site,#
+                       all.sp$Date,#
+                       all.sp$GenusSpecies,#
+                       sep=';'),#
+                 paste(sp$SiteDate,#
+                       sp$GenusSpecies,#
+                       sep=';'))
+match.dates
+head(sp)
+head(all.sp)
+sp <- expand.grid(#
+    SiteDate = unique(paste(sr.sched$Site,#
+      sr.sched$Date,#
+      sep=';')),#
+    GenusSpecies=unique(spec[,type]),#
+    Abund=NA)
+match.dates <- match(#
+                 paste(sp$SiteDate,#
+                       sp$GenusSpecies,#
+                       sep=';'),#
+                       paste(all.sp$Site,#
+                       all.sp$Date,#
+                       all.sp$GenusSpecies,#
+                       sep=';'))
+match.dates
+match.dates <- match(paste(all.sp$Site,#
+                       all.sp$Date,#
+                       all.sp$GenusSpecies,#
+                       sep=';'),#
+                 paste(sp$SiteDate,#
+                       sp$GenusSpecies,#
+                       sep=';'))
+sp[is.na(match.dates)]
+sp[is.na(match.dates),]
+head(all.sp)
+uniqur(all.sp$Abund)
+unique(all.sp$Abund)
+sp$Abund[!is.na(match.dates),] <- 1
+sp$Abund[!is.na(match.dates),]
+sp$Abund[!is.na(match.dates)] <- 1
+head(sp)
+Q
+## abundance of each species for all site-date combinations#
+make.by.species <- function(spec, sr.sched,#
+                            type="PlantGenusSpecies"){#
+  ## number of species at each site-date#
+  all.sp <- aggregate(list(Abund=spec[, type]),#
+                      list(Site=spec$Site,#
+                           Date=spec$Date,#
+                           GenusSpecies=spec[,type]),#
+                      length)#
+  ## all site-date species combinations#
+  sp <- expand.grid(#
+    SiteDate = unique(paste(sr.sched$Site,#
+      sr.sched$Date,#
+      sep=';')),#
+    GenusSpecies=unique(spec[,type]),#
+    Occ=NA)#
+  ## fill in the matrix of all combinations#
+  match.dates <- match(paste(all.sp$Site,#
+                       all.sp$Date,#
+                       all.sp$GenusSpecies,#
+                       sep=';'),#
+                 paste(sp$SiteDate,#
+                       sp$GenusSpecies,#
+                       sep=';'))#
+#
+  sp$Occ[!is.na(match.dates)] <- 1#
+browser()#
+  ## create site, date, genus etc. columns#
+  sp$Site <- sapply(strsplit(as.character(sp$SiteDate), ";"),#
+                    function(x) x[1])#
+  sp$Date <- as.Date(sapply(strsplit(as.character(sp$SiteDate), ";"),#
+                            function(x) x[2]))#
+  sp$Genus <- sapply(strsplit(as.character(sp$GenusSpecies), " "),#
+                     function(x) x[1])#
+  sp$Year <- format(sp$Date, '%Y')#
+#
+  spec$SiteType <- ifelse(spec$SiteStatus == "mature" |#
+                          spec$SiteStatus == "maturing",#
+                          "hedgerow", "control")#
+  sp$SiteStatus <- spec$SiteStatus[match(sp$Site,#
+                                         paste(spec$Site,#
+                                               spec$SiteType,#
+                                               sep=":"))]#
+  ## drop site-date column#
+  sp <- sp[,-1]#
+#
+  ## make a site by date by species arrary#
+  d <- data.frame(pollinator=spec[,type],#
+                  site=spec$Site,#
+                  date=spec$Date)#
+  null.mat <- tapply(rep(0, nrow(sr.sched)),#
+                     list(sites=paste(sr.sched$Site),#
+                          dates=sr.sched$Date), sum)#
+  pollinator.id <- id(d$pollinator)#
+  mats <- make.mats(pollinator.id,#
+                    null.mat,#
+                    pollinator=as.vector(d$pollinator), #
+                    var1=as.vector(d$site),#
+                    var2=d$date)#
+  sites <- rownames(mats[[1]])#
+  dates <- colnames(mats[[1]])#
+  species <- names(mats)#
+  mat <- array(unlist(mats),#
+               dim=c(dim(mats[[1]]),#
+                 length(mats)))#
+  dimnames(mat) <- list(site=sites,#
+                        date=dates,#
+                        species=species)#
+#
+  write.csv(sp, file=file.path(path.dir, 'sp.csv'),#
+            row.names=FALSE)#
+  save(sp, file= file.path(path.dir, 'sp.Rdata'))#
+  save(mat, file= file.path(path.dir, 'sp_array.Rdata'))#
+}#
+#
+make.by.species(spec, long.site.date)
+sp$Site <- sapply(strsplit(as.character(sp$SiteDate), ";"),#
+                    function(x) x[1])#
+  sp$Date <- as.Date(sapply(strsplit(as.character(sp$SiteDate), ";"),#
+                            function(x) x[2]))#
+  sp$Genus <- sapply(strsplit(as.character(sp$GenusSpecies), " "),#
+                     function(x) x[1])#
+  sp$Year <- format(sp$Date, '%Y')
+head(long.site.date)
+Q
+## plant occurrence#
+site.date <- mat[,,1]#
+long.site.date <- comm.mat2sample(site.date)#
+long.site.date <- long.site.date[!is.na(long.site.date$Samp),]#
+long.site.date$Site <- lapply(strsplit(#
+  as.character(long.site.date$Site),":"), function(x) x[1])
+long.site.date
+## abundance of each species for all site-date combinations#
+make.by.species <- function(spec, sr.sched,#
+                            type="PlantGenusSpecies"){#
+  ## number of species at each site-date#
+  all.sp <- aggregate(list(Abund=spec[, type]),#
+                      list(Site=spec$Site,#
+                           Date=spec$Date,#
+                           GenusSpecies=spec[,type]),#
+                      length)#
+  ## all site-date species combinations#
+  sp <- expand.grid(#
+    SiteDate = unique(paste(sr.sched$Site,#
+      sr.sched$Date,#
+      sep=';')),#
+    GenusSpecies=unique(spec[,type]),#
+    Occ=0)#
+  ## fill in the matrix of all combinations#
+  match.dates <- match(paste(all.sp$Site,#
+                       all.sp$Date,#
+                       all.sp$GenusSpecies,#
+                       sep=';'),#
+                 paste(sp$SiteDate,#
+                       sp$GenusSpecies,#
+                       sep=';'))#
+#
+  sp$Occ[!is.na(match.dates)] <- 1#
+browser()#
+  ## create site, date, genus etc. columns#
+  sp$Site <- sapply(strsplit(as.character(sp$SiteDate), ";"),#
+                    function(x) x[1])#
+  sp$Date <- as.Date(sapply(strsplit(as.character(sp$SiteDate), ";"),#
+                            function(x) x[2]))#
+  sp$Genus <- sapply(strsplit(as.character(sp$GenusSpecies), " "),#
+                     function(x) x[1])#
+  sp$Year <- format(sp$Date, '%Y')#
+#
+  spec$SiteType <- ifelse(spec$SiteStatus == "mature" |#
+                          spec$SiteStatus == "maturing",#
+                          "hedgerow", "control")#
+  sp$SiteStatus <- spec$SiteStatus[match(sp$Site,#
+                                         paste(spec$Site,#
+                                               spec$SiteType,#
+                                               sep=":"))]#
+  ## drop site-date column#
+  sp <- sp[,-1]#
+#
+  ## make a site by date by species arrary#
+  d <- data.frame(pollinator=spec[,type],#
+                  site=spec$Site,#
+                  date=spec$Date)#
+  null.mat <- tapply(rep(0, nrow(sr.sched)),#
+                     list(sites=paste(sr.sched$Site),#
+                          dates=sr.sched$Date), sum)#
+  pollinator.id <- id(d$pollinator)#
+  mats <- make.mats(pollinator.id,#
+                    null.mat,#
+                    pollinator=as.vector(d$pollinator), #
+                    var1=as.vector(d$site),#
+                    var2=d$date)#
+  sites <- rownames(mats[[1]])#
+  dates <- colnames(mats[[1]])#
+  species <- names(mats)#
+  mat <- array(unlist(mats),#
+               dim=c(dim(mats[[1]]),#
+                 length(mats)))#
+  dimnames(mat) <- list(site=sites,#
+                        date=dates,#
+                        species=species)#
+#
+  write.csv(sp, file=file.path(path.dir, 'sp.csv'),#
+            row.names=FALSE)#
+  save(sp, file= file.path(path.dir, 'sp.Rdata'))#
+  save(mat, file= file.path(path.dir, 'sp_array.Rdata'))#
+}#
+#
+make.by.species(spec, long.site.date)
+sp$Site <- sapply(strsplit(as.character(sp$SiteDate), ";"),#
+                    function(x) x[1])#
+  sp$Date <- as.Date(sapply(strsplit(as.character(sp$SiteDate), ";"),#
+                            function(x) x[2]))#
+  sp$Genus <- sapply(strsplit(as.character(sp$GenusSpecies), " "),#
+                     function(x) x[1])#
+  sp$Year <- format(sp$Date, '%Y')
+head(sp)
+sp$SiteStatus <- spec$SiteStatus[match(sp$Site, spec$Site)]
+head(sp)
+sp <- sp[,-1]
+d <- data.frame(pollinator=spec[,type],#
+                  site=spec$Site,#
+                  date=spec$Date)#
+  null.mat <- tapply(rep(0, nrow(sr.sched)),#
+                     list(sites=paste(sr.sched$Site),#
+                          dates=sr.sched$Date), sum)#
+  pollinator.id <- id(d$pollinator)#
+  mats <- make.mats(pollinator.id,#
+                    null.mat,#
+                    pollinator=as.vector(d$pollinator), #
+                    var1=as.vector(d$site),#
+                    var2=d$date)#
+  sites <- rownames(mats[[1]])#
+  dates <- colnames(mats[[1]])#
+  species <- names(mats)#
+  mat <- array(unlist(mats),#
+               dim=c(dim(mats[[1]]),#
+                 length(mats)))#
+  dimnames(mat) <- list(site=sites,#
+                        date=dates,#
+                        species=species)
+make.mats <- function(pollinator.id,#
+                      null.mat,#
+                      pollinator,#
+                      var1, var2) {#
+  make.mat <- function(P) {#
+    var1 <- var1[pollinator==P]#
+    var2 <- var2[pollinator==P]#
+    m <- tapply(rep(1, length(var1)),#
+                list(sites=var1, dates=var2), sum)#
+#
+    null.mat[rownames(m), colnames(m)][!is.na(m)] <- m[!is.na(m)]#
+    null.mat#
+  }#
+  mats <- lapply(pollinator.id, function(x) make.mat(x))#
+  names(mats) <- pollinator.id#
+  mats#
+}
+Q
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/dataPrep')#
+load('~/Dropbox/hedgerow/data_sets/traditional/specimens-complete.RData')#
+load("/Users/lcp/Dropbox/hedgerow_network/data/veg/veg.Rdata")#
+source('src/misc.R')#
+source('src/prepNets.R')#
+library(bipartite)#
+#
+trait.dir <- '~/Dropbox/hedgerow/data_sets/traditional/functional_traits'#
+bee.trait <-#
+  read.csv(file.path(trait.dir, 'bee.csv'),#
+           row.names=1)#
+syr.trait <-#
+  read.csv(file.path(trait.dir, 'syr.csv'),#
+           row.names=1)#
+#
+spec <- dd#
+#
+## subset to net specimens#
+spec <- spec[spec$NetPan == 'net',]#
+## create species column#
+spec$PlantGenusSpecies <-  fix.white.space(paste(spec$PlantGenus,#
+                                                 spec$PlantSpecies))#
+#
+## drop pollinators and plants without identifications#
+spec <-  spec[spec$PlantGenusSpecies != '',]#
+#
+to.drop.status <- c("forb", "natural")#
+spec <- spec[!spec$SiteStatus %in% to.drop.status,]#
+tot.spec <- nrow(spec)#
+#
+nrow(spec[spec$Family == 'Syrphidae',])/tot.spec#
+nrow(spec[spec$BeeNonbee == 'bee',])/tot.spec#
+#
+## subset to just bees and syrphids#
+spec <- spec[spec$Family == 'Syrphidae' |#
+             spec$BeeNonbee == 'bee',]#
+#
+spec <-  spec[spec$Species != '',]#
+spec$SiteStatus[spec$SiteStatus == "restored"] <- "maturing"#
+## total specimens#
+nrow(spec)#
+#
+## total species#
+length(unique(spec$GenusSpecies))#
+#
+## sampling dates#
+length(unique(paste(spec$Site, spec$Date)))#
+#
+## families and genera#
+length(unique(spec$Family))#
+length(unique(spec$Genus))#
+#
+## interactions#
+length(unique(paste(spec$GenusSpecies, spec$PlantGenusSpecies)))#
+## create a giant network to calculate specialization#
+agg.spec <- aggregate(list(abund=spec$GenusSpecies),#
+                      list(GenusSpecies=spec$GenusSpecies,#
+                           PlantGenusSpecies=spec$PlantGenusSpecies),#
+                      length)#
+#
+nets.all <- samp2site.spp(agg.spec$PlantGenusSpecies,#
+                          agg.spec$GenusSpecies, agg.spec$abund, FUN=sum)#
+#
+all.specializations <- specieslevel(nets.all,#
+                                    index=c("proportional generality",#
+                                      "degree",#
+                                      "d"))#
+#
+traits <- data.frame(GenusSpecies= unlist(sapply(all.specializations,#
+                       rownames)),#
+                     do.call(rbind, all.specializations))#
+rownames(traits) <- NULL#
+#
+site.table <- aggregate(list(Samples=spec$Date),#
+                        list(Year=spec$Year, Site=spec$Site),#
+                        function(x) length(unique(x)))#
+#
+## sampling table for manuscript#
+ms.table <- samp2site.spp(site=site.table$Site,#
+                          spp=site.table$Year,#
+                          abund=site.table$Samples,#
+                          FUN=sum)#
+ms.table <- cbind(spec$SiteStatus[match(rownames(ms.table),#
+                                        spec$Site)], ms.table)#
+colnames(ms.table) <- c("Site type", colnames(ms.table)[-1])#
+#
+ms.table <- ms.table[order(ms.table[, "Site type"], decreasing=TRUE),]#
+#
+ms.table[, "Site type"][ms.table[, "Site type"] == "maturing"] <-#
+  "Assembling HR"#
+#
+ms.table[, "Site type"][ms.table[, "Site type"] == "mature"] <-#
+  "Non-assembling HR"#
+#
+ms.table[, "Site type"][ms.table[, "Site type"] == "control"] <-#
+  "Non-assembling FM"#
+#
+write.table(ms.table, file="~/Dropbox/hedgerow_assembly/ms/tables/samples.txt",#
+            sep=" & ")#
+#
+## add various traits#
+## specialization#
+spec$d <- traits$d[match(spec$GenusSpecies, traits$GenusSpecies)]#
+spec$degree <- traits$degree[match(spec$GenusSpecies,#
+                                   traits$GenusSpecies)]#
+#
+## occurence#
+load('~/Dropbox/hedgerow/data_sets/matrices/net/bee.syr.RData')#
+occ <- apply(mat, c(3,1), function(x){#
+  sum(x > 0, na.rm=TRUE)/sum(x >= 0, na.rm=TRUE)#
+})#
 findOcc <- function(x){#
+  out <- try(occ[x["GenusSpecies"], paste(x["Site"], x["SiteStatusBACI"],#
+                                          sep=":")], silent=TRUE)#
+  if(inherits(out, "try-error")) out <- NA#
+  return(out)#
+}#
+#
+spec$occ.date <- apply(spec, 1, findOcc)#
+traits$occ.date <- spec$occ.date[match(traits$GenusSpecies,#
+                                       spec$GenusSpecies)]#
+## plant occurrence#
+site.date <- mat[,,1]#
+long.site.date <- comm.mat2sample(site.date)#
+long.site.date <- long.site.date[!is.na(long.site.date$Samp),]#
+long.site.date$Site <- lapply(strsplit(#
+  as.character(long.site.date$Site),":"), function(x) x[1])#
+## abundance of each species for all site-date combinations#
+make.by.species <- function(spec, sr.sched,#
+                            type="PlantGenusSpecies"){#
+  ## number of species at each site-date#
+  all.sp <- aggregate(list(Abund=spec[, type]),#
+                      list(Site=spec$Site,#
+                           Date=spec$Date,#
+                           GenusSpecies=spec[,type]),#
+                      length)#
+  ## all site-date species combinations#
+  sp <- expand.grid(#
+    SiteDate = unique(paste(sr.sched$Site,#
+      sr.sched$Date,#
+      sep=';')),#
+    GenusSpecies=unique(spec[,type]),#
+    Occ=0)#
+  ## fill in the matrix of all combinations#
+  match.dates <- match(paste(all.sp$Site,#
+                       all.sp$Date,#
+                       all.sp$GenusSpecies,#
+                       sep=';'),#
+                 paste(sp$SiteDate,#
+                       sp$GenusSpecies,#
+                       sep=';'))#
+#
+  sp$Occ[!is.na(match.dates)] <- 1#
+browser()#
+  ## create site, date, genus etc. columns#
+  sp$Site <- sapply(strsplit(as.character(sp$SiteDate), ";"),#
+                    function(x) x[1])#
+  sp$Date <- as.Date(sapply(strsplit(as.character(sp$SiteDate), ";"),#
+                            function(x) x[2]))#
+  sp$Genus <- sapply(strsplit(as.character(sp$GenusSpecies), " "),#
+                     function(x) x[1])#
+  sp$Year <- format(sp$Date, '%Y')#
+#
+  sp$SiteStatus <- spec$SiteStatus[match(sp$Site, spec$Site)]#
+  ## drop site-date column#
+  sp <- sp[,-1]#
+#
+  ## make a site by date by species arrary#
+  d <- data.frame(pollinator=spec[,type],#
+                  site=spec$Site,#
+                  date=spec$Date)#
+  null.mat <- tapply(rep(0, nrow(sr.sched)),#
+                     list(sites=paste(sr.sched$Site),#
+                          dates=sr.sched$Date), sum)#
+  pollinator.id <- id(d$pollinator)#
+  mats <- make.mats(pollinator.id,#
+                    null.mat,#
+                    pollinator=as.vector(d$pollinator), #
+                    var1=as.vector(d$site),#
+                    var2=d$date)#
+  sites <- rownames(mats[[1]])#
+  dates <- colnames(mats[[1]])#
+  species <- names(mats)#
+  mat <- array(unlist(mats),#
+               dim=c(dim(mats[[1]]),#
+                 length(mats)))#
+  dimnames(mat) <- list(site=sites,#
+                        date=dates,#
+                        species=species)#
+#
+  write.csv(sp, file=file.path(path.dir, 'sp.csv'),#
+            row.names=FALSE)#
+  save(sp, file= file.path(path.dir, 'sp.Rdata'))#
+  save(mat, file= file.path(path.dir, 'sp_array.Rdata'))#
+}#
+#
+make.by.species(spec, long.site.date)
+sp$Site <- sapply(strsplit(as.character(sp$SiteDate), ";"),#
+                    function(x) x[1])#
+  sp$Date <- as.Date(sapply(strsplit(as.character(sp$SiteDate), ";"),#
+                            function(x) x[2]))#
+  sp$Genus <- sapply(strsplit(as.character(sp$GenusSpecies), " "),#
+                     function(x) x[1])#
+  sp$Year <- format(sp$Date, '%Y')
+sp$SiteStatus <- spec$SiteStatus[match(sp$Site, spec$Site)]
+sp <- sp[,-1]
+d <- data.frame(pollinator=spec[,type],#
+                  site=spec$Site,#
+                  date=spec$Date)#
+  null.mat <- tapply(rep(0, nrow(sr.sched)),#
+                     list(sites=paste(sr.sched$Site),#
+                          dates=sr.sched$Date), sum)#
+  pollinator.id <- id(d$pollinator)
+mats <- make.mats(pollinator.id,#
+                    null.mat,#
+                    pollinator=as.vector(d$pollinator), #
+                    var1=as.vector(d$site),#
+                    var2=d$date)#
+  sites <- rownames(mats[[1]])#
+  dates <- colnames(mats[[1]])#
+  species <- names(mats)#
+  mat <- array(unlist(mats),#
+               dim=c(dim(mats[[1]]),#
+                 length(mats)))#
+  dimnames(mat) <- list(site=sites,#
+                        date=dates,#
+                        species=species)
+head(d)
+null.mat
+mats
+mats <- make.mats(pollinator.id,#
+                    null.mat,#
+                    pollinator=as.vector(d$pollinator), #
+                    var1=as.vector(d$site),#
+                    var2=d$date)
+d$pollinator
+d$site
+d$date
+null.mat
+pollinator.id
+mats <- make.mats(pollinator.id,#
+                    null.mat,#
+                    pollinator=as.vector(d$pollinator), #
+                    var1=as.vector(d$site),#
+                    var2=d$date)
+make.mats <- function(pollinator.id,#
+                      null.mat,#
+                      pollinator,#
+                      var1, var2) {#
+  make.mat <- function(P) {#
+    browser()#
+    var1 <- var1[pollinator==P]#
+    var2 <- var2[pollinator==P]#
+    m <- tapply(rep(1, length(var1)),#
+                list(sites=var1, dates=var2), sum)#
+#
+    null.mat[rownames(m), colnames(m)][!is.na(m)] <- m[!is.na(m)]#
+    null.mat#
+  }#
+  mats <- lapply(pollinator.id, function(x) make.mat(x))#
+  names(mats) <- pollinator.id#
+  mats#
+}
+mats <- make.mats(pollinator.id,#
+                    null.mat,#
+                    pollinator=as.vector(d$pollinator), #
+                    var1=as.vector(d$site),#
+                    var2=d$date)
+var1 <- var1[pollinator==P]#
+    var2 <- var2[pollinator==P]#
+    m <- tapply(rep(1, length(var1)),#
+                list(sites=var1, dates=var2), sum)
+m
+null.mat[rownames(m), colnames(m)][!is.na(m)] <- m[!is.na(m)]#
+    null.mat
+rownames(m)
+colnames(m)
+!is.na(m)
+m[!is.na(m)]
+null.mat[rownames(m), colnames(m)][!is.na(m)]
+rownames(m)
+colnames(m)
+head(null.mat)
+!is.na(m)
+null.mat[rownames(m), colnames(m)]
+Q
+## abundance of each species for all site-date combinations#
+make.by.species <- function(spec, sr.sched,#
+                            type="PlantGenusSpecies"){#
+  ## number of species at each site-date#
+  all.sp <- aggregate(list(Abund=spec[, type]),#
+                      list(Site=spec$Site,#
+                           Date=spec$Date,#
+                           GenusSpecies=spec[,type]),#
+                      length)#
+  ## all site-date species combinations#
+  sp <- expand.grid(#
+    SiteDate = unique(paste(sr.sched$Site,#
+      sr.sched$Date,#
+      sep=';')),#
+    GenusSpecies=unique(spec[,type]),#
+    Occ=0)#
+  ## fill in the matrix of all combinations#
+  match.dates <- match(paste(all.sp$Site,#
+                       all.sp$Date,#
+                       all.sp$GenusSpecies,#
+                       sep=';'),#
+                 paste(sp$SiteDate,#
+                       sp$GenusSpecies,#
+                       sep=';'))#
+#
+  sp$Occ[!is.na(match.dates)] <- 1#
+  ## create site, date, genus etc. columns#
+  sp$Site <- sapply(strsplit(as.character(sp$SiteDate), ";"),#
+                    function(x) x[1])#
+  sp$Date <- as.Date(sapply(strsplit(as.character(sp$SiteDate), ";"),#
+                            function(x) x[2]))#
+  sp$Genus <- sapply(strsplit(as.character(sp$GenusSpecies), " "),#
+                     function(x) x[1])#
+  sp$Year <- format(sp$Date, '%Y')#
+  sp$SiteStatus <- spec$SiteStatus[match(sp$Site, spec$Site)]#
+  ## drop site-date column#
+  sp <- sp[,-1]#
+browser()#
+  ## make a site by date by species arrary#
+  d <- data.frame(pollinator=spec[,type],#
+                  site=spec$Site,#
+                  date=spec$Date)#
+  null.mat <- tapply(rep(0, nrow(sr.sched)),#
+                     list(sites=paste(sr.sched$Site),#
+                          dates=sr.sched$Date), sum)#
+  pollinator.id <- id(d$pollinator)#
+  mats <- make.mats(pollinator.id,#
+                    null.mat,#
+                    pollinator=as.vector(d$pollinator), #
+                    var1=as.vector(d$site),#
+                    var2=d$date)#
+  sites <- rownames(mats[[1]])#
+  dates <- colnames(mats[[1]])#
+  species <- names(mats)#
+  mat <- array(unlist(mats),#
+               dim=c(dim(mats[[1]]),#
+                 length(mats)))#
+  dimnames(mat) <- list(site=sites,#
+                        date=dates,#
+                        species=species)#
+#
+  write.csv(sp, file=file.path(path.dir, 'sp.csv'),#
+            row.names=FALSE)#
+  save(sp, file= file.path(path.dir, 'sp.Rdata'))#
+  save(mat, file= file.path(path.dir, 'sp_array.Rdata'))#
+}#
+#
+make.by.species(spec, long.site.date)
+head(sr.sched)
+null.mat <- samp2site.spp(sr.sched$Site, sr.sched$Date,#
+                sr.sched$Samp)
+sr.sched$Site
+sr.sched
+head(sr.sched)
+sr.sched$Site
+sr.sched[,"Site"]
+site.date <- mat[,,1]#
+long.site.date <- comm.mat2sample(site.date)
+site.date
+long.site.date <- comm.mat2sample(site.date)
+long.site.date
+site.date[site.date > 0] <- 0
+site.date
+Q
+## plant occurrence#
+site.date <- mat[,,1]#
+site.date[site.date > 0] <- 0#
+long.site.date <- comm.mat2sample(site.date)#
+long.site.date <- long.site.date[!is.na(long.site.date$Samp),]#
+long.site.date$Site <- lapply(strsplit(#
+  as.character(long.site.date$Site),":"), function(x) x[1])#
+## abundance of each species for all site-date combinations#
+make.by.species <- function(spec,#
+                            sr.sched,#
+                            site.date,#
+                            type="PlantGenusSpecies"){#
+  ## number of species at each site-date#
+  all.sp <- aggregate(list(Abund=spec[, type]),#
+                      list(Site=spec$Site,#
+                           Date=spec$Date,#
+                           GenusSpecies=spec[,type]),#
+                      length)#
+  ## all site-date species combinations#
+  sp <- expand.grid(#
+    SiteDate = unique(paste(sr.sched$Site,#
+      sr.sched$Date,#
+      sep=';')),#
+    GenusSpecies=unique(spec[,type]),#
+    Occ=0)#
+  ## fill in the matrix of all combinations#
+  match.dates <- match(paste(all.sp$Site,#
+                       all.sp$Date,#
+                       all.sp$GenusSpecies,#
+                       sep=';'),#
+                 paste(sp$SiteDate,#
+                       sp$GenusSpecies,#
+                       sep=';'))#
+#
+  sp$Occ[!is.na(match.dates)] <- 1#
+  ## create site, date, genus etc. columns#
+  sp$Site <- sapply(strsplit(as.character(sp$SiteDate), ";"),#
+                    function(x) x[1])#
+  sp$Date <- as.Date(sapply(strsplit(as.character(sp$SiteDate), ";"),#
+                            function(x) x[2]))#
+  sp$Genus <- sapply(strsplit(as.character(sp$GenusSpecies), " "),#
+                     function(x) x[1])#
+  sp$Year <- format(sp$Date, '%Y')#
+  sp$SiteStatus <- spec$SiteStatus[match(sp$Site, spec$Site)]#
+  ## drop site-date column#
+  sp <- sp[,-1]#
+browser()#
+  ## make a site by date by species arrary#
+  d <- data.frame(pollinator=spec[,type],#
+                  site=spec$Site,#
+                  date=spec$Date)#
+#
+  null.mat <- samp2site.spp(sr.sched[,"Site"], sr.sched$Date,#
+                            sr.sched$Samp)#
+  null.mat <- tapply(rep(0, nrow(sr.sched)),#
+                     list(sites=paste(sr.sched$Site),#
+                          dates=sr.sched$Date), sum)#
+  pollinator.id <- id(d$pollinator)#
+  mats <- make.mats(pollinator.id,#
+                    null.mat,#
+                    pollinator=as.vector(d$pollinator), #
+                    var1=as.vector(d$site),#
+                    var2=d$date)#
+  sites <- rownames(mats[[1]])#
+  dates <- colnames(mats[[1]])#
+  species <- names(mats)#
+  mat <- array(unlist(mats),#
+               dim=c(dim(mats[[1]]),#
+                 length(mats)))#
+  dimnames(mat) <- list(site=sites,#
+                        date=dates,#
+                        species=species)#
+#
+  write.csv(sp, file=file.path(path.dir, 'sp.csv'),#
+            row.names=FALSE)#
+  save(sp, file= file.path(path.dir, 'sp.Rdata'))#
+  save(mat, file= file.path(path.dir, 'sp_array.Rdata'))#
+}#
+#
+make.by.species(spec, long.site.date, site.date)
+head(site.date)
+d <- data.frame(pollinator=spec[,type],#
+                  site=spec$Site,#
+                  date=spec$Date)
+head(d)
+null.mat <- samp2site.spp(sr.sched[,"Site"], sr.sched$Date,#
+                            sr.sched$Samp)
+null.mat <- site.date
+null.mat
+pollinator.id <- id(d$pollinator)
+mats <- make.mats(pollinator.id,#
+                    null.mat,#
+                    pollinator=as.vector(d$pollinator), #
+                    var1=as.vector(d$site),#
+                    var2=d$date)
+Q
+site.date <- mat[,,1]#
+site.date[site.date > 0] <- 0#
+rownames(site.date) <- lapply(strsplit(rownames(site.date),":"),#
+                              function(x) x[1])
+site.date
+## plant occurrence#
+site.date <- mat[,,1]#
+site.date[site.date > 0] <- 0#
+rownames(site.date) <- lapply(strsplit(rownames(site.date),":"),#
+                              function(x) x[1])#
+long.site.date <- comm.mat2sample(site.date)#
+long.site.date <- long.site.date[!is.na(long.site.date$Samp),]#
+## abundance of each species for all site-date combinations#
+make.by.species <- function(spec,#
+                            sr.sched,#
+                            site.date,#
+                            type="PlantGenusSpecies"){#
+  ## number of species at each site-date#
+  all.sp <- aggregate(list(Abund=spec[, type]),#
+                      list(Site=spec$Site,#
+                           Date=spec$Date,#
+                           GenusSpecies=spec[,type]),#
+                      length)#
+  ## all site-date species combinations#
+  sp <- expand.grid(#
+    SiteDate = unique(paste(sr.sched$Site,#
+      sr.sched$Date,#
+      sep=';')),#
+    GenusSpecies=unique(spec[,type]),#
+    Occ=0)#
+  ## fill in the matrix of all combinations#
+  match.dates <- match(paste(all.sp$Site,#
+                       all.sp$Date,#
+                       all.sp$GenusSpecies,#
+                       sep=';'),#
+                 paste(sp$SiteDate,#
+                       sp$GenusSpecies,#
+                       sep=';'))#
+#
+  sp$Occ[!is.na(match.dates)] <- 1#
+  ## create site, date, genus etc. columns#
+  sp$Site <- sapply(strsplit(as.character(sp$SiteDate), ";"),#
+                    function(x) x[1])#
+  sp$Date <- as.Date(sapply(strsplit(as.character(sp$SiteDate), ";"),#
+                            function(x) x[2]))#
+  sp$Genus <- sapply(strsplit(as.character(sp$GenusSpecies), " "),#
+                     function(x) x[1])#
+  sp$Year <- format(sp$Date, '%Y')#
+  sp$SiteStatus <- spec$SiteStatus[match(sp$Site, spec$Site)]#
+  ## drop site-date column#
+  sp <- sp[,-1]#
+#
+  ## make a site by date by species arrary#
+  d <- data.frame(pollinator=spec[,type],#
+                  site=spec$Site,#
+                  date=spec$Date)#
+  null.mat <- site.date#
+  pollinator.id <- id(d$pollinator)#
+  mats <- make.mats(pollinator.id,#
+                    null.mat,#
+                    pollinator=as.vector(d$pollinator), #
+                    var1=as.vector(d$site),#
+                    var2=d$date)#
+  sites <- rownames(mats[[1]])#
+  dates <- colnames(mats[[1]])#
+  species <- names(mats)#
+  mat <- array(unlist(mats),#
+               dim=c(dim(mats[[1]]),#
+                 length(mats)))#
+  dimnames(mat) <- list(site=sites,#
+                        date=dates,#
+                        species=species)#
+#
+  write.csv(sp, file=file.path(path.dir, 'sp.csv'),#
+            row.names=FALSE)#
+  save(sp, file= file.path(path.dir, 'sp.Rdata'))#
+  save(mat, file= file.path(path.dir, 'sp_array.Rdata'))#
+}#
+#
+make.by.species(spec, long.site.date, site.date)
+## abundance of each species for all site-date combinations#
+make.by.species <- function(spec,#
+                            sr.sched,#
+                            site.date,#
+                            type="PlantGenusSpecies"){#
+  ## number of species at each site-date#
+  all.sp <- aggregate(list(Abund=spec[, type]),#
+                      list(Site=spec$Site,#
+                           Date=spec$Date,#
+                           GenusSpecies=spec[,type]),#
+                      length)#
+  ## all site-date species combinations#
+  sp <- expand.grid(#
+    SiteDate = unique(paste(sr.sched$Site,#
+      sr.sched$Date,#
+      sep=';')),#
+    GenusSpecies=unique(spec[,type]),#
+    Occ=0)#
+  ## fill in the matrix of all combinations#
+  match.dates <- match(paste(all.sp$Site,#
+                       all.sp$Date,#
+                       all.sp$GenusSpecies,#
+                       sep=';'),#
+                 paste(sp$SiteDate,#
+                       sp$GenusSpecies,#
+                       sep=';'))#
+#
+  sp$Occ[!is.na(match.dates)] <- 1#
+  ## create site, date, genus etc. columns#
+  sp$Site <- sapply(strsplit(as.character(sp$SiteDate), ";"),#
+                    function(x) x[1])#
+  sp$Date <- as.Date(sapply(strsplit(as.character(sp$SiteDate), ";"),#
+                            function(x) x[2]))#
+  sp$Genus <- sapply(strsplit(as.character(sp$GenusSpecies), " "),#
+                     function(x) x[1])#
+  sp$Year <- format(sp$Date, '%Y')#
+  sp$SiteStatus <- spec$SiteStatus[match(sp$Site, spec$Site)]#
+  ## drop site-date column#
+  sp <- sp[,-1]#
+#
+  ## make a site by date by species arrary#
+  d <- data.frame(pollinator=spec[,type],#
+                  site=spec$Site,#
+                  date=spec$Date)#
   browser()#
-  mat[x[,"GenusSpecies"], paste(x[,"Site"], x[,"SiteStatusBACI"], sep=":")]#
+  null.mat <- site.date#
+  pollinator.id <- id(d$pollinator)#
+  mats <- make.mats(pollinator.id,#
+                    null.mat,#
+                    pollinator=as.vector(d$pollinator), #
+                    var1=as.vector(d$site),#
+                    var2=d$date)#
+  sites <- rownames(mats[[1]])#
+  dates <- colnames(mats[[1]])#
+  species <- names(mats)#
+  mat <- array(unlist(mats),#
+               dim=c(dim(mats[[1]]),#
+                 length(mats)))#
+  dimnames(mat) <- list(site=sites,#
+                        date=dates,#
+                        species=species)#
+#
+  write.csv(sp, file=file.path(path.dir, 'sp.csv'),#
+            row.names=FALSE)#
+  save(sp, file= file.path(path.dir, 'sp.Rdata'))#
+  save(mat, file= file.path(path.dir, 'sp_array.Rdata'))#
 }#
 #
-spec$occ.date <- apply(spec, 1, findOcc)
+make.by.species(spec, long.site.date, site.date)
+null.mat <- site.date#
+  pollinator.id <- id(d$pollinator)#
+  mats <- make.mats(pollinator.id,#
+                    null.mat,#
+                    pollinator=as.vector(d$pollinator), #
+                    var1=as.vector(d$site),#
+                    var2=d$date)
+site.date
+head(d)
+null.mat <- site.date[rownames(site.date) %in% d$Site]
+head(null.mat)
+rownames(site.date) %in% d$Site
+rownames(site.date)
+d$Site
+null.mat <- site.date[rownames(site.date) %in% d$site]
+null.mat
+null.mat <- site.date[rownames(site.date) %in% d$site,]
+null.mat
+pollinator.id <- id(d$pollinator)#
+  mats <- make.mats(pollinator.id,#
+                    null.mat,#
+                    pollinator=as.vector(d$pollinator), #
+                    var1=as.vector(d$site),#
+                    var2=d$date)
+pollinator.id
+null.mat
+pollinator=as.vector(d$pollinator)
+as.vector(d$pollinator)
+as.vector(d$site)
+head(sp)
+tail9sp
+tail(sp)
+sp
+all(sp$Occ==1)
+1111111

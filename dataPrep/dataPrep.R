@@ -80,14 +80,15 @@ rownames(traits) <- NULL
 
 site.table <- aggregate(list(Samples=spec$Date),
                         list(Year=spec$Year, Site=spec$Site),
-          function(x) length(unique(x)))
+                        function(x) length(unique(x)))
 
+## sampling table for manuscript
 ms.table <- samp2site.spp(site=site.table$Site,
                           spp=site.table$Year,
                           abund=site.table$Samples,
                           FUN=sum)
 ms.table <- cbind(spec$SiteStatus[match(rownames(ms.table),
-                                             spec$Site)], ms.table)
+                                        spec$Site)], ms.table)
 colnames(ms.table) <- c("Site type", colnames(ms.table)[-1])
 
 ms.table <- ms.table[order(ms.table[, "Site type"], decreasing=TRUE),]
@@ -107,27 +108,36 @@ write.table(ms.table, file="~/Dropbox/hedgerow_assembly/ms/tables/samples.txt",
 ## add various traits
 ## specialization
 spec$d <- traits$d[match(spec$GenusSpecies, traits$GenusSpecies)]
-spec$degree <- traits$degree[match(spec$GenusSpecies, traits$GenusSpecies)]
+spec$degree <- traits$degree[match(spec$GenusSpecies,
+                                   traits$GenusSpecies)]
+spec$degree <- traits$plant.degree[match(spec$PlantGenusSpecies,
+                                   traits$GenusSpecies)]
+
 ## occurence
 load('~/Dropbox/hedgerow/data_sets/matrices/net/bee.syr.RData')
-occ <- apply(mat, c(3,1), function(x){
-  sum(x > 0, na.rm=TRUE)/sum(x >= 0, na.rm=TRUE)
-})
 
-
-findOcc <- function(x){
-  out <- try(occ[x["GenusSpecies"], paste(x["Site"], x["SiteStatusBACI"],
-                                          sep=":")], silent=TRUE)
-  if(inherits(out, "try-error")) out <- NA
-  return(out)
-}
-
+occ <- apply(mat, c(3,1), calcOccArray)
 spec$occ.date <- apply(spec, 1, findOcc)
 traits$occ.date <- spec$occ.date[match(traits$GenusSpecies,
                                        spec$GenusSpecies)]
 
-## bee functional traits
 
+## plant occurrence
+## create sample matrix
+site.date <- mat[,,1]
+site.date[site.date > 0] <- 0
+rownames(site.date) <- lapply(strsplit(rownames(site.date),":"),
+                              function(x) x[1])
+long.site.date <- comm.mat2sample(site.date)
+long.site.date <- long.site.date[!is.na(long.site.date$Samp),]
+
+## create site by date matrices with plant presence
+plant.mat <- make.by.species(spec, long.site.date, site.date)
+occ.plant <- apply(plant.mat, c(3,1), calcOccArray)
+## match to dataset!
+spec$occ.plant.date <- apply(spec, 1, findOccPlant)
+
+## bee functional traits
 spec$Lecty <-
   bee.trait$Lecty[match(spec$GenusSpecies, rownames(bee.trait))]
 spec$NestLoc <-
