@@ -1,1434 +1,757 @@
+## standardd#
+install.packages("parallel")#
+#
+## community analysis#
+install.packages("vegan")#
+#
+## networks#
+install.packages("igraph")#
+install.packages("bipartite")#
+install.packages("RColorBrewer")#
+install.packages("sna")#
+#
+## phylogeny#
+install.packages("TreeSim")#
+install.packages("ape")#
+install.packages("picante")#
+install.packages("geiger")#
+#
+## misc#
+install.packages("mvtnorm")#
+install.packages("classInt")#
+install.packages("fields")#
+install.packages("poilog")#
+install.packages("moments")#
+#
+## jags#
+install.packages("rjags")#
+install.packages("R2jags")#
+install.packages("runjags")#
+install.packages("ggmcmc")#
+#
+## spatial#
+install.packages("sp")#
+install.packages("rgdal")#
+install.packages("raster")#
+install.packages("spatstat")#
+install.packages("maptools")#
+install.packages("SDMTools")#
+#
+## models#
+install.packages("lme4")#
+install.packages("RSQLite")#
+install.packages("lmerTest")#
+install.packages("metafor")#
+install.packages("pbkrtest")#
+install.packages("glmmADMB", repos=c("http://glmmadmb.r-forge.r-project.org/repos", getOption("repos")),type="source")#
+## dynamic docs#
+install.packages("knitr")
+2+2+3+2
+(9*16) + 2+7+11+8
+172/16
+(2*16) + (2*16) + 2 +(3*16) + 16 + 7 +16+11+8
+172/16
+3*6
+18/12
 rm(list=ls())#
-setwd("~/Dropbox/nimble-dev/occupancy/spatial")#
+setwd('~/Dropbox/hedgerow_assembly/analysis/speciesLevel')#
 source('src/initialize.R')#
-sp.mod <- nimbleCode({#
-  ## priors#
-  delta ~ dunif(0,10)#
-  sigma ~ dunif(0,10)#
-  psi ~ dunif(0, 1)#
-  p ~ dunif(0, 1)#
-  alpha ~ dnorm(0, 0.001)#
-  b1 ~ dnorm(0, 0.001)#
+load('../../data/networks/all_networks_years.Rdata')#
 #
-  ## Likelihood#
-  ## Ecological model for true occurrence#
-  for (i in 1:N) {#
-    z[i] ~ dbern(psi[i])#
-    logit(psi[i]) <- alpha + b1*elev[i] + rho[i]#
-    p.eff[i] <- z[i] * p#
+## **********************************************************#
+## species importance#
+## **********************************************************#
+## specs <- calcSpec(nets, spec, spec.metric = "d", 0.3)#
+## save(specs, file=file.path(save.path, 'specs.Rdata'))#
 #
-    ## Observation model for replicated detection/nondetection observations#
-    for (j in 1:nreps) {#
-      y[i,j] ~ dbern(p.eff[i])#
-    }#
-  }#
+## linear models#
+load(file=file.path(save.path, 'specs.Rdata'))#
+## SiteStatus or ypr#
+xvar <- "ypr"#
 #
-  rho[1:N] ~ dmnorm(zeros[1:N], cov = D.cov)#
-  ## turn the distance matrix to covariance matrix#
-  D.cov[1:N,1:N] <- (sigma^2)*exp(-delta*D[i,j])#
+## anything outputted by specieslevel#
+ys <- c("proportional.generality", "d", "degree", "betweenness",#
+        "closeness")#
 #
+## formulas <-lapply(ys, function(x) {#
+##   as.formula(paste(x, "~",#
+##                    paste(paste(xvar, "specialization", sep="*"), #
+##                          "(1|Site)",#
+##                           "(1|GenusSpecies)",#
+##                          sep="+")))#
+## })#
+#
+formulas <-lapply(ys, function(x) {#
+  as.formula(paste(x, "~",#
+                   paste(xvar, #
+                         "(1|Site)",#
+                          "(1|GenusSpecies)",#
+                         sep="+")))#
 })#
 #
-input1 <- list(code=sp.mod,#
-               constants=constants,#
-               data=model.data,#
-               inits=inits)#
-sp.mod.opt1 <- compareMCMCs(input1,#
-                            MCMCs=c('nimble'),#
-                            niter=niter,#
-                            burnin = burnin,#
-                            summary=FALSE,#
-                            check=FALSE)
-rm(list=ls())#
-setwd("~/Dropbox/nimble-dev/occupancy/spatial")#
-source('src/initialize.R')#
-sp.mod <- nimbleCode({#
-  ## priors#
-  delta ~ dunif(0,10)#
-  sigma ~ dunif(0,10)#
-  psi ~ dunif(0, 1)#
-  p ~ dunif(0, 1)#
-  alpha ~ dnorm(0, 0.001)#
-  b1 ~ dnorm(0, 0.001)#
-#
-  ## Likelihood#
-  ## Ecological model for true occurrence#
-  for (i in 1:N) {#
-    z[i] ~ dbern(psi[i])#
-    logit(psi[i]) <- alpha + b1*elev[i] + rho[i]#
-    p.eff[i] <- z[i] * p#
-#
-    ## Observation model for replicated detection/nondetection observations#
-    for (j in 1:nreps) {#
-      y[i,j] ~ dbern(p.eff[i])#
-    }#
-  }#
-#
-  rho[1:N] ~ dmnorm(zeros[1:N], cov = D.cov)#
-  ## turn the distance matrix to covariance matrix#
-  D.cov[1:N,1:N] <- (sigma^2)*exp(-delta*D[i,j])#
-#
+mod.pols <- lapply(formulas, function(x){#
+  lmer(x,#
+       data=specs[specs$speciesType == "pollinator",])#
 })#
 #
-input1 <- list(code=sp.mod,#
-               constants=constants,#
-               data=model.data,#
-               inits=inits)#
-sp.mod.opt1 <- compareMCMCs(input1,#
-                            MCMCs=c('nimble'),#
-                            niter=niter,#
-                            burnin = burnin,#
-                            summary=FALSE,#
-                            check=FALSE)
-rm(list=ls())#
-setwd("~/Dropbox/nimble-dev/occupancy/spatial")#
-source('src/initialize.R')#
-sp.mod <- nimbleCode({#
-  ## priors#
-  delta ~ dunif(0,10)#
-  sigma ~ dunif(0,10)#
-  psi ~ dunif(0, 1)#
-  p ~ dunif(0, 1)#
-  alpha ~ dnorm(0, 0.001)#
-  b1 ~ dnorm(0, 0.001)#
+mod.plants <- lapply(formulas, function(x){#
+  lmer(x,#
+       data=specs[specs$speciesType == "plant",])#
+})#
+names(mod.pols) <- names(mod.plants) <- ys#
+lapply(mod.plants, summary)#
+lapply(mod.pols, summary)#
 #
-  ## Likelihood#
-  ## Ecological model for true occurrence#
-  for (i in 1:N) {#
-    z[i] ~ dbern(psi[i])#
-    logit(psi[i]) <- alpha + b1*elev[i] + rho[i]#
-    p.eff[i] <- z[i] * p#
+save(mod.pols, mod.plants, ys, file=file.path(save.path,#
+            sprintf('mods/specs_%s.Rdata', xvar)))#
 #
-    ## Observation model for replicated detection/nondetection observations#
-    for (j in 1:nreps) {#
-      y[i,j] ~ dbern(p.eff[i])#
-    }#
+## **********************************************************#
+## degree distributions (abundance distributions)#
+## **********************************************************#
+#
+baci.sites <- c("Barger", "Butler", "MullerB", "Sperandio", "Hrdy")#
+specs <- specs[specs$Site %in% baci.sites,]#
+#
+layout(matrix(1:6, nrow=2))#
+cols <- rainbow(length(unique(specs$ypr)))#
+lapply(unique(specs$Site), function(x){#
+  print(x)#
+  this.specs <- specs[specs$Site == x, c("degree", "ypr")]#
+  plot(NA, ylim=c(0,0.8), xlim=c(0,25),#
+       ylab="Frequency",#
+       xlab="Abundance",#
+       main=x)#
+  for(i in 1:length(unique(this.specs$ypr))){#
+    this.ypr <- unique(this.specs$ypr)[i]#
+    print(this.ypr)#
+    points(density(this.specs$degree[this.specs$ypr == this.ypr]),#
+           col=cols[i], type="l", lwd=2)#
   }#
-#
-  rho[1:N] ~ dmnorm(zeros[1:N], cov = D.cov)#
-  ## turn the distance matrix to covariance matrix#
-  D.cov[1:N,1:N] <- (sigma^2)*exp(-delta*D[i,j])#
-#
 })#
 #
-input1 <- list(code=sp.mod,#
-               constants=constants,#
-               data=model.data,#
-               inits=inits)#
-sp.mod.opt1 <- compareMCMCs(input1,#
-                            MCMCs=c('nimble'),#
-                            niter=niter,#
-                            burnin = burnin,#
-                            summary=FALSE,#
-                            check=FALSE)
+plot(NA, ylim=c(0,1), xlim=c(0,1), xaxt="n", yaxt="n", ylab="", xlab="")#
+legend("center", col=cols, lwd="2",#
+       legend=sort(unique(specs$ypr)),#
+       bty="n")
+source('plotting/src/predictIntervals.R')#
+source('plotting/src/CIplotting.R')#
+source('plotting/src/plotPanels.R')#
+load(file='saved/corMets.Rdata')#
+#
+dd <- expand.grid(ypr=seq(from= min(cor.dats$ypr, na.rm=TRUE),#
+                          to= max(cor.dats$ypr, na.rm=TRUE),#
+                          length=10))#
+#
+## ************************************************************#
+## nodf#
+## ************************************************************#
+load(file='saved/mods/baci_nodf.Rdata')#
+#
+dd.nodf <- cbind(dd, zNODF=0)#
+#
+nodf.pi <- predict.int(mod= baci.nodf.mod,#
+                        dd=dd.nodf,#
+                        y="zNODF",#
+                        family="gaussian")#
+#
+## plot.predict.ypr(new.dd=nodf.pi,#
+##                  ylabel="Nestedness",#
+##                  dats=cor.dats,#
+##                  y1="zNODF")#
+#
+## ************************************************************#
+## modularity#
+## ************************************************************#
+load(file='saved/mods/baci_mod.Rdata')#
+#
+dd.mod <- cbind(dd, zmod.met.D=0)#
+#
+mod.pi <- predict.int(mod= baci.mod.mod,#
+                        dd=dd.mod,#
+                        y="zmod.met.D",#
+                        family="gaussian")#
+#
+## plot.predict.ypr(new.dd=mod.pi,#
+##                  ylabel="Modularity",#
+##                  dats=cor.dats,#
+##                  y1="zmodD")#
+#
+## ************************************************************#
+## specialization#
+## ************************************************************#
+load(file='saved/mods/baci_h2.Rdata')#
+#
+dd.h2 <- cbind(dd, H2=0)#
+#
+h2.pi <- predict.int(mod= baci.h2.mod,#
+                        dd=dd.h2,#
+                        y="H2",#
+                        family="gaussian")#
+#
+## plot.predict.ypr(new.dd=h2.pi,#
+##                  ylabel="Specialization",#
+##                  dats=cor.dats,#
+##                  y1="zH2")#
+## ************************************************************#
+## connectance#
+## ************************************************************#
+load(file='saved/mods/baci_conn.Rdata')#
+#
+dd.conn <- cbind(dd, connectance=0)#
+#
+conn.pi <- predict.int(mod= baci.conn.mod,#
+                        dd=dd.conn,#
+                        y="connectance",#
+                        family="gaussian")#
+#
+## ************************************************************#
+## plotting#
+## ************************************************************#
+plot.panels()
+library(RColorBrewer)#
+source('plotting/src/predictIntervals.R')#
+source('plotting/src/CIplotting.R')#
+source('plotting/src/plotPanels.R')#
+load(file="saved/spec.Rdata")#
+#
+lapply(metrics, plotSpecs,#
+       diff.spec = diff.spec[diff.spec$speciesType ==#
+                                      "pollinator",],#
+       type="pol",#
+       path.f="figures/specialization")#
+lapply(metrics, plotSpecs,#
+       diff.spec = diff.spec[diff.spec$speciesType ==#
+                                      "plant",],#
+       type="plant",#
+       path.f="figures/specialization")
 rm(list=ls())#
-setwd("~/Dropbox/nimble-dev/occupancy/spatial")#
+setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
 source('src/initialize.R')#
-sp.mod <- nimbleCode({#
-  ## priors#
-  delta ~ dunif(0,10)#
-  sigma ~ dunif(0,10)#
-  psi ~ dunif(0, 1)#
-  p ~ dunif(0, 1)#
-  alpha ~ dnorm(0, 0.001)#
-  b1 ~ dnorm(0, 0.001)#
+source('src/phyloIntBeta.R')#
 #
-  ## Likelihood#
-  ## Ecological model for true occurrence#
-  for (i in 1:N) {#
-    z[i] ~ dbern(psi[i])#
-    logit(psi[i]) <- alpha + b1*elev[i] + rho[i]#
-    p.eff[i] <- z[i] * p#
+## ************************************************************#
+## prepare link community in terminal#
+## ************************************************************#
+edges.com <- cbind(as.character(spec$GenusSpecies),#
+                  as.character(spec$PlantGenusSpecies))#
 #
-    ## Observation model for replicated detection/nondetection observations#
-    for (j in 1:nreps) {#
-      y[i,j] ~ dbern(p.eff[i])#
-    }#
-  }#
+## lc <- getLinkCommunities(edges.com, hcmethod = "average",#
+##                          bipartite=TRUE)#
+## save(lc, file="saved/lc.Rdata")#
 #
-  rho[1:N] ~ dmnorm(zeros[1:N], cov = D.cov)#
-  ## turn the distance matrix to covariance matrix#
-  D.cov[1:N,1:N] <- (sigma^2)*exp(-delta*D[i,j])#
+## ************************************************************#
+## turnover of phylo interactions through time#
+## ************************************************************#
+load(file="saved/lc.Rdata")#
+spec$Int <- paste(spec$GenusSpecies,#
+                  spec$PlantGenusSpecies)#
+phylo.int <- calcCommDis(spec, "Int", lc, abund.w=TRUE)#
+save(phylo.int, file="saved/phyloInt.Rdata")#
 #
-})#
+## linear model of phylo int by years between samples#
+load(file="saved/phyloInt.Rdata")#
+phylo.int.mod <- lmer(PhyloInt ~ Dist*SiteStatus +#
+                      (1|Site),#
+                      data=phylo.int$phylo.int)#
 #
-input1 <- list(code=sp.mod,#
-               constants=constants,#
-               data=model.data,#
-               inits=inits)#
-sp.mod.opt1 <- compareMCMCs(input1,#
-                            MCMCs=c('nimble'),#
-                            niter=niter,#
-                            burnin = burnin,#
-                            summary=FALSE,#
-                            check=FALSE)
+plot.box(ylabel="Node turnover",#
+                 dats=phylo.int$phylo.int,#
+                 y1="PhyloInt")#
+#
+## interaction lifespans#
+int.lives <- lapply(phylo.int$comm, function(x) sort(colSums(x)))#
+#
+plot(NA, ylim=c(0,1), xlim=c(0,100))#
+lapply(int.lives, function(x) points(density(x), type='l'))#
+## ## ************************************************************#
+## dengrogram based on shared plant interactions#
+## ************************************************************#
+#
+## pols <- cbind(spec$GenusSpecies, spec$PlantGenusSpecies)#
+## ## unique rows (interactions)#
+## pols <- as.data.frame(unique(pols, MARGIN=1))#
+## colnames(pols) <- c('GenusSpecies', 'PlantGenusSpecies')#
+#
+## clust <- calcDendDis(pols, c('GenusSpecies', 'PlantGenusSpecies'))#
+## phylo.int.mod <- lmer(PhyloInt ~ Dist*SiteStatus +#
+##                       (1|Site),#
+##                       data=phylo.int$phylo.int)#
+#
+## dd.phylo <- expand.grid(Dist=seq(#
+##                           from= min(phylo.int$phylo.int$Dist),#
+##                           to= max(phylo.int$phylo.int$Dist),#
+##                           length=10),#
+##                         SiteStatus=c("control", "maturing", "mature"),#
+##                         PhyloInt = 0)#
+#
+## phylo.pi <- predict.int(mod= phylo.int.mod,#
+##                         dd=dd.phylo,#
+##                         y="PhyloInt")#
+#
+## plot.predict(new.dd=phylo.pi,#
+##                  ylabel="Node turnover",#
+##                  dats=phylo.int$phylo.int,#
+##                  y1="PhyloInt",#
+##                  legend.loc="bottomright")
 rm(list=ls())#
-setwd("~/Dropbox/nimble-dev/occupancy/spatial")#
+setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
 source('src/initialize.R')#
-sp.mod <- nimbleCode({#
-  ## priors#
-  delta ~ dunif(0,10)#
-  sigma ~ dunif(0,10)#
-  psi ~ dunif(0, 1)#
-  p ~ dunif(0, 1)#
-  alpha ~ dnorm(0, 0.001)#
-  b1 ~ dnorm(0, 0.001)#
+source('src/phyloIntBeta.R')#
 #
-  ## Likelihood#
-  ## Ecological model for true occurrence#
-  for (i in 1:N) {#
-    z[i] ~ dbern(psi[i])#
-    logit(psi[i]) <- alpha + b1*elev[i] + rho[i]#
-    p.eff[i] <- z[i] * p#
+## ************************************************************#
+## prepare link community in terminal#
+## ************************************************************#
+edges.com <- cbind(as.character(spec$GenusSpecies),#
+                  as.character(spec$PlantGenusSpecies))#
 #
-    ## Observation model for replicated detection/nondetection observations#
-    for (j in 1:nreps) {#
-      y[i,j] ~ dbern(p.eff[i])#
-    }#
-  }#
+## lc <- getLinkCommunities(edges.com, hcmethod = "average",#
+##                          bipartite=TRUE)#
+## save(lc, file="saved/lc.Rdata")#
 #
-  rho[1:N] ~ dmnorm(zeros[1:N], cov = D.cov) #
-  ## derived quantities#
-  ## turning the distance matrix to covariance matrix#
-  D.cov[1:N, 1:N] <- (sigma^2)*exp(-delta*D[1:N, 1:N])#
-})#
+## ************************************************************#
+## turnover of phylo interactions through time#
+## ************************************************************#
+load(file="saved/lc.Rdata")#
+spec$Int <- paste(spec$GenusSpecies,#
+                  spec$PlantGenusSpecies)#
+phylo.int <- calcCommDis(spec, "Int", lc, abund.w=TRUE)#
+save(phylo.int, file="saved/phyloInt.Rdata")#
 #
-input1 <- list(code=sp.mod,#
-               constants=constants,#
-               data=model.data,#
-               inits=inits)#
-sp.mod.opt1 <- compareMCMCs(input1,#
-                            MCMCs=c('nimble'),#
-                            niter=niter,#
-                            burnin = burnin,#
-                            summary=FALSE,#
-                            check=FALSE)#
+## linear model of phylo int by years between samples#
+load(file="saved/phyloInt.Rdata")#
+phylo.int.mod <- lmer(PhyloInt ~ Dist*SiteStatus +#
+                      (1|Site),#
+                      data=phylo.int$phylo.int)#
 #
-save(sp.mod.opt1, file="saved/opt1.Rdata")#
+plot.box(ylabel="Node turnover",#
+                 dats=phylo.int$phylo.int,#
+                 y1="PhyloInt")#
 #
-checkChains(sp.mod.opt1[[1]]$samples,#
-            f.path = "figures/chains/%s.pdf")
+## interaction lifespans#
+int.lives <- lapply(phylo.int$comm, function(x) sort(colSums(x)))#
+#
+plot(NA, ylim=c(0,1), xlim=c(0,100))#
+lapply(int.lives, function(x) points(density(x), type='l'))#
+## ## ************************************************************#
+## dengrogram based on shared plant interactions#
+## ************************************************************#
+#
+## pols <- cbind(spec$GenusSpecies, spec$PlantGenusSpecies)#
+## ## unique rows (interactions)#
+## pols <- as.data.frame(unique(pols, MARGIN=1))#
+## colnames(pols) <- c('GenusSpecies', 'PlantGenusSpecies')#
+#
+## clust <- calcDendDis(pols, c('GenusSpecies', 'PlantGenusSpecies'))#
+## phylo.int.mod <- lmer(PhyloInt ~ Dist*SiteStatus +#
+##                       (1|Site),#
+##                       data=phylo.int$phylo.int)#
+#
+## dd.phylo <- expand.grid(Dist=seq(#
+##                           from= min(phylo.int$phylo.int$Dist),#
+##                           to= max(phylo.int$phylo.int$Dist),#
+##                           length=10),#
+##                         SiteStatus=c("control", "maturing", "mature"),#
+##                         PhyloInt = 0)#
+#
+## phylo.pi <- predict.int(mod= phylo.int.mod,#
+##                         dd=dd.phylo,#
+##                         y="PhyloInt")#
+#
+## plot.predict(new.dd=phylo.pi,#
+##                  ylabel="Node turnover",#
+##                  dats=phylo.int$phylo.int,#
+##                  y1="PhyloInt",#
+##                  legend.loc="bottomright")
+install.package("linkcomm")
+install.packages("linkcomm")
+29
 rm(list=ls())#
-setwd("~/Dropbox/nimble-dev/occupancy/spatial")#
+setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
 source('src/initialize.R')#
-sp.mod <- nimbleCode({#
-  ## priors#
-  delta ~ dunif(0,10)#
-  sigma ~ dunif(0,10)#
-  psi ~ dunif(0, 1)#
-  p ~ dunif(0, 1)#
-  alpha ~ dnorm(0, 0.001)#
-  b1 ~ dnorm(0, 0.001)#
+source('src/phyloIntBeta.R')#
 #
-  ## Likelihood#
-  ## Ecological model for true occurrence#
-  for (i in 1:N) {#
-    z[i] ~ dbern(psi[i])#
-    logit(psi[i]) <- alpha + b1*elev[i] + rho[i]#
-    p.eff[i] <- z[i] * p#
+## ************************************************************#
+## prepare link community in terminal#
+## ************************************************************#
+edges.com <- cbind(as.character(spec$GenusSpecies),#
+                  as.character(spec$PlantGenusSpecies))#
 #
-    ## Observation model for replicated detection/nondetection observations#
-    for (j in 1:nreps) {#
-      y[i,j] ~ dbern(p.eff[i])#
-    }#
-  }#
+## lc <- getLinkCommunities(edges.com, hcmethod = "average",#
+##                          bipartite=TRUE)#
+## save(lc, file="saved/lc.Rdata")#
 #
-  rho[1:N] ~ dmnorm(zeros[1:N], cov = D.cov[1:N, 1:N]) #
-  ## derived quantities#
-  ## turning the distance matrix to covariance matrix#
-  D.cov[1:N, 1:N] <- (sigma^2)*exp(-delta*D[1:N, 1:N])#
-})#
+## ************************************************************#
+## turnover of phylo interactions through time#
+## ************************************************************#
+load(file="saved/lc.Rdata")#
+spec$Int <- paste(spec$GenusSpecies,#
+                  spec$PlantGenusSpecies)#
+phylo.int <- calcCommDis(spec, "Int", lc, abund.w=TRUE)#
+save(phylo.int, file="saved/phyloInt.Rdata")#
 #
-input1 <- list(code=sp.mod,#
-               constants=constants,#
-               data=model.data,#
-               inits=inits)#
-sp.mod.opt1 <- compareMCMCs(input1,#
-                            MCMCs=c('nimble'),#
-                            niter=niter,#
-                            burnin = burnin,#
-                            summary=FALSE,#
-                            check=FALSE)#
+## linear model of phylo int by years between samples#
+load(file="saved/phyloInt.Rdata")#
+phylo.int.mod <- lmer(PhyloInt ~ Dist*SiteStatus +#
+                      (1|Site),#
+                      data=phylo.int$phylo.int)#
 #
-save(sp.mod.opt1, file="saved/opt1.Rdata")#
+plot.box(ylabel="Node turnover",#
+                 dats=phylo.int$phylo.int,#
+                 y1="PhyloInt")#
 #
-checkChains(sp.mod.opt1[[1]]$samples,#
-            f.path = "figures/chains/%s.pdf")
+## interaction lifespans#
+int.lives <- lapply(phylo.int$comm, function(x) sort(colSums(x)))#
+#
+plot(NA, ylim=c(0,1), xlim=c(0,100))#
+lapply(int.lives, function(x) points(density(x), type='l'))#
+## ## ************************************************************#
+## dengrogram based on shared plant interactions#
+## ************************************************************#
+#
+## pols <- cbind(spec$GenusSpecies, spec$PlantGenusSpecies)#
+## ## unique rows (interactions)#
+## pols <- as.data.frame(unique(pols, MARGIN=1))#
+## colnames(pols) <- c('GenusSpecies', 'PlantGenusSpecies')#
+#
+## clust <- calcDendDis(pols, c('GenusSpecies', 'PlantGenusSpecies'))#
+## phylo.int.mod <- lmer(PhyloInt ~ Dist*SiteStatus +#
+##                       (1|Site),#
+##                       data=phylo.int$phylo.int)#
+#
+## dd.phylo <- expand.grid(Dist=seq(#
+##                           from= min(phylo.int$phylo.int$Dist),#
+##                           to= max(phylo.int$phylo.int$Dist),#
+##                           length=10),#
+##                         SiteStatus=c("control", "maturing", "mature"),#
+##                         PhyloInt = 0)#
+#
+## phylo.pi <- predict.int(mod= phylo.int.mod,#
+##                         dd=dd.phylo,#
+##                         y="PhyloInt")#
+#
+## plot.predict(new.dd=phylo.pi,#
+##                  ylabel="Node turnover",#
+##                  dats=phylo.int$phylo.int,#
+##                  y1="PhyloInt",#
+##                  legend.loc="bottomright")
 rm(list=ls())#
-setwd("~/Dropbox/nimble-dev/occupancy/spatial")#
+setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
 source('src/initialize.R')#
-sp.mod <- nimbleCode({#
-  ## priors#
-  delta ~ dunif(0,10)#
-  sigma ~ dunif(0,10)#
-  psi ~ dunif(0, 1)#
-  p ~ dunif(0, 1)#
-  alpha ~ dnorm(0, 0.001)#
-  b1 ~ dnorm(0, 0.001)#
+source('src/phyloIntBeta.R')#
 #
-  ## Likelihood#
-  ## Ecological model for true occurrence#
-  for (i in 1:N) {#
-    z[i] ~ dbern(psi[i])#
-    logit(psi[i]) <- alpha + b1*elev[i] + rho[i]#
-    p.eff[i] <- z[i] * p#
+## ************************************************************#
+## prepare link community in terminal#
+## ************************************************************#
+edges.com <- cbind(as.character(spec$GenusSpecies),#
+                  as.character(spec$PlantGenusSpecies))#
 #
-    ## Observation model for replicated detection/nondetection observations#
-    for (j in 1:nreps) {#
-      y[i,j] ~ dbern(p.eff[i])#
-    }#
-  }#
+## lc <- getLinkCommunities(edges.com, hcmethod = "average",#
+##                          bipartite=TRUE)#
+## save(lc, file="saved/lc.Rdata")#
 #
-  rho[1:N] ~ dmnorm(zeros[1:N], cov = D.cov[1:N, 1:N]) #
-  ## derived quantities#
-  ## turning the distance matrix to covariance matrix#
-  D.cov[1:N, 1:N] <- (sigma^2)*exp(-delta*D[1:N, 1:N])#
-})#
+## ************************************************************#
+## turnover of phylo interactions through time#
+## ************************************************************#
+load(file="saved/lc.Rdata")#
+spec$Int <- paste(spec$GenusSpecies,#
+                  spec$PlantGenusSpecies)#
+phylo.int <- calcCommDis(spec, "Int", lc, abund.w=TRUE)#
+save(phylo.int, file="saved/phyloInt.Rdata")#
 #
-input1 <- list(code=sp.mod,#
-               constants=constants,#
-               data=model.data,#
-               inits=inits)#
-sp.mod.opt1 <- compareMCMCs(input1,#
-                            MCMCs=c('nimble'),#
-                            niter=niter,#
-                            burnin = burnin,#
-                            summary=FALSE,#
-                            check=FALSE)#
+## linear model of phylo int by years between samples#
+load(file="saved/phyloInt.Rdata")#
+phylo.int.mod <- lmer(PhyloInt ~ Dist*SiteStatus +#
+                      (1|Site),#
+                      data=phylo.int$phylo.int)#
 #
-save(sp.mod.opt1, file="saved/opt1.Rdata")#
+plot.box(ylabel="Node turnover",#
+                 dats=phylo.int$phylo.int,#
+                 y1="PhyloInt")#
 #
-checkChains(sp.mod.opt1[[1]]$samples,#
-            f.path = "figures/chains/%s.pdf")
+## interaction lifespans#
+int.lives <- lapply(phylo.int$comm, function(x) sort(colSums(x)))#
+#
+plot(NA, ylim=c(0,1), xlim=c(0,100))#
+lapply(int.lives, function(x) points(density(x), type='l'))#
+## ## ************************************************************#
+## dengrogram based on shared plant interactions#
+## ************************************************************#
+#
+## pols <- cbind(spec$GenusSpecies, spec$PlantGenusSpecies)#
+## ## unique rows (interactions)#
+## pols <- as.data.frame(unique(pols, MARGIN=1))#
+## colnames(pols) <- c('GenusSpecies', 'PlantGenusSpecies')#
+#
+## clust <- calcDendDis(pols, c('GenusSpecies', 'PlantGenusSpecies'))#
+## phylo.int.mod <- lmer(PhyloInt ~ Dist*SiteStatus +#
+##                       (1|Site),#
+##                       data=phylo.int$phylo.int)#
+#
+## dd.phylo <- expand.grid(Dist=seq(#
+##                           from= min(phylo.int$phylo.int$Dist),#
+##                           to= max(phylo.int$phylo.int$Dist),#
+##                           length=10),#
+##                         SiteStatus=c("control", "maturing", "mature"),#
+##                         PhyloInt = 0)#
+#
+## phylo.pi <- predict.int(mod= phylo.int.mod,#
+##                         dd=dd.phylo,#
+##                         y="PhyloInt")#
+#
+## plot.predict(new.dd=phylo.pi,#
+##                  ylabel="Node turnover",#
+##                  dats=phylo.int$phylo.int,#
+##                  y1="PhyloInt",#
+##                  legend.loc="bottomright")
 rm(list=ls())#
-setwd("~/Dropbox/nimble-dev/occupancy/spatial")#
+setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
 source('src/initialize.R')#
-sp.mod <- nimbleCode({#
-  ## priors#
-  delta ~ dunif(0,10)#
-  sigma ~ dunif(0,10)#
-  psi ~ dunif(0, 1)#
-  p ~ dunif(0, 1)#
-  alpha ~ dnorm(0, 0.001)#
-  b1 ~ dnorm(0, 0.001)#
+source('src/phyloIntBeta.R')#
 #
-  ## Likelihood#
-  ## Ecological model for true occurrence#
-  for (i in 1:N) {#
-    z[i] ~ dbern(psi[i])#
-    logit(psi[i]) <- alpha + b1*elev[i] + rho[i]#
-    p.eff[i] <- z[i] * p#
+## ************************************************************#
+## prepare link community in terminal#
+## ************************************************************#
+edges.com <- cbind(as.character(spec$GenusSpecies),#
+                  as.character(spec$PlantGenusSpecies))#
 #
-    ## Observation model for replicated detection/nondetection observations#
-    for (j in 1:nreps) {#
-      y[i,j] ~ dbern(p.eff[i])#
-    }#
-  }#
+## lc <- getLinkCommunities(edges.com, hcmethod = "average",#
+##                          bipartite=TRUE)#
+## save(lc, file="saved/lc.Rdata")#
 #
-  rho[1:N] ~ dmnorm(zeros[1:N], cov = D.cov[1:N, 1:N]) #
-  ## derived quantities#
-  ## turning the distance matrix to covariance matrix#
-  D.cov[1:N, 1:N] <- (sigma^2)*exp(-delta*D[1:N, 1:N])#
-})#
+## ************************************************************#
+## turnover of phylo interactions through time#
+## ************************************************************#
+load(file="saved/lc.Rdata")#
+spec$Int <- paste(spec$GenusSpecies,#
+                  spec$PlantGenusSpecies)#
+phylo.int <- calcCommDis(spec, "Int", lc, abund.w=TRUE)#
+save(phylo.int, file="saved/phyloInt.Rdata")#
 #
-input1 <- list(code=sp.mod,#
-               constants=constants,#
-               data=model.data,#
-               inits=inits)#
-sp.mod.opt1 <- compareMCMCs(input1,#
-                            MCMCs=c('nimble'),#
-                            niter=niter,#
-                            burnin = burnin,#
-                            summary=FALSE,#
-                            check=FALSE)#
+## linear model of phylo int by years between samples#
+load(file="saved/phyloInt.Rdata")#
+phylo.int.mod <- lmer(PhyloInt ~ Dist*SiteStatus +#
+                      (1|Site),#
+                      data=phylo.int$phylo.int)#
 #
-save(sp.mod.opt1, file="saved/opt1.Rdata")#
+plot.box(ylabel="Node turnover",#
+                 dats=phylo.int$phylo.int,#
+                 y1="PhyloInt")#
 #
-checkChains(sp.mod.opt1[[1]]$samples,#
-            f.path = "figures/chains/%s.pdf")
+## interaction lifespans#
+int.lives <- lapply(phylo.int$comm, function(x) sort(colSums(x)))#
+#
+plot(NA, ylim=c(0,1), xlim=c(0,100))#
+lapply(int.lives, function(x) points(density(x), type='l'))#
+## ## ************************************************************#
+## dengrogram based on shared plant interactions#
+## ************************************************************#
+#
+## pols <- cbind(spec$GenusSpecies, spec$PlantGenusSpecies)#
+## ## unique rows (interactions)#
+## pols <- as.data.frame(unique(pols, MARGIN=1))#
+## colnames(pols) <- c('GenusSpecies', 'PlantGenusSpecies')#
+#
+## clust <- calcDendDis(pols, c('GenusSpecies', 'PlantGenusSpecies'))#
+## phylo.int.mod <- lmer(PhyloInt ~ Dist*SiteStatus +#
+##                       (1|Site),#
+##                       data=phylo.int$phylo.int)#
+#
+## dd.phylo <- expand.grid(Dist=seq(#
+##                           from= min(phylo.int$phylo.int$Dist),#
+##                           to= max(phylo.int$phylo.int$Dist),#
+##                           length=10),#
+##                         SiteStatus=c("control", "maturing", "mature"),#
+##                         PhyloInt = 0)#
+#
+## phylo.pi <- predict.int(mod= phylo.int.mod,#
+##                         dd=dd.phylo,#
+##                         y="PhyloInt")#
+#
+## plot.predict(new.dd=phylo.pi,#
+##                  ylabel="Node turnover",#
+##                  dats=phylo.int$phylo.int,#
+##                  y1="PhyloInt",#
+##                  legend.loc="bottomright")
 rm(list=ls())#
-setwd("~/Dropbox/nimble-dev/occupancy/spatial")#
+setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
 source('src/initialize.R')#
-sp.mod <- nimbleCode({#
-  ## priors#
-  delta ~ dunif(0,10)#
-  sigma ~ dunif(0,10)#
-  psi ~ dunif(0, 1)#
-  p ~ dunif(0, 1)#
-  alpha ~ dnorm(0, 0.001)#
-  b1 ~ dnorm(0, 0.001)#
+source('src/phyloIntBeta.R')#
 #
-  ## Likelihood#
-  ## Ecological model for true occurrence#
-  for (i in 1:N) {#
-    z[i] ~ dbern(psi[i])#
-    logit(psi[i]) <- alpha + b1*elev[i] + rho[i]#
-    p.eff[i] <- z[i] * p#
+## ************************************************************#
+## prepare link community in terminal#
+## ************************************************************#
+edges.com <- cbind(as.character(spec$GenusSpecies),#
+                  as.character(spec$PlantGenusSpecies))#
 #
-    ## Observation model for replicated detection/nondetection observations#
-    for (j in 1:nreps) {#
-      y[i,j] ~ dbern(p.eff[i])#
-    }#
+## lc <- getLinkCommunities(edges.com, hcmethod = "average",#
+##                          bipartite=TRUE)#
+## save(lc, file="saved/lc.Rdata")#
+#
+## ************************************************************#
+## turnover of phylo interactions through time#
+## ************************************************************#
+load(file="saved/lc.Rdata")#
+spec$Int <- paste(spec$GenusSpecies,#
+                  spec$PlantGenusSpecies)#
+phylo.int <- calcCommDis(spec, "Int", lc, abund.w=TRUE)#
+save(phylo.int, file="saved/phyloInt.Rdata")#
+#
+## linear model of phylo int by years between samples#
+load(file="saved/phyloInt.Rdata")#
+phylo.int.mod <- lmer(PhyloInt ~ Dist*SiteStatus +#
+                      (1|Site),#
+                      data=phylo.int$phylo.int)#
+#
+plot.box(ylabel="Node turnover",#
+                 dats=phylo.int$phylo.int,#
+                 y1="PhyloInt")#
+#
+## interaction lifespans#
+int.lives <- lapply(phylo.int$comm, function(x) sort(colSums(x)))#
+#
+plot(NA, ylim=c(0,1), xlim=c(0,100))#
+lapply(int.lives, function(x) points(density(x), type='l'))#
+## ## ************************************************************#
+## dengrogram based on shared plant interactions#
+## ************************************************************#
+#
+## pols <- cbind(spec$GenusSpecies, spec$PlantGenusSpecies)#
+## ## unique rows (interactions)#
+## pols <- as.data.frame(unique(pols, MARGIN=1))#
+## colnames(pols) <- c('GenusSpecies', 'PlantGenusSpecies')#
+#
+## clust <- calcDendDis(pols, c('GenusSpecies', 'PlantGenusSpecies'))#
+## phylo.int.mod <- lmer(PhyloInt ~ Dist*SiteStatus +#
+##                       (1|Site),#
+##                       data=phylo.int$phylo.int)#
+#
+## dd.phylo <- expand.grid(Dist=seq(#
+##                           from= min(phylo.int$phylo.int$Dist),#
+##                           to= max(phylo.int$phylo.int$Dist),#
+##                           length=10),#
+##                         SiteStatus=c("control", "maturing", "mature"),#
+##                         PhyloInt = 0)#
+#
+## phylo.pi <- predict.int(mod= phylo.int.mod,#
+##                         dd=dd.phylo,#
+##                         y="PhyloInt")#
+#
+## plot.predict(new.dd=phylo.pi,#
+##                  ylabel="Node turnover",#
+##                  dats=phylo.int$phylo.int,#
+##                  y1="PhyloInt",#
+##                  legend.loc="bottomright")
+## phylo-beta of interactions#
+## takes raw specimen data (spec.dat), the , #
+calcCommDis <- function(spec.dat, type, lc, abund.w=TRUE){#
+  ## prep community of sites and interactions#
+  prep.comm <- aggregate(spec.dat[, type],#
+                         list(site=spec.dat$Site,#
+                              year=spec.dat$Year,#
+                              status=spec.dat$SiteStatus,#
+                              sp=spec.dat[, type]),#
+                         length)#
+  ## split by status then by site#
+  bystatus <- split(prep.comm, prep.comm$status)#
+  bysite1 <- lapply(bystatus, function(x){split(x, x$site)})#
+  bysite <- unlist(bysite1, recursive=FALSE)#
+  ## create a site by interaction community#
+  comm <- lapply(bysite, function(y) {#
+    samp2site.spp(y$year, y$sp, y$x)#
+  })#
+  ## drop sites that were only samples one year#
+  comm <- comm[lapply(comm,nrow) > 1]#
+  ## calculate the number of years between sampling times#
+  years <- lapply(comm, rownames)#
+  dist.time <- as.matrix(dist(unique(spec.dat$Year), diag=TRUE))#
+  rownames(dist.time) <- colnames(dist.time) <- unique(spec.dat$Year) #
+  dists.yrs <- lapply(years, function(x){dist.time[x,x]})#
+  c.dist <- lapply(dists.yrs, function(x)#
+                   {as.matrix(x)[lower.tri(x)]})#
+  ## rename the species as node numbers in preparation for using#
+  ## comdist using the dendrogram as distances#
+  node.num <- cbind(lc$hclust$labels, paste(lc$edgelist[,1],#
+                                            lc$edgelist[,2]))#
+  node.order <- lapply(comm, function(x){#
+    node.num[,1][match(colnames(x), node.num[,2])]#
+  })#
+  assignCols <- function(a,b){#
+    colnames(a) <- b#
+    return(a)#
   }#
+  comm.int <- mapply(function(a, b)#
+                     assignCols(a,b),#
+                     a=comm,#
+                     b=node.order)#
+  dist.tree <- cophenetic(lc$hclust)#
+  ## calculate the dissimilarity between years based on the dengrogram#
+  comm.dis <- lapply(comm.int, comdist,#
+                     dis=dist.tree,#
+                     abundance.weighted= abund.w)#
 #
-  rho[1:N] ~ dmnorm(zeros[1:N], cov = D.cov[1:N, 1:N]) #
-  ## derived quantities#
-  ## turning the distance matrix to covariance matrix#
-  D.cov[1:N, 1:N] <- (sigma^2)*exp(-delta*D[1:N, 1:N])#
-})#
-#
-input1 <- list(code=sp.mod,#
-               constants=constants,#
-               data=model.data,#
-               inits=inits)#
-sp.mod.opt1 <- compareMCMCs(input1,#
-                            MCMCs=c('nimble'),#
-                            niter=niter,#
-                            burnin = burnin,#
-                            summary=FALSE,#
-                            check=FALSE)#
-#
-save(sp.mod.opt1, file="saved/opt1.Rdata")#
-#
-checkChains(sp.mod.opt1[[1]]$samples,#
-            f.path = "figures/chains/%s.pdf")
-set.seed(100)#
-# Define function to draw random samples from a multivariate normal#
-# distribution#
-rmvn <- function(n, mu = 0, V = matrix(1)) {#
-    p <- length(mu)#
-    if (any(is.na(match(dim(V), p)))) #
-        stop("Dimension problem!")#
-    D <- chol(V)#
-    t(matrix(rnorm(n * p), ncol = p) %*% D + rep(mu, rep(n, p)))#
+  ## return a dataframe #
+  c.comm <- lapply(comm.dis, function(x)#
+                   {as.matrix(x)[lower.tri(x)]})#
+  site <- sapply(strsplit(names(comm.dis), "\\."),#
+                 function(x) x[2])#
+  sites <- rep(site, sapply(c.comm, length))#
+  out <- as.data.frame(cbind(PhyloInt=unlist(c.comm),#
+                             Dist= unlist(c.dist)))#
+  out$SiteStatus <- as.factor(sapply(strsplit(rownames(out), "\\."),#
+                                 function(x) x[1]))#
+  out$SiteStatus <- factor(out$SiteStatus,#
+                           levels=c("control", "maturing", "mature")) #
+  out$Site <- as.factor(sites)#
+  rownames(out) <- NULL #
+  return(list(phylo.int = out,#
+              dist.tree=dist.tree,#
+              comm=comm))#
 }#
+calcDendDis <- function(spec.dat, type){#
+  prep.comm <- aggregate(spec.dat[, type[1]],#
+                         list(sp=spec.dat[, type[1]],#
+                              sp2= spec.dat[, type[2]]), length)#
+  comm <- samp2site.spp(prep.comm$sp, prep.comm$sp2, prep.comm$x)#
+  comm.dis <- vegdist(comm, "chao", diag= TRUE)#
+  dengram <- hclust(comm.dis, method="average")#
 #
-# Set up a square lattice region#
-simgrid <- expand.grid(1:50, 1:50)#
-n <- nrow(simgrid)#
-#
-# Set up distance matrix#
-distance <- as.matrix(dist(simgrid))#
-# Generate random variable#
-delta <- 0.05#
-X <- rmvn(1, rep(0, n), exp(-delta * distance))#
-#
-# Visualize results#
-Xraster <- rasterFromXYZ(cbind(simgrid[, 1:2] - 0.5, X))#
-par(mfrow = c(1, 2))#
-plot(1:100, exp(-delta * 1:100), type = "l", xlab = "Distance", ylab = "Correlation")#
-plot(Xraster)
-elev <- raster(matrix(rnorm(n), 50, 50), xmn = 0, xmx = 50, ymn = 0, ymx = 50)#
-#
-plot(elev, main = "Elevation")
-# Define coefficients of the abundance-elevation regression#
-beta0 <- 0.1#
-beta1 <- 2#
-beta2 <- -2#
-#
-# Abundance as a quadratic function of elevation#
-lambda1 <- exp(beta0 + beta1 * values(elev) + beta2 * values(elev)^2)#
-#
-# Abundance as a quadratic function of elevation (+ the other spatially#
-# autocorrelated covariate)#
-lambda2 <- exp(beta0 + beta1 * values(elev) + beta2 * values(elev)^2 + 2 * values(Xraster))#
-#
-# Plot the results#
-par(mfrow = c(1, 2))#
-plot(values(elev), lambda1, cex = 0.5, main = expression(lambda == f(covariate)))#
-plot(values(elev), lambda2, cex = 0.5, main = expression(lambda == f(covariate, #
-    X)))
-counts <- rpois(n, lambda2)#
-counts <- rasterFromXYZ(cbind(coordinates(elev), counts))#
-#
-plot(counts, main = "Abundance distribution")
-id <- sample(1:n, 200)#
-coords <- coordinates(counts)[id, ]#
-#
-dat <- data.frame(coords, elev = extract(elev, coords), Xvar = extract(Xraster, #
-    coords), counts = extract(counts, coords))#
-head(dat)
-m1 <- lm(log1p(counts) ~ elev + I(elev^2), data = dat)#
-par(mfrow = c(2, 2))#
-plot(m1)
-coords <- coordinates(counts)#
-fulldata <- data.frame(coords, elevation = extract(elev, coords), Xvar = extract(Xraster, #
-    coords), counts = extract(counts, coords))#
-#
-sites <- sample(1:n, 200)#
-sampledata <- fulldata[sites, ]#
-#
-head(sampledata)
-m2 <- gls(log1p(counts) ~ elevation + I(elevation^2), data = sampledata)#
-vario2 <- Variogram(m2, form = ~x + y, resType = "pearson")#
-plot(vario2, smooth = TRUE, ylim = c(0, 1.2))
-# Convert dataset to SpatialPointsDataFrame#
-datsp <- sampledata#
-coordinates(datsp) <- c("x", "y")#
-#
-# Compute the sample variogram of our data (without covariate)#
-vario <- variogram(log1p(counts) ~ 1, datsp)#
-plot(vario)
-## library(devtools)#
-## install_github("nimble-dev/nimble",#
-##                ref = "devel",#
-##                subdir = "packages/nimble")#
-#
-library(nimble)#
-library(mcmcplots)#
-library(igraph)#
-library(raster)#
-library(lattice)#
-library(mvtnorm)#
-source("src/runNimble.R")#
-source("src/plotting.R")#
-#
-expit <- function(x) 1/(1+exp(-x))#
-logit <- function(x) log(x/(1-x))#
-#
-## parameters#
-ngrid <- 25#
-N <- 10#
-nreps <- 3#
-alpha <- 0.1#
-beta1 <- 2#
-p <- 0.5#
-sigma <- 0.5#
-delta <- 0.05#
-#
-set.seed(44)#
-#
-rmvn <- function(n, mu = 0, V = matrix(1)) {#
-  p <- length(mu)#
-  if (any(is.na(match(dim(V), p)))) #
-    stop("Dimension problem!")#
-  D <- chol(V)#
-  t(matrix(rnorm(n * p), ncol = p) %*% D + rep(mu, rep(n, p)))#
+  fden <- function(){#
+    plot(dengram, cex.lab=0.5, hang=-1)#
+  }#
+  path.dir <- 'figures/dgram'#
+  pdf.f(fden, file= file.path(path.dir, sprintf("%s.pdf",#
+                paste("dedrogram", type[1], sep="_"))),#
+        width=25, height=10)#
+  return(dengram)#
 }#
+plot.box <- function(ylabel,#
+                     dats,#
+                     y1){#
+  plot.ci <- function(){#
+    col.lines <- brewer.pal(3, "Dark2")#
+    col.fill <- add.alpha(col.lines, alpha=0.2)#
+    layout(matrix(1, ncol=1))#
+    par(oma=c(1, 5, 2, 1),#
+        mar=c(2, 0, 0.5, 1))#
+    boxplot(dats[,y1]~ dats$SiteStatus,#
+            col=col.lines,#
+            names=c("Non-assembling \n field margin",#
+              "Assembling \n  hedgerow", "Non-assembling \n hedgerow"))#
+    axis(2, pretty(dats[,y1]), labels=pretty(dats[,y1]))#
+    mtext(ylabel, 2, line=3.5, cex=1.5)#
+  }#
+  path <- 'figures' #
+  pdf.f(plot.ci, file=file.path(path,#
+                   sprintf("%s.pdf", paste(#
+                     gsub(" ", "", ylabel),#
+                     "box", sep="_"))),#
+        width=6, height=4)#
 #
-## Set up a square lattice region#
-simgrid <- expand.grid(1:ngrid, 1:ngrid)#
-n <- nrow(simgrid)#
-#
-## Set up distance matrix#
-distance <- as.matrix(dist(simgrid))#
-#
-## Generate spatial random variable#
-X <- rmvn(1, rep(0, n),  (sigma^2)*exp(-delta * distance))#
-Xraster <- rasterFromXYZ(cbind(simgrid[, 1:2] - 0.5, X))#
-#
-## simulate elevation data#
-elev <- raster(matrix(rnorm(n), ngrid, ngrid),#
-               xmn = 0, xmx = ngrid,#
-               ymn = 0, ymx = ngrid)#
-#
-## calculate psi values#
-psi <- expit(alpha + beta1 * values(elev) +  values(Xraster))#
-#
-## Latent occurrence state#
-z <- rbinom(n = n, size = 1, prob = psi) #
-z <- rasterFromXYZ(cbind(coordinates(elev), z))#
-#
-coords <- coordinates(z)#
-fulldata <- data.frame(coords,#
-                       elevation = extract(elev, coords),#
-                       Xvar = extract(Xraster, coords),#
-                       z = extract(z, coords))
-sites <- sample(1:n, N)
-sites
-y <- matrix(NA, nrow = n, ncol = nreps)
-for (j in 1:nreps){#
-  y[,j] <- rbinom(n = n, size = 1, prob = fulldata$z * p)#
 }
-dim(y)
-library(raster)#
-## Loading required package: sp#
-## Warning: package 'sp' was built under R version 3.0.2#
-library(gstat)#
-library(lattice)#
-## Warning: package 'lattice' was built under R version 3.0.2#
-library(nlme)#
-## Warning: package 'nlme' was built under R version 3.0.2#
-## #
-## Attaching package: 'nlme'#
-## #
-## The following object is masked from 'package:raster':#
-## #
-##     getData#
-set.seed(100)#
-# Define function to draw random samples from a multivariate normal#
-# distribution#
-rmvn <- function(n, mu = 0, V = matrix(1)) {#
-    p <- length(mu)#
-    if (any(is.na(match(dim(V), p)))) #
-        stop("Dimension problem!")#
-    D <- chol(V)#
-    t(matrix(rnorm(n * p), ncol = p) %*% D + rep(mu, rep(n, p)))#
-}#
-#
-# Set up a square lattice region#
-simgrid <- expand.grid(1:50, 1:50)#
-n <- nrow(simgrid)#
-#
-# Set up distance matrix#
-distance <- as.matrix(dist(simgrid))#
-# Generate random variable#
-delta <- 0.05#
-X <- rmvn(1, rep(0, n), exp(-delta * distance))#
-#
-# Visualize results#
-Xraster <- rasterFromXYZ(cbind(simgrid[, 1:2] - 0.5, X))#
-par(mfrow = c(1, 2))#
-plot(1:100, exp(-delta * 1:100), type = "l", xlab = "Distance", ylab = "Correlation")#
-plot(Xraster)
-ngrid = 50
-## simulate elevation data#
-elev <- raster(matrix(rnorm(n), ngrid, ngrid),#
-               xmn = 0, xmx = ngrid,#
-               ymn = 0, ymx = ngrid)
-beta0 <- 1#
-beta1 <- 3#
-beta2 <- -2#
-#
-# Abundance as a quadratic function of elevation#
-lambda1 <- exp(beta0 + beta1 * values(elev) + beta2 * values(elev)^2)#
-#
-# Abundance as a quadratic function of elevation (+ the other spatially#
-# autocorrelated covariate)#
-lambda2 <- exp(beta0 + beta1 * values(elev) + beta2 * values(elev)^2 + values(Xraster))#
-#
-# Plot the results#
-par(mfrow = c(1, 2))#
-plot(values(elev), lambda1, cex = 0.5, main = expression(lambda == f(elevation)))#
-plot(values(elev), lambda2, cex = 0.5, main = expression(lambda == f(elevation, #
-    X)))
-# Determine the actual counts#
-counts <- rpois(n, lambda2)#
-counts <- rasterFromXYZ(cbind(coordinates(elev), counts))#
-#
-plot(counts, main = "Abundance distribution")
-coords <- coordinates(counts)#
-fulldata <- data.frame(coords, elevation = extract(elev, coords), Xvar = extract(Xraster, #
-    coords), counts = extract(counts, coords))#
-#
-sites <- sample(1:n, 200)#
-sampledata <- fulldata[sites, ]
-# Define the sampled sites and add a missing response for the other ones#
-wbdata <- fulldata#
-wbdata[-sites, "counts"] <- NA#
-#
-# Compute the neighbourhood data (2nd order: 8 neighbours)#
-nb <- dnearneigh(as.matrix(wbdata[, 1:2]), 0, 1.5)#
-table(card(nb))
-library(spdep)
-# Define the sampled sites and add a missing response for the other ones#
-wbdata <- fulldata#
-wbdata[-sites, "counts"] <- NA#
-#
-# Compute the neighbourhood data (2nd order: 8 neighbours)#
-nb <- dnearneigh(as.matrix(wbdata[, 1:2]), 0, 1.5)#
-table(card(nb))
-# Convert the neighbourhood object in an object usable by WinBUGS#
-winnb <- nb2WB(nb)
-wbdata
-head(wbdata)
-n
-wbdata$counts
-wbdata$elevation
-## library(devtools)#
-## install_github("nimble-dev/nimble",#
-##                ref = "dlevel",#
-##                subdir = "packages/nimble")#
-#
-library(nimble)#
-library(mcmcplots)#
-library(igraph)#
-source("src/runNimble.R")#
-source("src/dynamicOcc.R")#
-source("src/dataGen.R")#
-#
-## *********************************************************************#
-##  Dynamic (multi-season) site-occupancy models#
-## *********************************************************************#
-set.seed(4)#
-data <- genDynamicOccData()#
-#
-## data zs with 0s set to NAs#
-zs <- apply(data$y, c(1, 3), max)#
-zs[zs == 0] <- NA#
-#
-## initial condiations, NAs where 1s are in z, and 1s are where NA#
-zinits <- zs#
-zinits[zinits == 1] <- 2#
-zinits[is.na(zinits)] <- 1#
-zinits[zinits == 2] <- NA#
-inits <- list(z = zinits)
-rm(list=ls())#
-setwd("~/Dropbox/nimble-dev/occupancy/singleSpp-multiSea")#
-source('src/initialize.R')
-model.data$y
-data$y
-dim(data$y)
-rm(list=ls())#
-setwd("~/Dropbox/nimble-dev/occupancy/spatial")#
-source('src/initialize.R')
-ysample
-## library(devtools)#
-## install_github("nimble-dev/nimble",#
-##                ref = "devel",#
-##                subdir = "packages/nimble")#
-#
-library(nimble)#
-library(mcmcplots)#
-library(igraph)#
-library(raster)#
-library(lattice)#
-library(mvtnorm)#
-source("src/runNimble.R")#
-source("src/plotting.R")#
-#
-expit <- function(x) 1/(1+exp(-x))#
-logit <- function(x) log(x/(1-x))#
-#
-## parameters#
-ngrid <- 25#
-nsite <- 20#
-nreps <- 5#
-alpha <- 0.1#
-beta1 <- 2#
-p <- 0.5#
-sigma <- 0.5#
-delta <- 0.05#
-#
-set.seed(44)#
-#
-rmvn <- function(n, mu = 0, V = matrix(1)) {#
-  p <- length(mu)#
-  if (any(is.na(match(dim(V), p)))) #
-    stop("Dimension problem!")#
-  D <- chol(V)#
-  t(matrix(rnorm(n * p), ncol = p) %*% D + rep(mu, rep(n, p)))#
-}#
-#
-## Set up a square lattice region#
-simgrid <- expand.grid(1:ngrid, 1:ngrid)#
-n <- nrow(simgrid)#
-#
-## Set up distance matrix#
-distance <- as.matrix(dist(simgrid))#
-#
-## Generate spatial random variable#
-X <- rmvn(1, rep(0, n),  (sigma^2)*exp(-delta * distance))#
-Xraster <- rasterFromXYZ(cbind(simgrid[, 1:2] - 0.5, X))#
-#
-## simulate elevation data#
-elev <- raster(matrix(rnorm(n), ngrid, ngrid),#
-               xmn = 0, xmx = ngrid,#
-               ymn = 0, ymx = ngrid)#
-#
-## calculate psi values#
-psi <- expit(alpha + beta1 * values(elev) +  values(Xraster))#
-#
-## Latent occurrence state#
-z <- rbinom(n = n, size = 1, prob = psi) #
-z <- rasterFromXYZ(cbind(coordinates(elev), z))#
-#
-coords <- coordinates(z)#
-fulldata <- data.frame(coords,#
-                       elevation = extract(elev, coords),#
-                       Xvar = extract(Xraster, coords),#
-                       z = extract(z, coords))#
-#
-## subsample at "sites"#
-sites <- sample(1:n, nsite)#
-#
-## Observation process: Sample detection/nondetection observations#
-## from a Bernoulli(with p) if z=1#
-y <- matrix(NA, nrow = n, ncol = nreps)#
-#
-for (j in 1:nreps){#
-  y[,j] <- rbinom(n = n, size = 1, prob = fulldata$z * p)#
-}#
-#
-## NA for "sites" that are not sampled#
-ysample <- y#
-ysample[-sites, ] <- NA#
-#
-## model data#
-model.data <- list(D = distance,#
-                   y = ysample,#
-                   zeros=rep(0, n),#
-                   elev = fulldata$elevation)#
-## constants#
-constants <- list(nsite = n, nreps=nreps)#
-#
-## parameters to monitor#
-monitors <- c("delta", "sigma", "psi", "p", "alpha", "b1")#
-#
-## inits#
-inits <- list()#
-#
-## MCMC settings#
-scale <- 1e1#
-burnin <- 1e1*scale#
-niter <- (1e3)*scale
-ysample
-lapply(model.data, dim)
-lapply(model.data, length)
-sites
-n
-distance
-ysample
-Define function to draw random samples from a multivariate normal#
-# distribution#
-rmvn <- function(n, mu = 0, V = matrix(1)) {#
-    p <- length(mu)#
-    if (any(is.na(match(dim(V), p)))) #
-        stop("Dimension problem!")#
-    D <- chol(V)#
-    t(matrix(rnorm(n * p), ncol = p) %*% D + rep(mu, rep(n, p)))#
-}#
-#
-# Set up a square lattice region#
-simgrid <- expand.grid(1:50, 1:50)#
-n <- nrow(simgrid)#
-#
-# Set up distance matrix#
-distance <- as.matrix(dist(simgrid))#
-# Generate random variable#
-delta <- 0.05#
-X <- rmvn(1, rep(0, n), exp(-delta * distance))#
-#
-# Visualize results#
-Xraster <- rasterFromXYZ(cbind(simgrid[, 1:2] - 0.5, X))#
-par(mfrow = c(1, 2))#
-plot(1:100, exp(-delta * 1:100), type = "l", xlab = "Distance", ylab = "Correlation")#
-plot(Xraster)
-elev <- raster(matrix(rnorm(n), 50, 50), xmn = 0, xmx = 50, ymn = 0, ymx = 50)#
-#
-plot(elev, main = "Elevation")
-beta0 <- 1#
-beta1 <- 3#
-beta2 <- -2#
-#
-# Abundance as a quadratic function of elevation#
-lambda1 <- exp(beta0 + beta1 * values(elev) + beta2 * values(elev)^2)#
-#
-# Abundance as a quadratic function of elevation (+ the other spatially#
-# autocorrelated covariate)#
-lambda2 <- exp(beta0 + beta1 * values(elev) + beta2 * values(elev)^2 + values(Xraster))#
-#
-# Plot the results#
-par(mfrow = c(1, 2))#
-plot(values(elev), lambda1, cex = 0.5, main = expression(lambda == f(elevation)))#
-plot(values(elev), lambda2, cex = 0.5, main = expression(lambda == f(elevation, #
-    X)))
-ne the actual counts#
-counts <- rpois(n, lambda2)#
-counts <- rasterFromXYZ(cbind(coordinates(elev), counts))#
-#
-plot(counts, main = "Abundance distribution")
-coords <- coordinates(counts)#
-fulldata <- data.frame(coords, elevation = extract(elev, coords), Xvar = extract(Xraster, #
-    coords), counts = extract(counts, coords))#
-#
-sites <- sample(1:n, 200)#
-sampledata <- fulldata[sites, ]#
-#
-head(sampledata)
-# Convert dataset to SpatialPointsDataFrame#
-datsp <- sampledata#
-coordinates(datsp) <- c("x", "y")#
-#
-# Compute the sample variogram of our data (without covariate)#
-vario <- variogram(log1p(counts) ~ 1, datsp)#
-plot(vario)
-# Define the sampled sites and add a missing response for the other ones#
-wbdata <- fulldata#
-wbdata[-sites, "counts"] <- NA#
-#
-# Compute the neighbourhood data (2nd order: 8 neighbours)#
-nb <- dnearneigh(as.matrix(wbdata[, 1:2]), 0, 1.5)#
-table(card(nb))
-v
-winnb <- nb2WB(nb)
-list(n = n, y = wbdata$counts, x1 = wbdata$elevation, x2 = (wbdata$elevation)^2, #
-    num = winnb$num, adj = winnb$adj, weights = winnb$weights)win.data <- list(n = n, y = wbdata$counts, x1 = wbdata$elevation, x2 = (wbdata$elevation)^2, #
-    num = winnb$num, adj = winnb$adj, weights = winnb$weights)
-win.data <- list(n = n, y = wbdata$counts, x1 = wbdata$elevation, x2 = (wbdata$elevation)^2, #
-    num = winnb$num, adj = winnb$adj, weights = winnb$weights)
-lapply(win.data, dim)
-lapply(win.data, length)
-win.data <- list(n = n, y = wbdata$counts, x1 = wbdata$elevation, x2 = (wbdata$elevation)^2, #
-    num = winnb$num, adj = winnb$adj, weights = winnb$weights, D=distance)
-lapply(win.data, length)
-2500*2500
-n
-# Simulate imperfect detection of the abundance#
-y <- matrix(nrow = n, ncol = 3)#
-# Detection probability#
-p <- 0.5#
-for (i in 1:3) {#
-    y[, i] <- rbinom(n = n, size = fulldata$counts, prob = p)#
-}#
-# Have a look at the full dataset#
-head(y)
-# Use NAs for all unsurveyed sites#
-ysample <- y#
-ysample[-sites, ] <- NA#
-#
-# ysample must be a matrix otherwise WinBUGS will crash#
-class(ysample)
-win.data <- list(n = n, nrep = 3, C = ysample, x1 = wbdata$elevation, x2 = (wbdata$elevation)^2, #
-    num = winnb$num, adj = winnb$adj, weights = winnb$weights, D=distance)
-lapply(win.data, length)
-lapply(win.data, dim)
-lapply(win.data, length)
-lapply(win.data, length)
-n
-nrep
-dim(win.data$C)
-dim(distance)
-length(sites)
-## library(devtools)#
-## install_github("nimble-dev/nimble",#
-##                ref = "devel",#
-##                subdir = "packages/nimble")#
-#
-library(nimble)#
-library(mcmcplots)#
-library(igraph)#
-library(raster)#
-library(lattice)#
-library(mvtnorm)#
-source("src/runNimble.R")#
-source("src/plotting.R")#
-#
-expit <- function(x) 1/(1+exp(-x))#
-logit <- function(x) log(x/(1-x))#
-#
-## parameters#
-ngrid <- 25#
-nsite <- 20#
-nreps <- 5#
-alpha <- 0.1#
-beta1 <- 2#
-p <- 0.6#
-sigma <- 0.5#
-delta <- 0.05#
-#
-set.seed(44)#
-#
-rmvn <- function(n, mu = 0, V = matrix(1)) {#
-  p <- length(mu)#
-  if (any(is.na(match(dim(V), p)))) #
-    stop("Dimension problem!")#
-  D <- chol(V)#
-  t(matrix(rnorm(n * p), ncol = p) %*% D + rep(mu, rep(n, p)))#
-}#
-#
-## Set up a square lattice region#
-simgrid <- expand.grid(1:ngrid, 1:ngrid)#
-n <- nrow(simgrid)#
-#
-## Set up distance matrix#
-distance <- as.matrix(dist(simgrid))#
-#
-## Generate spatial random variable#
-X <- rmvn(1, rep(0, n),  (sigma^2)*exp(-delta * distance))#
-Xraster <- rasterFromXYZ(cbind(simgrid[, 1:2] - 0.5, X))#
-#
-## simulate elevation data#
-elev <- raster(matrix(rnorm(n), ngrid, ngrid),#
-               xmn = 0, xmx = ngrid,#
-               ymn = 0, ymx = ngrid)#
-#
-## calculate psi values#
-psi <- expit(alpha + beta1 * values(elev) +  values(Xraster))#
-#
-## Latent occurrence state#
-z <- rbinom(n = n, size = 1, prob = psi) #
-z <- rasterFromXYZ(cbind(coordinates(elev), z))#
-#
-coords <- coordinates(z)#
-fulldata <- data.frame(coords,#
-                       elevation = extract(elev, coords),#
-                       Xvar = extract(Xraster, coords),#
-                       z = extract(z, coords))#
-#
-## subsample at "sites"#
-sites <- sample(1:n, nsite)#
-#
-## Observation process: Sample detection/nondetection observations#
-## from a Bernoulli(with p) if z=1#
-y <- matrix(NA, nrow = n, ncol = nreps)#
-#
-for (j in 1:nreps){#
-  y[,j] <- rbinom(n = n, size = 1, prob = fulldata$z * p)#
-}#
-#
-## NA for "sites" that are not sampled#
-ysample <- y#
-ysample[-sites, ] <- NA#
-#
-## model data#
-model.data <- list(D = distance,#
-                   y = ysample,#
-                   zeros=rep(0, n),#
-                   elev = fulldata$elevation)#
-## constants
-dim(ysample)
-n
-nrep
-nreps
-dim(y)
-dim(distance)
-length(fulldata$elevation)
-nreps
-nsite
-n
-rm(list=ls())#
-setwd("~/Dropbox/nimble-dev/occupancy/spatial")#
-source('src/initialize.R')#
-#
-sp.mod <- nimbleCode({#
-  ## priors#
-  delta ~ dunif(0,10)#
-  sigma ~ dunif(0,10)#
-  psi ~ dunif(0, 1)#
-  p ~ dunif(0, 1)#
-  alpha ~ dnorm(0, 0.001)#
-  b1 ~ dnorm(0, 0.001)#
-#
-  ## Likelihood#
-  ## Ecological model for true occurrence#
-  for (i in 1:nsite) {#
-    z[i] ~ dbern(psi[i])#
-    logit(psi[i]) <- alpha + b1*elev[i] + rho[i]#
-    p.eff[i] <- z[i] * p#
-#
-    ## Observation model for replicated detection/nondetection observations#
-    for (j in 1:nreps) {#
-      y[i,j] ~ dbern(p.eff[i])#
-    }#
-  }#
-#
-  rho[1:nsite] ~ dmnorm(zeros[1:nsite],#
-                        cov = D.cov[1:nsite, 1:nsite]) #
-  ## derived quantities#
-  ## turning the distance matrix to covariance matrix#
-  D.cov[1:nsite, 1:nsite] <- (sigma^2)*exp(-delta*D[1:nsite, 1:nsite])#
-})#
-#
-input1 <- list(code=sp.mod,#
-               constants=constants,#
-               data=model.data,#
-               inits=inits)#
-sp.mod.opt1 <- compareMCMCs(input1,#
-                            MCMCs=c('nimble'),#
-                            niter=niter,#
-                            burnin = burnin,#
-                            summary=FALSE,#
-                            check=FALSE)#
-#
-save(sp.mod.opt1, file="saved/opt1.Rdata")#
-#
-checkChains(sp.mod.opt1[[1]]$samples,#
-            f.path = "figures/chains/%s.pdf")
-ysample
-rm(list=ls())#
-setwd("~/Dropbox/nimble-dev/occupancy/spatial")#
-source('src/initialize.R')#
-#
-sp.mod <- nimbleCode({#
-  ## priors#
-  delta ~ dunif(0,10)#
-  sigma ~ dunif(0,10)#
-  psi ~ dunif(0, 1)#
-  p ~ dunif(0, 1)#
-  alpha ~ dnorm(0, 0.001)#
-  b1 ~ dnorm(0, 0.001)#
-#
-  ## Likelihood#
-  ## Ecological model for true occurrence#
-  for (i in 1:nsite) {#
-    z[i] ~ dbern(psi[i])#
-    logit(psi[i]) <- alpha + b1*elev[i] + rho[i]#
-    p.eff[i] <- z[i] * p#
-#
-    ## Observation model for replicated detection/nondetection observations#
-    for (j in 1:nreps) {#
-      y[i,j] ~ dbern(p.eff[i])#
-    }#
-  }#
-#
-  rho[1:nsite] ~ dmnorm(zeros[1:nsite],#
-                        cov = D.cov) #
-  ## derived quantities#
-  ## turning the distance matrix to covariance matrix#
-  D.cov[1:nsite, 1:nsite] <- (sigma^2)*exp(-delta*D[1:nsite, 1:nsite])#
-})#
-#
-input1 <- list(code=sp.mod,#
-               constants=constants,#
-               data=model.data,#
-               inits=inits)#
-sp.mod.opt1 <- compareMCMCs(input1,#
-                            MCMCs=c('nimble'),#
-                            niter=niter,#
-                            burnin = burnin,#
-                            summary=FALSE,#
-                            check=FALSE)#
-#
-save(sp.mod.opt1, file="saved/opt1.Rdata")#
-#
-checkChains(sp.mod.opt1[[1]]$samples,#
-            f.path = "figures/chains/%s.pdf")
-rm(list=ls())#
-setwd("~/Dropbox/nimble-dev/occupancy/spatial")#
-source('src/initialize.R')#
-#
-sp.mod <- nimbleCode({#
-  ## priors#
-  delta ~ dunif(0,10)#
-  sigma ~ dunif(0,10)#
-  psi ~ dunif(0, 1)#
-  p ~ dunif(0, 1)#
-  alpha ~ dnorm(0, 0.001)#
-  b1 ~ dnorm(0, 0.001)#
-#
-  ## Likelihood#
-  ## Ecological model for true occurrence#
-  for (i in 1:nsite) {#
-    z[i] ~ dbern(psi[i])#
-    logit(psi[i]) <- alpha + b1*elev[i] + rho[i]#
-    p.eff[i] <- z[i] * p#
-#
-    ## Observation model for replicated detection/nondetection observations#
-    for (j in 1:nreps) {#
-      y[i,j] ~ dbern(p.eff[i])#
-    }#
-  }#
-#
-  rho[1:nsite] ~ dmnorm(zeros[1:nsite],#
-                        cov = D.cov[1:nsite, 1:nsite]) #
-  ## derived quantities#
-  ## turning the distance matrix to covariance matrix#
-  D.cov[1:nsite, 1:nsite] <- (sigma^2)*exp(-delta*D)#
-})#
-#
-input1 <- list(code=sp.mod,#
-               constants=constants,#
-               data=model.data,#
-               inits=inits)#
-sp.mod.opt1 <- compareMCMCs(input1,#
-                            MCMCs=c('nimble'),#
-                            niter=niter,#
-                            burnin = burnin,#
-                            summary=FALSE,#
-                            check=FALSE)#
-#
-save(sp.mod.opt1, file="saved/opt1.Rdata")#
-#
-checkChains(sp.mod.opt1[[1]]$samples,#
-            f.path = "figures/chains/%s.pdf")
-rm(list=ls())#
-setwd("~/Dropbox/nimble-dev/occupancy/spatial")#
-source('src/initialize.R')#
-#
-sp.mod <- nimbleCode({#
-  ## priors#
-  delta ~ dunif(0,10)#
-  sigma ~ dunif(0,10)#
-  psi ~ dunif(0, 1)#
-  p ~ dunif(0, 1)#
-  alpha ~ dnorm(0, 0.001)#
-  b1 ~ dnorm(0, 0.001)#
-#
-  ## Likelihood#
-  ## Ecological model for true occurrence#
-  for (i in 1:nsite) {#
-    z[i] ~ dbern(psi[i])#
-    logit(psi[i]) <- alpha + b1*elev[i] + rho[i]#
-    p.eff[i] <- z[i] * p#
-#
-    ## Observation model for replicated detection/nondetection observations#
-    for (j in 1:nreps) {#
-      y[i,j] ~ dbern(p.eff[i])#
-    }#
-  }#
-#
-  rho[1:nsite] ~ dmnorm(zeros[1:nsite],#
-                        cov = D.cov[1:nsite, 1:nsite]) #
-  ## derived quantities#
-  ## turning the distance matrix to covariance matrix#
-  D.cov[1:nsite, 1:nsite] <- (sigma^2)*exp(-delta*D[1:nsite, 1:nsite])#
-})#
-#
-input1 <- list(code=sp.mod,#
-               constants=constants,#
-               data=model.data,#
-               inits=inits)#
-sp.mod.opt1 <- compareMCMCs(input1,#
-                            MCMCs=c('nimble'),#
-                            niter=niter,#
-                            burnin = burnin,#
-                            summary=FALSE,#
-                            check=FALSE)#
-#
-save(sp.mod.opt1, file="saved/opt1.Rdata")#
-#
-checkChains(sp.mod.opt1[[1]]$samples,#
-            f.path = "figures/chains/%s.pdf")
-n
-nreps
-dim(distance)
-length(fulldata$elevation)
-dim(ysample)
-site
-sites
-n
-nsite
-head(ysample)
-ysample
-rm(list=ls())#
-setwd("~/Dropbox/nimble-dev/occupancy/spatial")#
-source('src/initialize.R')#
-#
-sp.mod <- nimbleCode({#
-  ## priors#
-  delta ~ dunif(0,10)#
-  sigma ~ dunif(0,10)#
-  psi ~ dunif(0, 1)#
-  p ~ dunif(0, 1)#
-  alpha ~ dnorm(0, 0.001)#
-  b1 ~ dnorm(0, 0.001)#
-#
-  ## Likelihood#
-  ## Ecological model for true occurrence#
-  for (i in 1:nsite) {#
-    z[i] ~ dbern(psi[i])#
-    logit(psi[i]) <- alpha + b1*elev[i] + rho[i]#
-    p.eff[i] <- z[i] * p#
-#
-    ## Observation model for replicated detection/nondetection observations#
-    for (j in 1:nreps) {#
-      y[i,j] ~ dbern(p.eff[i])#
-    }#
-  }#
-#
-  rho[1:nsite] ~ dmnorm(zeros[1:nsite],#
-                        cov = D.cov[1:nsite, 1:nsite]) #
-  ## derived quantities#
-  ## turning the distance matrix to covariance matrix#
-  D.cov[1:nsite, 1:nsite] <- (sigma^2)*exp(-delta*D[1:nsite, 1:nsite])#
-})#
-#
-input1 <- list(code=sp.mod,#
-               constants=constants,#
-               data=model.data,#
-               inits=inits)#
-sp.mod.opt1 <- compareMCMCs(input1,#
-                            MCMCs=c('nimble'),#
-                            niter=niter,#
-                            burnin = burnin,#
-                            summary=FALSE,#
-                            check=FALSE)
-## library(devtools)#
-## install_github("nimble-dev/nimble",#
-##                ref = "devel",#
-##                subdir = "packages/nimble")#
-#
-library(nimble)#
-library(mcmcplots)#
-library(igraph)#
-library(raster)#
-library(lattice)#
-library(mvtnorm)#
-source("src/runNimble.R")#
-source("src/plotting.R")#
-#
-expit <- function(x) 1/(1+exp(-x))#
-logit <- function(x) log(x/(1-x))#
-#
-## parameters#
-ngrid <- 25#
-nsite <- 20#
-nreps <- 5#
-#
-alpha <- 0.1#
-beta1 <- 2#
-p <- 0.6#
-sigma <- 0.5#
-delta <- 0.05#
-#
-set.seed(44)#
-#
-rmvn <- function(n, mu = 0, V = matrix(1)) {#
-  p <- length(mu)#
-  if (any(is.na(match(dim(V), p)))) #
-    stop("Dimension problem!")#
-  D <- chol(V)#
-  t(matrix(rnorm(n * p), ncol = p) %*% D + rep(mu, rep(n, p)))#
-}#
-#
-## Set up a square lattice region#
-simgrid <- expand.grid(1:ngrid, 1:ngrid)#
-n <- nrow(simgrid)#
-#
-## Set up distance matrix#
-distance <- as.matrix(dist(simgrid))#
-#
-## Generate spatial random variable#
-X <- rmvn(1, rep(0, n),  (sigma^2)*exp(-delta * distance))#
-Xraster <- rasterFromXYZ(cbind(simgrid[, 1:2] - 0.5, X))#
-#
-## simulate elevation data#
-elev <- raster(matrix(rnorm(n), ngrid, ngrid),#
-               xmn = 0, xmx = ngrid,#
-               ymn = 0, ymx = ngrid)#
-#
-## calculate probabilities of occurrence#
-psi <- expit(alpha + beta1 * values(elev) +  values(Xraster))#
-#
-## Latent occurrence state#
-z <- rbinom(n = n, size = 1, prob = psi) #
-z <- rasterFromXYZ(cbind(coordinates(elev), z))#
-#
-coords <- coordinates(z)#
-fulldata <- data.frame(coords,#
-                       elevation = extract(elev, coords),#
-                       Xvar = extract(Xraster, coords),#
-                       z = extract(z, coords))#
-#
-## subsample at "sites"#
-sites <- sample(1:n, nsite)#
-#
-## Observation process: Sample detection/nondetection observations#
-## from a Bernoulli(with p) if z=1#
-y <- matrix(NA, nrow = n, ncol = nreps)#
-#
-for (j in 1:nreps){#
-  y[,j] <- rbinom(n = n, size = 1, prob = fulldata$z * p)#
-}#
-#
-## NA for "sites" that are not sampled#
-ysample <- y#
-ysample[-sites, ] <- NA#
-#
-## model data#
-model.data <- list(D = distance[sites, sites],#
-                   y = ysample[sites,],#
-                   zeros=rep(0, nsites),#
-                   elev = fulldata$elevation[sites])#
-## constants#
-constants <- list(nsite = n, nreps=nreps)#
-#
-## parameters to monitor#
-monitors <- c("delta", "sigma", "psi", "p", "alpha", "b1")#
-#
-## inits#
-inits <- list()#
-#
-## MCMC settings#
-scale <- 1e1#
-burnin <- 1e1*scale#
-niter <- (1e3)*scale
-rm(list=ls())#
-setwd("~/Dropbox/nimble-dev/occupancy/spatial")#
-source('src/initialize.R')#
-#
-sp.mod <- nimbleCode({#
-  ## priors#
-  delta ~ dunif(0,10)#
-  sigma ~ dunif(0,10)#
-  psi ~ dunif(0, 1)#
-  p ~ dunif(0, 1)#
-  alpha ~ dnorm(0, 0.001)#
-  b1 ~ dnorm(0, 0.001)#
-#
-  ## Likelihood#
-  ## Ecological model for true occurrence#
-  for (i in 1:nsite) {#
-    z[i] ~ dbern(psi[i])#
-    logit(psi[i]) <- alpha + b1*elev[i] + rho[i]#
-    p.eff[i] <- z[i] * p#
-#
-    ## Observation model for replicated detection/nondetection observations#
-    for (j in 1:nreps) {#
-      y[i,j] ~ dbern(p.eff[i])#
-    }#
-  }#
-#
-  rho[1:nsite] ~ dmnorm(zeros[1:nsite],#
-                        cov = D.cov[1:nsite, 1:nsite]) #
-  ## derived quantities#
-  ## turning the distance matrix to covariance matrix#
-  D.cov[1:nsite, 1:nsite] <- (sigma^2)*exp(-delta*D[1:nsite, 1:nsite])#
-})#
-#
-input1 <- list(code=sp.mod,#
-               constants=constants,#
-               data=model.data,#
-               inits=inits)#
-sp.mod.opt1 <- compareMCMCs(input1,#
-                            MCMCs=c('nimble'),#
-                            niter=niter,#
-                            burnin = burnin,#
-                            summary=FALSE,#
-                            check=FALSE)
-class(ysample)
-model.data
-lapply(model.data, class)
-rm(list=ls())#
-setwd("~/Dropbox/nimble-dev/occupancy/spatial")#
-source('src/initialize.R')#
-#
-sp.mod <- nimbleCode({#
-  ## priors#
-  delta ~ dunif(0,10)#
-  sigma ~ dunif(0,10)#
-  psi ~ dunif(0, 1)#
-  p ~ dunif(0, 1)#
-  alpha ~ dnorm(0, 0.001)#
-  b1 ~ dnorm(0, 0.001)#
-#
-  ## Likelihood#
-  ## Ecological model for true occurrence#
-  for (i in 1:nsite) {#
-    z[i] ~ dbern(psi[i])#
-    logit(psi[i]) <- alpha + b1*elev[i] + rho[i]#
-    p.eff[i] <- z[i] * p#
-#
-    ## Observation model for replicated detection/nondetection#
-    ## observations#
-    for (j in 1:nreps) {#
-      y[i,j] ~ dbern(p.eff[i])#
-    }#
-  }#
-#
-  rho[1:nsite] ~ dmnorm(zeros[1:nsite],#
-                        cov = D.cov[1:nsite, 1:nsite]) #
-  ## derived quantities#
-  ## turning the distance matrix to covariance matrix#
-  D.cov[1:nsite, 1:nsite] <- (sigma^2)*exp(-delta*D[1:nsite, 1:nsite])#
-})#
-#
-input1 <- list(code=sp.mod,#
-               constants=constants,#
-               data=model.data,#
-               inits=inits)#
-sp.mod.opt1 <- compareMCMCs(input1,#
-                            MCMCs=c('nimble'),#
-                            niter=niter,#
-                            burnin = burnin,#
-                            summary=FALSE,#
-                            check=FALSE)#
-#
-save(sp.mod.opt1, file="saved/opt1.Rdata")#
-#
-checkChains(sp.mod.opt1[[1]]$samples,#
-            f.path = "figures/chains/%s.pdf")
+plot.box(ylabel="Node turnover",#
+                 dats=phylo.int$phylo.int,#
+                 y1="PhyloInt")
+?boxplot
 rm(list=ls())#
 setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
 source('src/initialize.R')#
@@ -1498,201 +821,3 @@ lapply(int.lives, function(x) points(density(x), type='l'))#
 ##                  dats=phylo.int$phylo.int,#
 ##                  y1="PhyloInt",#
 ##                  legend.loc="bottomright")
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
-source('src/initialize.R')#
-source('src/phyloIntBeta.R')#
-#
-## ************************************************************#
-## prepare link community in terminal#
-## ************************************************************#
-edges.com <- cbind(as.character(spec$GenusSpecies),#
-                  as.character(spec$PlantGenusSpecies))#
-#
-## lc <- getLinkCommunities(edges.com, hcmethod = "average",#
-##                          bipartite=TRUE)#
-## save(lc, file="saved/lc.Rdata")#
-#
-## ************************************************************#
-## turnover of phylo interactions through time#
-## ************************************************************#
-load(file="saved/lc.Rdata")#
-spec$Int <- paste(spec$GenusSpecies,#
-                  spec$PlantGenusSpecies)#
-phylo.int <- calcCommDis(spec, "Int", lc, abund.w=TRUE)#
-save(phylo.int, file="saved/phyloInt.Rdata")#
-#
-## linear model of phylo int by years between samples#
-load(file="saved/phyloInt.Rdata")#
-phylo.int.mod <- lmer(PhyloInt ~ Dist*SiteStatus +#
-                      (1|Site),#
-                      data=phylo.int$phylo.int)#
-#
-plot.box(ylabel="Node turnover",#
-                 dats=phylo.int$phylo.int,#
-                 y1="PhyloInt")#
-#
-## interaction lifespans#
-int.lives <- lapply(phylo.int$comm, function(x) sort(colSums(x)))#
-#
-plot(NA, ylim=c(0,1), xlim=c(0,100))#
-lapply(int.lives, function(x) points(density(x), type='l'))#
-## ## ************************************************************#
-## dengrogram based on shared plant interactions#
-## ************************************************************#
-#
-## pols <- cbind(spec$GenusSpecies, spec$PlantGenusSpecies)#
-## ## unique rows (interactions)#
-## pols <- as.data.frame(unique(pols, MARGIN=1))#
-## colnames(pols) <- c('GenusSpecies', 'PlantGenusSpecies')#
-#
-## clust <- calcDendDis(pols, c('GenusSpecies', 'PlantGenusSpecies'))#
-## phylo.int.mod <- lmer(PhyloInt ~ Dist*SiteStatus +#
-##                       (1|Site),#
-##                       data=phylo.int$phylo.int)#
-#
-## dd.phylo <- expand.grid(Dist=seq(#
-##                           from= min(phylo.int$phylo.int$Dist),#
-##                           to= max(phylo.int$phylo.int$Dist),#
-##                           length=10),#
-##                         SiteStatus=c("control", "maturing", "mature"),#
-##                         PhyloInt = 0)#
-#
-## phylo.pi <- predict.int(mod= phylo.int.mod,#
-##                         dd=dd.phylo,#
-##                         y="PhyloInt")#
-#
-## plot.predict(new.dd=phylo.pi,#
-##                  ylabel="Node turnover",#
-##                  dats=phylo.int$phylo.int,#
-##                  y1="PhyloInt",#
-##                  legend.loc="bottomright")
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
-source('src/initialize.R')#
-library(bipartite)#
-source('src/calcDis.R')#
-traits <- read.csv("../../data/traits.csv")#
-## ************************************************************#
-## the variability fo interactions of plants and pols#
-## ************************************************************#
-## for each species at each site, 1) create a interaction partner by#
-## year matrix, 2) calculate the dissimilarity of interaction partners#
-## between years 3) extract dispersion values for each species, site#
-#
-load('../../data/networks/expanded_networks.Rdata')#
-#
-sites <- sapply(strsplit(names(nets), "[.]"), function(x) x[1])#
-#
-specs.agg <- aggregate(list(k=specs$k,#
-                            closeness=specs$weighted.closeness),#
-                       list(GenusSpecies=specs$GenusSpecies), mean,#
-                       na.rm=TRUE)#
-#
-plants <- getDis(sites, 1, nets, specs.agg, traits, spec)#
-pols <- getDis(sites, 2, nets, specs.agg, traits, spec)
-plants
-head(plants)
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
-source('src/initialize.R')#
-library(bipartite)#
-source('src/calcDis.R')#
-traits <- read.csv("../../data/traits.csv")#
-## ************************************************************#
-## the variability fo interactions of plants and pols#
-## ************************************************************#
-## for each species at each site, 1) create a interaction partner by#
-## year matrix, 2) calculate the dissimilarity of interaction partners#
-## between years 3) extract dispersion values for each species, site#
-#
-load('../../data/networks/expanded_networks.Rdata')#
-#
-sites <- sapply(strsplit(names(nets), "[.]"), function(x) x[1])#
-#
-specs.agg <- aggregate(list(k=specs$k,#
-                            closeness=specs$weighted.closeness),#
-                       list(GenusSpecies=specs$GenusSpecies), mean,#
-                       na.rm=TRUE)#
-#
-plants <- getDis(sites, 1, nets, specs.agg, traits, spec)
-pp.dis
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
-source('src/initialize.R')#
-source('src/phyloIntBeta.R')#
-#
-## ************************************************************#
-## prepare link community in terminal#
-## ************************************************************#
-edges.com <- cbind(as.character(spec$GenusSpecies),#
-                  as.character(spec$PlantGenusSpecies))#
-#
-## lc <- getLinkCommunities(edges.com, hcmethod = "average",#
-##                          bipartite=TRUE)#
-## save(lc, file="saved/lc.Rdata")#
-#
-## ************************************************************#
-## turnover of phylo interactions through time#
-## ************************************************************#
-load(file="saved/lc.Rdata")#
-spec$Int <- paste(spec$GenusSpecies,#
-                  spec$PlantGenusSpecies)#
-phylo.int <- calcCommDis(spec, "Int", lc, abund.w=TRUE)#
-save(phylo.int, file="saved/phyloInt.Rdata")#
-#
-## linear model of phylo int by years between samples#
-load(file="saved/phyloInt.Rdata")#
-phylo.int.mod <- lmer(PhyloInt ~ Dist*SiteStatus +#
-                      (1|Site),#
-                      data=phylo.int$phylo.int)#
-#
-plot.box(ylabel="Node turnover",#
-                 dats=phylo.int$phylo.int,#
-                 y1="PhyloInt")#
-#
-## interaction lifespans#
-int.lives <- lapply(phylo.int$comm, function(x) sort(colSums(x)))#
-#
-plot(NA, ylim=c(0,1), xlim=c(0,100))#
-lapply(int.lives, function(x) points(density(x), type='l'))#
-## ## ************************************************************#
-## dengrogram based on shared plant interactions#
-## ************************************************************#
-#
-## pols <- cbind(spec$GenusSpecies, spec$PlantGenusSpecies)#
-## ## unique rows (interactions)#
-## pols <- as.data.frame(unique(pols, MARGIN=1))#
-## colnames(pols) <- c('GenusSpecies', 'PlantGenusSpecies')#
-#
-## clust <- calcDendDis(pols, c('GenusSpecies', 'PlantGenusSpecies'))#
-## phylo.int.mod <- lmer(PhyloInt ~ Dist*SiteStatus +#
-##                       (1|Site),#
-##                       data=phylo.int$phylo.int)#
-#
-## dd.phylo <- expand.grid(Dist=seq(#
-##                           from= min(phylo.int$phylo.int$Dist),#
-##                           to= max(phylo.int$phylo.int$Dist),#
-##                           length=10),#
-##                         SiteStatus=c("control", "maturing", "mature"),#
-##                         PhyloInt = 0)#
-#
-## phylo.pi <- predict.int(mod= phylo.int.mod,#
-##                         dd=dd.phylo,#
-##                         y="PhyloInt")#
-#
-## plot.predict(new.dd=phylo.pi,#
-##                  ylabel="Node turnover",#
-##                  dats=phylo.int$phylo.int,#
-##                  y1="PhyloInt",#
-##                  legend.loc="bottomright")
-summary(phylo.int.mod)
-phylo.int.mod <- lmer(PhyloInt ~ SiteStatus +#
-                      (1|Site),#
-                      data=phylo.int$phylo.int)#
-summary(phylo.int.mod)
-phylo.int$phylo.int$SiteStatus <- factor(phylo.int$phylo.int$SiteStatus, levels=c("mature", "control", "maturing"))
-phylo.int.mod <- lmer(PhyloInt ~ SiteStatus +#
-                      (1|Site),#
-                      data=phylo.int$phylo.int)#
-summary(phylo.int.mod)

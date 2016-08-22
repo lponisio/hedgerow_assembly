@@ -228,7 +228,7 @@ important contributors network reorganizations --- are less persistent
 and connected species.  Lastly, we examine whether networks are
 assembling toward predictable interaction patterns, and the
 ramifications for the robustness of the networks to species extinction
-and perturbation.
+and cascading perturbations.
 
 %% objectives
 % 1) Are hedgerows assembling by preferential attachment, or are there
@@ -459,15 +459,38 @@ is calculated. The area below the extinction curve is used as a
 measure of network robustness \citep{bipartite}.
 
 We also explored how the robustness to cascading effects changed as
-community assembled, using algebraic connectivity--- the second
+community assembled, using algebraic connectivity --- the second
 smallest eigenvalue of the Laplacian matrix
-\citep{fiedler1973algebraic}--- as a proxy for network robustness
-(e.g. Gaiarsa et al., submitted). Algebraic connectivity was first
-used to describe spectral properties of complex graphs other than
-ecological networks, and it has been extensively studied \citep[e.g.,][]{fiedler1973algebraic, costa2007characterization, mohar1991laplacian, de2007old}.   Algebraic connectivity is related to the mean diameter of a graph and to how difficult it is to turn
-a network into completely disconnected groups of nodes, or species
-\citep{costa2007characterization}--- the larger the algebraic connectivity, the more robust a
-network is to cascading effects (e.g. Gaiarsa et al., submitted), and the harder it is to break the community into isolated groups of species.
+\citep{fiedler1973algebraic} --- as a proxy for network robustness
+(Gaiarsa et al., submitted). Algebraic connectivity is related to the
+mean diameter of a graph and to how difficult it is to turn a network
+into completely disconnected groups of nodes, or species
+\citep{costa2007characterization} --- the larger the algebraic
+connectivity, the more robust a network is to cascading effects
+(Gaiarsa et al., submitted), and the harder it is to break the
+community into isolated groups of species.
+
+%% marilia:
+%% I'm not totally sure what this adds to the methods. Since most
+%% people reading this paper will not understand what "spectral
+%% properties" are (I don't in fact =/ ) it is a bit of a misdirection
+%% since we are not interested in it. I think it is enough to point to
+%% your paper which is using the Alg Con the way we want to. 
+
+%% removed:
+% Algebraic connectivity is
+% used to describe spectral properties of complex graphs other than
+% ecological networks \citep[e.g.,][]{fiedler1973algebraic,
+%   costa2007characterization, mohar1991laplacian, de2007old}.
+
+% what's the mean diameter of a graph? Also can we use the
+%% term network instead of graph to be mote consistent with the rest
+%% of the methods? We use graph a bit in the change point section, but
+%% I think it is explained a bit better there? 
+
+%% I also removed the e.g.'s because your paper is all we want to
+%% cite, and not "for example Gariarsa et al." 
+
 
 \section*{Results}
 \label{sec:results}
@@ -565,11 +588,11 @@ extinction when species where removed incrementally by degree
 of the estimate, $6*10^{-5} \pm 4*10^{-3}$, $p$-value=$0.987$) or
 abundance ($0.001 \pm 0.003$, $p$-value=$0.65$, Fig.~\ref{fig:rob}).
 
-In contrast, the robustness of networks to perturbation, as measured
-by the algebraic connectivity of the network, increased as the network
-assembled (estimate of the slope of robustness through time $\pm$
-standard error of the estimate, $0.6814 \pm 0.272$, $p$-value=$0.042$,
-Fig.~\ref{fig:rob}).
+In contrast, the robustness of networks to cascading perturbations, as
+measured by the algebraic connectivity of the network, increased as
+the network assembled (estimate of the slope of robustness through
+time $\pm$ standard error of the estimate, $0.6814 \pm 0.272$,
+$p$-value=$0.042$, Fig.~\ref{fig:rob}).
 
 \begin{figure}
   \centering
@@ -600,7 +623,7 @@ year 2009 and 2011 (Fig.~\ref{fig:changePoints}). In California, 2011
 marked the beginning of a multi-year drought. In the assembling
 hedgerows were not sampled in 2010, so disentangling whether the
 changing points are due to skipping a year of assembly or the drought
-is not possible, even though two changing points did occur in the non assembling hedgerow six between 2009 and 2010, and 2010 and 2011 (HR6, Fig.~\ref{fig:changePoints}). Interestingly, most of the assembling hedgerows did
+is not possible. Interestingly, most of the assembling hedgerows did
 not undergo a significant reorganization of interactions immediately
 the hedgerow was planted (i.e., the transition from weedy field margin
 to hedgerow). This result is consistent with the finding that in our
@@ -608,28 +631,35 @@ study system, hedgerow restoration takes several years to have a
 significant impact on the plant-pollintor communities (Kremen and
 M'Gonigle, in prep).
 
-Given that changing ponts did occur, we then turned to explore how these changing points came to be, and what species were responsible for it. Ecolgical theory predicts that species abundance is positively correlated to number of interaction partners a species has (degree \citep{Bluthgen2007}). Thus, we expected that the more abundant species would be more persisten through network assembly, and would contribute the least to the changing points. Surprisingly however, we encountered the opposite: the species that were most variable in
-their network position and thus contributed most to network
-reorganizations where species with the highest degrees (i.e., most
-generalized) and persistence. For example, the five most ubiquitous
-species in our study landscape --- \textit{Halictus ligatus},
-\textit{Halictus tripartitus},\textit{Lasioglossum (Dialictus)
-  incompletum}, and \textit{Toxomerus marginatus} --- were the
-only species that changed what module (i.e., community), and they were also 
-present in across years in all of the assembling hedgerows. Because
-species degree and persistence were strongly correlated, it is
-difficult to disentangle the causal mechanism for why species with
-those characteristics are so variable in their network
-position. Generalized species may be able to better exploit the limited
-floral resources the intensively managed agriculture landscape, and
-thus also most persistent. More persistent species also have longer
-phenologies, so they have the opportunity to visit many different
-flowers, resulting in a higher degree. Either way, our result suggests
-that adaptable species can change their network position to utilize
-the most advantageous floral resources available, which my depend the other
-pollinator species that are present and the state of the floral
-resource. Thus given the opportunity and ability to use different
-resources, species will often change their network positions.
+Given that several changing points in network organization occured
+during assembling, we next explored the species most likely
+responsible for the observed shifts in interaciton patterns. Based on
+a preferential attachment-like mechanism, we expect that the most
+persistent and high degree species would remain stable in the network
+core during assembly, and would thus contribute the least to the
+changing points in network organization. Surprisingly however, we
+encountered the opposite: the species that were most variable in their
+network position and thus contributed most to network reorganizations
+where species with the highest degrees (i.e., most generalized) and
+persistence. For example, the five most ubiquitous species in our
+study landscape --- \textit{Halictus ligatus}, \textit{Halictus
+  tripartitus}, \textit{Lasioglossum (Dialictus) incompletum}, and
+\textit{Toxomerus marginatus} --- were the only species that changed
+what module (i.e., community), and they were also present in across
+years in all of the assembling hedgerows. Because species degree and
+persistence were strongly correlated, it is difficult to disentangle
+the causal mechanism for why species with those characteristics are so
+variable in their network position. Generalized species may be able to
+better exploit the limited floral resources the intensively managed
+agriculture landscape, and thus also most persistent. More persistent
+species also have longer phenologies, so they have the opportunity to
+visit many different flowers, resulting in a higher degree. Either
+way, our result suggests that adaptable species can change their
+network position to utilize the most advantageous floral resources
+available, which my depend the other pollinator species that are
+present and the state of the floral resource. Thus given the
+opportunity and ability to use different resources, species will often
+change their network positions.
 
 %% node/species turnover  - I am not sure I get these results so there might be some nonsense in the below paragraph...
 Given the regional species pool it is possible that specialization migth be constant either because species are not changing through time, or because there is a species turnover, but new species have the same role/posotion as the species there are absent in the following time step. We found that node turover was higher in assembling and non-assembling hedgerows when compared to field margin, but there was no difference between them. Thus, maybe looking just at network level metrics, such as nestedness and modularity, when exploring the temporal assembly of ecological networks might be misleading, given that there is a node turnover happening at the species level. 
@@ -639,11 +669,11 @@ of the location of species in networks, and turnover of species and
 nodes all point to an assembly mechanism other than preferential
 attachment. Nestedness did increase with years post restoration, as
 would be expected if colonizing, specialist species attached to a
-central, pre existing generalist core \cite{albrecht2010plant}. With preferential
+central, generalist core \cite{albrecht2010plant}. With preferential
 attachment, however, we would also expect connectance and
-specialization to increase, and we found no such trends. The stable level
-of network-level specialization through the assembly process may be
-due to the increased colonization of specialized species
+specialization to increase, and we found no such trends. The stable
+level of network-level specialization through the assembly process may
+be due to the increased colonization of specialized species
 \citep{mgonigle-2015-x} accompanied by an increase in the diet breath
 of resident species. This would be expected if resident species were
 able to minimize their foraging time by expanding their diet breath as
@@ -653,15 +683,41 @@ pollinator behavior would also explain the increase in network
 nestedness.
 
 The changes in network patterns with assembly also increased the
-robustness of the networks to perturbation -- providing further
-evidence that hedgerows are valuable tool for promoting species
-conservation and ecosystem provision in agricultural areas
+robustness of the networks to cascading perturbations -- providing
+further evidence that hedgerows are valuable tool for promoting
+species conservation and ecosystem provision in agricultural areas
 \citep{mgonigle-2015-x, ponisio2015farm, kremen-2015-602}. Because the
-vulnerability of the network to cascading effects, as
-measured by algebraic connectivity, is correlated with species
-richness, the increase and plant and pollinator richness following
-restoration is at least partially responsible for enhancing network
-robustness to cascading effects. This result contributes to the stability and diversity debate indicating that diversity might promote statibility, even though there are contrasting results in the literature \citep [e.g.][]{may1972will, pimm1984complexity, montoya2006ecological}. However, the robustness of ecological communities to disturbances  might depend on the identity of the species mostly being affected by the disturbance (REF). For example, networks might be more sensible to the disturbance of a generalist when compared to a specialist (REF).
+vulnerability of the network to cascading effects, as measured by
+algebraic connectivity, is correlated with species richness, the
+increase and plant and pollinator richness following restoration is at
+least partially responsible for enhancing network robustness to
+cascading effects. The relationship between diversity and stability in
+networks has been the subject of considerable debate
+\citep[e.g.,][]{may1972will, pimm1984complexity,
+  montoya2006ecological}. Our results provides one of the few
+empirical examples of how restoring species diversity contributes to
+enhancing network stability. Through these hedgerows were designed to
+promote floral resrouces across the growing season and not
+specifically to promote any specific network properties
+\citep{menz-2010-4}, the pollinators assembled into resilent
+interaction patterns. With prior knowledge of the floral preferences
+of pollinators, future restoration efforts may also be able to
+incorporate promoting network stability into planning efforts
+\citep{mgonigle2016tool}
+ 
+%% marilia: not totally sure where you are going here. I was thinking
+%% it could be expanded into a whole paragraph on the fact that we
+%% don't really understand what effects species persistence, and how
+%% that is problematic with understanding netwokr robustness. But
+%% maybe it is a bit too far removed from the main message of the
+%% paper? Maybe something could be added in the last papergraph about
+%% needed more mechanistic models? 
+ 
+%  However, the robustness of ecological
+% communities to disturbances might depend on the identity of the
+% species mostly being affected by the disturbance (REF). For example,
+% networks might be more sensible to the disturbance of a generalist
+% when compared to a specialist (REF).
 
 Interestingly, however, the robustness of hedgerow communities to
 species loss did not change with assembly. This is particularly
