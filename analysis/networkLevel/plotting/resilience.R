@@ -55,9 +55,11 @@ ypr.pi.alg <- predict.int(mod= alg.con.mod.ypr,
                         family="gaussian")
 
 plot.predict.ypr(new.dd=ypr.pi.alg,
-                 ylabel="Robustness to perturbation",
+                 ylabel="Robustness to \n cascading effects",
                  dats=all.alg.Con.status,
                  y1="AlgCon",
                  extinction.method="perturb")
 
 plot.panels()
+
+

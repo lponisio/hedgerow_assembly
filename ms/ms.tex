@@ -464,11 +464,10 @@ smallest eigenvalue of the Laplacian matrix
 \citep{fiedler1973algebraic}--- as a proxy for network robustness
 (e.g. Gaiarsa et al., submitted). Algebraic connectivity was first
 used to describe spectral properties of complex graphs other than
-ecological networks, and it is related to how difficult it is to turn
+ecological networks, and it has been extensively studied \citep[e.g.,][]{fiedler1973algebraic, costa2007characterization, mohar1991laplacian, de2007old}.   Algebraic connectivity is related to the mean diameter of a graph and to how difficult it is to turn
 a network into completely disconnected groups of nodes, or species
-\citep{fiedler1973algebraic, costa2007characterization}, and also to
-flows in . The larger the algebraic connectivity, the more robust a
-network is to perturbations (e.g. Gaiarsa et al., submitted).
+\citep{costa2007characterization}--- the larger the algebraic connectivity, the more robust a
+network is to cascading effects (e.g. Gaiarsa et al., submitted), and the harder it is to break the community into isolated groups of species.
 
 \section*{Results}
 \label{sec:results}
@@ -576,9 +575,9 @@ Fig.~\ref{fig:rob}).
   \centering
   \includegraphics[width=.7\textwidth]{../analysis/networkLevel/figures/robustness.pdf}
   \caption{The robustness of networks to species extinction and
-    perturbation. The robustness to species extinction is measured by
+    to cascading effects. The robustness to species extinction is measured by
     incrementally removing species by degree, through removing species
-    by abundance did not yield qualitatively different results. Points
+    by abundance did not yield qualitatively different results. The robustness of networks to cascading effects is measured as the algebraic connectivity, the second smallest eigenvalue of the Laplacian matrix. Points
     are the value for each site at each year of assembly. The solid
     line indicates the mean slope estimate and the dashed lines are
     the $95\%$ confidence intervals around the estimate.}
@@ -601,7 +600,7 @@ year 2009 and 2011 (Fig.~\ref{fig:changePoints}). In California, 2011
 marked the beginning of a multi-year drought. In the assembling
 hedgerows were not sampled in 2010, so disentangling whether the
 changing points are due to skipping a year of assembly or the drought
-is not impossible. Interestingly, most of the assembling hedgerows did
+is not possible, even though two changing points did occur in the non assembling hedgerow six between 2009 and 2010, and 2010 and 2011 (HR6, Fig.~\ref{fig:changePoints}) . Interestingly, most of the assembling hedgerows did
 not undergo a significant reorganization of interactions immediately
 the hedgerow was planted (i.e., the transition from weedy field margin
 to hedgerow). This result is consistent with the finding that in our
@@ -609,7 +608,7 @@ study system, hedgerow restoration takes several years to have a
 significant impact on the plant-pollintor communities (Kremen and
 M'Gonigle, in prep).
 
-TRANSITION... Surprisingly, the species that were most variable in
+Given that changing ponts did occur, TRANSITION... Surprisingly, the species that were most variable in
 their network position and thus contributed most to network
 reorganizations where species with the highest degrees (i.e., most
 generalized) and persistence.  For example, the five most ubiquitous

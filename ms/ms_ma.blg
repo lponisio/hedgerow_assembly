@@ -1,0 +1,49 @@
+This is BibTeX, Version 0.99d (TeX Live 2016)
+Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
+The top-level auxiliary file: ms_ma.aux
+The style file: ecol_let.bst
+Database file #1: refs.bib
+Warning--I didn't find a database entry for "fiedler1973algebraic"
+Warning--I didn't find a database entry for "costa2007characterization"
+You've used 15 entries,
+            2997 wiz_defined-function locations,
+            733 strings with 7183 characters,
+and the built_in function-call counts, 9460 in all, are:
+= -- 765
+> -- 470
+< -- 4
++ -- 184
+- -- 165
+* -- 786
+:= -- 1542
+add.period$ -- 45
+call.type$ -- 15
+change.case$ -- 129
+chr.to.int$ -- 15
+cite$ -- 15
+duplicate$ -- 628
+empty$ -- 628
+format.name$ -- 218
+if$ -- 1778
+int.to.chr$ -- 1
+int.to.str$ -- 1
+missing$ -- 143
+newline$ -- 79
+num.names$ -- 60
+pop$ -- 243
+preamble$ -- 1
+purify$ -- 114
+quote$ -- 0
+skip$ -- 167
+stack$ -- 0
+substring$ -- 507
+swap$ -- 355
+text.length$ -- 0
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 135
+warning$ -- 0
+while$ -- 70
+width$ -- 0
+write$ -- 197
+(There were 2 warnings)
