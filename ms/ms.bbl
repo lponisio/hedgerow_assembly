@@ -1,4 +1,4 @@
-\begin{thebibliography}{64}
+\begin{thebibliography}{63}
 \expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
 
 \bibitem[{Alarc{\'o}n \emph{et~al.}(2008)Alarc{\'o}n, Waser \&
@@ -89,11 +89,6 @@ Costa, L.d.F., Rodrigues, F.A., Travieso, G. \& Villas~Boas, P.R. (2007).
 Csardi, G. \& Nepusz, T. (2006).
 \newblock The igraph software package for complex network research.
 \newblock \emph{InterJournal}, Complex Systems, 1695.
-
-\bibitem[{De~Abreu(2007)}]{de2007old}
-De~Abreu, N.M.M. (2007).
-\newblock Old and new results on algebraic connectivity of graphs.
-\newblock \emph{Linear algebra and its applications}, 423, 53--73.
 
 \bibitem[{Devoto \emph{et~al.}(2012)Devoto, Bailey, Craze \&
   Memmott}]{devoto2012understanding}
@@ -243,11 +238,11 @@ M'Gonigle, L., Ponisio, L., Cutler, K. \& Kremen, C. (2015).
   in intensively-managed agriculture.
 \newblock \emph{Ecol. Appl.}, 25, 1557--1565.
 
-\bibitem[{Mohar \emph{et~al.}(1991)Mohar, Alavi, Chartrand \&
-  Oellermann}]{mohar1991laplacian}
-Mohar, B., Alavi, Y., Chartrand, G. \& Oellermann, O. (1991).
-\newblock The laplacian spectrum of graphs.
-\newblock \emph{Graph theory, combinatorics, and applications}, 2, 12.
+\bibitem[{M'Gonigle \emph{et~al.}(2016)M'Gonigle, Williams, Lonsdorf \&
+  Kremen}]{mgonigle2016tool}
+M'Gonigle, L.K., Williams, N.M., Lonsdorf, E. \& Kremen, C. (2016).
+\newblock A tool for selecting plants when restoring habitat for pollinators.
+\newblock \emph{Conservation Letters}.
 
 \bibitem[{Montoya \emph{et~al.}(2006)Montoya, Pimm \&
   Sol{\'e}}]{montoya2006ecological}
