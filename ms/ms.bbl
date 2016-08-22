@@ -1,4 +1,4 @@
-\begin{thebibliography}{61}
+\begin{thebibliography}{64}
 \expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
 
 \bibitem[{Alarc{\'o}n \emph{et~al.}(2008)Alarc{\'o}n, Waser \&
@@ -218,6 +218,11 @@ Kuznetsova, A., {Bruun Brockhoff}, P. \& {Haubo Bojesen Christensen}, R.
   effect models (lmer objects of lme4 package).}
 \newblock R package version 2.0-11.
 
+\bibitem[{May(1972)}]{may1972will}
+May, R.M. (1972).
+\newblock Will a large complex system be stable?
+\newblock \emph{Nature}, 238, 413--414.
+
 \bibitem[{Memmott \emph{et~al.}(2004)Memmott, Waser \& Price}]{Memmott2004}
 Memmott, J., Waser, N.M. \& Price, M.V. (2004).
 \newblock Tolerance of pollination networks to species extinctions.
@@ -243,6 +248,12 @@ M'Gonigle, L., Ponisio, L., Cutler, K. \& Kremen, C. (2015).
 Mohar, B., Alavi, Y., Chartrand, G. \& Oellermann, O. (1991).
 \newblock The laplacian spectrum of graphs.
 \newblock \emph{Graph theory, combinatorics, and applications}, 2, 12.
+
+\bibitem[{Montoya \emph{et~al.}(2006)Montoya, Pimm \&
+  Sol{\'e}}]{montoya2006ecological}
+Montoya, J.M., Pimm, S.L. \& Sol{\'e}, R.V. (2006).
+\newblock Ecological networks and their fragility.
+\newblock \emph{Nature}, 442, 259--264.
 
 \bibitem[{Morandin \& Kremen(2013)}]{morandin-2013-829}
 Morandin, L. \& Kremen, C. (2013).
@@ -297,6 +308,11 @@ Petanidou, T., Kallimanis, S., Tzanopoulos, J., Sgardelis, S. \& Pantis, J.
   species and interactions, relative invariance of network structure and
   implications for estimates of specialization.
 \newblock \emph{Ecol. Lett.}, 11, 564--575.
+
+\bibitem[{Pimm(1984)}]{pimm1984complexity}
+Pimm, S.L. (1984).
+\newblock The complexity and stability of ecosystems.
+\newblock \emph{Nature}, 307, 321--326.
 
 \bibitem[{Ponisio \emph{et~al.}(2015)Ponisio, M'Gonigle \&
   Kremen}]{ponisio2015farm}
