@@ -2,26 +2,37 @@ plot.panels <- function(){
   f <- function(){
     col.lines <-  brewer.pal(4, "Greys")[3]
     col.fill <- add.alpha(col.lines, alpha=0.2)
-    layout(matrix(1:2, ncol=2))
-    par(oma=c(6, 7, 2, 1),
+    layout(matrix(1:2, ncol=1))
+    par(oma=c(4, 6, 2, 1),
         mar=c(0.5, 0, 0.5, 1), cex.axis=1.5)
     ## nodf
-    plot.panel(new.dd=nodf.pi,
-               dats=cor.dats,
-               y1="Robustness",
+    plot.panel(new.dd=ypr.pi.pol,
+               dats=specs,
+               y1="closeness",
                xs="ypr",
                col.fill=col.fill,
                col.lines=col.lines,
-               plotPoints=TRUE)
-    mtext("Robustness", 2, line=5, cex=1.5)
-    axis(1, pretty(cor.dats$ypr), labels=pretty(cor.dats$ypr))
-    mtext("Years Post Restoration", 1, line=3.5, cex=1.5)
+               plotPoints=TRUE,
+               agg.col="GenusSpecies")
+
+    plot.panel(new.dd=ypr.pi.plant,
+               dats=specs,
+               y1="closeness",
+               xs="ypr",
+               col.fill=col.fill,
+               col.lines=col.lines,
+               plotPoints=TRUE,
+               agg.col="GenusSpecies")
+    
+    axis(1, pretty(specs$ypr), labels=pretty(specs$ypr))
+    mtext("Closeness", 2, line=4.5, cex=1.5, adj=1.75)
+    mtext("Years of Assembly", 1, line=3, cex=1.5)
 
   }
   path <- 'figures' 
   pdf.f(f, file=file.path(path,
-             sprintf("%s.pdf", "baci")),
-        width=5, height=12)
+             sprintf("%s.pdf", "closenessPanel")),
+        width=4, height=6)
 
 }
 

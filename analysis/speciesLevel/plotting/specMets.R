@@ -41,3 +41,19 @@ for(j in pp){
                      agg.col="GenusSpecies")
   }
 }
+
+
+## closeness only
+
+ypr.pi.pol <- predict.int(mod= mods$pol$closeness,
+                      dd=dd.ypr,
+                      y="closeness",
+                      family="gaussian")
+
+
+ypr.pi.plant <- predict.int(mod= mods$plant$closeness,
+                      dd=dd.ypr,
+                      y="closeness",
+                      family="gaussian")
+
+plot.panels()
