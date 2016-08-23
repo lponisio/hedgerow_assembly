@@ -4,8 +4,8 @@ plot.panels <- function(){
     col.fill <- add.alpha(col.lines, alpha=0.2)
     names(col.lines) <- names(col.fill) <- "all"
     layout(matrix(1:4, nrow=2, byrow=TRUE))
-    par(oma=c(4, 5, 0.5, 1),
-        mar=c(1, 0, 0, 1), cex.axis=1.2)
+    par(oma=c(2, 5, 0.5, 1),
+        mar=c(2.5, 0, 0, 1), cex.axis=1.2)
     ## persistence pollinators
     plot.panel(new.dd=occ.pi.close,
                dats=occ.closeness.cv$data,
@@ -15,7 +15,7 @@ plot.panels <- function(){
                col.fill=col.fill,
                col.lines=col.lines,
                plot.y=TRUE,
-               plot.x=FALSE,
+               plot.x=TRUE,
                treatments="all")
     ## degree pollinators
     plot.panel(new.dd=degree.pi,
@@ -26,15 +26,15 @@ plot.panels <- function(){
                col.fill=col.fill,
                col.lines=col.lines,
                plot.y=FALSE,
-               plot.x=FALSE,
+               plot.x=TRUE,
                treatments="all",
                dec=0)
 
     ## persistence plants
-    plot.panel(new.dd=occ.pi.close,
+    plot.panel(new.dd=plants.occ.pi.close,
                dats=plants.occ.closeness.cv$data,
                y1="cv",
-               y2= range(c(degree.pi$plo, degree.pi$phi)),
+               y2= range(c(plants.degree.pi$plo, plants.degree.pi$phi)),
                xs="traits",
                col.fill=col.fill,
                col.lines=col.lines,
@@ -46,9 +46,9 @@ plot.panels <- function(){
           line=3.2, cex=1.2, adj=-0.75)
 
     ## degree plants
-    plot.panel(new.dd=degree.pi,
+    plot.panel(new.dd=plants.degree.pi,
                dats=plants.degree.closeness.cv$data,
-               y2=range(c(occ.pi.close$plo, occ.pi.close$phi)),
+               y2=range(c(plants.occ.pi.close$plo, plants.occ.pi.close$phi)),
                y1="cv",
                xs="traits",
                col.fill=col.fill,

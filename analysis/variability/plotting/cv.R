@@ -10,28 +10,36 @@ load('saved/contMods.Rdata')
 ## ************************************************************
 ## persistence closeness
 ## ************************************************************
-dd.occ <- expand.grid(traits=seq(
-                        from= min(c(occ.closeness.cv$data$traits,
-                          plants.occ.closeness.cv$data$traits),
-                          na.rm=TRUE),
-                        to= max(c(occ.closeness.cv$data$traits,
-                          plants.occ.closeness.cv$data$traits),
-                          na.rm=TRUE),
-                        length=20),
-                      SiteStatus="all",
-                      cv= 0)
+dd.occ.pol <- expand.grid(traits=seq(
+                            from= min(occ.closeness.cv$data$traits,
+                              na.rm=TRUE),
+                            to= max(occ.closeness.cv$data$traits,
+                              na.rm=TRUE),
+                            length=20),
+                          SiteStatus="all",
+                          cv= 0)
 
 ## pols
 occ.closeness.cv$data$SiteStatus <- "all"
 occ.pi.close <- predict.int(mod= occ.closeness.cv$lm.nss,
-                            dd=dd.occ,
+                            dd=dd.occ.pol,
                             y="cv",
                             family="gaussian")
 
 ## plants
+dd.occ.plants <- expand.grid(traits=seq(
+                               from= min(plants.occ.closeness.cv$data$traits,
+                                 na.rm=TRUE),
+                               to= max(plants.occ.closeness.cv$data$traits,
+                                 na.rm=TRUE),
+                               length=20),
+                             SiteStatus="all",
+                             cv= 0)
+
+
 plants.occ.closeness.cv$data$SiteStatus <- "all"
 plants.occ.pi.close <- predict.int(mod= plants.occ.closeness.cv$lm.nss,
-                                   dd=dd.occ,
+                                   dd=dd.occ.plants,
                                    y="cv",
                                    family="gaussian")
 
@@ -39,14 +47,12 @@ plants.occ.pi.close <- predict.int(mod= plants.occ.closeness.cv$lm.nss,
 ## ************************************************************
 ## degree closeness
 ## ************************************************************
-dd.degree <- expand.grid(traits=seq(
+dd.degree.pol <- expand.grid(traits=seq(
                                from=
-                               min(c(degree.closeness.cv$data$traits,
-                                     plants.degree.closeness.cv$data$traits),
+                               min(degree.closeness.cv$data$traits,
                                    na.rm=TRUE),
                                to=
-                               max(c(degree.closeness.cv$data$traits,
-                                      plants.degree.closeness.cv$data$traits),
+                               max(degree.closeness.cv$data$traits,
                                    na.rm=TRUE),
                                length=10),
                              SiteStatus="all",
@@ -56,15 +62,26 @@ dd.degree <- expand.grid(traits=seq(
 degree.closeness.cv$data$SiteStatus <- "all"
 
 degree.pi <- predict.int(mod= degree.closeness.cv$lm.nss,
-                         dd=dd.degree,
+                         dd=dd.degree.pol,
                          y="cv",
                          family="gaussian")
 
 ## plants
+dd.degree.plants <- expand.grid(traits=seq(
+                           from=
+                           min(plants.degree.closeness.cv$data$traits,
+                               na.rm=TRUE),
+                           to=
+                           max(plants.degree.closeness.cv$data$traits,
+                               na.rm=TRUE),
+                           length=10),
+                         SiteStatus="all",
+                         cv= 0)
+
 plants.degree.closeness.cv$data$SiteStatus <- "all"
 
 plants.degree.pi <- predict.int(mod= plants.degree.closeness.cv$lm.nss,
-                                dd=dd.degree,
+                                dd=dd.degree.plants,
                                 y="cv",
                                 family="gaussian")
 

@@ -57,8 +57,11 @@ plot.panel <- function(dats,
   }
 
   plot(NA,
-       xlim=range(dats[, xs], na.rm=TRUE),
-       ylim=range(c(new.dd$phi,  new.dd$plo, y2), na.rm=TRUE),
+       xlim=range(new.dd[,xs], na.rm=TRUE),
+       ylim=range(c(new.dd$phi,  new.dd$plo, y2,
+          quantile(dats[,y1],
+         na.rm=TRUE)[c("25%","75%")]),
+         na.rm=TRUE),
        xlab="",
        ylab="",
        xaxt="n",
@@ -78,7 +81,7 @@ plot.panel <- function(dats,
              sd(dats[, "traits.ns"], na.rm=TRUE)) +
              mean(dats[, "traits.ns"], na.rm=TRUE), dec))
     } else{
-      axis(1, pretty(dats[,xs], 4))
+      axis(1, pretty(new.dd[,xs], 4))
     }
   }
   plotting.loop()
