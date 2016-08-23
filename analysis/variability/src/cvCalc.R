@@ -34,7 +34,7 @@ cv.trait <- function(spec.dat,
   coeff.cv <- lapply(prep.cv, function(x){apply(x, 2, cv.function, ...)})
   dats <- data.frame(cv=unlist(coeff.cv))
   if(standard.cv){
-    dats$cv <- dats$cv/100
+    dats$cv[!is.na(dats$cv)] <- log(dats$cv[!is.na(dats$cv)])
   }
   dats$SiteStatus <-  gsub('\\..*', '', rownames(dats))
   dats$SiteStatus <- factor(dats$SiteStatus, levels=status.order)
@@ -44,8 +44,10 @@ cv.trait <- function(spec.dat,
   rownames(dats) <- NULL
   if(cont){
     dats$traits.ns <- spec.dat[,trait][match(dats$GenusSpecies,
-                                             spec.dat[, species.type])]
-    dats$traits <- scale(dats$traits.ns)
+                                             spec.dat[,
+                                                      species.type])]
+    ## trying out not scaling... does it break everything?
+    dats$traits <- dats$traits.ns
   } else{
     dats$traits <- spec.dat[,trait][match(dats$GenusSpecies,
                                           spec.dat[, species.type])]

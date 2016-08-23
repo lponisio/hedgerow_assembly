@@ -9,7 +9,7 @@ plot.panel <- function(dats,
                        ylabel="",
                        ag.col="SiteStatus",
                        plot.x=TRUE,
-                       scaled=TRUE,
+                       scaled=FALSE,
                        plot.y=TRUE,
                        pchs=c(16, 16, 16),
                        dec=1){
@@ -55,6 +55,7 @@ plot.panel <- function(dats,
               col=col.fill[i], border=NA)
     }
   }
+
   plot(NA,
        xlim=range(dats[, xs], na.rm=TRUE),
        ylim=range(c(new.dd$phi,  new.dd$plo, y2), na.rm=TRUE),
@@ -64,13 +65,16 @@ plot.panel <- function(dats,
        yaxt="n",
        las=1)
   if(plot.y){
-    axis(2, pretty(range(c(new.dd$phi,  new.dd$plo, na.rm=TRUE))), las=1)
+    axis(2,
+         pretty(range(c(new.dd$phi,  new.dd$plo, y2), na.rm=TRUE),
+                       min.n=3),
+         las=1)
     mtext(ylabel, 2, line=3, cex=1.5)
   }
   if(plot.x){
     if(scaled){
-      axis(1, pretty(dats[,xs], 5),
-           labels= round((pretty(dats[,xs], 5)*
+      axis(1, pretty(new.dd[,xs], 3),
+           labels= round((pretty(new.dd[,xs], 5)*
              sd(dats[, "traits.ns"], na.rm=TRUE)) +
              mean(dats[, "traits.ns"], na.rm=TRUE), dec))
     } else{

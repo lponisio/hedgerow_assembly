@@ -9,7 +9,7 @@ source('src/initialize.R')
 ## occurrence
 ## ************************************************************
 ## pollinators and k
-## not sig
+## sig!
 occ.k.cv <- cv.trait(spec,
                      specs[specs$speciesType =="pollinator",],
                      trait="occ.date",
@@ -17,12 +17,12 @@ occ.k.cv <- cv.trait(spec,
                      abund.col="k",
                      cv.function=cv,
                      zero2na=TRUE,
-                     standard.cv=FALSE,
+                     standard.cv=TRUE,
                      na.rm=TRUE)
 summary(occ.k.cv$lm.nss)
 
 ## plants and k
-## medium sig
+## not sig!
 plants.occ.k.cv <- cv.trait(spec,
                             specs[specs$speciesType =="plant",],
                             trait="occ.plant.date",
@@ -30,13 +30,13 @@ plants.occ.k.cv <- cv.trait(spec,
                             abund.col="k",
                             cv.function=cv,
                             zero2na=TRUE,
-                            standard.cv=FALSE,
+                            standard.cv=TRUE,
                             na.rm=TRUE,
                             species.type="PlantGenusSpecies")
 summary(plants.occ.k.cv$lm.nss)
 
 ## pollinators and closeness
-## medium sig
+## sig
 occ.closeness.cv <- cv.trait(spec,
                              specs[specs$speciesType =="pollinator",],
                              trait="occ.date",
@@ -44,7 +44,7 @@ occ.closeness.cv <- cv.trait(spec,
                              abund.col="weighted.closeness",
                              cv.function=cv,
                              zero2na=TRUE,
-                             standard.cv=FALSE,
+                             standard.cv=TRUE,
                              na.rm=TRUE)
 summary(occ.closeness.cv$lm.nss)
 
@@ -57,7 +57,7 @@ plants.occ.closeness.cv <- cv.trait(spec,
                                     abund.col="weighted.closeness",
                                     cv.function=cv,
                                     zero2na=TRUE,
-                                    standard.cv=FALSE,
+                                    standard.cv=TRUE,
                                     na.rm=TRUE,
                                     species.type="PlantGenusSpecies")
 summary(plants.occ.closeness.cv$lm.nss)
@@ -66,7 +66,7 @@ summary(plants.occ.closeness.cv$lm.nss)
 ## degree
 ## ************************************************************
 ## pollinators and k
-## not sig
+## sig
 degree.k.cv <- cv.trait(spec,
                         specs[specs$speciesType =="pollinator",],
                         trait="degree",
@@ -74,12 +74,12 @@ degree.k.cv <- cv.trait(spec,
                         abund.col="k",
                         cv.function=cv,
                         zero2na=TRUE,
-                        standard.cv=FALSE,
+                        standard.cv=TRUE,
                         na.rm=TRUE)
 summary(degree.k.cv$lm.nss)
 
 ## plants and k
-## not sig
+## sig
 plants.degree.k.cv <- cv.trait(spec,
                                specs[specs$speciesType =="plant",],
                                trait="plant.degree",
@@ -87,7 +87,7 @@ plants.degree.k.cv <- cv.trait(spec,
                                abund.col="k",
                                cv.function=cv,
                                zero2na=TRUE,
-                               standard.cv=FALSE,
+                               standard.cv=TRUE,
                                na.rm=TRUE,
                                species.type="PlantGenusSpecies")
 summary(plants.degree.k.cv$lm.nss)
@@ -101,7 +101,7 @@ degree.closeness.cv <- cv.trait(spec,
                                 abund.col="weighted.closeness",
                                 cv.function=cv,
                                 zero2na=TRUE,
-                                standard.cv=FALSE,
+                                standard.cv=TRUE,
                                 na.rm=TRUE)
 summary(degree.closeness.cv$lm.nss)
 
@@ -114,7 +114,7 @@ plants.degree.closeness.cv <- cv.trait(spec,
                                        abund.col="weighted.closeness",
                                        cv.function=cv,
                                        zero2na=TRUE,
-                                       standard.cv=FALSE,
+                                       standard.cv=TRUE,
                                        na.rm=TRUE,
                                        species.type="PlantGenusSpecies")
 summary(plants.degree.closeness.cv$lm.nss)
@@ -153,7 +153,7 @@ dprime.closeness.cv <- cv.trait(spec,
                                 abund.col="weighted.closeness",
                                 cv.function=cv,
                                 zero2na=TRUE,
-                                standard.cv=FALSE,
+                                standard.cv=TRUE,
                                 na.rm=TRUE)
 summary(dprime.closeness.cv$lm.nss)
 
