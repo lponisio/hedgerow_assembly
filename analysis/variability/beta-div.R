@@ -1,6 +1,6 @@
 rm(list=ls())
 setwd('~/Dropbox/hedgerow_assembly/analysis/variability')
-binary <- FALSE
+binary <- TRUE
 alpha <- TRUE
 source('src/initialize_beta.R')
 
@@ -28,15 +28,19 @@ dats.pols <- data.frame(site=comm.pols$sites,
                        dist=unlist(sapply(dis.pols, function(x)
                          x$distances)))
 
+# invid nulls all not sig, alpha nulls mature marginally sig less,
+# occurrence nulls all not sig
+
 ## run model, plot
-mod.pols <- summary(lmer(dist ~ status +  (1|site),
-                        data=dats.pols))
+mod.pols <- lmer(dist ~ status +  (1|site),
+                        data=dats.pols)
+summary(mod.pols)
 
 plot.beta.div(dis.method =dis.method, dists= dats.pols$dist,
               status= dats.pols$status, type= "time",
               sub= "pols", occ=occ)
 
-plot.coeffs(dis.method =dis.method, mod=mod.pols,
+plot.coeffs(dis.method =dis.method, mod=summary(mod.pols),
               status= dats.pols$status, type= "space",
               sub= "pols", occ=occ)
 

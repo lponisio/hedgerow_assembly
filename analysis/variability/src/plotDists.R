@@ -9,21 +9,25 @@ plot.beta.div <- function(dis.method, ## dissmiliarity method for file name
                           occ,## occ data? TRUE/FALSE
                           fig.path = 'figures/betadisper'){ 
   cols <- brewer.pal(4, "Greys")[c(2,3,4)]
+  cols.fills <- add.alpha(cols, alpha=0.5)
   f <- function(){
     par(oma=c(2,6,1,1), mar=c(5,0,2,0.5), mgp=c(2,1,0),
         cex.axis=1.5)
     status <- factor(status,
                      levels=c('control', 'maturing',
                        'mature'))
-    boxplot(dists ~ status, col=cols,
+    boxplot(dists ~ status, col=cols.fills,
             xlab='', ylab='',
-            names=c('Unrestored', 'Maturing',
-              'Mature'),
+            names=c("","",""),
             las=1)
+    mtext(c("Non-assembling \n field margin",
+            "Assembling \n  hedgerow",
+            "Non-assembling \n hedgerow"),
+          side = 1, line= 2, at = 1:3)
+    beeswarm(dists ~ status, col = cols, add = TRUE)
     if(type == 'time'){
-      mtext(expression(paste('corrected ',
-          beta-'diversity through time')),
-            2, line=3, cex=1.5)
+      mtext("Species temporal turnover",
+            2, line=3.5, cex=1.5)
     } else {
       mtext(expression(paste(beta-'diversity', ' (corrected)')),
             2, line=3.3, cex=2)
@@ -72,8 +76,9 @@ plot.coeffs <- function(dis.method, ## dissmiliarity method for file name
     arrows(x0=1:3,
            y0= ci.lb, y1=ci.ub, angle=90,
            length=0, code=3, col=cols, lwd=1.5)
-    mtext(expression(paste(beta-'diversity', ' (corrected)')), 2,
-          line=3.5 , cex=2)
+    mtext("Temporal turnover", 2, line=3.5 , cex=2)
+    ## mtext(expression(paste(beta-'diversity', ' (corrected)')), 2,
+    ##       line=3.5 , cex=2)
     ## mtext('Site status',
     ##       side=1, line=4, cex=1.5)
     ## x.labs <- c('Unrestored', 'Maturing', 'Mature')
