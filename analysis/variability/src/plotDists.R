@@ -7,7 +7,7 @@ plot.beta.div <- function(dis.method, ## dissmiliarity method for file name
                           type, ## time or space for ylab
                           sub, ## bees/syrphids for file name
                           occ,## occ data? TRUE/FALSE
-                          fig.path <- 'figures/betadisper'){ 
+                          fig.path = 'figures/betadisper'){ 
   cols <- brewer.pal(4, "Greys")[c(2,3,4)]
   f <- function(){
     par(oma=c(2,6,1,1), mar=c(5,0,2,0.5), mgp=c(2,1,0),
@@ -48,8 +48,9 @@ plot.coeffs <- function(dis.method, ## dissmiliarity method for file name
                         type,  ## time or space for ylab
                         sub, ## bees/syrphids for file name
                         occ, ## occ data? TRUE/FALSE
-                        fig.path <- 'figures/betadisper'){  
-  cols <-brewer.pal(6, 'Dark2')[c(6,2,1)]
+                        fig.path = 'figures/betadisper'){  
+  ## cols <-brewer.pal(6, 'Dark2')[c(6,2,1)]
+  cols <- brewer.pal(4, "Greys")[c(2,3,4)]
   f <- function(){
     par(oma=c(2,6,1,1), mar=c(5,0,2,0.5), mgp=c(2,1,0),
         cex.axis=1.5)

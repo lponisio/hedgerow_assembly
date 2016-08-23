@@ -1,4 +1,5 @@
-
+## computes dispersion of community matrices, returns output of vegan
+## function betadisper
 
 beta.status <- function(comm,
                         status,
@@ -30,7 +31,7 @@ beta.status <- function(comm,
       sum(x[length(null.dis)] == x)
     })
     cor.dis <- as.dist((less.than + 0.5*equal.2)/
-                       length(null.dis))
+                       length(null.dis), diag= TRUE)
   }else{
     cor.dis  <-  (comm.dis -
                   apply(arr , 1:2 , mean))/

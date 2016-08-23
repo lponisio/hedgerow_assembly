@@ -7,7 +7,7 @@ source('src/initialize.R')
 source('src/commPrep.R')
 save.dir.comm <- "saved/communities"
 save.dir.nulls <- "saved/nulls"
-nnull <- 3
+nnull <- 999
 
 src.dir2 <- '~/Dropbox/hedgerow_network/analysis/beta-div'
 source(file.path(src.dir2, 'src/misc.R'))
@@ -28,10 +28,11 @@ years <- lapply(comms, rownames)
 comm.pols <- list(comm=comms,
                   years=years,
                   sites= rep(names(comms),
-                    nyears[nyears >= 3]))
+                    sapply(comms, nrow)))
 statuses <- spec$SiteStatus[match(comm.pols$sites,
                                           spec$Site)]
-comm.pols$status <- split(statuses, comm.pols$sites)
+comm.pols$status <- split(statuses,
+                          comm.pols$sites)[names(comm.pols$comm)]
 
 save(comm.pols, file=file.path(save.dir.comm, 'pols-abund.Rdata'))
 

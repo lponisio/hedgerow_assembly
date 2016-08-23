@@ -1,3 +1,10 @@
+library(lme4)
+library(vegan)
+library(lmerTest)
+source('src/misc.R')
+source('src/beta.R')
+source('src/plotDists.R')
+
 
 if(!binary & alpha){
   occ <- "abund"
