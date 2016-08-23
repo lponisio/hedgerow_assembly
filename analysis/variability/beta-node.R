@@ -2,6 +2,7 @@ rm(list=ls())
 setwd('~/Dropbox/hedgerow_assembly/analysis/variability')
 source('src/initialize.R')
 source('src/phyloIntBeta.R')
+source('src/plotDists.R')
 
 ## ************************************************************
 ## prepare link community in terminal
@@ -39,11 +40,14 @@ summary(phylo.int.mod)
 ## summary(phylo.int.mod)
 
 
-plot.box(ylabel="Node turnover",
+plot.node.box(ylabel="Weighted species temporal turnover",
                  dats=phylo.int$phylo.int,
                  y1="PhyloInt")
 
+## ## ************************************************************
 ## interaction lifespans
+## ************************************************************
+
 int.lives <- lapply(phylo.int$comm, function(x) sort(colSums(x)))
 
 plot(NA, ylim=c(0,1), xlim=c(0,100))

@@ -1,3 +1,4 @@
+
 ## phylo-beta of interactions
 ## takes raw specimen data (spec.dat), the , 
 calcCommDis <- function(spec.dat, type, lc, abund.w=TRUE){
@@ -83,34 +84,4 @@ calcDendDis <- function(spec.dat, type){
                 paste("dedrogram", type[1], sep="_"))),
         width=25, height=10)
   return(dengram)
-}
-
-
-plot.box <- function(ylabel,
-                     dats,
-                     y1){
-  plot.ci <- function(){
-    col.lines <-  brewer.pal(4, "Greys")[c(2,3,4)]
-    col.fill <- add.alpha(col.lines, alpha=0.2)
-    layout(matrix(1, ncol=1))
-    par(oma=c(1, 5, 2, 1),
-        mar=c(2, 0, 0.5, 1))
-    boxplot(dats[,y1]~ dats$SiteStatus,
-            col=col.lines,
-             axes = F)
-    axis(1, at= 1:3, labels= c("", "", ""), lty= 1, las= .8)
-    mtext(c("Non-assembling \n field margin",
-              "Assembling \n  hedgerow",
-                     "Non-assembling \n hedgerow"),
-          side = 1, line= 2, at = 1:3)
-    axis(2, pretty(dats[,y1]), labels=pretty(dats[,y1]))
-    mtext(ylabel, 2, line=3.5, cex=1.5)
-  }
-  path <- 'figures' 
-  pdf.f(plot.ci, file=file.path(path,
-                   sprintf("%s.pdf", paste(
-                     gsub(" ", "", ylabel),
-                     "box", sep="_"))),
-        width=6, height=4)
-
 }
