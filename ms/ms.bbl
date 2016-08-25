@@ -1,5 +1,10 @@
-\begin{thebibliography}{63}
+\begin{thebibliography}{69}
 \expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
+
+\bibitem[{Ahn \emph{et~al.}(2010)Ahn, Bagrow \& Lehmann}]{ahn2010link}
+Ahn, Y.Y., Bagrow, J.P. \& Lehmann, S. (2010).
+\newblock Link communities reveal multiscale complexity in networks.
+\newblock \emph{Nature}, 466, 761--764.
 
 \bibitem[{Alarc{\'o}n \emph{et~al.}(2008)Alarc{\'o}n, Waser \&
   Ollerton}]{alarcon2008year}
@@ -22,6 +27,15 @@ Almeida-Neto, M., Gumar\~{a}es, P., Gumar{\~a}es, P.R., Loyola, R.D. \& Ulrich,
 \newblock A consistent metric for nestedness analysis in ecological systems:
   reconciling concept and measurement.
 \newblock \emph{Oikos}, 117, 1227--1239.
+
+\bibitem[{Anderson \emph{et~al.}(2011)Anderson, Crist, Chase, Vellend, Inouye,
+  Freestone, Sanders, Cornell, Comita, Davies \emph{et~al.}}]{anderson-2011-19}
+Anderson, M.J., Crist, T.O., Chase, J.M., Vellend, M., Inouye, B.D., Freestone,
+  A.L., Sanders, N.J., Cornell, H.V., Comita, L.S., Davies, K.F. \emph{et~al.}
+  (2011).
+\newblock Navigating the multiple meanings of $\beta$ diversity: a roadmap for
+  the practicing ecologist.
+\newblock \emph{Ecol. Lett.}, 14, 19--28.
 
 \bibitem[{Barab{\'a}si \& Albert(1999)}]{barabasi1999emergence}
 Barab{\'a}si, A.L. \& Albert, R. (1999).
@@ -78,6 +92,13 @@ Burkle, L.A. \& Alarc{\'o}n, R. (2011).
 \newblock The future of plant-pollinator diversity: Understanding interaction
   networks across time, space, and global change.
 \newblock \emph{American Journal of Botany}, 98, 528.
+
+\bibitem[{Chao \emph{et~al.}(2005)Chao, Chazdon, Colwell \&
+  Shen}]{chao-2005-148}
+Chao, A., Chazdon, R.L., Colwell, R.K. \& Shen, T.J. (2005).
+\newblock A new statistical approach for assessing similarity of species
+  composition with incidence and abundance data.
+\newblock \emph{Ecol. Lett.}, 8, 148--159.
 
 \bibitem[{Costa \emph{et~al.}(2007)Costa, Rodrigues, Travieso \&
   Villas~Boas}]{costa2007characterization}
@@ -158,6 +179,12 @@ Galeano, J., Pastor, J.M. \& Iriondo, J.M. (2009).
   calculate over frequency matrices.
 \newblock \emph{Environmental Modeling \& Software}, 24, 1342--1346.
 
+\bibitem[{Graham \& Fine(2008)}]{graham2008phylogenetic}
+Graham, C.H. \& Fine, P.V. (2008).
+\newblock Phylogenetic beta diversity: linking ecological and evolutionary
+  processes across space in time.
+\newblock \emph{Ecology letters}, 11, 1265--1277.
+
 \bibitem[{Holland \emph{et~al.}(2006)Holland, Okuyama \&
   DeAngelis}]{holland2006comment}
 Holland, J.N., Okuyama, T. \& DeAngelis, D.L. (2006).
@@ -172,6 +199,19 @@ Kaiser-Bunbury, C.N., Muff, S., Memmott, J., M{\"u}ller, C.B. \& Caflisch, A.
 \newblock The robustness of pollination networks to the loss of species and
   interactions: a quantitative approach incorporating pollinator behaviour.
 \newblock \emph{Ecology Letters}, 13, 442--452.
+
+\bibitem[{Kalinka \& Tomancak(2011)}]{kalinka2011linkcomm}
+Kalinka, A.T. \& Tomancak, P. (2011).
+\newblock linkcomm: an r package for the generation, visualization, and
+  analysis of link communities in networks of arbitrary size and type.
+\newblock \emph{Bioinformatics}, 27.
+
+\bibitem[{Kembel \emph{et~al.}(2010)Kembel, Cowan, Helmus, Cornwell, Morlon,
+  Ackerly, Blomberg \& Webb}]{picante-2010-1463}
+Kembel, S., Cowan, P., Helmus, M., Cornwell, W., Morlon, H., Ackerly, D.,
+  Blomberg, S. \& Webb, C. (2010).
+\newblock Picante: {R} tools for integrating phylogenies and ecology.
+\newblock \emph{Bioinformatics}, 26, 1463--1464.
 
 \bibitem[{Klein \emph{et~al.}(2007)Klein, Vaissi\`{e}re, Cane,
   Steffan-Dewenter, Cunningham, Kremen \& Tscharntke}]{klein-2007-303}

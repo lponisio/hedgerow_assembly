@@ -2,6 +2,8 @@ rm(list=ls())
 setwd('~/Dropbox/hedgerow_assembly/analysis/variability')
 binary <- FALSE
 alpha <- TRUE
+## int or pols
+type <- "int"
 source('src/initialize_beta.R')
 
 ## ************************************************************
@@ -27,9 +29,10 @@ dats.pols <- data.frame(site=comm.pols$sites,
                         year=unlist(comm.pols$years),
                         dist=unlist(sapply(dis.pols, function(x)
                           x$distances)))
+rownames(dats.pols) <- NULL
 
 save(dats.pols, file= file.path('saved/speciesTurnover',
-                  sprintf('%s.pdf', paste(dis.method, alpha, occ,
+                  sprintf('%s.pdf', paste(dis.method, alpha, occ, type,
                                           sep='_'))))
 
 ## invid nulls all not sig, alpha nulls mature marginally sig less,
@@ -38,7 +41,7 @@ save(dats.pols, file= file.path('saved/speciesTurnover',
 ## run model, plot
 
 load(file= file.path('saved/speciesTurnover', sprintf('%s.pdf',
-       paste(dis.method, alpha, occ, sep='_'))))
+       paste(dis.method, alpha, occ, type, sep='_'))))
 
 
 mod.pols <- lmer(dist ~ status +  (1|site),
@@ -47,11 +50,11 @@ summary(mod.pols)
 
 plot.beta.div(dis.method =dis.method, dists= dats.pols$dist,
               status= dats.pols$status, type= "time",
-              sub= "pols", occ=occ)
+              sub= type, occ=occ, ylabel=ylabel)
 
 plot.coeffs(dis.method =dis.method, mod=summary(mod.pols),
             status= dats.pols$status, type= "space",
-            sub= "pols", occ=occ)
+            sub= type, occ=occ)
 
 
-plotDistPanels()
+## plotDistPanels()

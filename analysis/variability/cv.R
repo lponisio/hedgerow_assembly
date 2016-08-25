@@ -121,13 +121,21 @@ summary(plants.degree.closeness.cv$lm.nss)
 
 
 ## check correlation of degree and occ 
-occ.k.sd$data$degree <-
-  degree$data$traits.ns[match(occ.k.sd$data$GenusSpecies,
-                              degree$data$GenusSpecies)]
+## pollinators
+check.pol <- unique(cbind(spec$degree,
+                          spec$occ.date))
+plot(check.pol)
 
-plot(occ.k.sd$data$traits.ns ~ occ.k.sd$data$degree)
+cor.test(check.pol[,1], check.pol[,2])
 
-cor.test(occ.k.sd$data$traits.ns, occ.k.sd$data$degree)
+
+check.plant <- unique(cbind(spec$plant.degree,
+                            spec$occ.plant.date))
+plot(check.plant)
+
+cor.test(check.plant[,1], check.plant[,2])
+
+
 
 
 ## ************************************************************

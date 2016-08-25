@@ -3,22 +3,26 @@
 ## takes raw specimen data (spec.dat), the , 
 calcCommDis <- function(spec.dat, type, lc, abund.w=TRUE){
   ## prep community of sites and interactions
+ 
   prep.comm <- aggregate(spec.dat[, type],
                          list(site=spec.dat$Site,
                               year=spec.dat$Year,
                               status=spec.dat$SiteStatus,
                               sp=spec.dat[, type]),
                          length)
+  
   ## split by status then by site
   bystatus <- split(prep.comm, prep.comm$status)
   bysite1 <- lapply(bystatus, function(x){split(x, x$site)})
   bysite <- unlist(bysite1, recursive=FALSE)
+
   ## create a site by interaction community
   comm <- lapply(bysite, function(y) {
     samp2site.spp(y$year, y$sp, y$x)
   })
   ## drop sites that were only samples one year
-  comm <- comm[lapply(comm,nrow) > 1]
+  comm <- comm[lapply(comm, nrow) >= 3]
+
   ## calculate the number of years between sampling times
   years <- lapply(comm, rownames)
   dist.time <- as.matrix(dist(unique(spec.dat$Year), diag=TRUE))
@@ -42,7 +46,11 @@ calcCommDis <- function(spec.dat, type, lc, abund.w=TRUE){
                      assignCols(a,b),
                      a=comm,
                      b=node.order)
+
+  ## calculate "phylogenetic" distance between interactions
+  
   dist.tree <- cophenetic(lc$hclust)
+
   ## calculate the dissimilarity between years based on the dengrogram
   comm.dis <- lapply(comm.int, comdist,
                      dis=dist.tree,

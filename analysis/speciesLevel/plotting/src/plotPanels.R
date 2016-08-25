@@ -26,7 +26,7 @@ plot.panels <- function(){
     
     axis(1, pretty(specs$ypr), labels=pretty(specs$ypr))
     mtext("Closeness", 2, line=4.5, cex=1.5, adj=1.75)
-    mtext("Years of Assembly", 1, line=3, cex=1.5)
+    mtext("Years of assembly", 1, line=3, cex=1.5)
 
   }
   path <- 'figures' 

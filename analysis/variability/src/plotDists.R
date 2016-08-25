@@ -2,10 +2,18 @@ library(RColorBrewer)
 library(beeswarm)
 ## box plot
 
-f1 <- function(){
-  makeBetaBox <- function(dists=dists, ## beta-div estimate (box data)
-                          status=status){ ## vector of site statuses
-    ## (box catagoties)
+plot.beta.div <- function(dis.method, ## dissmiliarity method for file name
+                          dists, ## beta-div estimate (box data)
+                          status, ## vector of site statuses (box catagoties)
+                          type, ## time or space for ylab
+                          sub, ## bees/syrphids for file name
+                          occ,## occ data? TRUE/FALSE
+                          fig.path = 'figures/betadisper',
+                          ylabel){
+  makeBetaBox <- function(){
+
+    par(oma=c(2,6,1,1), mar=c(5,0,2,0.5), mgp=c(2,1,0),
+        cex.axis=1.5)
     status <- factor(status,
                      levels=c('control', 'maturing',
                        'mature'))
@@ -14,35 +22,19 @@ f1 <- function(){
     boxplot(dists ~ status, col=cols.fills,
             xlab='', ylab='',
             names=c("","",""),
-            las=1)
-    if(add.labels){
-      mtext(c("Non-assembling \n field margin",
-              "Assembling \n  hedgerow",
-              "Non-assembling \n hedgerow"),
-            side = 1, line= 2, at = 1:3)
-    }
+            las=1,
+            ylim=c(0,1))
+    mtext(c("Non-assembling \n field margin",
+            "Assembling \n  hedgerow",
+            "Non-assembling \n hedgerow"),
+          side = 1, line= 2, at = 1:3)
     beeswarm(dists ~ status, col = cols, add = TRUE)
-    if(type == 'time'){
-      mtext("Species temporal turnover",
-            2, line=3.5, cex=1.5)
-    } else {
-      mtext(expression(paste(beta-'diversity', ' (corrected)')),
-            2, line=3.3, cex=2)
-    }
+
+    mtext(ylabel,
+          2, line=3.5, cex=1.5)
+
   }
-}
-
-plot.beta.div <- function(dis.method, ## dissmiliarity method for file name
-                          dists, ## beta-div estimate (box data)
-                          status, ## vector of site statuses (box catagoties)
-                          type, ## time or space for ylab
-                          sub, ## bees/syrphids for file name
-                          occ,## occ data? TRUE/FALSE
-                          fig.path = 'figures/betadisper'){
-  par(oma=c(2,6,1,1), mar=c(5,0,2,0.5), mgp=c(2,1,0),
-      cex.axis=1.5)
-
-  pdf.f(f1,
+  pdf.f(makeBetaBox,
         file= file.path(fig.path, sprintf('%s.pdf',
           paste(type,
                 occ,
@@ -104,10 +96,12 @@ plot.coeffs <- function(dis.method, ## dissmiliarity method for file name
 }
 
 
-f2 <- function(){
-  makeNodeBox <- function(ylabel=ylabel,
-                          dats=dats,
-                          y1=y1){
+plot.node.box <- function(ylabel,
+                          dats,
+                          y1){
+  makeNodeBox <- function(){
+    par(oma=c(2,6,1,1), mar=c(5,0,2,0.5), mgp=c(2,1,0),
+        cex.axis=1.5)
     cols <- brewer.pal(4, "Greys")[c(2,3,4)]
     cols.fills <- add.alpha(cols, alpha=0.5)
     boxplot(dats[,y1]~ dats$SiteStatus,
@@ -120,18 +114,11 @@ f2 <- function(){
     beeswarm(dats[,y1]~ dats$SiteStatus, col = cols, add = TRUE)
     mtext(ylabel, 2, line=3.5, cex=1.5)
   }
-}
-
-plot.node.box <- function(ylabel,
-                          dats,
-                          y1){
-  par(oma=c(2,6,1,1), mar=c(5,0,2,0.5), mgp=c(2,1,0),
-      cex.axis=1.5)
   path <- 'figures'
-  pdf.f(f2, file=file.path(path,
-              sprintf("%s.pdf", paste(
-                gsub(" ", "", ylabel),
-                "box", sep="_"))),
+  pdf.f(makeNodeBox, file=file.path(path,
+                       sprintf("%s.pdf", paste(
+                         gsub(" ", "", ylabel),
+                         "box", sep="_"))),
         width=6, height=6)
   
 }
@@ -139,12 +126,15 @@ plot.node.box <- function(ylabel,
 
 plotDistPanels <- function(){
   f3 <- function(){
-    layout(matrix(1:2, nrow=2))
-    par(oma=c(3, 5, 0.5, 1),
-        mar=c(1, 0, 0, 1), cex.axis=1.2)
+    layout(matrix(1:3, ncol=1))
+    par(oma=c(5, 6.5, 0.5, 1),
+        mar=c(1, 0, 0, 1), cex.axis=1.5)
     cols <- brewer.pal(4, "Greys")[c(2,3,4)]
     cols.fills <- add.alpha(cols, alpha=0.5)
+
     ## species turnover
+    load(file= file.path('saved/speciesTurnover', sprintf('%s.pdf',
+           paste(dis.method, alpha, occ, type="pols", sep='_'))))
     dists <- dats.pols$dist
     status <- dats.pols$status
     status <- factor(status,
@@ -156,11 +146,27 @@ plotDistPanels <- function(){
             las=1, xaxt="n")
     beeswarm(dists ~ status, col = cols, add = TRUE)
     mtext("Species turnover",
-          2, line=3.5, cex=1.5)
+          2, line=4, cex=1.2)
     
-    ## node turnover
+    ## interaction turnover
+    load(file= file.path('saved/speciesTurnover', sprintf('%s.pdf',
+           paste(dis.method, alpha, occ, type="int", sep='_'))))
+    dists <- dats.pols$dist
+    status <- dats.pols$status
+    status <- factor(status,
+                     levels=c('control', 'maturing',
+                       'mature'))
+    boxplot(dists ~ status, col=cols.fills,
+            xlab='', ylab='',
+            names=c("","",""),
+            las=1, xaxt="n")
+    beeswarm(dists ~ status, col = cols, add = TRUE)
+    mtext("Interaction turnover",
+          2, line=4, cex=1.2)
+    
+    ## weighted link turnover
     load(file="saved/phyloInt.Rdata")
-    ylabel <- "Weighted species turnover"
+    ylabel <- "Weighted interaction turnover"
     dats <- phylo.int$phylo.int
     y1 <- "PhyloInt"
     boxplot(dats[,y1]~ dats$SiteStatus,
@@ -169,13 +175,13 @@ plotDistPanels <- function(){
     mtext(c("Non-assembling \n field margin",
             "Assembling \n  hedgerow",
             "Non-assembling \n hedgerow"),
-          side = 1, line= 2, at = 1:3, cex=1.2)
+          side = 1, line= 3, at = 1:3, cex=1.1)
     beeswarm(dats[,y1]~ dats$SiteStatus, col = cols, add = TRUE)
-    mtext(ylabel, 2, line=3.5, cex=1.5)
+    mtext(ylabel, 2, line=4, cex=1.2)
   }
   path <- 'figures'
   pdf.f(f3, file=file.path(path,
               sprintf("%s.pdf", "turnover_panels")),
-        width=8, height=11)
+        width=5.2, height=8)
 }
 
