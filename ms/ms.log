@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.5.24)  25 AUG 2016 17:29
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.5.24)  25 AUG 2016 17:33
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -654,17 +654,17 @@ input line 845.
 LaTeX Warning: Float too large for page by 4.5204pt on input line 857.
 
 [28] [29] [30 <../analysis/changePoint/plotting/networks.pdf>]
-<../analysis/changePoint/plotting/communitiesSkanky.pdf, id=558, 789.62778pt x 
-318.2848pt>
+<../analysis/changePoint/plotting/communitiesSkanky.pdf, id=558, 802.61435pt x 
+318.7294pt>
 File: ../analysis/changePoint/plotting/communitiesSkanky.pdf Graphic file (type
  pdf)
  <use ../analysis/changePoint/plotting/communitiesSkanky.pdf>
 Package pdftex.def Info: ../analysis/changePoint/plotting/communitiesSkanky.pdf
  used on input line 862.
-(pdftex.def)             Requested size: 375.80544pt x 151.47824pt.
+(pdftex.def)             Requested size: 422.77664pt x 167.88986pt.
 
 [31 <../analysis/changePoint/plotting/communitiesSkanky.pdf>]
-<../analysis/variability/figures/cv/occ_degree.pdf, id=6734, 361.35pt x 289.08p
+<../analysis/variability/figures/cv/occ_degree.pdf, id=6736, 361.35pt x 289.08p
 t>
 File: ../analysis/variability/figures/cv/occ_degree.pdf Graphic file (type pdf)
 
@@ -673,16 +673,16 @@ Package pdftex.def Info: ../analysis/variability/figures/cv/occ_degree.pdf used
  on input line 874.
 (pdftex.def)             Requested size: 375.80544pt x 300.64491pt.
  [32 <../analysis/variability/figures/cv/occ_degree.pdf>]
-<../analysis/variability/figures/turnover_panels.pdf, id=6748, 722.7pt x 650.43
+<../analysis/variability/figures/turnover_panels.pdf, id=6750, 722.7pt x 650.43
 pt>
 File: ../analysis/variability/figures/turnover_panels.pdf Graphic file (type pd
 f)
  <use ../analysis/variability/figures/turnover_panels.pdf>
 Package pdftex.def Info: ../analysis/variability/figures/turnover_panels.pdf us
 ed on input line 889.
-(pdftex.def)             Requested size: 328.82707pt x 295.9461pt.
+(pdftex.def)             Requested size: 375.80544pt x 338.22554pt.
  [33 <../analysis/variability/figures/turnover_panels.pdf>]
-<../analysis/networkLevel/figures/baci.pdf, id=6763, 722.7pt x 433.62pt>
+<../analysis/networkLevel/figures/baci.pdf, id=6765, 722.7pt x 433.62pt>
 File: ../analysis/networkLevel/figures/baci.pdf Graphic file (type pdf)
 
 <use ../analysis/networkLevel/figures/baci.pdf>
@@ -690,7 +690,7 @@ Package pdftex.def Info: ../analysis/networkLevel/figures/baci.pdf used on inpu
 t line 908.
 (pdftex.def)             Requested size: 469.75502pt x 281.85628pt.
  [34 <../analysis/networkLevel/figures/baci.pdf>]
-<../analysis/networkLevel/figures/robustness.pdf, id=6776, 289.08pt x 397.485pt
+<../analysis/networkLevel/figures/robustness.pdf, id=6778, 289.08pt x 397.485pt
 >
 File: ../analysis/networkLevel/figures/robustness.pdf Graphic file (type pdf)
  <use ../analysis/networkLevel/figures/robustness.pdf>
@@ -726,10 +726,10 @@ mf-dist/fonts/type1/urw/palatino/uplr8a.pfb></usr/local/texlive/2015/texmf-dist
 /type1/urw/times/utmb8a.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/urw
 /times/utmr8a.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/urw/times/utm
 ri8a.pfb>
-Output written on ms.pdf (35 pages, 2460716 bytes).
+Output written on ms.pdf (35 pages, 2470055 bytes).
 PDF statistics:
- 6853 PDF objects out of 7423 (max. 8388607)
- 4677 compressed objects within 47 object streams
+ 6855 PDF objects out of 7423 (max. 8388607)
+ 4679 compressed objects within 47 object streams
  137 named destinations out of 1000 (max. 500000)
  31 words of extra memory for PDF output out of 10000 (max. 10000000)
 
