@@ -38,7 +38,7 @@ calcCommDis <- function(spec.dat, type, lc, abund.w=TRUE){
   node.order <- lapply(comm, function(x){
     node.num[,1][match(colnames(x), node.num[,2])]
   })
-  assignCols <- function(a,b){
+  assignCols <- function(a, b){
     colnames(a) <- b
     return(a)
   }
