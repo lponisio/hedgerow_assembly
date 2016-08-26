@@ -126,62 +126,83 @@ plot.node.box <- function(ylabel,
 
 plotDistPanels <- function(){
   f3 <- function(){
-    layout(matrix(1:3, ncol=1))
-    par(oma=c(5, 6.5, 0.5, 1),
-        mar=c(1, 0, 0, 1), cex.axis=1.5)
+    layout(matrix(1:4, ncol=2, byrow=TRUE))
+    par(oma=c(2.5, 6, 1, 1),
+        mar=c(1, 1, 2, 1), cex.axis=1.5)
     cols <- brewer.pal(4, "Greys")[c(2,3,4)]
     cols.fills <- add.alpha(cols, alpha=0.5)
 
-    ## species turnover
+    ## pollinator species turnover
     load(file= file.path('saved/speciesTurnover', sprintf('%s.pdf',
            paste(dis.method, alpha, occ, type="pols", sep='_'))))
-    dists <- dats.pols$dist
-    status <- dats.pols$status
+    dists <- dats$dist
+    status <- dats$status
     status <- factor(status,
                      levels=c('control', 'maturing',
                        'mature'))
     boxplot(dists ~ status, col=cols.fills,
-            xlab='', ylab='',
+            xlab='', ylab='', ylim=c(0,1),
             names=c("","",""),
             las=1, xaxt="n")
     beeswarm(dists ~ status, col = cols, add = TRUE)
-    mtext("Species turnover",
-          2, line=4, cex=1.2)
+    mtext("Pollinators",
+          3, line=0.9, cex=1.3)
+
+    ## plant species turnover
+    load(file= file.path('saved/speciesTurnover', sprintf('%s.pdf',
+           paste(dis.method, alpha, occ, type="plants", sep='_'))))
+    dists <- dats$dist
+    status <- dats$status
+    status <- factor(status,
+                     levels=c('control', 'maturing',
+                       'mature'))
+    boxplot(dists ~ status, col=cols.fills,
+            xlab='', ylab='',ylim=c(0,1),
+            names=c("","",""),
+            las=1, xaxt="n", yaxt="n")
+    beeswarm(dists ~ status, col = cols, add = TRUE)
+    mtext("Plants",
+          3, line=0.9, cex=1.3)
     
     ## interaction turnover
     load(file= file.path('saved/speciesTurnover', sprintf('%s.pdf',
            paste(dis.method, alpha, occ, type="int", sep='_'))))
-    dists <- dats.pols$dist
-    status <- dats.pols$status
+    dists <- dats$dist
+    status <- dats$status
     status <- factor(status,
                      levels=c('control', 'maturing',
                        'mature'))
     boxplot(dists ~ status, col=cols.fills,
-            xlab='', ylab='',
+            xlab='', ylab='',ylim=c(0,1),
             names=c("","",""),
-            las=1, xaxt="n")
+            las=1)
     beeswarm(dists ~ status, col = cols, add = TRUE)
-    mtext("Interaction turnover",
-          2, line=4, cex=1.2)
+    mtext("Interactions",
+          3, line=0.9, cex=1.3)
+    mtext(c("Non-assembling \n field margin",
+            "Assembling \n  hedgerow",
+            "Non-assembling \n hedgerow"),
+          side = 1, line= 2, at = 1:3, cex=0.9)
+    mtext("Turnover", 2, line=4, cex=1.3, adj=1.2)
     
     ## weighted link turnover
     load(file="saved/phyloInt.Rdata")
-    ylabel <- "Weighted interaction turnover"
     dats <- phylo.int$phylo.int
     y1 <- "PhyloInt"
     boxplot(dats[,y1]~ dats$SiteStatus,
             col=cols.fills,
-            names=c("","",""), las=1)
+            names=c("","",""), las=1,
+            ylim=c(0,1), yaxt="n")
     mtext(c("Non-assembling \n field margin",
             "Assembling \n  hedgerow",
             "Non-assembling \n hedgerow"),
-          side = 1, line= 3, at = 1:3, cex=1.1)
+          side = 1, line= 2, at = 1:3, cex=0.9)
     beeswarm(dats[,y1]~ dats$SiteStatus, col = cols, add = TRUE)
-    mtext(ylabel, 2, line=4, cex=1.2)
+    mtext("Weighted interactions", 3, line=0.9, cex=1.3)
   }
   path <- 'figures'
   pdf.f(f3, file=file.path(path,
               sprintf("%s.pdf", "turnover_panels")),
-        width=5.2, height=8)
+        width=10, height=9)
 }
 

@@ -118,7 +118,15 @@ plotDend <- function(){
          edge.arrow.mode=0,
          layout=l, palette=colors,
          mark.border = "white",
-         mark.col="white") 
+         mark.col="white")
+  }
+    for(j in 1:length(this.tree)){
+    ceb <- cebs[[j]]
+    colors <-  c('#a6cee3', '#b2df8a', '#fb9a99', '#fdbf6f',
+                  '#cab2d6', '#ffff99', '#1f78b4', '#33a02c')
+    dendPlot(ceb, mode="hclust",
+         tip.label="",
+         layout=l, palette=colors)
   }
 }
 ## ap <- c(rep("P", length(rownames(nets1))),rep("A", length(colnames(nets1))))

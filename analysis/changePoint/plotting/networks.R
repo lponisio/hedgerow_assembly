@@ -20,6 +20,6 @@ for(i in unique(sites.trees)){
         file=file.path(fig.path, sprintf("%s_networks.pdf", i)),
         width=18, height=4)
   pdf.f(plotDend,
-        file=file.path(fig.path, sprintf("%s_communities.pdf", i)),
+        file=file.path(fig.path, sprintf("%s_dend.pdf", i)),
         width=10, height=4)
 }
