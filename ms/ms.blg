@@ -5,42 +5,42 @@ The style file: ecol_let.bst
 Database file #1: refs.bib
 You've used 69 entries,
             2997 wiz_defined-function locations,
-            1047 strings with 17292 characters,
-and the built_in function-call counts, 43175 in all, are:
-= -- 3460
-> -- 2178
+            1050 strings with 17024 characters,
+and the built_in function-call counts, 43107 in all, are:
+= -- 3463
+> -- 2154
 < -- 24
-+ -- 865
-- -- 765
-* -- 3533
-:= -- 7039
++ -- 856
+- -- 756
+* -- 3524
+:= -- 7020
 add.period$ -- 206
 call.type$ -- 69
-change.case$ -- 596
+change.case$ -- 593
 chr.to.int$ -- 68
 cite$ -- 69
-duplicate$ -- 2879
-empty$ -- 2860
-format.name$ -- 982
-if$ -- 8140
+duplicate$ -- 2878
+empty$ -- 2867
+format.name$ -- 973
+if$ -- 8136
 int.to.chr$ -- 2
 int.to.str$ -- 1
-missing$ -- 657
+missing$ -- 656
 newline$ -- 348
 num.names$ -- 276
-pop$ -- 1131
+pop$ -- 1124
 preamble$ -- 1
-purify$ -- 529
+purify$ -- 526
 quote$ -- 0
 skip$ -- 793
 stack$ -- 0
-substring$ -- 2246
+substring$ -- 2264
 swap$ -- 1627
 text.length$ -- 3
 text.prefix$ -- 0
 top$ -- 0
 type$ -- 618
 warning$ -- 0
-while$ -- 316
+while$ -- 317
 width$ -- 0
-write$ -- 894
+write$ -- 895

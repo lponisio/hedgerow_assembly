@@ -4,7 +4,7 @@ plot.panels <- function(){
     col.fill <- add.alpha(col.lines, alpha=0.2)
     names(col.lines) <- names(col.fill) <- "all"
     layout(matrix(1:4, nrow=2, byrow=TRUE))
-    par(oma=c(2, 5, 0.5, 1),
+    par(oma=c(2, 6.5, 0.5, 1),
         mar=c(2.5, 0, 0, 1), cex.axis=1.2)
     ## persistence pollinators
     plot.panel(new.dd=occ.pi.close,
@@ -17,6 +17,8 @@ plot.panels <- function(){
                plot.y=TRUE,
                plot.x=TRUE,
                treatments="all")
+    mtext("Pollinators", 2, line=5, cex=1.2)
+    
     ## degree pollinators
     plot.panel(new.dd=degree.pi,
                dats=degree.closeness.cv$data,
@@ -41,9 +43,12 @@ plot.panels <- function(){
                plot.y=TRUE,
                treatments="all")
     
+    mtext("Plants", 2, line=5, cex=1.2)
+    
     mtext("Persistence", 1, line=3, cex=1.2)
     mtext("Closeness variability (log)", 2,
           line=3.2, cex=1.2, adj=-0.75)
+
 
     ## degree plants
     plot.panel(new.dd=plants.degree.pi,

@@ -1,4 +1,4 @@
-\begin{thebibliography}{69}
+\begin{thebibliography}{66}
 \expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
 
 \bibitem[{Ahn \emph{et~al.}(2010)Ahn, Bagrow \& Lehmann}]{ahn2010link}
@@ -163,12 +163,6 @@ Graham, C.H. \& Fine, P.V. (2008).
   processes across space in time.
 \newblock \emph{Ecol. Lett.}, 11, 1265--1277.
 
-\bibitem[{Guimar{\~a}es \emph{et~al.}(2011)Guimar{\~a}es, Jordano \&
-  Thompson}]{Guimaraes2011}
-Guimar{\~a}es, P.R., Jordano, P. \& Thompson, J.N. (2011).
-\newblock Evolution and coevolution in mutualistic networks.
-\newblock \emph{Ecol. Lett.}, 14, 877--885.
-
 \bibitem[{Holland \emph{et~al.}(2006)Holland, Okuyama \&
   DeAngelis}]{holland2006comment}
 Holland, J.N., Okuyama, T. \& DeAngelis, D.L. (2006).
@@ -290,12 +284,6 @@ Newman, M.E.J. \& Girvan, M. (2004).
 \newblock Finding and evaluating community structure in networks.
 \newblock \emph{Phys. Rev. E}, 69, 026113.
 
-\bibitem[{Nuismer \emph{et~al.}(2013)Nuismer, Jordano \&
-  Bascompte}]{Nuismer2013}
-Nuismer, S.L., Jordano, P. \& Bascompte, J. (2013).
-\newblock Coevolution and the architecture of mutualistic networks.
-\newblock \emph{Evolution}, 67, 338--354.
-
 \bibitem[{Olesen \emph{et~al.}(2007)Olesen, Bascompte, Dupont \&
   Jordano}]{Olesen2007}
 Olesen, J.M., Bascompte, J., Dupont, Y. \& Jordano, P. (2007).
@@ -390,12 +378,6 @@ Stang, M., Klinkhamer, P.G. \& Van Der~Meijden, E. (2006).
 \newblock Size constraints and flower abundance determine the number of
   interactions in a plant--flower visitor web.
 \newblock \emph{Oikos}, 112, 111--121.
-
-\bibitem[{Th{\'e}bault \& Fontaine(2010)}]{Thebault2010}
-Th{\'e}bault, E. \& Fontaine, C. (2010).
-\newblock Stability of ecological communities and the architecture of
-  mutualistic and trophic networks.
-\newblock \emph{Science}, 329, 853--856.
 
 \bibitem[{Valdovinos \emph{et~al.}(2013)Valdovinos, Moisset~de Espan{\'e}s,
   Flores \& Ramos-Jiliberto}]{valdovinos2013adaptive}
