@@ -18,6 +18,7 @@
 \usepackage{makecell}
 \usepackage{longtable}
 \usepackage{xr}
+\usepackage{subfig}
 \externaldocument{ms}
 \bibliographystyle{gcb}
 \parindent=2em
@@ -180,6 +181,14 @@
 \end{figure}
 \clearpage
 
+\begin{figure}[!tbp]
+  \centering
+  \subfloat[Before]{\includegraphics[width=0.4\textwidth]{figures/before.pdf}\label{fig:f1}}
+%  \hfill
+  \subfloat[After]{\includegraphics[width=0.4\textwidth]{figures/after.pdf}\label{fig:f2}}
+  \caption{The before and after hedgerows were planted, at the same location.}
+\end{figure}
+\clearpage
 
 
 \end{document}
