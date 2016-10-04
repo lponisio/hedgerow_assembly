@@ -11,12 +11,15 @@ load('../../data/networks/all_networks_years.Rdata')
 
 ## linear models
 load(file=file.path(save.path, 'specs.Rdata'))
+specs$closeness[specs$closeness == 0] <- 1*10^-6
+specs$closeness.log <- log(specs$closeness)
+
 ## SiteStatus or ypr
 xvar <- "ypr"
 
 ## anything outputted by specieslevel
 ys <- c("proportional.generality", "d", "degree", "betweenness",
-        "closeness")
+        "closeness.log")
 
 ## formulas <-lapply(ys, function(x) {
 ##   as.formula(paste(x, "~",

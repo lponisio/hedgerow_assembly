@@ -1,4 +1,4 @@
-\begin{thebibliography}{69}
+\begin{thebibliography}{71}
 \expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
 
 \bibitem[{Ahn \emph{et~al.}(2010)Ahn, Bagrow \& Lehmann}]{ahn2010link}
@@ -93,12 +93,6 @@ Chao, A., Chazdon, R.L., Colwell, R.K. \& Shen, T.J. (2005).
   composition with incidence and abundance data.
 \newblock \emph{Ecol. Lett.}, 8, 148--159.
 
-\bibitem[{Costa \emph{et~al.}(2007)Costa, Rodrigues, Travieso \&
-  Villas~Boas}]{costa2007characterization}
-Costa, L.d.F., Rodrigues, F.A., Travieso, G. \& Villas~Boas, P.R. (2007).
-\newblock Characterization of complex networks: A survey of measurements.
-\newblock \emph{Advances in physics}, 56, 167--242.
-
 \bibitem[{Csardi \& Nepusz(2006)}]{igraph}
 Csardi, G. \& Nepusz, T. (2006).
 \newblock The igraph software package for complex network research.
@@ -132,11 +126,6 @@ van Engelsdorp, D., Evans, J., Saegerman, C., Mullin, C., Haubruge, E., Nguyen,
 \newblock Colony collapse disorder: A descriptive study.
 \newblock \emph{PloS one}, 4, 1--17.
 
-\bibitem[{Fiedler(1973)}]{fiedler1973algebraic}
-Fiedler, M. (1973).
-\newblock Algebraic connectivity of graphs.
-\newblock \emph{Czechoslovak mathematical journal}, 23, 298--305.
-
 \bibitem[{Forup \emph{et~al.}(2008{\natexlab{a}})Forup, Henson, Craze \&
   Memmott}]{forup-2008-742}
 Forup, M., Henson, K., Craze, P. \& Memmott, J. (2008{\natexlab{a}}).
@@ -151,11 +140,23 @@ Forup, M.L., Henson, K.S., Craze, P.G. \& Memmott, J. (2008{\natexlab{b}}).
   networks on ancient and restored heathlands.
 \newblock \emph{J. Appl. Ecol.}, 45, 742--752.
 
+\bibitem[{Freeman(1978)}]{freeman1978centrality}
+Freeman, L.C. (1978).
+\newblock Centrality in social networks conceptual clarification.
+\newblock \emph{Social networks}, 1, 215--239.
+
 \bibitem[{Galeano \emph{et~al.}(2009)Galeano, Pastor \& Iriondo}]{Galeano2009}
 Galeano, J., Pastor, J.M. \& Iriondo, J.M. (2009).
 \newblock Weighted-interaction nestedness estimator (wine): a new estimator to
   calculate over frequency matrices.
 \newblock \emph{Environmental Modeling \& Software}, 24, 1342--1346.
+
+\bibitem[{G{\'o}mez \& Zamora(2006)}]{gomez2006ecological}
+G{\'o}mez, J.M. \& Zamora, R. (2006).
+\newblock Ecological factors that promote the evolution of generalization in
+  pollination systems.
+\newblock \emph{Plant-pollinator interactions, NM Waser, J. Ollerton (eds.).
+  The University of Chicago Press, Chicago}, pp. 145--166.
 
 \bibitem[{Graham \& Fine(2008)}]{graham2008phylogenetic}
 Graham, C.H. \& Fine, P.V. (2008).
@@ -236,6 +237,13 @@ Kuznetsova, A., {Bruun Brockhoff}, P. \& {Haubo Bojesen Christensen}, R.
 \newblock \emph{{lmerTest}: Tests for random and fixed effects for linear mixed
   effect models (lmer objects of lme4 package).}
 \newblock R package version 2.0-11.
+
+\bibitem[{MacLeod \emph{et~al.}(2016)MacLeod, Genung, Ascher \&
+  Winfree}]{macleod2016measuring}
+MacLeod, M., Genung, M.A., Ascher, J.S. \& Winfree, R. (2016).
+\newblock Measuring partner choice in plant--pollinator networks: Using null
+  models to separate rewiring and fidelity from chance.
+\newblock \emph{Ecology}.
 
 \bibitem[{May(1972)}]{may1972will}
 May, R.M. (1972).
@@ -433,9 +441,17 @@ V{\'a}zquez, D.P., Chacoff, N.P. \& Cagnolo, L. (2009).
   mutualistic networks.
 \newblock \emph{Ecology}, 90, 2039--2046.
 
-\bibitem[{Waser \emph{et~al.}(1996)Waser, Chittka, Price, Williams \&
-  Ollerton}]{Waser1996}
-Waser, N.M., Chittka, L., Price, M.V., Williams, N.M. \& Ollerton, J. (1996).
+\bibitem[{Waser \emph{et~al.}(1996{\natexlab{a}})Waser, Chittka, Price,
+  Williams \& Ollerton}]{waser1996generalization}
+Waser, N.M., Chittka, L., Price, M.V., Williams, N.M. \& Ollerton, J.
+  (1996{\natexlab{a}}).
+\newblock Generalization in pollination systems, and why it matters.
+\newblock \emph{Ecology}, 77, 1043--1060.
+
+\bibitem[{Waser \emph{et~al.}(1996{\natexlab{b}})Waser, Chittka, Price,
+  Williams \& Ollerton}]{Waser1996}
+Waser, N.M., Chittka, L., Price, M.V., Williams, N.M. \& Ollerton, J.
+  (1996{\natexlab{b}}).
 \newblock Generalization in pollination systems, and why it matters.
 \newblock \emph{Ecology}, 77, 1043.
 

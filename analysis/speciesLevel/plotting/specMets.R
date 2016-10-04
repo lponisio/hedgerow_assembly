@@ -45,15 +45,15 @@ for(j in pp){
 
 ## closeness only
 
-ypr.pi.pol <- predict.int(mod= mods$pol$closeness,
+ypr.pi.pol <- predict.int(mod= mods$pol$closeness.log,
                       dd=dd.ypr,
-                      y="closeness",
+                      y="closeness.log",
                       family="gaussian")
 
 
-ypr.pi.plant <- predict.int(mod= mods$plant$closeness,
+ypr.pi.plant <- predict.int(mod= mods$plant$closeness.log,
                       dd=dd.ypr,
-                      y="closeness",
+                      y="closeness.log",
                       family="gaussian")
 
 plot.panels()

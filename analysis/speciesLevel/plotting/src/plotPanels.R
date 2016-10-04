@@ -8,7 +8,7 @@ plot.panels <- function(){
     ## nodf
     plot.panel(new.dd=ypr.pi.pol,
                dats=specs,
-               y1="closeness",
+               y1="closeness.log",
                xs="ypr",
                col.fill=col.fill,
                col.lines=col.lines,
@@ -19,7 +19,7 @@ plot.panels <- function(){
 
     plot.panel(new.dd=ypr.pi.plant,
                dats=specs,
-               y1="closeness",
+               y1="closeness.log",
                xs="ypr",
                col.fill=col.fill,
                col.lines=col.lines,
@@ -27,7 +27,7 @@ plot.panels <- function(){
                agg.col="GenusSpecies")
     
     axis(1, pretty(specs$ypr), labels=pretty(specs$ypr))
-    mtext("Closeness", 2, line=4.5, cex=1.5, adj=1.75)
+    mtext("Closeness (log)", 2, line=4.5, cex=1.5, adj=4)
     mtext("Plants", 3, line=0.5, cex=1.5)
     mtext("Years of assembly", 1, line=3, cex=1.5)
 
