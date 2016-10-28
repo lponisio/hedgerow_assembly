@@ -2,986 +2,18 @@ rm(list=ls())#
 setwd('~/Dropbox/hedgerow_assembly/analysis/networkLevel')#
 source('src/initialize.R')#
 load('../../data/networks/baci_networks_years.Rdata')#
-N <- 999#
-#
-## ## ************************************************************#
-## ## calculate metrics and zscores#
-## ## ************************************************************#
-## mets <- lapply(nets, network.metrics, N)#
-#
-## cor.dats <- prep.dat(mets,  spec)#
-#
-## ## ************************************************************#
-## ## niche overlap#
-## ## ************************************************************#
-#
-## no <- t(sapply(nets, networklevel, index="niche overlap"))#
-#
-## cor.dats$niche.overlap.pol <- no[, "niche.overlap.HL"][match(rownames(no),#
-##                                      paste(cor.dats$Site,#
-##                                      cor.dats$Year, sep="."))]#
-## cor.dats$niche.overlap.plants <- no[, "niche.overlap.LL"][match(rownames(no),#
-##                                      paste(cor.dats$Site,#
-##                                      cor.dats$Year, sep="."))]#
-#
-## save(cor.dats, file='saved/corMets.Rdata')#
-#
-## ************************************************************#
-## effect of years post restoration#
-## ************************************************************#
-#
-load(file='saved/corMets.Rdata')#
-#
-## nestedness#
-baci.nodf.mod <- lmer(zNODF ~ scale(ypr) +#
+N <- 99
+baci.h2.mod <- lmer(zH2 ~ scale(ypr) +#
                  (1|Site) + (1|Year),#
                  data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.nodf.mod)#
-save(baci.nodf.mod, file='saved/mods/baci_nodf.Rdata')#
-#
-## modularity#
-baci.mod.mod <- lmer(zmod.met.D ~ scale(ypr) +#
+summary(baci.h2.mod)
+load(file='saved/corMets.Rdata')
+baci.h2.mod <- lmer(zH2 ~ scale(ypr) +#
                  (1|Site) + (1|Year),#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.mod.mod)#
-save(baci.mod.mod, file='saved/mods/baci_mod.Rdata')#
-#
-## h2#
-baci.h2.mod <- lmer(H2 ~ scale(ypr) +#
-                 (1|Site) + (1|Year),#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
+                 data=cor.dats[!is.na(cor.dats$ypr),])
+summary(baci.h2.mod)
 summary(baci.h2.mod)#
-save(baci.h2.mod, file='saved/mods/baci_h2.Rdata')#
-#
-## connectance#
-baci.conn.mod <- lmer(connectance ~ scale(ypr) +#
-                 (1|Site) + (1|Year),#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.conn.mod)#
-save(baci.conn.mod, file='saved/mods/baci_conn.Rdata')#
-#
-## weighted connectance#
-baci.wconn.mod <- lmer(weighted.connectance ~ scale(ypr) +#
-                 (1|Site) + (1|Year),#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.wconn.mod)#
-save(baci.wconn.mod, file='saved/mods/baci_wconn.Rdata')#
-#
-## niche overlap pollinators#
-baci.no.pol.mod <- lmer(niche.overlap.pol ~ scale(ypr) +#
-                 (1|Site) + (1|Year),#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.no.pol.mod)#
-save(baci.no.pol.mod, file='saved/mods/baci_no_pol.Rdata')#
-#
-## niche overlap plants#
-baci.no.plant.mod <- lmer(niche.overlap.plants ~ scale(ypr) +#
-                 (1|Site) + (1|Year),#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.no.plant.mod)#
-save(baci.no.plant.mod, file='saved/mods/baci_no_plant.Rdata')
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/networkLevel')#
-source('src/initialize.R')#
-load('../../data/networks/all_networks_years.Rdata')#
-#
-## either "abund" or "degree"#
-extinction.method <- "degree"#
-#
-## **********************************************************#
-## robustness#
-## **********************************************************#
-## simulation plant extinction#
-#
-res <- simExtinction(nets, extinction.method, spec)#
-#
-save(res, file=file.path(save.path,#
-            sprintf('resilience_%s.Rdata', extinction.method)))#
-#
-## no change in robustness by site status#
-mod.status <- lmer(Robustness ~ SiteStatus#
-             + (1|Site) + (1|Year),#
-             data=res)#
-summary(mod.status)#
-save(mod.status, file=file.path(save.path,#
-            sprintf('mods/resilience_status_%s.Rdata', extinction.method)))#
-## no effect of ypr on robustness#
-mod.ypr <- lmer(Robustness ~ ypr#
-             + (1|Site) + (1|Year),#
-             data=res[!is.na(res$ypr),])#
-summary(mod.ypr)#
-save(mod.ypr, file=file.path(save.path,#
-            sprintf('mods/resilience_ypr_%s.Rdata', extinction.method)))
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/networkLevel')#
-source('plotting/src/predictIntervals.R')#
-source('plotting/src/CIplotting.R')#
-source('plotting/src/plotPanels_resilence.R')#
-source('src/initialize.R')#
-#
-## ************************************************************#
-## robustness to species extinction#
-## ************************************************************#
-## either "abund" or "degree"#
-extinction.method <- "degree"#
-#
-load(file=file.path(save.path,#
-            sprintf('resilience_%s.Rdata', extinction.method)))#
-#
-dd <- expand.grid(ypr=seq(from= min(res$ypr, na.rm=TRUE),#
-                          to= max(res$ypr, na.rm=TRUE),#
-                          length=10))#
-load(file=file.path(save.path,#
-            sprintf('mods/resilience_ypr_%s.Rdata',#
-                    extinction.method)))#
-#
-dd.ypr <- cbind(dd, Robustness=0)#
-#
-ypr.pi <- predict.int(mod= mod.ypr,#
-                        dd=dd.ypr,#
-                        y="Robustness",#
-                        family="gaussian")#
-#
-plot.predict.ypr(new.dd=ypr.pi,#
-                 ylabel="Robustness to \n species extinction",#
-                 dats=res,#
-                 y1="Robustness",#
-                 extinction.method=extinction.method)#
-#
-## ************************************************************#
-## robustness to perturbation#
-## ************************************************************#
-#
-load(file=file.path(save.path, 'mods/AlgCon.Rdata'))#
-#
-dd.ypr.alg <- expand.grid(ypr=seq(from= min(all.alg.Con.status$ypr,#
-                                    na.rm=TRUE),#
-                    to= max(all.alg.Con.status$ypr,#
-                      na.rm=TRUE),#
-                    length=10),#
-                  AlgCon=0)#
-#
-ypr.pi.alg <- predict.int(mod= alg.con.mod.ypr,#
-                        dd=dd.ypr.alg,#
-                        y="AlgCon",#
-                        family="gaussian")#
-#
-plot.predict.ypr(new.dd=ypr.pi.alg,#
-                 ylabel="Robustness to perturbation",#
-                 dats=all.alg.Con.status,#
-                 y1="AlgCon",#
-                 extinction.method="perturb")#
-#
-plot.panels()
-plot.panels <- function(){#
-  f <- function(){#
-    col.lines <- brewer.pal(4, "Greys")[3]#
-    col.fill <- add.alpha(col.lines, alpha=0.2)#
-    layout(matrix(1:2, ncol=1))#
-    par(oma=c(6, 1, 2, 1),#
-        mar=c(1, 6, 0.5, 1), cex.axis=1.5)#
-    ## nodf#
-    plot.panel(new.dd=ypr.pi,#
-               dats=res,#
-               y1="Robustness",#
-               xs="ypr",#
-               col.fill=col.fill,#
-               col.lines=col.lines,#
-               plotPoints=TRUE)#
-    mtext("Robustness to \n species extinction", 2, line=4, cex=1.5)#
-    ## modularity#
-    plot.panel(new.dd=ypr.pi.alg,#
-               dats=all.alg.Con.status,#
-               y1="AlgCon",#
-               xs="ypr",#
-               col.fill=col.fill,#
-               col.lines=col.lines,#
-               plotPoints=TRUE)#
-    mtext("Robustness to perturbation", 2, line=4, cex=1.5)#
-#
-    axis(1, pretty(res$ypr), labels=pretty(res$ypr))#
-    mtext("Year of assembly", 1, line=3.5, cex=1.5)#
-  }#
-  path <- 'figures'#
-  pdf.f(f, file=file.path(path,#
-             sprintf("%s.pdf", "baci")),#
-        width=4, height=7)#
-#
-}
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/networkLevel')#
-source('plotting/src/predictIntervals.R')#
-source('plotting/src/CIplotting.R')#
-source('plotting/src/plotPanels_resilence.R')#
-source('src/initialize.R')#
-#
-## ************************************************************#
-## robustness to species extinction#
-## ************************************************************#
-## either "abund" or "degree"#
-extinction.method <- "degree"#
-#
-load(file=file.path(save.path,#
-            sprintf('resilience_%s.Rdata', extinction.method)))#
-#
-dd <- expand.grid(ypr=seq(from= min(res$ypr, na.rm=TRUE),#
-                          to= max(res$ypr, na.rm=TRUE),#
-                          length=10))#
-load(file=file.path(save.path,#
-            sprintf('mods/resilience_ypr_%s.Rdata',#
-                    extinction.method)))#
-#
-dd.ypr <- cbind(dd, Robustness=0)#
-#
-ypr.pi <- predict.int(mod= mod.ypr,#
-                        dd=dd.ypr,#
-                        y="Robustness",#
-                        family="gaussian")#
-#
-plot.predict.ypr(new.dd=ypr.pi,#
-                 ylabel="Robustness to \n species extinction",#
-                 dats=res,#
-                 y1="Robustness",#
-                 extinction.method=extinction.method)#
-#
-## ************************************************************#
-## robustness to perturbation#
-## ************************************************************#
-#
-load(file=file.path(save.path, 'mods/AlgCon.Rdata'))#
-#
-dd.ypr.alg <- expand.grid(ypr=seq(from= min(all.alg.Con.status$ypr,#
-                                    na.rm=TRUE),#
-                    to= max(all.alg.Con.status$ypr,#
-                      na.rm=TRUE),#
-                    length=10),#
-                  AlgCon=0)#
-#
-ypr.pi.alg <- predict.int(mod= alg.con.mod.ypr,#
-                        dd=dd.ypr.alg,#
-                        y="AlgCon",#
-                        family="gaussian")#
-#
-plot.predict.ypr(new.dd=ypr.pi.alg,#
-                 ylabel="Robustness to perturbation",#
-                 dats=all.alg.Con.status,#
-                 y1="AlgCon",#
-                 extinction.method="perturb")#
-#
-plot.panels()
-plot.panels <- function(){#
-  f <- function(){#
-    col.lines <- brewer.pal(4, "Greys")[3]#
-    col.fill <- add.alpha(col.lines, alpha=0.2)#
-    layout(matrix(1:2, ncol=1))#
-    par(oma=c(6, 1, 2, 1),#
-        mar=c(1, 6, 0.5, 1), cex.axis=1.5)#
-    ## nodf#
-    plot.panel(new.dd=ypr.pi,#
-               dats=res,#
-               y1="Robustness",#
-               xs="ypr",#
-               col.fill=col.fill,#
-               col.lines=col.lines,#
-               plotPoints=TRUE)#
-    mtext("Robustness to \n species extinction", 2, line=4, cex=1.5)#
-    ## modularity#
-    plot.panel(new.dd=ypr.pi.alg,#
-               dats=all.alg.Con.status,#
-               y1="AlgCon",#
-               xs="ypr",#
-               col.fill=col.fill,#
-               col.lines=col.lines,#
-               plotPoints=TRUE)#
-    mtext("Robustness to perturbation", 2, line=4, cex=1.5)#
-#
-    axis(1, pretty(res$ypr), labels=pretty(res$ypr))#
-    mtext("Year of assembly", 1, line=3.5, cex=1.5)#
-  }#
-  path <- 'figures'#
-  pdf.f(f, file=file.path(path,#
-             sprintf("%s.pdf", "robustness")),#
-        width=4, height=7)#
-#
-}
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/networkLevel')#
-source('plotting/src/predictIntervals.R')#
-source('plotting/src/CIplotting.R')#
-source('plotting/src/plotPanels_resilence.R')#
-source('src/initialize.R')#
-#
-## ************************************************************#
-## robustness to species extinction#
-## ************************************************************#
-## either "abund" or "degree"#
-extinction.method <- "degree"#
-#
-load(file=file.path(save.path,#
-            sprintf('resilience_%s.Rdata', extinction.method)))#
-#
-dd <- expand.grid(ypr=seq(from= min(res$ypr, na.rm=TRUE),#
-                          to= max(res$ypr, na.rm=TRUE),#
-                          length=10))#
-load(file=file.path(save.path,#
-            sprintf('mods/resilience_ypr_%s.Rdata',#
-                    extinction.method)))#
-#
-dd.ypr <- cbind(dd, Robustness=0)#
-#
-ypr.pi <- predict.int(mod= mod.ypr,#
-                        dd=dd.ypr,#
-                        y="Robustness",#
-                        family="gaussian")#
-#
-plot.predict.ypr(new.dd=ypr.pi,#
-                 ylabel="Robustness to \n species extinction",#
-                 dats=res,#
-                 y1="Robustness",#
-                 extinction.method=extinction.method)#
-#
-## ************************************************************#
-## robustness to perturbation#
-## ************************************************************#
-#
-load(file=file.path(save.path, 'mods/AlgCon.Rdata'))#
-#
-dd.ypr.alg <- expand.grid(ypr=seq(from= min(all.alg.Con.status$ypr,#
-                                    na.rm=TRUE),#
-                    to= max(all.alg.Con.status$ypr,#
-                      na.rm=TRUE),#
-                    length=10),#
-                  AlgCon=0)#
-#
-ypr.pi.alg <- predict.int(mod= alg.con.mod.ypr,#
-                        dd=dd.ypr.alg,#
-                        y="AlgCon",#
-                        family="gaussian")#
-#
-plot.predict.ypr(new.dd=ypr.pi.alg,#
-                 ylabel="Robustness to perturbation",#
-                 dats=all.alg.Con.status,#
-                 y1="AlgCon",#
-                 extinction.method="perturb")#
-#
-plot.panels()
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/networkLevel')#
-source('plotting/src/predictIntervals.R')#
-source('plotting/src/CIplotting.R')#
-source('plotting/src/plotPanels_resilence.R')#
-source('src/initialize.R')#
-#
-## ************************************************************#
-## robustness to species extinction#
-## ************************************************************#
-## either "abund" or "degree"#
-extinction.method <- "degree"#
-#
-load(file=file.path(save.path,#
-            sprintf('resilience_%s.Rdata', extinction.method)))#
-#
-dd <- expand.grid(ypr=seq(from= min(res$ypr, na.rm=TRUE),#
-                          to= max(res$ypr, na.rm=TRUE),#
-                          length=10))#
-load(file=file.path(save.path,#
-            sprintf('mods/resilience_ypr_%s.Rdata',#
-                    extinction.method)))#
-#
-dd.ypr <- cbind(dd, Robustness=0)#
-#
-ypr.pi <- predict.int(mod= mod.ypr,#
-                        dd=dd.ypr,#
-                        y="Robustness",#
-                        family="gaussian")#
-#
-plot.predict.ypr(new.dd=ypr.pi,#
-                 ylabel="Robustness to \n species extinction",#
-                 dats=res,#
-                 y1="Robustness",#
-                 extinction.method=extinction.method)#
-#
-## ************************************************************#
-## robustness to perturbation#
-## ************************************************************#
-#
-load(file=file.path(save.path, 'mods/AlgCon.Rdata'))#
-#
-dd.ypr.alg <- expand.grid(ypr=seq(from= min(all.alg.Con.status$ypr,#
-                                    na.rm=TRUE),#
-                    to= max(all.alg.Con.status$ypr,#
-                      na.rm=TRUE),#
-                    length=10),#
-                  AlgCon=0)#
-#
-ypr.pi.alg <- predict.int(mod= alg.con.mod.ypr,#
-                        dd=dd.ypr.alg,#
-                        y="AlgCon",#
-                        family="gaussian")#
-#
-plot.predict.ypr(new.dd=ypr.pi.alg,#
-                 ylabel="Robustness to perturbation",#
-                 dats=all.alg.Con.status,#
-                 y1="AlgCon",#
-                 extinction.method="perturb")#
-#
-plot.panels()
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/networkLevel')#
-source('src/initialize.R')#
-load('../../data/networks/baci_networks_years.Rdata')#
-N <- 999#
-#
-## ## ************************************************************#
-## ## calculate metrics and zscores#
-## ## ************************************************************#
-## mets <- lapply(nets, network.metrics, N)#
-#
-## cor.dats <- prep.dat(mets,  spec)#
-#
-## ## ************************************************************#
-## ## niche overlap#
-## ## ************************************************************#
-#
-## no <- t(sapply(nets, networklevel, index="niche overlap"))#
-#
-## cor.dats$niche.overlap.pol <- no[, "niche.overlap.HL"][match(rownames(no),#
-##                                      paste(cor.dats$Site,#
-##                                      cor.dats$Year, sep="."))]#
-## cor.dats$niche.overlap.plants <- no[, "niche.overlap.LL"][match(rownames(no),#
-##                                      paste(cor.dats$Site,#
-##                                      cor.dats$Year, sep="."))]#
-#
-## save(cor.dats, file='saved/corMets.Rdata')#
-#
-## ************************************************************#
-## effect of years post restoration#
-## ************************************************************#
-#
-load(file='saved/corMets.Rdata')#
-#
-## nestedness#
-baci.nodf.mod <- lmer(zNODF ~ scale(ypr) +#
-                 (1|Site) + (1|Year),#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.nodf.mod)#
-save(baci.nodf.mod, file='saved/mods/baci_nodf.Rdata')#
-#
-## modularity#
-baci.mod.mod <- lmer(zmod.met.D ~ scale(ypr) +#
-                 (1|Site) + (1|Year),#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.mod.mod)#
-save(baci.mod.mod, file='saved/mods/baci_mod.Rdata')#
-#
-## h2#
-baci.h2.mod <- lmer(H2 ~ scale(ypr) +#
-                 (1|Site) + (1|Year),#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.h2.mod)#
-save(baci.h2.mod, file='saved/mods/baci_h2.Rdata')#
-#
-## connectance#
-baci.conn.mod <- lmer(connectance ~ scale(ypr) +#
-                 (1|Site) + (1|Year),#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.conn.mod)#
-save(baci.conn.mod, file='saved/mods/baci_conn.Rdata')#
-#
-## weighted connectance#
-baci.wconn.mod <- lmer(weighted.connectance ~ scale(ypr) +#
-                 (1|Site) + (1|Year),#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.wconn.mod)#
-save(baci.wconn.mod, file='saved/mods/baci_wconn.Rdata')#
-#
-## niche overlap pollinators#
-baci.no.pol.mod <- lmer(niche.overlap.pol ~ scale(ypr) +#
-                 (1|Site) + (1|Year),#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.no.pol.mod)#
-save(baci.no.pol.mod, file='saved/mods/baci_no_pol.Rdata')#
-#
-## niche overlap plants#
-baci.no.plant.mod <- lmer(niche.overlap.plants ~ scale(ypr) +#
-                 (1|Site) + (1|Year),#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.no.plant.mod)#
-save(baci.no.plant.mod, file='saved/mods/baci_no_plant.Rdata')#
-source('plotting/baci.R')#
-## distribution is niche overlap#
-#
-dis.mats <- lapply(lapply(nets, t), vegdist, method="chao")#
-#
-layout(matrix(1:6, nrow=2))#
-cols <- rainbow(length(unique(cor.dats$Year)))#
-lapply(unique(cor.dats$Site), function(x){#
-  this.mats <- dis.mats[cor.dats$Site == x]#
-  plot(NA, ylim=c(0,10), xlim=c(0,1.5),#
-       ylab="Frequency",#
-       xlab="Niche Overlap",#
-       main= x)#
-  for(i in 1:length(this.mats)){#
-    points(density(this.mats[[i]]), col=cols[i], type="l", lwd=2)#
-  }#
-})#
-#
-plot(NA, ylim=c(0,1), xlim=c(0,1), xaxt="n", yaxt="n", ylab="", xlab="")#
-legend("center", col=cols, lwd="2",#
-       legend=sort(unique(cor.dats$Year)),#
-       bty="n")
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/networkLevel')#
-source('src/initialize.R')#
-load('../../data/networks/baci_networks_years.Rdata')#
-N <- 999#
-#
-## ## ************************************************************#
-## ## calculate metrics and zscores#
-## ## ************************************************************#
-## mets <- lapply(nets, network.metrics, N)#
-#
-## cor.dats <- prep.dat(mets,  spec)#
-#
-## ## ************************************************************#
-## ## niche overlap#
-## ## ************************************************************#
-#
-## no <- t(sapply(nets, networklevel, index="niche overlap"))#
-#
-## cor.dats$niche.overlap.pol <- no[, "niche.overlap.HL"][match(rownames(no),#
-##                                      paste(cor.dats$Site,#
-##                                      cor.dats$Year, sep="."))]#
-## cor.dats$niche.overlap.plants <- no[, "niche.overlap.LL"][match(rownames(no),#
-##                                      paste(cor.dats$Site,#
-##                                      cor.dats$Year, sep="."))]#
-#
-## save(cor.dats, file='saved/corMets.Rdata')#
-#
-## ************************************************************#
-## effect of years post restoration#
-## ************************************************************#
-#
-load(file='saved/corMets.Rdata')#
-#
-## nestedness#
-baci.nodf.mod <- lmer(zNODF ~ scale(ypr) +#
-                 (1|Site) + (1|Year),#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.nodf.mod)#
-save(baci.nodf.mod, file='saved/mods/baci_nodf.Rdata')#
-#
-## modularity#
-baci.mod.mod <- lmer(zmod.met.D ~ scale(ypr) +#
-                 (1|Site) + (1|Year),#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.mod.mod)#
-save(baci.mod.mod, file='saved/mods/baci_mod.Rdata')#
-#
-## h2#
-baci.h2.mod <- lmer(H2 ~ scale(ypr) +#
-                 (1|Site) + (1|Year),#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.h2.mod)#
-save(baci.h2.mod, file='saved/mods/baci_h2.Rdata')#
-#
-## connectance#
-baci.conn.mod <- lmer(connectance ~ scale(ypr) +#
-                 (1|Site) + (1|Year),#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.conn.mod)#
-save(baci.conn.mod, file='saved/mods/baci_conn.Rdata')#
-#
-## weighted connectance#
-baci.wconn.mod <- lmer(weighted.connectance ~ scale(ypr) +#
-                 (1|Site) + (1|Year),#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.wconn.mod)#
-save(baci.wconn.mod, file='saved/mods/baci_wconn.Rdata')#
-#
-## niche overlap pollinators#
-baci.no.pol.mod <- lmer(niche.overlap.pol ~ scale(ypr) +#
-                 (1|Site) + (1|Year),#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.no.pol.mod)#
-save(baci.no.pol.mod, file='saved/mods/baci_no_pol.Rdata')#
-#
-## niche overlap plants#
-baci.no.plant.mod <- lmer(niche.overlap.plants ~ scale(ypr) +#
-                 (1|Site) + (1|Year),#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.no.plant.mod)#
-save(baci.no.plant.mod, file='saved/mods/baci_no_plant.Rdata')#
-source('plotting/baci.R')#
-## distribution is niche overlap#
-#
-dis.mats <- lapply(lapply(nets, t), vegdist, method="chao")#
-#
-layout(matrix(1:6, nrow=2))#
-cols <- rainbow(length(unique(cor.dats$Year)))#
-lapply(unique(cor.dats$Site), function(x){#
-  this.mats <- dis.mats[cor.dats$Site == x]#
-  plot(NA, ylim=c(0,10), xlim=c(0,1.5),#
-       ylab="Frequency",#
-       xlab="Niche Overlap",#
-       main= x)#
-  for(i in 1:length(this.mats)){#
-    points(density(this.mats[[i]]), col=cols[i], type="l", lwd=2)#
-  }#
-})#
-#
-plot(NA, ylim=c(0,1), xlim=c(0,1), xaxt="n", yaxt="n", ylab="", xlab="")#
-legend("center", col=cols, lwd="2",#
-       legend=sort(unique(cor.dats$Year)),#
-       bty="n")
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/networkLevel')#
-source('plotting/src/predictIntervals.R')#
-source('plotting/src/CIplotting.R')#
-source('plotting/src/plotPanels_resilence.R')#
-source('src/initialize.R')#
-#
-## ************************************************************#
-## robustness to species extinction#
-## ************************************************************#
-## either "abund" or "degree"#
-extinction.method <- "degree"#
-#
-load(file=file.path(save.path,#
-            sprintf('resilience_%s.Rdata', extinction.method)))#
-#
-dd <- expand.grid(ypr=seq(from= min(res$ypr, na.rm=TRUE),#
-                          to= max(res$ypr, na.rm=TRUE),#
-                          length=10))#
-load(file=file.path(save.path,#
-            sprintf('mods/resilience_ypr_%s.Rdata',#
-                    extinction.method)))#
-#
-dd.ypr <- cbind(dd, Robustness=0)#
-#
-ypr.pi <- predict.int(mod= mod.ypr,#
-                        dd=dd.ypr,#
-                        y="Robustness",#
-                        family="gaussian")#
-#
-plot.predict.ypr(new.dd=ypr.pi,#
-                 ylabel="Robustness to \n species extinction",#
-                 dats=res,#
-                 y1="Robustness",#
-                 extinction.method=extinction.method)#
-#
-## ************************************************************#
-## robustness to perturbation#
-## ************************************************************#
-#
-load(file=file.path(save.path, 'mods/AlgCon.Rdata'))#
-#
-dd.ypr.alg <- expand.grid(ypr=seq(from= min(all.alg.Con.status$ypr,#
-                                    na.rm=TRUE),#
-                    to= max(all.alg.Con.status$ypr,#
-                      na.rm=TRUE),#
-                    length=10),#
-                  AlgCon=0)#
-#
-ypr.pi.alg <- predict.int(mod= alg.con.mod.ypr,#
-                        dd=dd.ypr.alg,#
-                        y="AlgCon",#
-                        family="gaussian")#
-#
-plot.predict.ypr(new.dd=ypr.pi.alg,#
-                 ylabel="Robustness to perturbation",#
-                 dats=all.alg.Con.status,#
-                 y1="AlgCon",#
-                 extinction.method="perturb")#
-#
-plot.panels()
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/networkLevel')#
-source('plotting/src/predictIntervals.R')#
-source('plotting/src/CIplotting.R')#
-source('plotting/src/plotPanels_resilence.R')#
-source('src/initialize.R')#
-#
-## ************************************************************#
-## robustness to species extinction#
-## ************************************************************#
-## either "abund" or "degree"#
-extinction.method <- "degree"#
-#
-load(file=file.path(save.path,#
-            sprintf('resilience_%s.Rdata', extinction.method)))#
-#
-dd <- expand.grid(ypr=seq(from= min(res$ypr, na.rm=TRUE),#
-                          to= max(res$ypr, na.rm=TRUE),#
-                          length=10))#
-load(file=file.path(save.path,#
-            sprintf('mods/resilience_ypr_%s.Rdata',#
-                    extinction.method)))#
-#
-dd.ypr <- cbind(dd, Robustness=0)#
-#
-ypr.pi <- predict.int(mod= mod.ypr,#
-                        dd=dd.ypr,#
-                        y="Robustness",#
-                        family="gaussian")#
-#
-plot.predict.ypr(new.dd=ypr.pi,#
-                 ylabel="Robustness to \n species extinction",#
-                 dats=res,#
-                 y1="Robustness",#
-                 extinction.method=extinction.method)#
-#
-## ************************************************************#
-## robustness to perturbation#
-## ************************************************************#
-#
-load(file=file.path(save.path, 'mods/AlgCon.Rdata'))#
-#
-dd.ypr.alg <- expand.grid(ypr=seq(from= min(all.alg.Con.status$ypr,#
-                                    na.rm=TRUE),#
-                    to= max(all.alg.Con.status$ypr,#
-                      na.rm=TRUE),#
-                    length=10),#
-                  AlgCon=0)#
-#
-ypr.pi.alg <- predict.int(mod= alg.con.mod.ypr,#
-                        dd=dd.ypr.alg,#
-                        y="AlgCon",#
-                        family="gaussian")#
-#
-plot.predict.ypr(new.dd=ypr.pi.alg,#
-                 ylabel="Robustness to perturbation",#
-                 dats=all.alg.Con.status,#
-                 y1="AlgCon",#
-                 extinction.method="perturb")#
-#
-plot.panels()
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/networkLevel')#
-source('plotting/src/predictIntervals.R')#
-source('plotting/src/CIplotting.R')#
-source('plotting/src/plotPanels_resilence.R')#
-source('src/initialize.R')#
-#
-## ************************************************************#
-## robustness to species extinction#
-## ************************************************************#
-## either "abund" or "degree"#
-extinction.method <- "degree"#
-#
-load(file=file.path(save.path,#
-            sprintf('resilience_%s.Rdata', extinction.method)))#
-#
-dd <- expand.grid(ypr=seq(from= min(res$ypr, na.rm=TRUE),#
-                          to= max(res$ypr, na.rm=TRUE),#
-                          length=10))#
-load(file=file.path(save.path,#
-            sprintf('mods/resilience_ypr_%s.Rdata',#
-                    extinction.method)))#
-#
-dd.ypr <- cbind(dd, Robustness=0)#
-#
-ypr.pi <- predict.int(mod= mod.ypr,#
-                        dd=dd.ypr,#
-                        y="Robustness",#
-                        family="gaussian")#
-#
-plot.predict.ypr(new.dd=ypr.pi,#
-                 ylabel="Robustness to \n species extinction",#
-                 dats=res,#
-                 y1="Robustness",#
-                 extinction.method=extinction.method)#
-#
-## ************************************************************#
-## robustness to perturbation#
-## ************************************************************#
-#
-load(file=file.path(save.path, 'mods/AlgCon.Rdata'))#
-#
-dd.ypr.alg <- expand.grid(ypr=seq(from= min(all.alg.Con.status$ypr,#
-                                    na.rm=TRUE),#
-                    to= max(all.alg.Con.status$ypr,#
-                      na.rm=TRUE),#
-                    length=10),#
-                  AlgCon=0)#
-#
-ypr.pi.alg <- predict.int(mod= alg.con.mod.ypr,#
-                        dd=dd.ypr.alg,#
-                        y="AlgCon",#
-                        family="gaussian")#
-#
-plot.predict.ypr(new.dd=ypr.pi.alg,#
-                 ylabel="Robustness to perturbation",#
-                 dats=all.alg.Con.status,#
-                 y1="AlgCon",#
-                 extinction.method="perturb")#
-#
-plot.panels()
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/networkLevel')#
-source('plotting/src/predictIntervals.R')#
-source('plotting/src/CIplotting.R')#
-source('plotting/src/plotPanels_resilence.R')#
-source('src/initialize.R')#
-#
-## ************************************************************#
-## robustness to species extinction#
-## ************************************************************#
-## either "abund" or "degree"#
-extinction.method <- "degree"#
-#
-load(file=file.path(save.path,#
-            sprintf('resilience_%s.Rdata', extinction.method)))#
-#
-dd <- expand.grid(ypr=seq(from= min(res$ypr, na.rm=TRUE),#
-                          to= max(res$ypr, na.rm=TRUE),#
-                          length=10))#
-load(file=file.path(save.path,#
-            sprintf('mods/resilience_ypr_%s.Rdata',#
-                    extinction.method)))#
-#
-dd.ypr <- cbind(dd, Robustness=0)#
-#
-ypr.pi <- predict.int(mod= mod.ypr,#
-                        dd=dd.ypr,#
-                        y="Robustness",#
-                        family="gaussian")#
-#
-plot.predict.ypr(new.dd=ypr.pi,#
-                 ylabel="Robustness to \n species extinction",#
-                 dats=res,#
-                 y1="Robustness",#
-                 extinction.method=extinction.method)#
-#
-## ************************************************************#
-## robustness to perturbation#
-## ************************************************************#
-#
-load(file=file.path(save.path, 'mods/AlgCon.Rdata'))#
-#
-dd.ypr.alg <- expand.grid(ypr=seq(from= min(all.alg.Con.status$ypr,#
-                                    na.rm=TRUE),#
-                    to= max(all.alg.Con.status$ypr,#
-                      na.rm=TRUE),#
-                    length=10),#
-                  AlgCon=0)#
-#
-ypr.pi.alg <- predict.int(mod= alg.con.mod.ypr,#
-                        dd=dd.ypr.alg,#
-                        y="AlgCon",#
-                        family="gaussian")#
-#
-plot.predict.ypr(new.dd=ypr.pi.alg,#
-                 ylabel="Robustness to perturbation",#
-                 dats=all.alg.Con.status,#
-                 y1="AlgCon",#
-                 extinction.method="perturb")#
-#
-plot.panels()
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/networkLevel')#
-source('src/initialize.R')#
-load('../../data/networks/baci_networks_years.Rdata')#
-N <- 999#
-#
-## ## ************************************************************#
-## ## calculate metrics and zscores#
-## ## ************************************************************#
-## mets <- lapply(nets, network.metrics, N)#
-#
-## cor.dats <- prep.dat(mets,  spec)#
-#
-## ## ************************************************************#
-## ## niche overlap#
-## ## ************************************************************#
-#
-## no <- t(sapply(nets, networklevel, index="niche overlap"))#
-#
-## cor.dats$niche.overlap.pol <- no[, "niche.overlap.HL"][match(rownames(no),#
-##                                      paste(cor.dats$Site,#
-##                                      cor.dats$Year, sep="."))]#
-## cor.dats$niche.overlap.plants <- no[, "niche.overlap.LL"][match(rownames(no),#
-##                                      paste(cor.dats$Site,#
-##                                      cor.dats$Year, sep="."))]#
-#
-## save(cor.dats, file='saved/corMets.Rdata')#
-#
-## ************************************************************#
-## effect of years post restoration#
-## ************************************************************#
-#
-load(file='saved/corMets.Rdata')#
-#
-## nestedness#
-baci.nodf.mod <- lmer(zNODF ~ scale(ypr) +#
-                 (1|Site) + (1|Year),#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.nodf.mod)#
-save(baci.nodf.mod, file='saved/mods/baci_nodf.Rdata')#
-#
-## modularity#
-baci.mod.mod <- lmer(zmod.met.D ~ scale(ypr) +#
-                 (1|Site) + (1|Year),#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.mod.mod)#
-save(baci.mod.mod, file='saved/mods/baci_mod.Rdata')#
-#
-## h2#
-baci.h2.mod <- lmer(H2 ~ scale(ypr) +#
-                 (1|Site) + (1|Year),#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.h2.mod)#
-save(baci.h2.mod, file='saved/mods/baci_h2.Rdata')#
-#
-## connectance#
-baci.conn.mod <- lmer(connectance ~ scale(ypr) +#
-                 (1|Site) + (1|Year),#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.conn.mod)#
-save(baci.conn.mod, file='saved/mods/baci_conn.Rdata')#
-#
-## weighted connectance#
-baci.wconn.mod <- lmer(weighted.connectance ~ scale(ypr) +#
-                 (1|Site) + (1|Year),#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.wconn.mod)#
-save(baci.wconn.mod, file='saved/mods/baci_wconn.Rdata')#
-#
-## niche overlap pollinators#
-baci.no.pol.mod <- lmer(niche.overlap.pol ~ scale(ypr) +#
-                 (1|Site) + (1|Year),#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.no.pol.mod)#
-save(baci.no.pol.mod, file='saved/mods/baci_no_pol.Rdata')#
-#
-## niche overlap plants#
-baci.no.plant.mod <- lmer(niche.overlap.plants ~ scale(ypr) +#
-                 (1|Site) + (1|Year),#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.no.plant.mod)#
-save(baci.no.plant.mod, file='saved/mods/baci_no_plant.Rdata')#
-source('plotting/baci.R')#
-## distribution is niche overlap#
-#
-dis.mats <- lapply(lapply(nets, t), vegdist, method="chao")#
-#
-layout(matrix(1:6, nrow=2))#
-cols <- rainbow(length(unique(cor.dats$Year)))#
-lapply(unique(cor.dats$Site), function(x){#
-  this.mats <- dis.mats[cor.dats$Site == x]#
-  plot(NA, ylim=c(0,10), xlim=c(0,1.5),#
-       ylab="Frequency",#
-       xlab="Niche Overlap",#
-       main= x)#
-  for(i in 1:length(this.mats)){#
-    points(density(this.mats[[i]]), col=cols[i], type="l", lwd=2)#
-  }#
-})#
-#
-plot(NA, ylim=c(0,1), xlim=c(0,1), xaxt="n", yaxt="n", ylab="", xlab="")#
-legend("center", col=cols, lwd="2",#
-       legend=sort(unique(cor.dats$Year)),#
-       bty="n")
+save(baci.h2.mod, file='saved/mods/baci_h2.Rdata')
 library(RColorBrewer)#
 library(lme4)#
 library(lmerTest)#
@@ -1006,14 +38,14 @@ nodf.pi <- predict.int(mod= baci.nodf.mod,#
                         dd=dd.nodf,#
                         y="zNODF",#
                        family="gaussian")#
-## ************************************************************#
+## ************************************************************#
 ## modularity#
-## ************************************************************#
+## ************************************************************#
 load(file='saved/mods/baci_mod.Rdata')#
 dd.mod <- cbind(dd, zmod.met.D=0)#
-mod.pi <- predict.int(mod= baci.mod.mod,#
-                        dd=dd.mod,#
-                        y="zmod.met.D",#
+mod.pi <- predict.int(mod= baci.mod.mod,#
+                        dd=dd.mod,#
+                        y="zmod.met.D",#
                       family="gaussian")#
 ## ************************************************************#
 ## specialization#
@@ -1022,14 +54,14 @@ load(file='saved/mods/baci_h2.Rdata')#
 dd.h2 <- cbind(dd, H2=0)#
 h2.pi <- predict.int(mod= baci.h2.mod,#
                         dd=dd.h2,#
-                        y="H2",#
+                        y="zH2",#
                         family="gaussian")#
 ## ************************************************************#
 ## niche overlap - Plants#
 ## ************************************************************#
 load(file='saved/mods/baci_no_plant.Rdata')#
 #
-dd.nop <- cbind(dd, niche.overlap.plants =0)#
+dd.nop <- cbind(dd, niche.overlap.LL =0)#
 #
 nop.pi <- predict.int(mod= baci.no.plant.mod,#
                         dd=dd.nop,#
@@ -1040,74 +72,7 @@ nop.pi <- predict.int(mod= baci.no.plant.mod,#
 ## ************************************************************#
 load(file='saved/mods/baci_no_pol.Rdata')#
 #
-dd.nopol <- cbind(dd, niche.overlap.pol =0)#
-nopol.pi <- predict.int(mod= baci.no.pol.mod,#
-                        dd=dd.nopol,#
-                        y="niche.overlap.pol",#
-                        family="gaussian")                        #
-## ************************************************************#
-## all panels#
-## ************************************************************#
-plot.panels()
-library(RColorBrewer)#
-library(lme4)#
-library(lmerTest)#
-source('plotting/src/predictIntervals.R')#
-source('plotting/src/CIplotting.R')#
-source('plotting/src/plotPanels.R')#
-source('src/misc.R')#
-load(file='saved/corMets.Rdata')#
-#
-dd <- expand.grid(ypr=seq(from= min(cor.dats$ypr, na.rm=TRUE),#
-                          to= max(cor.dats$ypr, na.rm=TRUE),#
-                          length=10))#
-#
-## ************************************************************#
-## nodf#
-## ************************************************************#
-load(file='saved/mods/baci_nodf.Rdata')#
-#
-dd.nodf <- cbind(dd, zNODF=0)#
-#
-nodf.pi <- predict.int(mod= baci.nodf.mod,#
-                        dd=dd.nodf,#
-                        y="zNODF",#
-                       family="gaussian")#
-## ************************************************************#
-## modularity#
-## ************************************************************#
-load(file='saved/mods/baci_mod.Rdata')#
-dd.mod <- cbind(dd, zmod.met.D=0)#
-mod.pi <- predict.int(mod= baci.mod.mod,#
-                        dd=dd.mod,#
-                        y="zmod.met.D",#
-                      family="gaussian")#
-## ************************************************************#
-## specialization#
-## ************************************************************#
-load(file='saved/mods/baci_h2.Rdata')#
-dd.h2 <- cbind(dd, H2=0)#
-h2.pi <- predict.int(mod= baci.h2.mod,#
-                        dd=dd.h2,#
-                        y="H2",#
-                        family="gaussian")#
-## ************************************************************#
-## niche overlap - Plants#
-## ************************************************************#
-load(file='saved/mods/baci_no_plant.Rdata')#
-#
-dd.nop <- cbind(dd, niche.overlap.plants =0)#
-#
-nop.pi <- predict.int(mod= baci.no.plant.mod,#
-                        dd=dd.nop,#
-                        y="niche.overlap.plants",#
-                        family="gaussian")#
-## ************************************************************#
-## niche overlap - Polinators#
-## ************************************************************#
-load(file='saved/mods/baci_no_pol.Rdata')#
-#
-dd.nopol <- cbind(dd, niche.overlap.pol =0)#
+dd.nopol <- cbind(dd, niche.overlap.HL =0)#
 nopol.pi <- predict.int(mod= baci.no.pol.mod,#
                         dd=dd.nopol,#
                         y="niche.overlap.pol",#
@@ -1123,159 +88,434 @@ conn.pi <- predict.int(mod= baci.conn.mod,#
                         dd=dd.conn,#
                         y="connectance",#
                         family="gaussian")#
+#
+## ************************************************************#
+## plant richness#
+## ************************************************************#
+load(file='saved/mods/baci_rich_ll.Rdata')#
+#
+dd.rich.ll <- cbind(dd, number.of.species.LL =0)#
+rich.ll.pi <- predict.int(mod= baci.rich.ll.mod,#
+                        dd=dd.rich.ll,#
+                        y="number.of.species.LL",#
+                        family="poisson")#
+## ************************************************************#
+## pol richness#
+## ************************************************************#
+load(file='saved/mods/baci_rich_hl.Rdata')#
+#
+dd.rich.hl <- cbind(dd, number.of.species.HL =0)#
+rich.hl.pi <- predict.int(mod= baci.rich.hl.mod,#
+                        dd=dd.rich.hl,#
+                        y="number.of.species.HL",#
+                        family="poisson")#
 ## ************************************************************#
 ## all panels#
 ## ************************************************************#
 plot.panels()
+library(RColorBrewer)#
+library(lme4)#
+library(lmerTest)#
+source('plotting/src/predictIntervals.R')#
+source('plotting/src/CIplotting.R')#
+source('plotting/src/plotPanels.R')#
+source('src/misc.R')#
+load(file='saved/corMets.Rdata')#
+#
+dd <- expand.grid(ypr=seq(from= min(cor.dats$ypr, na.rm=TRUE),#
+                          to= max(cor.dats$ypr, na.rm=TRUE),#
+                          length=10))#
+#
+## ************************************************************#
+## nodf#
+## ************************************************************#
+load(file='saved/mods/baci_nodf.Rdata')#
+#
+dd.nodf <- cbind(dd, zNODF=0)#
+#
+nodf.pi <- predict.int(mod= baci.nodf.mod,#
+                        dd=dd.nodf,#
+                        y="zNODF",#
+                       family="gaussian")#
+## ************************************************************#
+## modularity#
+## ************************************************************#
+load(file='saved/mods/baci_mod.Rdata')#
+dd.mod <- cbind(dd, zmod.met.D=0)#
+mod.pi <- predict.int(mod= baci.mod.mod,#
+                        dd=dd.mod,#
+                        y="zmod.met.D",#
+                      family="gaussian")#
+## ************************************************************#
+## specialization#
+## ************************************************************#
+load(file='saved/mods/baci_h2.Rdata')#
+dd.h2 <- cbind(dd, zH2=0)#
+h2.pi <- predict.int(mod= baci.h2.mod,#
+                        dd=dd.h2,#
+                        y="zH2",#
+                        family="gaussian")#
+## ************************************************************#
+## niche overlap - Plants#
+## ************************************************************#
+load(file='saved/mods/baci_no_plant.Rdata')#
+#
+dd.nop <- cbind(dd, niche.overlap.LL =0)#
+#
+nop.pi <- predict.int(mod= baci.no.plant.mod,#
+                        dd=dd.nop,#
+                        y="niche.overlap.plants",#
+                        family="gaussian")#
+## ************************************************************#
+## niche overlap - Polinators#
+## ************************************************************#
+load(file='saved/mods/baci_no_pol.Rdata')#
+#
+dd.nopol <- cbind(dd, niche.overlap.HL =0)#
+nopol.pi <- predict.int(mod= baci.no.pol.mod,#
+                        dd=dd.nopol,#
+                        y="niche.overlap.pol",#
+                        family="gaussian")#
+#
+## ************************************************************#
+## connectance#
+## ************************************************************#
+load(file='saved/mods/baci_conn.Rdata')#
+#
+dd.conn <- cbind(dd, connectance =0)#
+conn.pi <- predict.int(mod= baci.conn.mod,#
+                        dd=dd.conn,#
+                        y="connectance",#
+                        family="gaussian")#
+#
+## ************************************************************#
+## plant richness#
+## ************************************************************#
+load(file='saved/mods/baci_rich_ll.Rdata')#
+#
+dd.rich.ll <- cbind(dd, number.of.species.LL =0)#
+rich.ll.pi <- predict.int(mod= baci.rich.ll.mod,#
+                        dd=dd.rich.ll,#
+                        y="number.of.species.LL",#
+                        family="poisson")#
+## ************************************************************#
+## pol richness#
+## ************************************************************#
+load(file='saved/mods/baci_rich_hl.Rdata')#
+#
+dd.rich.hl <- cbind(dd, number.of.species.HL =0)#
+rich.hl.pi <- predict.int(mod= baci.rich.hl.mod,#
+                        dd=dd.rich.hl,#
+                        y="number.of.species.HL",#
+                        family="poisson")#
+## ************************************************************#
+## all panels#
+## ************************************************************#
+plot.panels()
+ls()
+summary(baci.h2.mod)
 rm(list=ls())#
 setwd('~/Dropbox/hedgerow_assembly/analysis/networkLevel')#
+source('plotting/src/predictIntervals.R')#
+source('plotting/src/CIplotting.R')#
+source('plotting/src/plotPanels_resilence.R')#
 source('src/initialize.R')#
-load('../../data/networks/all_networks_years.Rdata')#
 #
+## ************************************************************#
+## robustness to species extinction#
+## ************************************************************#
 ## either "abund" or "degree"#
 extinction.method <- "degree"#
 #
-## **********************************************************#
-## robustness#
-## **********************************************************#
-## simulation plant extinction#
-#
-res <- simExtinction(nets, extinction.method, spec)#
-#
-save(res, file=file.path(save.path,#
+load(file=file.path(save.path,#
             sprintf('resilience_%s.Rdata', extinction.method)))#
 #
-## no change in robustness by site status#
-mod.status <- lmer(Robustness ~ SiteStatus#
-             + (1|Site) + (1|Year),#
-             data=res)#
-summary(mod.status)#
-save(mod.status, file=file.path(save.path,#
-            sprintf('mods/resilience_status_%s.Rdata', extinction.method)))
-## no effect of ypr on robustness#
-mod.ypr <- lmer(Robustness ~ ypr#
-             + (1|Site) + (1|Year),#
-             data=res[!is.na(res$ypr),])#
-summary(mod.ypr)#
-save(mod.ypr, file=file.path(save.path,#
-            sprintf('mods/resilience_ypr_%s.Rdata', extinction.method)))
+dd <- expand.grid(ypr=seq(from= min(res$ypr, na.rm=TRUE),#
+                          to= max(res$ypr, na.rm=TRUE),#
+                          length=10))#
+load(file=file.path(save.path,#
+            sprintf('mods/resilience_ypr_%s.Rdata',#
+                    extinction.method)))#
+#
+dd.ypr <- cbind(dd, Robustness=0)#
+#
+ypr.pi <- predict.int(mod= mod.ypr,#
+                        dd=dd.ypr,#
+                        y="Robustness",#
+                        family="gaussian")#
+#
+plot.predict.ypr(new.dd=ypr.pi,#
+                 ylabel="Robustness to \n species extinction",#
+                 dats=res,#
+                 y1="Robustness",#
+                 extinction.method=extinction.method)#
+#
+## ************************************************************#
+## robustness to perturbation#
+## ************************************************************#
+#
+load(file=file.path(save.path, 'mods/AlgCon.Rdata'))#
+#
+dd.ypr.alg <- expand.grid(ypr=seq(from= min(all.alg.Con.status$ypr,#
+                                    na.rm=TRUE),#
+                    to= max(all.alg.Con.status$ypr,#
+                      na.rm=TRUE),#
+                    length=10),#
+                  AlgCon=0)#
+#
+ypr.pi.alg <- predict.int(mod= alg.con.mod.ypr,#
+                        dd=dd.ypr.alg,#
+                        y="AlgCon",#
+                        family="gaussian")#
+#
+plot.predict.ypr(new.dd=ypr.pi.alg,#
+                 ylabel="Robustness to \n cascading effects",#
+                 dats=all.alg.Con.status,#
+                 y1="AlgCon",#
+                 extinction.method="perturb")#
+#
+plot.panels()
 rm(list=ls())#
 setwd('~/Dropbox/hedgerow_assembly/analysis/networkLevel')#
+source('plotting/src/predictIntervals.R')#
+source('plotting/src/CIplotting.R')#
+source('plotting/src/plotPanels_resilence.R')#
 source('src/initialize.R')#
-load('../../data/networks/all_networks_years.Rdata')#
 #
+## ************************************************************#
+## robustness to species extinction#
+## ************************************************************#
 ## either "abund" or "degree"#
-extinction.method <- "abund"#
+extinction.method <- "degree"#
 #
-## **********************************************************#
-## robustness#
-## **********************************************************#
-## simulation plant extinction#
-#
-res <- simExtinction(nets, extinction.method, spec)#
-#
-save(res, file=file.path(save.path,#
+load(file=file.path(save.path,#
             sprintf('resilience_%s.Rdata', extinction.method)))#
 #
-## no change in robustness by site status#
-mod.status <- lmer(Robustness ~ SiteStatus#
-             + (1|Site) + (1|Year),#
-             data=res)#
-summary(mod.status)#
-save(mod.status, file=file.path(save.path,#
-            sprintf('mods/resilience_status_%s.Rdata', extinction.method)))#
-## no effect of ypr on robustness#
-mod.ypr <- lmer(Robustness ~ ypr#
-             + (1|Site) + (1|Year),#
-             data=res[!is.na(res$ypr),])#
-summary(mod.ypr)#
-save(mod.ypr, file=file.path(save.path,#
-            sprintf('mods/resilience_ypr_%s.Rdata', extinction.method)))
+dd <- expand.grid(ypr=seq(from= min(res$ypr, na.rm=TRUE),#
+                          to= max(res$ypr, na.rm=TRUE),#
+                          length=10))#
+load(file=file.path(save.path,#
+            sprintf('mods/resilience_ypr_%s.Rdata',#
+                    extinction.method)))#
+#
+dd.ypr <- cbind(dd, Robustness=0)#
+#
+ypr.pi <- predict.int(mod= mod.ypr,#
+                        dd=dd.ypr,#
+                        y="Robustness",#
+                        family="gaussian")#
+#
+plot.predict.ypr(new.dd=ypr.pi,#
+                 ylabel="Robustness to \n species extinction",#
+                 dats=res,#
+                 y1="Robustness",#
+                 extinction.method=extinction.method)#
+#
+## ************************************************************#
+## robustness to perturbation#
+## ************************************************************#
+#
+load(file=file.path(save.path, 'mods/AlgCon.Rdata'))#
+#
+dd.ypr.alg <- expand.grid(ypr=seq(from= min(all.alg.Con.status$ypr,#
+                                    na.rm=TRUE),#
+                    to= max(all.alg.Con.status$ypr,#
+                      na.rm=TRUE),#
+                    length=10),#
+                  AlgCon=0)#
+#
+ypr.pi.alg <- predict.int(mod= alg.con.mod.ypr,#
+                        dd=dd.ypr.alg,#
+                        y="AlgCon",#
+                        family="gaussian")#
+#
+plot.predict.ypr(new.dd=ypr.pi.alg,#
+                 ylabel="Robustness to \n cascading effects",#
+                 dats=all.alg.Con.status,#
+                 y1="AlgCon",#
+                 extinction.method="perturb")#
+#
+plot.panels()
 rm(list=ls())#
 setwd('~/Dropbox/hedgerow_assembly/analysis/networkLevel')#
+source('plotting/src/predictIntervals.R')#
+source('plotting/src/CIplotting.R')#
+source('plotting/src/plotPanels_resilence.R')#
 source('src/initialize.R')#
-load('../../data/networks/all_networks_years.Rdata')#
 #
+## ************************************************************#
+## robustness to species extinction#
+## ************************************************************#
 ## either "abund" or "degree"#
-extinction.method <- "abund"#
+extinction.method <- "degree"#
 #
-## **********************************************************#
-## robustness#
-## **********************************************************#
-## simulation plant extinction#
-#
-res <- simExtinction(nets, extinction.method, spec)#
-#
-save(res, file=file.path(save.path,#
+load(file=file.path(save.path,#
             sprintf('resilience_%s.Rdata', extinction.method)))#
 #
-## no change in robustness by site status#
-mod.status <- lmer(Robustness ~ SiteStatus#
-             + (1|Site) + (1|Year),#
-             data=res)#
-summary(mod.status)#
-save(mod.status, file=file.path(save.path,#
-            sprintf('mods/resilience_status_%s.Rdata', extinction.method)))#
-## no effect of ypr on robustness#
-mod.ypr <- lmer(Robustness ~ ypr#
-             + (1|Site) + (1|Year),#
-             data=res[!is.na(res$ypr),])#
-summary(mod.ypr)#
-save(mod.ypr, file=file.path(save.path,#
-            sprintf('mods/resilience_ypr_%s.Rdata', extinction.method)))
+dd <- expand.grid(ypr=seq(from= min(res$ypr, na.rm=TRUE),#
+                          to= max(res$ypr, na.rm=TRUE),#
+                          length=10))#
+load(file=file.path(save.path,#
+            sprintf('mods/resilience_ypr_%s.Rdata',#
+                    extinction.method)))#
+#
+dd.ypr <- cbind(dd, Robustness=0)#
+#
+ypr.pi <- predict.int(mod= mod.ypr,#
+                        dd=dd.ypr,#
+                        y="Robustness",#
+                        family="gaussian")#
+#
+plot.predict.ypr(new.dd=ypr.pi,#
+                 ylabel="Robustness to \n species extinction",#
+                 dats=res,#
+                 y1="Robustness",#
+                 extinction.method=extinction.method)#
+#
+## ************************************************************#
+## robustness to perturbation#
+## ************************************************************#
+#
+load(file=file.path(save.path, 'mods/AlgCon.Rdata'))#
+#
+dd.ypr.alg <- expand.grid(ypr=seq(from= min(all.alg.Con.status$ypr,#
+                                    na.rm=TRUE),#
+                    to= max(all.alg.Con.status$ypr,#
+                      na.rm=TRUE),#
+                    length=10),#
+                  AlgCon=0)#
+#
+ypr.pi.alg <- predict.int(mod= alg.con.mod.ypr,#
+                        dd=dd.ypr.alg,#
+                        y="AlgCon",#
+                        family="gaussian")#
+#
+plot.predict.ypr(new.dd=ypr.pi.alg,#
+                 ylabel="Robustness to \n cascading effects",#
+                 dats=all.alg.Con.status,#
+                 y1="AlgCon",#
+                 extinction.method="perturb")#
+#
+plot.panels()
 rm(list=ls())#
-library(lme4)#
-library(lmerTest)#
 setwd('~/Dropbox/hedgerow_assembly/analysis/networkLevel')#
+source('plotting/src/predictIntervals.R')#
+source('plotting/src/CIplotting.R')#
+source('plotting/src/plotPanels_resilence.R')#
+source('src/initialize.R')#
 #
-load('../../data/networks/allSpecimens.Rdata')#
-f.path <- "../changePoint/cptPeel/baci"#
-load(file=file.path(f.path, "graphs.Rdata"))#
+## ************************************************************#
+## robustness to species extinction#
+## ************************************************************#
+## either "abund" or "degree"#
+extinction.method <- "degree"#
 #
-source('src/laplacian_functions.R')#
+load(file=file.path(save.path,#
+            sprintf('resilience_%s.Rdata', extinction.method)))#
 #
-fig.path <- '../speciesLevel/Figures'#
-sites <- sapply(strsplit(names(nets), "[.]"), function(x) x[1])#
-years <- sapply(strsplit(names(nets), "[.]"), function(x) x[2])#
+dd <- expand.grid(ypr=seq(from= min(res$ypr, na.rm=TRUE),#
+                          to= max(res$ypr, na.rm=TRUE),#
+                          length=10))#
+load(file=file.path(save.path,#
+            sprintf('mods/resilience_ypr_%s.Rdata',#
+                    extinction.method)))#
 #
-status.table <- table(spec$Site, spec$SiteStatus)#
-status.table <- as.data.frame(cbind(rownames(status.table),#
-                                    colnames(status.table)[apply(status.table,#
-                                                            1, which.max)]))#
-colnames(status.table)<- c("Site", "SiteStatus")#
+dd.ypr <- cbind(dd, Robustness=0)#
 #
-all.alg.Con <- t(do.call(cbind.data.frame, lapply(nets, algCone)))#
-all.alg.Con <- as.data.frame(cbind(sites,years, all.alg.Con))#
-colnames(all.alg.Con) <- c("Site", "Year","Ncomp", "AlgCon")#
+ypr.pi <- predict.int(mod= mod.ypr,#
+                        dd=dd.ypr,#
+                        y="Robustness",#
+                        family="gaussian")#
 #
-## add status#
-all.alg.Con.status <- merge(x=all.alg.Con,#
-                            y= status.table,#
-                            by.x="Site",#
-                            by.y="Site")#
+plot.predict.ypr(new.dd=ypr.pi,#
+                 ylabel="Robustness to \n species extinction",#
+                 dats=res,#
+                 y1="Robustness",#
+                 extinction.method=extinction.method)#
 #
-## add ypr#
-all.alg.Con.status$ypr <- spec$ypr[match(paste(all.alg.Con.status$Site,#
-                                               all.alg.Con.status$Year),#
-                                         paste(spec$Site, spec$Year))]#
+## ************************************************************#
+## robustness to perturbation#
+## ************************************************************#
 #
-baci.sites <- c("MullerB", "Sperandio", "Barger", "Butler", "Hrdy")#
+load(file=file.path(save.path, 'mods/AlgCon.Rdata'))#
 #
-all.alg.Con.status$ypr[!all.alg.Con.status$Site %in% baci.sites] <- NA#
+dd.ypr.alg <- expand.grid(ypr=seq(from= min(all.alg.Con.status$ypr,#
+                                    na.rm=TRUE),#
+                    to= max(all.alg.Con.status$ypr,#
+                      na.rm=TRUE),#
+                    length=10),#
+                  AlgCon=0)#
 #
-## change AlgCon to numeric (it is a factor for some reason..)#
-all.alg.Con.status$AlgCon <- as.numeric(as.character(#
-  all.alg.Con.status$AlgCon))#
+ypr.pi.alg <- predict.int(mod= alg.con.mod.ypr,#
+                        dd=dd.ypr.alg,#
+                        y="AlgCon",#
+                        family="gaussian")#
 #
-alg.con.mod <- lmer(AlgCon ~ SiteStatus +#
-                    (1|Site) + (1|Year),    #
-                    data=all.alg.Con.status)#
+plot.predict.ypr(new.dd=ypr.pi.alg,#
+                 ylabel="Robustness to \n cascading effects",#
+                 dats=all.alg.Con.status,#
+                 y1="AlgCon",#
+                 extinction.method="perturb")#
 #
-summary(alg.con.mod)#
-alg.con.mod.ypr <- lmer(AlgCon ~ ypr +#
-                        (1|Site) + (1|Year),    #
-                        data=all.alg.Con.status)#
-summary(alg.con.mod.ypr)#
+plot.panels()
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/networkLevel')#
+source('plotting/src/predictIntervals.R')#
+source('plotting/src/CIplotting.R')#
+source('plotting/src/plotPanels_resilence.R')#
+source('src/initialize.R')#
 #
-save(alg.con.mod.ypr, all.alg.Con.status,#
-     file="saved/mods/AlgCon.Rdata")
+## ************************************************************#
+## robustness to species extinction#
+## ************************************************************#
+## either "abund" or "degree"#
+extinction.method <- "degree"#
+#
+load(file=file.path(save.path,#
+            sprintf('resilience_%s.Rdata', extinction.method)))#
+#
+dd <- expand.grid(ypr=seq(from= min(res$ypr, na.rm=TRUE),#
+                          to= max(res$ypr, na.rm=TRUE),#
+                          length=10))#
+load(file=file.path(save.path,#
+            sprintf('mods/resilience_ypr_%s.Rdata',#
+                    extinction.method)))#
+#
+dd.ypr <- cbind(dd, Robustness=0)#
+#
+ypr.pi <- predict.int(mod= mod.ypr,#
+                        dd=dd.ypr,#
+                        y="Robustness",#
+                        family="gaussian")#
+#
+plot.predict.ypr(new.dd=ypr.pi,#
+                 ylabel="Robustness to \n species extinction",#
+                 dats=res,#
+                 y1="Robustness",#
+                 extinction.method=extinction.method)#
+#
+## ************************************************************#
+## robustness to perturbation#
+## ************************************************************#
+#
+load(file=file.path(save.path, 'mods/AlgCon.Rdata'))#
+#
+dd.ypr.alg <- expand.grid(ypr=seq(from= min(all.alg.Con.status$ypr,#
+                                    na.rm=TRUE),#
+                    to= max(all.alg.Con.status$ypr,#
+                      na.rm=TRUE),#
+                    length=10),#
+                  AlgCon=0)#
+#
+ypr.pi.alg <- predict.int(mod= alg.con.mod.ypr,#
+                        dd=dd.ypr.alg,#
+                        y="AlgCon",#
+                        family="gaussian")#
+#
+plot.predict.ypr(new.dd=ypr.pi.alg,#
+                 ylabel="Robustness to \n cascading effects",#
+                 dats=all.alg.Con.status,#
+                 y1="AlgCon",#
+                 extinction.method="perturb")#
+#
+plot.panels()

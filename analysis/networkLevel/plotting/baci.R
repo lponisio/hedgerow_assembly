@@ -40,11 +40,11 @@ mod.pi <- predict.int(mod= baci.mod.mod,
 ## ************************************************************
 load(file='saved/mods/baci_h2.Rdata')
 
-dd.h2 <- cbind(dd, H2=0)
+dd.h2 <- cbind(dd, zH2=0)
 
 h2.pi <- predict.int(mod= baci.h2.mod,
                         dd=dd.h2,
-                        y="H2",
+                        y="zH2",
                         family="gaussian")
 
 ## ************************************************************

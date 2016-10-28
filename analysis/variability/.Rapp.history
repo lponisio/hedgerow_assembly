@@ -1,168 +1,82 @@
 rm(list=ls())#
-setwd('~/Dropbox/skyIslands/analysis/speciesLevel')#
-source('plotting/src/predictIntervals.R')#
-source('plotting/src/CIplotting.R')#
-source('plotting/src/plotPanels.R')#
-source('src/initialize.R')#
+library(nimble)#
+setwd("~/Dropbox/nimble/occupancy/analysis/spatial")#
+source('../all/plotting.R')#
+save.dir <-  "../../../saved/spatial/saved"#
 #
-## ************************************************************#
-## specialization#
-## ************************************************************#
+## original model jags and nimble#
+load(file=file.path(save.dir, "orig.Rdata"))#
 #
-load(file='../data/spec/spLev.Rdata')#
-load(file=file.path(save.path, "mods/spLev_Order.Rdata"))#
+## vanilla nimble and auto block#
+load(file=file.path(save.dir, "opt1.Rdata"))#
 #
-ylabs <- c("Proportional Generality", "Specialization (d')", "Degree",#
-           "Betweenness", "Closeness" )#
+## custom sampler for zs, slice for other parms#
+load(file=file.path(save.dir, "opt2.Rdata"))#
 #
-dd <- expand.grid(ypr=seq(from= min(sp.lev$Order, na.rm=TRUE),#
-                          to= max(sp.lev$Order, na.rm=TRUE),#
-                          length=10))#
-pp <- c("plants", "pols")#
-mods <- list(mod.pols, mod.plants)#
-names(mods) <- pp#
+## rename results#
+sp.opt2[[1]] <- rename_MCMC_comparison_method('nimbleOpt2',#
+                                                 'slice',#
+                                                 comparison=sp.opt2[[1]])#
+## compare mcmcs#
+sp.occ.all <- combine_MCMC_comparison_results(sp.orig[[1]],#
+                                                 sp.opt1[[1]],#
+                                                 sp.opt2[[1]],#
+                                                 name = "sp" )#
+make_MCMC_comparison_pages(sp.occ.all,#
+                           dir=file.path(save.dir,#
+                             "../figures/comparisons"))#
 #
-for(j in pp){#
-  for(i in 1:length(ys)){#
-    dd.ypr <- cbind(dd, 0)#
-    colnames(dd.ypr) <- c("Order", ys[i])#
-      ypr.pi <- predict.int(mod= mods[[j]][[i]],#
-                            dd=dd.ypr,#
-                            y=ys[i],#
-                            family="gaussian")#
-#
-    plot.predict.ypr(new.dd=ypr.pi,#
-                     ylabel=ylabs[i],#
-                     dats=sp.lev,#
-                     y1=ys[i],#
-                     extinction.method=j,#
-                     agg.col="GenusSpecies")#
-  }#
-}#
-#
-pols <- unique(sp.lev$GenusSpecies[sp.lev$speciesType ==#
-                                    "pollinator"])
-cols <- shadesOfGrey(length(pols))
-shadesOfGrey <- colorRampPalette(c("grey0", "grey100"))#
-cols <- shadesOfGrey(length(pols))#
-names(cols) <- pols
-plot(NA, ylim=c(0,1), xlim=c(1,5))#
-for(i in pols){#
-  this.pol <- sp.lev[sp.lev$GenusSpecies == i,]#
-  points(this.pol$d ~ this.pol$Order, col=cols[i], type="o")#
-}
-head(spec)
-cols <- rainbow(length(pols))#
-names(cols) <- pols#
-#
-plot(NA, ylim=c(0,1), xlim=c(1,5))#
-for(i in pols){#
-  this.pol <- sp.lev[sp.lev$GenusSpecies == i,]#
-  points(this.pol$d ~ this.pol$Order, col=cols[i], type="o")#
-}
-plot(NA, ylim=c(0,1), xlim=c(1,5),#
-     xlab="Distance from Rockies",#
-     ylab="Specialization")#
-for(i in pols){#
-  this.pol <- sp.lev[sp.lev$GenusSpecies == i,]#
-  points(this.pol$d ~ this.pol$Order, col=cols[i], type="o")#
-}
-for(i in pols){#
-  browser()#
-  this.pol <- sp.lev[sp.lev$GenusSpecies == i,]#
-  points(this.pol$d ~ this.pol$Order, col=cols[i], type="o")#
-}
-this.pol <- sp.lev[sp.lev$GenusSpecies == i,]
-this.pol
-Q
-for(i in pols){#
-  this.pol <- sp.lev[sp.lev$GenusSpecies == i,]#
-  plot(this.pol$d ~ this.pol$Order, col=cols[i], type="o", main=i)#
-}
-for(i in pols){#
-  this.pol <- sp.lev[sp.lev$GenusSpecies == i,]#
-  if(nrow(this.pol) > 2){#
-    quartz()#
-    plot(this.pol$d ~ this.pol$Order, col=cols[i], type="o", main=i)#
-  }#
-}
-for(i in pols){#
-  this.pol <- sp.lev[sp.lev$GenusSpecies == i,]#
-  if(nrow(this.pol) > 3){#
-    quartz()#
-    plot(this.pol$d ~ this.pol$Order, col=cols[i], type="o", main=i,#
-         ylim=c(0,1), xlim=c(1,5),#
-         xlab="Distance from Rockies",#
-         ylab="Specialization")#
-  }#
-}
+checkChains(sp.occ.all[[1]]$samples,#
+            f.path = file.path(save.dir,#
+            "../figures/chains/%s.pdf"))
 rm(list=ls())#
 setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
 source('src/initialize.R')#
-source('src/phyloIntBeta.R')#
-source('src/plotDists.R')#
 #
 ## ************************************************************#
-## prepare link community in terminal#
+## coefficient of variation of degree thingy through time#
 ## ************************************************************#
-edges.com <- aggregate(list(abund=spec$GenusSpecies),#
-                       list(GenusSpecies=spec$GenusSpecies,#
-                            PlantGenusSpecies=spec$PlantGenusSpecies),#
-                       length)#
+## ************************************************************#
+## occurrence#
+## ************************************************************#
+## pollinators and k#
+## sig!#
+occ.k.cv <- cv.trait(spec,#
+                     specs[specs$speciesType =="pollinator",],#
+                     trait="occ.date",#
+                     method= "time", time.col="assem",#
+                     abund.col="k",#
+                     cv.function=cv,#
+                     zero2na=TRUE,#
+                     standard.cv=TRUE,#
+                     na.rm=TRUE)#
+summary(occ.k.cv$lm.nss)
+install.packages("linkcomm")
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
+source('src/initialize.R')#
 #
-## lc <- getLinkCommunities(edges.com,#
-##                          hcmethod = "average",#
-##                          bipartite=TRUE)#
-## save(lc, file="saved/lc.Rdata")#
-#
 ## ************************************************************#
-## turnover of phylo interactions through time#
+## coefficient of variation of degree thingy through time#
 ## ************************************************************#
-load(file="saved/lc.Rdata")
-plot(lc)
-plotDend(lc)
-dendPlot(lc)
-plot(lc, type="dend")
-plot(lc, type="graph")
-plot(lc, type = "graph", layout = layout.fruchterman.reingold)
-plot(lc, type = "graph", layout = "spencer.circle")
-plot(lc, type = "graph", layout = "spencer.circle", shownodesin = 3)
-plot(lc, type = "graph", shownodesin = 2, node.pies = TRUE)
-plot(lc, type = "dend")
-lc
-plot(lc, type = "dend", labels=TRUE)
-plot(lc, type = "dend", labels=TRUE)
-?plot
-plot(lc, type = "dend", tip.labels=TRUE)
-?plot.tree
-library(ape)
-?plot.tree
-?plot.phylo
-plot(lc, type = "dend", show.tip.label=TRUE)
-?dendPlot
-?plot.hclust
-plot(lc, type = "dend", labels=20)
-plot(lc, type = "dend", labels=TRUE)
-plotLinkCommDend(lc, type = "dend", labels=TRUE)
-plotLinkCommDend(lc, type = "dend", labels=TRUE, arg="rectangle")
-plotLinkCommDend(lc,labels=TRUE)
-plotLinkCommDend(lc,labels=TRUE, plotcut=FALSE)
-plot(lc, type = "members")
-plotLinkCommDend(lc,labels=TRUE, plotcut=FALSE)
-dendPlot(lc$hclust)
-plot(lc$hclust, method="hclust")
-plot(lc$hclust)
-lc$hclust
-cbind(lc$hclust$labels, paste(lc$edgelist[,1],#
-                                            lc$edgelist[,2]))
-plot(lc$hclust, labels=paste(lc$edgelist[,1],#
-                                            lc$edgelist[,2])))
-plot(lc$hclust, labels=paste(lc$edgelist[,1],#
-                                            lc$edgelist[,2]))
-plot.graph
-methods(lc$hclust)
-methods("hclust")
-plot(lc$hclust, labels=paste(lc$edgelist[,1],#
-                                            lc$edgelist[,2]), cex=.5)
-plot(lc$hclust, labels=paste(lc$edgelist[,1],#
-                                            lc$edgelist[,2]), cex=.3)
+## ************************************************************#
+## occurrence#
+## ************************************************************#
+## pollinators and k#
+## sig!#
+occ.k.cv <- cv.trait(spec,#
+                     specs[specs$speciesType =="pollinator",],#
+                     trait="occ.date",#
+                     method= "time", time.col="assem",#
+                     abund.col="k",#
+                     cv.function=cv,#
+                     zero2na=TRUE,#
+                     standard.cv=TRUE,#
+                     na.rm=TRUE)#
+summary(occ.k.cv$lm.nss)
+occ.k.cv
+names(occ.k.cv)
+occ.k.cv$data
+head(occ.k.cv.data)
+head(occ.k.cv$data)
+unique(occ.k.cv$data$Site)

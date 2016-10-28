@@ -37,7 +37,7 @@ summary(baci.mod.mod)
 save(baci.mod.mod, file='saved/mods/baci_mod.Rdata')
 
 ## h2
-baci.h2.mod <- lmer(H2 ~ scale(ypr) +
+baci.h2.mod <- lmer(zH2 ~ scale(ypr) +
                  (1|Site) + (1|Year),
                  data=cor.dats[!is.na(cor.dats$ypr),])
 summary(baci.h2.mod)

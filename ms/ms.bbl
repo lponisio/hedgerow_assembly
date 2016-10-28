@@ -13,10 +13,10 @@ Albrecht, M., Riesen, M. \& Schmid, B. (2010).
   glacier foreland.
 \newblock \emph{Oikos}, 119, 1610--1624.
 
-\bibitem[{Almeida-Neto \emph{et~al.}(2008)Almeida-Neto, Gumar\~{a}es,
-  Gumar{\~a}es, Loyola \& Ulrich}]{nodf}
-Almeida-Neto, M., Gumar\~{a}es, P., Gumar{\~a}es, P.R., Loyola, R.D. \& Ulrich,
-  W. (2008).
+\bibitem[{Almeida-neto \emph{et~al.}(2008)Almeida-neto, Gumar\~{a}es,
+  Gumar{\~a}es, Loyola \& Ulrich}]{almeida-neto-2008-1227}
+Almeida-neto, M., Gumar\~{a}es, P., Gumar{\~a}es, P., Loyola, R. \& Ulrich, W.
+  (2008).
 \newblock A consistent metric for nestedness analysis in ecological systems:
   reconciling concept and measurement.
 \newblock \emph{Oikos}, 117, 1227--1239.
@@ -93,10 +93,16 @@ Chao, A., Chazdon, R.L., Colwell, R.K. \& Shen, T.J. (2005).
   composition with incidence and abundance data.
 \newblock \emph{Ecol. Lett.}, 8, 148--159.
 
-\bibitem[{Csardi \& Nepusz(2006)}]{igraph}
+\bibitem[{Costa \emph{et~al.}(2007)Costa, Rodrigues, Travieso \&
+  Villas~Boas}]{costa2007characterization}
+Costa, L.d.F., Rodrigues, F.A., Travieso, G. \& Villas~Boas, P.R. (2007).
+\newblock Characterization of complex networks: A survey of measurements.
+\newblock \emph{Advances in physics}, 56, 167--242.
+
+\bibitem[{Csardi \& Nepusz(2006)}]{csardi-2006}
 Csardi, G. \& Nepusz, T. (2006).
 \newblock The igraph software package for complex network research.
-\newblock \emph{InterJournal}, Complex Systems, 1695.
+\newblock \emph{InterJournal, Complex Systems}, 1695.
 
 \bibitem[{Devoto \emph{et~al.}(2012)Devoto, Bailey, Craze \&
   Memmott}]{devoto2012understanding}
@@ -134,18 +140,22 @@ van Engelsdorp, D., Evans, J., Saegerman, C., Mullin, C., Haubruge, E., Nguyen,
 \newblock Colony collapse disorder: A descriptive study.
 \newblock \emph{PloS one}, 4, 1--17.
 
-\bibitem[{Forup \emph{et~al.}(2008{\natexlab{a}})Forup, Henson, Craze \&
+\bibitem[{Fiedler(1973)}]{fiedler1973algebraic}
+Fiedler, M. (1973).
+\newblock Algebraic connectivity of graphs.
+\newblock \emph{Czechoslovak mathematical journal}, 23, 298--305.
+
+\bibitem[{Fort \emph{et~al.}(2016)Fort, V{\'a}zquez \& Lan}]{fort2016abundance}
+Fort, H., V{\'a}zquez, D.P. \& Lan, B.L. (2016).
+\newblock Abundance and generalisation in mutualistic networks: solving the
+  chicken-and-egg dilemma.
+\newblock \emph{Ecology letters}, 19, 4--11.
+
+\bibitem[{Forup \emph{et~al.}(2008)Forup, Henson, Craze \&
   Memmott}]{forup-2008-742}
-Forup, M., Henson, K., Craze, P. \& Memmott, J. (2008{\natexlab{a}}).
+Forup, M., Henson, K., Craze, P. \& Memmott, J. (2008).
 \newblock The restoration of ecological interactions: plant-pollinator networks
   on ancient and restored heathlands.
-\newblock \emph{J. Appl. Ecol.}, 45, 742--752.
-
-\bibitem[{Forup \emph{et~al.}(2008{\natexlab{b}})Forup, Henson, Craze \&
-  Memmott}]{forup2008restoration}
-Forup, M.L., Henson, K.S., Craze, P.G. \& Memmott, J. (2008{\natexlab{b}}).
-\newblock The restoration of ecological interactions: plant--pollinator
-  networks on ancient and restored heathlands.
 \newblock \emph{J. Appl. Ecol.}, 45, 742--752.
 
 \bibitem[{Freeman(1978)}]{freeman1978centrality}
@@ -158,6 +168,13 @@ Galeano, J., Pastor, J.M. \& Iriondo, J.M. (2009).
 \newblock Weighted-interaction nestedness estimator (wine): a new estimator to
   calculate over frequency matrices.
 \newblock \emph{Environmental Modeling \& Software}, 24, 1342--1346.
+
+\bibitem[{Gibert \emph{et~al.}(2013)Gibert, Pires, Thompson \&
+  Guimar{\~a}es~Jr}]{gibert2013spatial}
+Gibert, J.P., Pires, M.M., Thompson, J.N. \& Guimar{\~a}es~Jr, P.R. (2013).
+\newblock The spatial structure of antagonistic species affects coevolution in
+  predictable ways.
+\newblock \emph{The American Naturalist}, 182, 578--591.
 
 \bibitem[{G{\'o}mez \& Zamora(2006)}]{gomez2006ecological}
 G{\'o}mez, J.M. \& Zamora, R. (2006).
@@ -181,8 +198,8 @@ Guimar{\~a}es, P.R., Jordano, P. \& Thompson, J.N. (2011).
 \bibitem[{Holland \emph{et~al.}(2006)Holland, Okuyama \&
   DeAngelis}]{holland2006comment}
 Holland, J.N., Okuyama, T. \& DeAngelis, D.L. (2006).
-\newblock Comment on “asymmetric coevolutionary networks facilitate
-  biodiversity maintenance”.
+\newblock Comment on ``asymmetric coevolutionary networks facilitate
+  biodiversity maintenance''.
 \newblock \emph{Science}, 313, 1887b--1887b.
 
 \bibitem[{Kaiser-Bunbury \emph{et~al.}(2010)Kaiser-Bunbury, Muff, Memmott,
@@ -253,11 +270,6 @@ MacLeod, M., Genung, M.A., Ascher, J.S. \& Winfree, R. (2016).
   models to separate rewiring and fidelity from chance.
 \newblock \emph{Ecology}.
 
-\bibitem[{May(1972)}]{may1972will}
-May, R.M. (1972).
-\newblock Will a large complex system be stable?
-\newblock \emph{Nature}, 238, 413--414.
-
 \bibitem[{Memmott \emph{et~al.}(2004)Memmott, Waser \& Price}]{Memmott2004}
 Memmott, J., Waser, N.M. \& Price, M.V. (2004).
 \newblock Tolerance of pollination networks to species extinctions.
@@ -283,12 +295,6 @@ M'Gonigle, L., Ponisio, L., Cutler, K. \& Kremen, C. (2015).
 M'Gonigle, L.K., Williams, N.M., Lonsdorf, E. \& Kremen, C. (2016).
 \newblock A tool for selecting plants when restoring habitat for pollinators.
 \newblock \emph{Conserv. Lett.}
-
-\bibitem[{Montoya \emph{et~al.}(2006)Montoya, Pimm \&
-  Sol{\'e}}]{montoya2006ecological}
-Montoya, J.M., Pimm, S.L. \& Sol{\'e}, R.V. (2006).
-\newblock Ecological networks and their fragility.
-\newblock \emph{Nature}, 442, 259--264.
 
 \bibitem[{Morandin \& Kremen(2013)}]{morandin-2013-829}
 Morandin, L. \& Kremen, C. (2013).
@@ -349,11 +355,6 @@ Petanidou, T., Kallimanis, S., Tzanopoulos, J., Sgardelis, S. \& Pantis, J.
   species and interactions, relative invariance of network structure and
   implications for estimates of specialization.
 \newblock \emph{Ecol. Lett.}, 11, 564--575.
-
-\bibitem[{Pimm(1984)}]{pimm1984complexity}
-Pimm, S.L. (1984).
-\newblock The complexity and stability of ecosystems.
-\newblock \emph{Nature}, 307, 321--326.
 
 \bibitem[{Ponisio \emph{et~al.}(2016)Ponisio, M'Gonigle \&
   Kremen}]{ponisio2015farm}

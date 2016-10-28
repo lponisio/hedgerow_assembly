@@ -22,7 +22,7 @@ plot.panels <- function(){
                col.fill=col.fill,
                col.lines=col.lines,
                plotPoints=TRUE)
-    mtext("Robustness to \n cascading effects", 2, line=4, cex=1.5)
+    mtext("Sensitivity to \n perturbations", 2, line=4, cex=1.5)
 
     axis(1, pretty(res$ypr), labels=pretty(res$ypr))
     mtext("Year of assembly", 1, line=3.5, cex=1.5)
