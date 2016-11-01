@@ -144,9 +144,10 @@ plotDistPanels <- function(){
             xlab='', ylab='', ylim=c(0,1),
             names=c("","",""),
             las=1, xaxt="n")
-    beeswarm(dists ~ status, col = cols, add = TRUE)
+    beeswarm(dists ~ status, col = cols.fills,
+             add = TRUE, method="hex", corral="gutter")
     mtext("Pollinators",
-          3, line=0.9, cex=1.3)
+          3, line=0.9, cex=1.5)
 
     ## plant species turnover
     load(file= file.path('saved/speciesTurnover', sprintf('%s.pdf',
@@ -160,9 +161,10 @@ plotDistPanels <- function(){
             xlab='', ylab='',ylim=c(0,1),
             names=c("","",""),
             las=1, xaxt="n", yaxt="n")
-    beeswarm(dists ~ status, col = cols, add = TRUE)
+    beeswarm(dists ~ status, col = cols.fills, add = TRUE,
+             method="hex", corral="gutter")
     mtext("Plants",
-          3, line=0.9, cex=1.3)
+          3, line=0.9, cex=1.5)
     
     ## interaction turnover
     load(file= file.path('saved/speciesTurnover', sprintf('%s.pdf',
@@ -176,14 +178,15 @@ plotDistPanels <- function(){
             xlab='', ylab='',ylim=c(0,1),
             names=c("","",""),
             las=1)
-    beeswarm(dists ~ status, col = cols, add = TRUE)
+    beeswarm(dists ~ status, col = cols.fills, add = TRUE,
+             method="hex", corral="gutter")
     mtext("Interactions",
-          3, line=0.9, cex=1.3)
+          3, line=0.9, cex=1.5)
     mtext(c("Non-assembling \n field margin",
             "Assembling \n  hedgerow",
             "Non-assembling \n hedgerow"),
           side = 1, line= 2, at = 1:3, cex=0.9)
-    mtext("Turnover", 2, line=4, cex=1.3, adj=1.2)
+    mtext("Turnover", 2, line=4, cex=2, adj=1.35)
     
     ## weighted link turnover
     load(file="saved/phyloInt.Rdata")
@@ -197,8 +200,9 @@ plotDistPanels <- function(){
             "Assembling \n  hedgerow",
             "Non-assembling \n hedgerow"),
           side = 1, line= 2, at = 1:3, cex=0.9)
-    beeswarm(dats[,y1]~ dats$SiteStatus, col = cols, add = TRUE)
-    mtext("Weighted interactions", 3, line=0.9, cex=1.3)
+    beeswarm(dats[,y1]~ dats$SiteStatus, col = cols.fills, add = TRUE,
+             method="hex", corral="gutter")
+    mtext("Weighted interactions", 3, line=0.9, cex=1.5)
   }
   path <- 'figures'
   pdf.f(f3, file=file.path(path,

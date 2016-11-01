@@ -30,6 +30,7 @@
   \textcolor{blue}{#1}
 }
 
+
 \def\title{Major interaction reorganizations punctuate the assembly of
   pollination networks} \def\author{Lauren C.\ Ponisio$^{1,2,3}$,
   Marilia P. Gaiarsa$^4$, Claire Kremen$^1$}
@@ -65,7 +66,7 @@
     Riverside, California, USA\\
     92521\\
   \item Departamento de Ecologia\\
-    Universidade de Sao Paulo\\
+    Universidade de S{\~a}o Paulo\\
     S{\~a}o Paulo, SP, Brazil\\
     05508-900\\
   \end{enumerate}
@@ -459,7 +460,7 @@ similar species. At non-assembling communities, species turnover may
 overestimate the temporal changes in the networks if the interactions
 occurring in one year are similar to those in the next year when they
 are weighted by the similarity of their constituent species
-(Fig.~\ref{fig:methods}). We develop a method to examine the temporal
+(Fig.~ S2). We develop a method to examine the temporal
 turnover of interactions with weightings based on their similarity. We
 followed the algorithm of \cite{ahn2010link} to cluster all the
 interactions (edges) hierarchically across sites and years based on
@@ -556,18 +557,22 @@ second smallest eigenvalue of the Laplacian matrix
 difficult it is to turn a network into completely disconnected groups
 of species \citep{costa2007characterization, gibert2013spatial}. The
 larger the algebraic connectivity, the more sensitive a network is to
-cascading perturbations. Perturbations, such as the decrease in abundance of a
-plant or pollinator, can have negative consequences
-for the species in the network. For example, pollination service provided to planst could decrease following a decrease in
-abundance of a pollinator. The affected plants would set less seeds,
-and decrease in abundance the subsequent year. Consequently, other pollinators that
-depended on those plant species would also be affected, and the effects of this perturbation would
-continue to propagate throughout the network, potentially affecting all species in the community. Alternatively, perturbations could
-also have a positive effect. For example, the increase in abundance of a
-plant species would lead to an increase in resource availability for the pollinators. The examples
-of negative perturbations (e.g., resource collapse, disease spreading,
-parasites), however, outnumber possible positive perturbations. It is important to point out that both robustness and algebraic connectivity assume that the network is static --- these metrics do not
-account for the ability of species to alter their interaction
+cascading perturbations. Perturbations, such as the decrease in
+abundance of a plant or pollinator, can have negative consequences for
+the species in the network. For example, a decrease in abundance of a
+pollinator will diminish the pollination services it provides to
+plants. The affected plants would set less seeds, and decrease in
+abundance the subsequent year. Consequently, other pollinators that
+depended on those plant species would also be affected, and the
+effects of this perturbation would continue to propagate throughout
+the network. Alternatively, perturbations could also have a positive
+effect. For example, the increase in abundance of a plant species
+would lead to an increase in resource availability for the
+pollinators. The examples of negative perturbations (e.g., resource
+collapse, disease spreading, parasites), however, outnumber possible
+positive perturbations. It is important to note that both robustness
+and algebraic connectivity assume that the network is static. They do
+not account for the ability of species to alter their interaction
 depending on circumstances and the resource availability.
 
 \section*{Results}
@@ -895,19 +900,6 @@ Fe Institute for facilitating this international collaboration.
 
 \bibliography{refs}
 
-\clearpage
-\begin{figure}
-  \centering
-  \includegraphics[width=.8\textwidth]{figures/scheme.pdf}
-  \caption{Diagram illustrating the analysis to examine the temporal
-    turnover of interactions weighted based on their similarity. A, B
-    and C are animal species, and Ps are plant species. The dendrogram
-    depicts the interaction similarity across years based on the
-    number of shared constituent species.}
-  \label{fig:methods}
-\end{figure}
-\clearpage
-
 
 \begin{figure}
   \centering
@@ -931,9 +923,8 @@ Fe Institute for facilitating this international collaboration.
   \includegraphics[width=.95\textwidth]{../analysis/changePoint/plotting/communitiesSkanky2.pdf}
   \caption{The module membership between network changing points. Two
     representative assembling hedgerows are depicted. In the top
-    panel, species are grouped by community. The bottom panels
-    visualize the flow of species between communities between changing
-    points. }
+    panel, species are grouped by module. The bottom panels visualize
+    the flow of species between modules between changing points. }
   \label{fig:changePoints2}
 \end{figure}
 \clearpage
