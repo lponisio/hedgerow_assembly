@@ -1,5 +1,6 @@
 plot.panels <- function(){
   f <- function(){
+    col.white <- add.alpha("white", alpha=0)
     col.lines <- brewer.pal(4, "Greys")[3]
     col.fill <- add.alpha(col.lines, alpha=0.2)
     layout(matrix(1:6, ncol=3))
@@ -19,8 +20,9 @@ plot.panels <- function(){
                dats=cor.dats,
                y1="zmod.met.D",
                xs="ypr",
-               col.fill=col.fill,
-               col.lines=col.lines,
+               col.fill=col.white,
+               col.lines=col.white,
+               col.points=col.fill,
                plotPoints=TRUE)
     mtext("Modularity", 2, line=4, cex=1.5)
 

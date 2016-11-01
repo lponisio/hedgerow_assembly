@@ -48,6 +48,7 @@ occ.closeness.cv <- cv.trait(spec,
                              na.rm=TRUE)
 summary(occ.closeness.cv$lm.nss)
 
+
 ## plants and closeness
 ## not sig
 plants.occ.closeness.cv <- cv.trait(spec,

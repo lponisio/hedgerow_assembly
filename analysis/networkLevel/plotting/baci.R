@@ -1,6 +1,7 @@
 library(RColorBrewer)
 library(lme4)
 library(lmerTest)
+setwd('~/Dropbox/hedgerow_assembly/analysis/networkLevel')
 source('plotting/src/predictIntervals.R')
 source('plotting/src/CIplotting.R')
 source('plotting/src/plotPanels.R')

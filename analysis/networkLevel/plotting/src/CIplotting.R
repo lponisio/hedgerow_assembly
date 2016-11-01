@@ -4,6 +4,7 @@ plot.panel <- function(dats,
                        xs,
                        col.lines,
                        col.fill,
+                       col.points=col.fill,
                        plotPoints=TRUE,
                        agg.col="Site",...){
   plotting.loop <- function(){
@@ -15,7 +16,7 @@ plot.panel <- function(dats,
       points(x=jitter(ys$x, factor=0.25),
              y=ys$y,
              pch=16,
-             col=col.fill,
+             col=col.points,
              cex=1.2)
     }
     lines(x=new.dd[,xs],

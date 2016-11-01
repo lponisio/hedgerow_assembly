@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.5.24)  31 OCT 2016 16:07
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.5.24)  31 OCT 2016 17:03
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -609,13 +609,13 @@ LaTeX Font Info:    Font shape `U/msb/m/n' will be
 LaTeX Font Info:    Font shape `U/msb/m/n' will be
 (Font)              scaled to size 7.29405pt on input line 272.
  [5] [6] [7] [8] [9] [10] [11] [12] [13] [14]
-Overfull \hbox (1.92525pt too wide) in paragraph at lines 620--635
+Overfull \hbox (1.92525pt too wide) in paragraph at lines 622--637
 \OT1/ptm/m/n/12 hedgerows, non-assembling hedgerows and field mar-gins, though 
 ma-ture hedgerows has marginally
  []
 
 [15] [16] [17]
-Overfull \hbox (4.36095pt too wide) in paragraph at lines 735--757
+Overfull \hbox (4.36095pt too wide) in paragraph at lines 742--764
 []\OT1/ptm/m/n/12 Interestingly, though as-sem-bling hedgerows had more net-wor
 k re-or-ga-ni-za-tions than non-assembling
  []
@@ -625,18 +625,18 @@ k re-or-ga-ni-za-tions than non-assembling
 File: figures/scheme.pdf Graphic file (type pdf)
 
 <use figures/scheme.pdf>
-Package pdftex.def Info: figures/scheme.pdf used on input line 892.
+Package pdftex.def Info: figures/scheme.pdf used on input line 899.
 (pdftex.def)             Requested size: 375.80544pt x 189.06728pt.
  [29] [30 <./figures/scheme.pdf>]
 <../analysis/changePoint/plotting/networks.pdf, id=513, 578.16pt x 785.93625pt>
 File: ../analysis/changePoint/plotting/networks.pdf Graphic file (type pdf)
 <use ../analysis/changePoint/plotting/networks.pdf>
 Package pdftex.def Info: ../analysis/changePoint/plotting/networks.pdf used on 
-input line 905.
+input line 912.
 (pdftex.def)             Requested size: 375.80544pt x 510.85251pt.
 
 
-LaTeX Warning: Float too large for page by 4.5204pt on input line 917.
+LaTeX Warning: Float too large for page by 4.5204pt on input line 924.
 
 [31 <../analysis/changePoint/plotting/networks.pdf>]
 <../analysis/changePoint/plotting/communitiesSkanky2.pdf, id=571, 802.61435pt x
@@ -645,7 +645,7 @@ File: ../analysis/changePoint/plotting/communitiesSkanky2.pdf Graphic file (typ
 e pdf)
  <use ../analysis/changePoint/plotting/communitiesSkanky2.pdf>
 Package pdftex.def Info: ../analysis/changePoint/plotting/communitiesSkanky2.pd
-f used on input line 922.
+f used on input line 929.
 (pdftex.def)             Requested size: 422.77664pt x 167.88986pt.
 
 [32 <../analysis/changePoint/plotting/communitiesSkanky2.pdf>]
@@ -655,7 +655,7 @@ File: ../analysis/variability/figures/cv/occ_degree.pdf Graphic file (type pdf)
 
  <use ../analysis/variability/figures/cv/occ_degree.pdf>
 Package pdftex.def Info: ../analysis/variability/figures/cv/occ_degree.pdf used
- on input line 934.
+ on input line 941.
 (pdftex.def)             Requested size: 375.80544pt x 300.64491pt.
  [33 <../analysis/variability/figures/cv/occ_degree.pdf>]
 <../analysis/variability/figures/turnover_panels.pdf, id=6760, 722.7pt x 650.43
@@ -664,7 +664,7 @@ File: ../analysis/variability/figures/turnover_panels.pdf Graphic file (type pd
 f)
  <use ../analysis/variability/figures/turnover_panels.pdf>
 Package pdftex.def Info: ../analysis/variability/figures/turnover_panels.pdf us
-ed on input line 949.
+ed on input line 956.
 (pdftex.def)             Requested size: 469.75502pt x 422.78441pt.
  [34 <../analysis/variability/figures/turnover_panels.pdf>]
 <../analysis/networkLevel/figures/baci.pdf, id=6774, 722.7pt x 433.62pt>
@@ -672,7 +672,7 @@ File: ../analysis/networkLevel/figures/baci.pdf Graphic file (type pdf)
 
 <use ../analysis/networkLevel/figures/baci.pdf>
 Package pdftex.def Info: ../analysis/networkLevel/figures/baci.pdf used on inpu
-t line 968.
+t line 975.
 (pdftex.def)             Requested size: 469.75502pt x 281.85628pt.
  [35 <../analysis/networkLevel/figures/baci.pdf>]
 <../analysis/networkLevel/figures/robustness.pdf, id=6788, 289.08pt x 397.485pt
@@ -680,23 +680,23 @@ t line 968.
 File: ../analysis/networkLevel/figures/robustness.pdf Graphic file (type pdf)
  <use ../analysis/networkLevel/figures/robustness.pdf>
 Package pdftex.def Info: ../analysis/networkLevel/figures/robustness.pdf used o
-n input line 986.
+n input line 993.
 (pdftex.def)             Requested size: 234.8775pt x 322.95576pt.
  [36 <../analysis/networkLevel/figures/robustness.pdf>]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1002.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 1002.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1009.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 1009.
  (./ms.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 1002.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 1002.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 1009.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 1009.
 
 Package rerunfilecheck Info: File `ms.out' has not changed.
 (rerunfilecheck)             Checksum: D41D8CD98F00B204E9800998ECF8427E;0.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 1002.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 1009.
  ) 
 Here is how much of TeX's memory you used:
  8359 strings out of 493089
  122047 string characters out of 6134842
- 210191 words of memory out of 5000000
+ 209191 words of memory out of 5000000
  11526 multiletter control sequences out of 15000+600000
  49980 words of font info for 115 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
@@ -712,7 +712,7 @@ mf-dist/fonts/type1/urw/palatino/uplr8a.pfb></usr/local/texlive/2015/texmf-dist
 /type1/urw/times/utmb8a.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/urw
 /times/utmr8a.pfb></usr/local/texlive/2015/texmf-dist/fonts/type1/urw/times/utm
 ri8a.pfb>
-Output written on ms.pdf (36 pages, 2478497 bytes).
+Output written on ms.pdf (36 pages, 2477445 bytes).
 PDF statistics:
  6865 PDF objects out of 7423 (max. 8388607)
  4684 compressed objects within 47 object streams

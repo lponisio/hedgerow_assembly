@@ -2,6 +2,7 @@ plot.panels <- function(){
   f <- function(){
     col.lines <- "black"
     col.fill <- add.alpha(col.lines, alpha=0.2)
+    col.white <- add.alpha("white", alpha=0)
     names(col.lines) <- names(col.fill) <- "all"
     layout(matrix(1:4, nrow=2, byrow=TRUE))
     par(oma=c(2, 6.5, 0.5, 1),
@@ -36,10 +37,12 @@ plot.panels <- function(){
     plot.panel(new.dd=plants.occ.pi.close,
                dats=plants.occ.closeness.cv$data,
                y1="cv",
-               y2= range(c(plants.degree.pi$plo, plants.degree.pi$phi)),
+               y2= range(c(plants.degree.pi$plo, plants.degree.pi$phi)
+    + c(-0.2,0.2)),
                xs="traits",
-               col.fill=col.fill,
-               col.lines=col.lines,
+               col.fill=col.white,
+               col.lines=col.white,
+               col.points=col.fill,
                plot.y=TRUE,
                treatments="all")
     
@@ -53,11 +56,13 @@ plot.panels <- function(){
     ## degree plants
     plot.panel(new.dd=plants.degree.pi,
                dats=plants.degree.closeness.cv$data,
-               y2=range(c(plants.occ.pi.close$plo, plants.occ.pi.close$phi)),
+               y2=range(c(plants.occ.pi.close$plo,
+    plants.occ.pi.close$phi)) + c(-0.2, 0.1),
                y1="cv",
                xs="traits",
-               col.fill=col.fill,
-               col.lines=col.lines,
+               col.fill=col.white,
+               col.lines=col.white,
+               col.points=col.fill,
                plot.y=FALSE,
                treatments="all",
                dec=0)
