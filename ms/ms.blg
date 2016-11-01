@@ -1,46 +1,46 @@
-This is BibTeX, Version 0.99d (TeX Live 2015)
+This is BibTeX, Version 0.99d (TeX Live 2016)
 Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
 The top-level auxiliary file: ms.aux
 The style file: ecol_let.bst
 Database file #1: refs.bib
-You've used 72 entries,
+You've used 65 entries,
             2997 wiz_defined-function locations,
-            1064 strings with 17961 characters,
-and the built_in function-call counts, 45238 in all, are:
-= -- 3633
-> -- 2288
-< -- 25
-+ -- 905
-- -- 804
-* -- 3705
-:= -- 7365
-add.period$ -- 215
-call.type$ -- 72
-change.case$ -- 624
-chr.to.int$ -- 71
-cite$ -- 72
-duplicate$ -- 3018
-empty$ -- 2986
-format.name$ -- 1034
-if$ -- 8537
-int.to.chr$ -- 2
+            1025 strings with 16648 characters,
+and the built_in function-call counts, 40417 in all, are:
+= -- 3266
+> -- 2010
+< -- 22
++ -- 796
+- -- 705
+* -- 3288
+:= -- 6581
+add.period$ -- 195
+call.type$ -- 65
+change.case$ -- 557
+chr.to.int$ -- 65
+cite$ -- 65
+duplicate$ -- 2714
+empty$ -- 2673
+format.name$ -- 914
+if$ -- 7630
+int.to.chr$ -- 1
 int.to.str$ -- 1
-missing$ -- 686
-newline$ -- 363
-num.names$ -- 288
-pop$ -- 1188
+missing$ -- 610
+newline$ -- 329
+num.names$ -- 260
+pop$ -- 1056
 preamble$ -- 1
-purify$ -- 554
+purify$ -- 493
 quote$ -- 0
-skip$ -- 838
+skip$ -- 766
 stack$ -- 0
-substring$ -- 2341
-swap$ -- 1709
-text.length$ -- 4
+substring$ -- 2095
+swap$ -- 1530
+text.length$ -- 3
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 645
+type$ -- 585
 warning$ -- 0
-while$ -- 331
+while$ -- 298
 width$ -- 0
-write$ -- 933
+write$ -- 843
