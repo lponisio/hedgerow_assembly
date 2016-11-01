@@ -30,10 +30,9 @@
   \textcolor{blue}{#1}
 }
 
-\def\title{The temporal assembly of plant-pollinator networks
-  following restoration}
-\def\author{Lauren C.\ Ponisio$^{1,2}$, Marilia P. Gaiarsa$^3$, Claire
-  Kremen$^1$}
+\def\title{Major interaction reorganizations punctuate the assembly of
+  pollination networks} \def\author{Lauren C.\ Ponisio$^{1,2,3}$,
+  Marilia P. Gaiarsa$^4$, Claire Kremen$^1$}
 
 \def\runninghead{Plant-pollinator network assembly}
 \def\keywords{community assembly, change points, specialization,
@@ -56,6 +55,10 @@
     130 Mulford Hall\\
     Berkeley, California, USA\\
     94720\\
+  \item Berkeley Institute for Data Science (BIDS)\\
+    University of California, Berkeley\\
+    190 Doe Library \\
+    Berkeley, California, USA\\
   \item Department of Entomology\\
     University of California, Riverside\\
     417 Entomology Bldg.\\
@@ -97,7 +100,7 @@
   species extinction is related to the structure of
   networks. Understanding network structure and how it relates to
   network assembly, therefore, is a priority for conservation
-  biology. Using a long-term data set comprising nearly $20,000$
+  biology. Using a nine-year-dataset comprising nearly $20,000$
   pollinator visitation records, we explore the assembly of
   plant-pollinator communities at native plant restorations in the
   Central Valley of California. Across years, species are highly
@@ -106,19 +109,21 @@
   non-assembling networks did not restructure as frequently. Across
   all communities, pollinator species were opportunistic in the
   flowers they visited. The most persistent and generalized species
-  were also the most variable in their network positions, contrary to what is expected through prefereantial attachment theory. High species
-  and interaction turnover was ubiquitous across assembling and
-  non-assembling communities, though unique interactions turned over
-  at higher rates in assembling hedgerows as the networks continually
-  reorganized. Nestedness of assembling networks also increased
-  through time, but there was no increase in robustness to simulated
-  plant extinctions. The sensitivity of networks to cascading
-  perturbations, however, increased as the communities assembled, at
-  least partially due to accumulating species richness. We elucidate
-  some of the mechanisms underlying plant-pollinator network assembly
-  and restoration, while providing further evidence that hedgerows are
-  a valuable tool for promoting species conservation and ecosystem
-  service? provision in agricultural areas.
+  were also the most variable in their network positions, contrary to
+  what is expected through prefereantial attachment theory. High
+  species and interaction turnover was ubiquitous across assembling
+  and non-assembling communities, though unique interactions turned
+  over at higher rates in assembling hedgerows as the networks
+  continually reorganized. Nestedness of assembling networks also
+  increased through time, but there was no increase in robustness to
+  simulated plant extinctions. The sensitivity of networks to
+  cascading perturbations, however, increased as the communities
+  assembled, at least partially due to accumulating species
+  richness. We elucidate some of the mechanisms underlying
+  plant-pollinator network assembly and restoration, while providing
+  further evidence that hedgerows are a valuable tool for promoting
+  species conservation and ecosystem service? provision in
+  agricultural areas.
 \end{abstract}
 
 \keywords
@@ -906,24 +911,24 @@ Fe Institute for facilitating this international collaboration.
 
 \begin{figure}
   \centering
-  \includegraphics[width=.8\textwidth]{../analysis/changePoint/plotting/networks.pdf}
+  \includegraphics[width=1\textwidth]{../analysis/changePoint/plotting/networksv1.pdf}
   \caption{Assembling hedgerow networks had more changing points
     (vertical red lines) than non-assembling hedgerows and weedy field
     margins (a representative sample of non-assembling sites are
     depicted here). In each network, plants and pollinators are
     represented by green and yellow circles, respectively, weighted by
     their degree. Each species has a consistent position in the
-    network across years. In the assembling hedgerows, colored squares
-    in the corner of each network represent the year of
-    assembly. Before hedgerows are installed (when they are still
-    field margins) the year of assembly is zero.}
+    perimeter of the network across years. In the assembling
+    hedgerows, colored squares in the corner of each network represent
+    the year of assembly. Asterisks indicate the year the hegdgerow
+    was planted. Before that, the sites were weedy field margins.}
   \label{fig:changePoints}
 \end{figure}
 \clearpage
 
 \begin{figure}
   \centering
-  \includegraphics[width=.9\textwidth]{../analysis/changePoint/plotting/communitiesSkanky2.pdf}
+  \includegraphics[width=.95\textwidth]{../analysis/changePoint/plotting/communitiesSkanky2.pdf}
   \caption{The module membership between network changing points. Two
     representative assembling hedgerows are depicted. In the top
     panel, species are grouped by community. The bottom panels

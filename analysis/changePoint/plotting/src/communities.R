@@ -1,6 +1,15 @@
 require(googleVis)
 
+## add transparency to named colors
+add.alpha <- function(col, alpha=0.2){
+  apply(sapply(col, col2rgb)/255, 2, 
+        function(x) 
+        rgb(x[1], x[2], x[3],
+            alpha=alpha))  
+}
+
 plotNet <- function(){
+  col.white <- add.alpha("white", alpha=0)
   par(mar=c(0,0.5,0,0))
   layout(matrix(1:length(all.poss.yrs), nrow=1))
   for(j in all.poss.yrs){
@@ -9,15 +18,17 @@ plotNet <- function(){
       gs <- graph.incidence(g, weighted=TRUE)
       cols <- c(rep("darkolivegreen", length(rownames(g))),
                 rep("gold", length(colnames(g))))
+      importance <-  (c(rowSums(g) +0.1, colSums(g) + 0.1)/sum(g))*175
+      cols[importance == min(importance)] <- col.white
       V(gs)$color <- cols
-      importance <-  (c(rowSums(g) +0.1, colSums(g) + 0.1)/sum(g))*100
       v.labs <- names(importance)
-      v.labs[importance < 5] = ""
+      v.labs[importance == min(importance)] = ""
       V(gs)$size <- importance
-      
-      E(gs)$width <- (E(gs)$weight/sum(E(gs)$weight))*40
+      v.boarders <- rep("black", length(importance))
+      v.boarders[importance == min(importance)] <- col.white
+      ## E(gs)$width <- (E(gs)$weight/sum(E(gs)$weight))*40
       gs$layout <- layout_in_circle
-      plot.igraph(gs, vertex.label="")
+      plot.igraph(gs, vertex.label="", vertex.frame.color=v.boarders)
       ## ## vertex.label.cex=importance/10,
       ## vertex.label=v.labs)
     } else{
