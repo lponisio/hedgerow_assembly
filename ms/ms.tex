@@ -1,6 +1,6 @@
 \documentclass[12pt]{article} 
 \usepackage[pdftex]{graphicx}
-\usepackage{natbib} 
+\usepackage[numbers]{natbib} 
 \usepackage{color}
 \usepackage{amsmath} 
 \usepackage{amssymb} 
@@ -43,10 +43,16 @@
 \def\extras{
   \begin{itemize}
   \item Submitted as a Letter
-  \item Abstract word count: 
-  \item Main text word count: 
-  \item Number of references: 
-  \item Number of figures:
+  \item Abstract word count: 148
+  \item Main text word count: 5152
+  \item Number of references: 65
+  \item Number of figures: 6
+  \item Author contributions: CK designed the study, LCP and CK
+    collected data, LCP and MPG analyzed output data.  LCP wrote the
+    first draft of the manuscript, and all authors contributed to
+    revisions.
+  \item Data accessibility statement: Data will de depositied in Dryad
+    upon publication
   \end{itemize}
 }
 
@@ -107,24 +113,24 @@
   plant-pollinator communities at native plant restorations in the
   Central Valley of California. Across years, species are highly
   dynamic in their network position, causing community assembly to be
-  punctuated by major interaction reorganizations. In contrast, the
-  non-assembling networks did not restructure as frequently. Across
-  all communities, pollinator species were opportunistic in the
-  flowers they visited. The most persistent and generalized species
+  punctuated by major interaction reorganizations.%  In contrast, the
+  % non-assembling networks did not restructure as frequently.
+  % Across all communities, pollinator species were opportunistic in the
+  % flowers they visited.
+  The most persistent and generalized species
   were also the most variable in their network positions, contrary to
-  what is expected through prefereantial attachment theory. High
-  species and interaction turnover was ubiquitous across assembling
-  and non-assembling communities, though unique interactions turned
-  over at higher rates in assembling hedgerows as the networks
-  continually reorganized. Nestedness of assembling networks also
-  increased through time, but there was no increase in robustness to
-  simulated plant extinctions. The sensitivity of networks to
-  cascading perturbations, however, increased as the communities
-  assembled, at least partially due to accumulating species
-  richness. We elucidate some of the mechanisms underlying
-  plant-pollinator network assembly and restoration, while providing
-  further evidence that hedgerows are a valuable tool for promoting
-  species conservation provision in agricultural areas.
+  what is expected through prefereantial attachment theory. % High
+  % species and interaction turnover was ubiquitous across assembling
+  % and non-assembling communities, though unique interactions turned
+  % over at higher rates in assembling hedgerows as the networks
+  % continually reorganized.
+  % Nestedness of assembling networks also increased through time, but
+  The sensitivity of networks to cascading perturbations,
+  increased with assembly, at least partially due to accumulating
+  species richness. We elucidate some of the mechanisms underlying
+  plant-pollinator network assembly and restoration --- challenging
+  the widely-held hypothesis that mutualistic networks assemble
+  through preferential attachment.
 \end{abstract}
 
 \keywords
@@ -552,8 +558,9 @@ extinction curve is an estimate of network robustness
 We also explored how the robustness to cascading perturbations changed
 as the community assembled, using algebraic connectivity --- the
 second smallest eigenvalue of the Laplacian matrix
-\citep{fiedler1973algebraic} --- as a proxy for network robustness
-(Gaiarsa et al., in prep). Algebraic connectivity relates to how
+\citep{fiedler1973algebraic} --- as a proxy for network robustness.
+% (Gaiarsa et al., in prep)
+ Algebraic connectivity relates to how
 difficult it is to turn a network into completely disconnected groups
 of species \citep{costa2007characterization, gibert2013spatial}. The
 larger the algebraic connectivity, the more sensitive a network is to
@@ -714,7 +721,7 @@ consistent with the finding that in our study system, hedgerow
 restoration takes several years to have an impact on the
 plant-pollinator communities, and with the observation that hedgerows
 do not begin to produce many flowers until $3$--$5$ years following
-planting (Kremen and M'Gonigle, in prep).
+planting \citep{kremen-2015-602}.
 
 In addition to finding multiple network organization changing points
 during assembly, the way in which these reorganizations occur was
