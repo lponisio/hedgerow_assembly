@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.5.24)  1 NOV 2016 15:36
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.5.24)  2 NOV 2016 11:12
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -181,7 +181,7 @@ Package textcomp Info: Setting pplj sub-encoding to TS1/3 on input line 407.
 Package textcomp Info: Setting ptmx sub-encoding to TS1/4 on input line 408.
 Package textcomp Info: Setting ptmj sub-encoding to TS1/4 on input line 409.
 )
-No file coverLetter.aux.
+(./coverLetter.aux)
 \openout1 = `coverLetter.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 15.
@@ -198,6 +198,7 @@ LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 15.
 LaTeX Font Info:    ... okay on input line 15.
 LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 15.
 LaTeX Font Info:    Try loading font information for TS1+cmr on input line 15.
+
 (/usr/local/texlive/2015/texmf-dist/tex/latex/base/ts1cmr.fd
 File: ts1cmr.fd 2014/09/29 v2.5h Standard LaTeX font definitions
 )
@@ -337,8 +338,8 @@ File: ts1ptm.fd 2001/06/04 font definitions for TS1/ptm.
 {/usr/local/texlive/2015/texmf-var/fonts/map/pdftex/updmap/pdftex.map}] (./cove
 rLetter.aux) ) 
 Here is how much of TeX's memory you used:
- 2680 strings out of 493089
- 39479 string characters out of 6134842
+ 2682 strings out of 493089
+ 39511 string characters out of 6134842
  97909 words of memory out of 5000000
  6121 multiletter control sequences out of 15000+600000
  13972 words of font info for 37 fonts, out of 8000000 for 9000
@@ -348,7 +349,7 @@ Here is how much of TeX's memory you used:
 /usr/local/texlive/2015/texmf-dist/fonts/type1/urw/palatino/uplr8a.pfb></usr/lo
 cal/texlive/2015/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/local/texliv
 e/2015/texmf-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on coverLetter.pdf (1 page, 38966 bytes).
+Output written on coverLetter.pdf (1 page, 39367 bytes).
 PDF statistics:
  21 PDF objects out of 1000 (max. 8388607)
  14 compressed objects within 1 object stream
