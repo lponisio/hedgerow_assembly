@@ -81,17 +81,27 @@ make.by.species <- function(spec,
       sr.sched$Date,
       sep=';')),
     GenusSpecies=unique(spec[,type]),
-    Occ=0)
+    ## Occ=0,
+    Abund=0)
   ## fill in the matrix of all combinations
   match.dates <- match(paste(all.sp$Site,
                        all.sp$Date,
-                       all.sp$GenusSpecies,
-                       sep=';'),
-                 paste(sp$SiteDate,
-                       sp$GenusSpecies,
-                       sep=';'))
-
-  sp$Occ[!is.na(match.dates)] <- 1
+                             all.sp$GenusSpecies,
+                             sep=';'),
+                       paste(sp$SiteDate,
+                             sp$GenusSpecies,
+                             sep=';'))
+  match.abund <- match(paste(sp$SiteDate,
+                             sp$GenusSpecies,
+                             sep=';'),
+                       paste(all.sp$Site,
+                       all.sp$Date,
+                             all.sp$GenusSpecies,
+                             sep=';'))
+  
+  sp$Abund <- all.sp$Abund[match.abund]
+  ## sp$Occ <- sp$Abund
+  ## sp$Occ[sp$Occ > 0] <- 1
   ## create site, date, genus etc. columns
   sp$Site <- sapply(strsplit(as.character(sp$SiteDate), ";"),
                     function(x) x[1])
@@ -113,7 +123,7 @@ make.by.species <- function(spec,
                     pollinator=as.vector(sp$GenusSpecies), 
                     var1=as.vector(sp$Site),
                     var2=sp$Date,
-                    occ=sp$Occ)
+                    occ=sp$Abund)
   
   sites <- rownames(mats[[1]])
   dates <- colnames(mats[[1]])
@@ -143,5 +153,6 @@ findOccPlant <- function(x){
 }
 
 calcOccArray <-  function(x){
+  x[x > 1] <- 1
   sum(x > 0, na.rm=TRUE)/sum(x >= 0, na.rm=TRUE)
 }

@@ -58,8 +58,9 @@ length(unique(spec$Genus))
 ## interactions
 length(unique(paste(spec$GenusSpecies, spec$PlantGenusSpecies)))
 
-
+## *************************************************
 ## create a giant network to calculate specialization
+## *************************************************
 agg.spec <- aggregate(list(abund=spec$GenusSpecies),
                       list(GenusSpecies=spec$GenusSpecies,
                            PlantGenusSpecies=spec$PlantGenusSpecies),
@@ -78,11 +79,38 @@ traits <- data.frame(GenusSpecies= unlist(sapply(all.specializations,
                      do.call(rbind, all.specializations))
 rownames(traits) <- NULL
 
+## *************************************************
+## thermal traits
+## *************************************************
+spec$AverageTemp <- apply(spec, 1, function(x){
+  mean(as.numeric(c(x["TempStart"], x["TempEnd"])),
+       na.rm=TRUE)
+})
+
+temp.tol <- do.call(rbind, tapply(spec$AverageTemp, spec$GenusSpecies,
+                   function(x){
+                     temp.mean <- mean(x, na.rm=TRUE)
+                     temp.range <- range(x, na.rm=TRUE)
+                     max.temp <- temp.range[2]
+                     temp.range <- temp.range[2] - temp.range[1]
+                     return(c(temp.mean=temp.mean,
+                              max.temp=max.temp,
+                              temp.range=temp.range))
+                   }))
+temp.tol <- as.data.frame(temp.tol)
+temp.tol$GenusSpecies <- rownames(temp.tol)
+rownames(temp.tol) <- NULL
+
+traits <- merge(traits, temp.tol)
+
+## *************************************************
+## sampling table for manuscript
+## *************************************************
+
 site.table <- aggregate(list(Samples=spec$Date),
                         list(Year=spec$Year, Site=spec$Site),
                         function(x) length(unique(x)))
 
-## sampling table for manuscript
 ms.table <- samp2site.spp(site=site.table$Site,
                           spp=site.table$Year,
                           abund=site.table$Samples,
@@ -105,7 +133,9 @@ ms.table[, "Site type"][ms.table[, "Site type"] == "control"] <-
 write.table(ms.table, file="~/Dropbox/hedgerow_assembly/ms/tables/samples.txt",
             sep=" & ")
 
+## *************************************************
 ## add various traits
+## *************************************************
 ## specialization
 spec$d <- traits$d[match(spec$GenusSpecies, traits$GenusSpecies)]
 spec$degree <- traits$degree[match(spec$GenusSpecies,
@@ -133,6 +163,11 @@ long.site.date <- long.site.date[!is.na(long.site.date$Samp),]
 
 ## create site by date matrices with plant presence
 plant.mat <- make.by.species(spec, long.site.date, site.date)
+pol.mat <- make.by.species(spec, long.site.date, site.date,
+                           type="GenusSpecies")
+
+save(plant.mat, pol.mat, file='../data/species/allSamples.Rdata')
+
 occ.plant <- apply(plant.mat, c(3,1), calcOccArray)
 ## match to dataset!
 spec$occ.plant.date <- apply(spec, 1, findOccPlant)
@@ -158,6 +193,10 @@ spec$AdultDiet <- syr.trait$AdultDiet[match(spec$GenusSpecies,
 spec$WingLength <- syr.trait$WingLength[match(spec$GenusSpecies,
                                               rownames(syr.trait))]
 
+traits <- merge(traits, syr.trait[,c(5:7,10,33)], all.x=TRUE)
+
+traits <- merge(traits, bee.trait[,c(1:5,27)], all.x=TRUE)
+
 save(spec, file='../data/networks/allSpecimens.Rdata')
 write.csv(traits, file="../data/traits.csv", row.names=FALSE)
 
@@ -178,6 +217,8 @@ save(nets, file=file.path(f.path, 'all_networks_years.Rdata'))
 
 ## *******************************************************************
 ## keep only BACI sites
+## *******************************************************************
+
 BACI.site <- c('Barger', 'Butler', 'Hrdy', 'MullerB', 'Sperandio')
 spec <-  spec[spec$Site %in% BACI.site,]
 veg <-  veg[veg$Site %in% BACI.site,]
@@ -202,6 +243,7 @@ veg.sum <- aggregate(list(abundance=veg$NumQuads),
 
 ## *******************************************************************
 ## create networks
+## *******************************************************************
 
 ## by early/late assembly 
 networks <- breakNet(spec, 'Site', 'assem')
@@ -216,6 +258,7 @@ save(nets, file=file.path(f.path, 'baci_networks_years.Rdata'))
 
 ## *******************************************************************
 ## specialization of each species at each site
+## *******************************************************************
 
 species.lev <- lapply(networks, function(x){
   sl <- specieslevel(x)
