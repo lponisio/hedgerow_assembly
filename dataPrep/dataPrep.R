@@ -14,6 +14,9 @@ syr.trait <-
   read.csv(file.path(trait.dir, 'syr.csv'),
            row.names=1)
 
+both.trait <-
+  read.csv(file.path(trait.dir, 'bee.syr.csv'))
+
 spec <- dd
 
 ## subset to net specimens
@@ -101,7 +104,7 @@ temp.tol <- as.data.frame(temp.tol)
 temp.tol$GenusSpecies <- rownames(temp.tol)
 rownames(temp.tol) <- NULL
 
-traits <- merge(traits, temp.tol)
+traits <- merge(traits, temp.tol, all.x=TRUE)
 
 ## *************************************************
 ## sampling table for manuscript
@@ -196,6 +199,24 @@ spec$WingLength <- syr.trait$WingLength[match(spec$GenusSpecies,
 traits <- merge(traits, syr.trait[,c(5:7,10,33)], all.x=TRUE)
 
 traits <- merge(traits, bee.trait[,c(1:5,27)], all.x=TRUE)
+
+traits <- merge(traits, both.trait[,c(2:3,7)], all.x=TRUE)
+
+traits$bee.syr <- spec$BeeNonbee[match(traits$GenusSpecies,
+                                       spec$GenusSpecies)]
+
+traits$bee.syr[is.na(traits$bee.syr)] <- "plant"
+
+mean.abund.pol <- apply(apply(pol.mat, c(1,3), mean, na.rm=TRUE), 2,
+                        mean)
+mean.abund.plant <- apply(apply(plant.mat, c(1,3), mean, na.rm=TRUE),
+                        2, mean)
+mean.abund <- c(mean.abund.pol, mean.abund.plant)
+
+
+traits$mean.abun.net <- mean.abund[match(traits$GenusSpecies,
+                                          names(mean.abund))]
+
 
 save(spec, file='../data/networks/allSpecimens.Rdata')
 write.csv(traits, file="../data/traits.csv", row.names=FALSE)
