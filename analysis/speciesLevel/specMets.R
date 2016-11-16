@@ -6,13 +6,8 @@ load('../../data/networks/all_networks_years.Rdata')
 ## **********************************************************
 ## species importance
 ## **********************************************************
-## specs <- calcSpec(nets, spec, spec.metric = "d", 0.3)
-## save(specs, file=file.path(save.path, 'specs.Rdata'))
-
 ## linear models
 load(file=file.path(save.path, 'specs.Rdata'))
-specs$closeness[specs$closeness == 0] <- 1*10^-6
-specs$closeness.log <- log(specs$closeness)
 
 ## SiteStatus or ypr
 xvar <- "ypr"

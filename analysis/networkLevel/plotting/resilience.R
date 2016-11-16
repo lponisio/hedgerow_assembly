@@ -30,11 +30,11 @@ ypr.pi <- predict.int(mod= mod.ypr,
                         y="Robustness",
                         family="gaussian")
 
-plot.predict.ypr(new.dd=ypr.pi,
-                 ylabel="Robustness to \n species extinction",
-                 dats=res,
-                 y1="Robustness",
-                 extinction.method=extinction.method)
+## plot.predict.ypr(new.dd=ypr.pi,
+##                  ylabel="Robustness to \n species extinction",
+##                  dats=res,
+##                  y1="Robustness",
+##                  extinction.method=extinction.method)
 
 ## ************************************************************
 ## robustness to perturbation
@@ -54,11 +54,11 @@ ypr.pi.alg <- predict.int(mod= alg.con.mod.ypr,
                         y="AlgCon",
                         family="gaussian")
 
-plot.predict.ypr(new.dd=ypr.pi.alg,
-                 ylabel="Robustness to \n cascading effects",
-                 dats=all.alg.Con.status,
-                 y1="AlgCon",
-                 extinction.method="perturb")
+## plot.predict.ypr(new.dd=ypr.pi.alg,
+##                  ylabel="Robustness to \n cascading effects",
+##                  dats=all.alg.Con.status,
+##                  y1="AlgCon",
+##                  extinction.method="perturb")
 
 plot.panels()
 

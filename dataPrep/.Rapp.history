@@ -14,6 +14,9 @@ syr.trait <-#
   read.csv(file.path(trait.dir, 'syr.csv'),#
            row.names=1)#
 #
+both.trait <-#
+  read.csv(file.path(trait.dir, 'bee.syr.csv'))#
+#
 spec <- dd#
 #
 ## subset to net specimens#
@@ -53,7 +56,10 @@ length(unique(spec$Genus))#
 #
 ## interactions#
 length(unique(paste(spec$GenusSpecies, spec$PlantGenusSpecies)))#
+#
+## *************************************************#
 ## create a giant network to calculate specialization#
+## *************************************************#
 agg.spec <- aggregate(list(abund=spec$GenusSpecies),#
                       list(GenusSpecies=spec$GenusSpecies,#
                            PlantGenusSpecies=spec$PlantGenusSpecies),#
@@ -72,10 +78,3584 @@ traits <- data.frame(GenusSpecies= unlist(sapply(all.specializations,#
                      do.call(rbind, all.specializations))#
 rownames(traits) <- NULL#
 #
+## *************************************************#
+## thermal traits#
+## *************************************************#
+spec$AverageTemp <- apply(spec, 1, function(x){#
+  mean(as.numeric(c(x["TempStart"], x["TempEnd"])),#
+       na.rm=TRUE)#
+})#
+#
+temp.tol <- do.call(rbind, tapply(spec$AverageTemp, spec$GenusSpecies,#
+                                  function(x){#
+                                    temp.mean <- mean(x, na.rm=TRUE)#
+                                    temp.range <- range(x, na.rm=TRUE)#
+                                    max.temp <- temp.range[2]#
+                                    temp.range <- temp.range[2] - temp.range[1]#
+                                    return(c(temp.mean=temp.mean,#
+                                             max.temp=max.temp,#
+                                             temp.range=temp.range))#
+                                  }))#
+temp.tol <- as.data.frame(temp.tol)#
+temp.tol$GenusSpecies <- rownames(temp.tol)#
+rownames(temp.tol) <- NULL#
+#
+traits <- merge(traits, temp.tol, all.x=TRUE)#
+#
+## *************************************************#
+## sampling table for manuscript#
+## *************************************************#
+#
 site.table <- aggregate(list(Samples=spec$Date),#
                         list(Year=spec$Year, Site=spec$Site),#
-                        function(x) length(unique(x)))
-head(site.table)
-tapply(site.table$Samples, site.table$Year)
-tapply(site.table$Samples, site.table$Year, mean)
-mean(tapply(site.table$Samples, site.table$Year, mean))
+                        function(x) length(unique(x)))#
+#
+ms.table <- samp2site.spp(site=site.table$Site,#
+                          spp=site.table$Year,#
+                          abund=site.table$Samples,#
+                          FUN=sum)#
+ms.table <- cbind(spec$SiteStatus[match(rownames(ms.table),#
+                                        spec$Site)], ms.table)#
+colnames(ms.table) <- c("Site type", colnames(ms.table)[-1])#
+#
+ms.table <- ms.table[order(ms.table[, "Site type"], decreasing=TRUE),]#
+#
+ms.table[, "Site type"][ms.table[, "Site type"] == "maturing"] <-#
+  "Assembling HR"#
+#
+ms.table[, "Site type"][ms.table[, "Site type"] == "mature"] <-#
+  "Non-assembling HR"#
+#
+ms.table[, "Site type"][ms.table[, "Site type"] == "control"] <-#
+  "Non-assembling FM"#
+#
+write.table(ms.table, file="~/Dropbox/hedgerow_assembly/ms/tables/samples.txt",#
+            sep=" & ")#
+#
+## *************************************************#
+## add various traits#
+## *************************************************#
+## specialization#
+spec$d <- traits$d[match(spec$GenusSpecies, traits$GenusSpecies)]#
+spec$degree <- traits$degree[match(spec$GenusSpecies,#
+                                   traits$GenusSpecies)]#
+spec$plant.degree <- traits$degree[match(spec$PlantGenusSpecies,#
+                                         traits$GenusSpecies)]#
+#
+## occurence#
+load('~/Dropbox/hedgerow/data_sets/matrices/net/bee.syr.RData')#
+#
+occ <- apply(mat, c(3,1), calcOccArray)#
+spec$occ.date <- apply(spec, 1, findOcc)#
+traits$occ.date <- spec$occ.date[match(traits$GenusSpecies,#
+                                       spec$GenusSpecies)]#
+## plant occurrence#
+## create sample matrix#
+site.date <- mat[,,1]#
+site.date[site.date > 0] <- 0#
+rownames(site.date) <- lapply(strsplit(rownames(site.date),":"),#
+                              function(x) x[1])#
+long.site.date <- comm.mat2sample(site.date)#
+long.site.date <- long.site.date[!is.na(long.site.date$Samp),]#
+#
+## create site by date matrices with plant presence#
+plant.mat <- make.by.species(spec, long.site.date, site.date)#
+pol.mat <- make.by.species(spec, long.site.date, site.date,#
+                           type="GenusSpecies")#
+#
+save(plant.mat, pol.mat, file='../data/species/allSamples.Rdata')#
+#
+occ.plant <- apply(plant.mat, c(3,1), calcOccArray)#
+## match to dataset!#
+spec$occ.plant.date <- apply(spec, 1, findOccPlant)#
+#
+## bee functional traits#
+spec$Lecty <-#
+  bee.trait$Lecty[match(spec$GenusSpecies, rownames(bee.trait))]#
+spec$NestLoc <-#
+  bee.trait$NestLoc[match(spec$GenusSpecies, rownames(bee.trait))]#
+spec$Excavate <-#
+  bee.trait$Excavate[match(spec$GenusSpecies, rownames(bee.trait))]#
+spec$ITD <-#
+  bee.trait$MeanITD[match(spec$GenusSpecies, rownames(bee.trait))]#
+spec$Sociality <-#
+  bee.trait$Sociality[match(spec$GenusSpecies, rownames(bee.trait))]#
+#
+## syrphid functional traits#
+#
+spec$LarvalDiet <- syr.trait$LarvalDiet[match(spec$GenusSpecies,#
+                                              rownames(syr.trait))]#
+spec$AdultDiet <- syr.trait$AdultDiet[match(spec$GenusSpecies,#
+                                            rownames(syr.trait))]#
+spec$WingLength <- syr.trait$WingLength[match(spec$GenusSpecies,#
+                                              rownames(syr.trait))]#
+#
+traits <- merge(traits, syr.trait[,c(5:7,10,33)], all.x=TRUE)#
+#
+traits <- merge(traits, bee.trait[,c(1:5,27)], all.x=TRUE)#
+#
+traits <- merge(traits, both.trait[,c(2:3,7)], all.x=TRUE)#
+#
+traits$bee.syr <- spec$BeeNonbee[match(traits$GenusSpecies,#
+                                       spec$GenusSpecies)]#
+#
+traits$bee.syr[is.na(traits$bee.syr)] <- "plant"#
+#
+mean.abund.pol <- apply(apply(pol.mat, c(1,3), mean, na.rm=TRUE), 2,#
+                        mean)#
+mean.abund.plant <- apply(apply(plant.mat, c(1,3), mean, na.rm=TRUE),#
+                          2, mean)#
+mean.abund <- c(mean.abund.pol, mean.abund.plant)#
+traits$mean.abun.net <- mean.abund[match(traits$GenusSpecies,#
+                                         names(mean.abund))]#
+save(spec, file='../data/networks/allSpecimens.Rdata')#
+write.csv(traits, file="../data/traits.csv", row.names=FALSE)#
+site.years <- aggregate(Year~ Site, data=spec,#
+                        function(x) length(unique(x)))#
+#
+sites.to.keep <- site.years$Site[site.years$Year >= 5]#
+#
+## *******************************************************************#
+## create networks#
+## all sites with > 5 years#
+#
+nets <- breakNet(spec[spec$Site %in% sites.to.keep,], 'Site', 'Year')
+z
+sapply(z, FUN=function(q){#
+    any(dim(q) < 3)
+})
+length(z)
+dim(z)
+adj.mat <- dropNet(comms)
+Q
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/dataPrep')#
+load('~/Dropbox/hedgerow/data_sets/traditional/specimens-complete.RData')#
+load("/Users/lcp/Dropbox/hedgerow_network/data/veg/veg.Rdata")#
+source('src/misc.R')#
+source('src/prepNets.R')#
+library(bipartite)#
+#
+trait.dir <- '~/Dropbox/hedgerow/data_sets/traditional/functional_traits'#
+bee.trait <-#
+  read.csv(file.path(trait.dir, 'bee.csv'),#
+           row.names=1)#
+syr.trait <-#
+  read.csv(file.path(trait.dir, 'syr.csv'),#
+           row.names=1)#
+#
+both.trait <-#
+  read.csv(file.path(trait.dir, 'bee.syr.csv'))#
+#
+spec <- dd#
+#
+## subset to net specimens#
+spec <- spec[spec$NetPan == 'net',]#
+## create species column#
+spec$PlantGenusSpecies <-  fix.white.space(paste(spec$PlantGenus,#
+                                                 spec$PlantSpecies))#
+#
+## drop pollinators and plants without identifications#
+spec <-  spec[spec$PlantGenusSpecies != '',]#
+#
+to.drop.status <- c("forb", "natural")#
+spec <- spec[!spec$SiteStatus %in% to.drop.status,]#
+tot.spec <- nrow(spec)#
+#
+nrow(spec[spec$Family == 'Syrphidae',])/tot.spec#
+nrow(spec[spec$BeeNonbee == 'bee',])/tot.spec#
+#
+## subset to just bees and syrphids#
+spec <- spec[spec$Family == 'Syrphidae' |#
+             spec$BeeNonbee == 'bee',]#
+#
+spec <-  spec[spec$Species != '',]#
+spec$SiteStatus[spec$SiteStatus == "restored"] <- "maturing"#
+## total specimens#
+nrow(spec)#
+#
+## total species#
+length(unique(spec$GenusSpecies))#
+#
+## sampling dates#
+length(unique(paste(spec$Site, spec$Date)))#
+#
+## families and genera#
+length(unique(spec$Family))#
+length(unique(spec$Genus))#
+#
+## interactions#
+length(unique(paste(spec$GenusSpecies, spec$PlantGenusSpecies)))#
+#
+## *************************************************#
+## create a giant network to calculate specialization#
+## *************************************************#
+agg.spec <- aggregate(list(abund=spec$GenusSpecies),#
+                      list(GenusSpecies=spec$GenusSpecies,#
+                           PlantGenusSpecies=spec$PlantGenusSpecies),#
+                      length)#
+#
+nets.all <- samp2site.spp(agg.spec$PlantGenusSpecies,#
+                          agg.spec$GenusSpecies, agg.spec$abund, FUN=sum)#
+#
+all.specializations <- specieslevel(nets.all,#
+                                    index=c("proportional generality",#
+                                      "degree",#
+                                      "d"))#
+#
+traits <- data.frame(GenusSpecies= unlist(sapply(all.specializations,#
+                       rownames)),#
+                     do.call(rbind, all.specializations))#
+rownames(traits) <- NULL#
+#
+## *************************************************#
+## thermal traits#
+## *************************************************#
+spec$AverageTemp <- apply(spec, 1, function(x){#
+  mean(as.numeric(c(x["TempStart"], x["TempEnd"])),#
+       na.rm=TRUE)#
+})#
+#
+temp.tol <- do.call(rbind, tapply(spec$AverageTemp, spec$GenusSpecies,#
+                                  function(x){#
+                                    temp.mean <- mean(x, na.rm=TRUE)#
+                                    temp.range <- range(x, na.rm=TRUE)#
+                                    max.temp <- temp.range[2]#
+                                    temp.range <- temp.range[2] - temp.range[1]#
+                                    return(c(temp.mean=temp.mean,#
+                                             max.temp=max.temp,#
+                                             temp.range=temp.range))#
+                                  }))#
+temp.tol <- as.data.frame(temp.tol)#
+temp.tol$GenusSpecies <- rownames(temp.tol)#
+rownames(temp.tol) <- NULL#
+#
+traits <- merge(traits, temp.tol, all.x=TRUE)#
+#
+## *************************************************#
+## sampling table for manuscript#
+## *************************************************#
+#
+site.table <- aggregate(list(Samples=spec$Date),#
+                        list(Year=spec$Year, Site=spec$Site),#
+                        function(x) length(unique(x)))#
+#
+ms.table <- samp2site.spp(site=site.table$Site,#
+                          spp=site.table$Year,#
+                          abund=site.table$Samples,#
+                          FUN=sum)#
+ms.table <- cbind(spec$SiteStatus[match(rownames(ms.table),#
+                                        spec$Site)], ms.table)#
+colnames(ms.table) <- c("Site type", colnames(ms.table)[-1])#
+#
+ms.table <- ms.table[order(ms.table[, "Site type"], decreasing=TRUE),]#
+#
+ms.table[, "Site type"][ms.table[, "Site type"] == "maturing"] <-#
+  "Assembling HR"#
+#
+ms.table[, "Site type"][ms.table[, "Site type"] == "mature"] <-#
+  "Non-assembling HR"#
+#
+ms.table[, "Site type"][ms.table[, "Site type"] == "control"] <-#
+  "Non-assembling FM"#
+#
+write.table(ms.table, file="~/Dropbox/hedgerow_assembly/ms/tables/samples.txt",#
+            sep=" & ")#
+#
+## *************************************************#
+## add various traits#
+## *************************************************#
+## specialization#
+spec$d <- traits$d[match(spec$GenusSpecies, traits$GenusSpecies)]#
+spec$degree <- traits$degree[match(spec$GenusSpecies,#
+                                   traits$GenusSpecies)]#
+spec$plant.degree <- traits$degree[match(spec$PlantGenusSpecies,#
+                                         traits$GenusSpecies)]#
+#
+## occurence#
+load('~/Dropbox/hedgerow/data_sets/matrices/net/bee.syr.RData')#
+#
+occ <- apply(mat, c(3,1), calcOccArray)#
+spec$occ.date <- apply(spec, 1, findOcc)#
+traits$occ.date <- spec$occ.date[match(traits$GenusSpecies,#
+                                       spec$GenusSpecies)]#
+## plant occurrence#
+## create sample matrix#
+site.date <- mat[,,1]#
+site.date[site.date > 0] <- 0#
+rownames(site.date) <- lapply(strsplit(rownames(site.date),":"),#
+                              function(x) x[1])#
+long.site.date <- comm.mat2sample(site.date)#
+long.site.date <- long.site.date[!is.na(long.site.date$Samp),]#
+#
+## create site by date matrices with plant presence#
+plant.mat <- make.by.species(spec, long.site.date, site.date)#
+pol.mat <- make.by.species(spec, long.site.date, site.date,#
+                           type="GenusSpecies")#
+#
+save(plant.mat, pol.mat, file='../data/species/allSamples.Rdata')#
+#
+occ.plant <- apply(plant.mat, c(3,1), calcOccArray)#
+## match to dataset!#
+spec$occ.plant.date <- apply(spec, 1, findOccPlant)#
+#
+## bee functional traits#
+spec$Lecty <-#
+  bee.trait$Lecty[match(spec$GenusSpecies, rownames(bee.trait))]#
+spec$NestLoc <-#
+  bee.trait$NestLoc[match(spec$GenusSpecies, rownames(bee.trait))]#
+spec$Excavate <-#
+  bee.trait$Excavate[match(spec$GenusSpecies, rownames(bee.trait))]#
+spec$ITD <-#
+  bee.trait$MeanITD[match(spec$GenusSpecies, rownames(bee.trait))]#
+spec$Sociality <-#
+  bee.trait$Sociality[match(spec$GenusSpecies, rownames(bee.trait))]#
+#
+## syrphid functional traits#
+#
+spec$LarvalDiet <- syr.trait$LarvalDiet[match(spec$GenusSpecies,#
+                                              rownames(syr.trait))]#
+spec$AdultDiet <- syr.trait$AdultDiet[match(spec$GenusSpecies,#
+                                            rownames(syr.trait))]#
+spec$WingLength <- syr.trait$WingLength[match(spec$GenusSpecies,#
+                                              rownames(syr.trait))]#
+#
+traits <- merge(traits, syr.trait[,c(5:7,10,33)], all.x=TRUE)#
+#
+traits <- merge(traits, bee.trait[,c(1:5,27)], all.x=TRUE)#
+#
+traits <- merge(traits, both.trait[,c(2:3,7)], all.x=TRUE)#
+#
+traits$bee.syr <- spec$BeeNonbee[match(traits$GenusSpecies,#
+                                       spec$GenusSpecies)]#
+#
+traits$bee.syr[is.na(traits$bee.syr)] <- "plant"#
+#
+mean.abund.pol <- apply(apply(pol.mat, c(1,3), mean, na.rm=TRUE), 2,#
+                        mean)#
+mean.abund.plant <- apply(apply(plant.mat, c(1,3), mean, na.rm=TRUE),#
+                          2, mean)#
+mean.abund <- c(mean.abund.pol, mean.abund.plant)#
+traits$mean.abun.net <- mean.abund[match(traits$GenusSpecies,#
+                                         names(mean.abund))]#
+save(spec, file='../data/networks/allSpecimens.Rdata')#
+write.csv(traits, file="../data/traits.csv", row.names=FALSE)#
+site.years <- aggregate(Year~ Site, data=spec,#
+                        function(x) length(unique(x)))#
+#
+sites.to.keep <- site.years$Site[site.years$Year >= 5]#
+#
+## *******************************************************************#
+## create networks#
+## all sites with > 5 years#
+#
+nets <- breakNet(spec[spec$Site %in% sites.to.keep,], 'Site', 'Year')#
+#
+## save networks for each site, timeframe#
+f.path <- '../data/networks'#
+save(nets, file=file.path(f.path, 'all_networks_years.Rdata'))#
+#
+## *******************************************************************#
+## keep only BACI sites#
+## *******************************************************************#
+#
+BACI.site <- c('Barger', 'Butler', 'Hrdy', 'MullerB', 'Sperandio')#
+spec <-  spec[spec$Site %in% BACI.site,]#
+veg <-  veg[veg$Site %in% BACI.site,]#
+#
+veg$ypr <- spec$ypr[match(paste(veg$Year, veg$Site),#
+                          paste(spec$Year, spec$Site))]#
+#
+save(spec, file='../data/networks/specimens.Rdata')#
+#
+## create a "year" columns grouping years 1-3 post restoration and 4-9#
+spec$assem <- 'early'#
+spec$assem[spec$ypr > 3] <- 'late'#
+#
+veg$assem <- 'early'#
+veg$assem[veg$ypr > 3] <- 'late'#
+#
+veg.sum <- aggregate(list(abundance=veg$NumQuads),#
+                     list(site=veg$Site,#
+                          status=veg$assem,#
+                          species=veg$PlantGenusSpecies),#
+                     sum)#
+#
+## *******************************************************************#
+## create networks#
+## *******************************************************************#
+#
+## ## by early/late assembly #
+## networks <- breakNet(spec, 'Site', 'assem')#
+#
+## ## save networks for each site, timeframe#
+## saveDats(networks, names(networks), f.path)#
+## save(networks, file=file.path(f.path, 'networks_stages.Rdata'))#
+#
+## for each year#
+nets <- breakNet(spec, 'Site', 'Year')#
+save(nets, file=file.path(f.path, 'baci_networks_years.Rdata'))#
+#
+## *******************************************************************#
+## specialization of each species at each site#
+## *******************************************************************#
+#
+## species.lev <- lapply(networks, function(x){#
+##   sl <- specieslevel(x)#
+##   sl$'higher level'$tot.int <- colSums(x)#
+##   sl$'lower level'$tot.int <- rowSums(x)#
+##   return(sl)#
+## })#
+#
+## specializations  <-  mapply(function(a, b)#
+##                             getSpec(species.lev = a,#
+##                                     names.net = b),#
+##                             a = species.lev,#
+##                             b = names(networks),#
+##                             SIMPLIFY = FALSE)#
+#
+## specializations <- do.call(rbind, specializations)#
+## rownames(specializations) <- NULL#
+#
+## f.path <- '../data/degree'#
+## save(specializations, file=file.path(f.path, 'specializations.Rdata'))#
+## ## *******************************************************************#
+## ## change in visits of by the generalized pollinators#
+#
+## ## hist(specializations$proportional.generality[specializations$speciesType ==#
+## ##                                              "pollinator"],#
+## ##      xlab="Generalization")#
+#
+## ## plants#
+## diff.gens.plants <- getVisitChange(0, 0.2, "proportional.generality",#
+##                                    "PlantGenusSpecies", "GenusSpecies")#
+#
+## diff.spec.plants <- getVisitChange(0.5, 1, "proportional.generality",#
+##                                    "PlantGenusSpecies", "GenusSpecies")#
+#
+## diff.all.plants <- getVisitChange(0, 1, "proportional.generality",#
+##                                   "PlantGenusSpecies", "GenusSpecies")#
+#
+## ## pollinators#
+## diff.gens.pol <- getVisitChange(0, 0.2, "proportional.generality",#
+##                                 "GenusSpecies", "PlantGenusSpecies")#
+#
+## diff.spec.pol <- getVisitChange(0.5, 1, "proportional.generality",#
+##                                 "GenusSpecies", "PlantGenusSpecies")#
+#
+## diff.all.pol <- getVisitChange(0, 1, "proportional.generality",#
+##                                "GenusSpecies", "PlantGenusSpecies")#
+#
+## f.path <- '../data/degree'#
+## save(diff.gens.plants, diff.spec.plants, diff.all.plants,#
+##      file=file.path(f.path, 'PlantVisitDiffs.Rdata'))#
+## write.csv(diff.all.plants,#
+##           file=file.path(f.path, 'PlantVisitDiffs.csv'), row.names=FALSE)#
+#
+## save(diff.gens.pol, diff.spec.pol, diff.all.pol,#
+##      file=file.path(f.path, 'PolVisitDiffs.Rdata'))#
+## write.csv(diff.all.pol,#
+##           file=file.path(f.path, 'PolVisitDiffs.csv'), row.names=FALSE)#
+## ## *******************************************************************#
+## ## species lists for each site#
+#
+## plants <- getSpecies(networks, rownames)#
+## pols <- getSpecies(networks, rownames)#
+#
+## f.path <- '../data/species'#
+## write.csv(plants, file.path(f.path, 'plants.csv'),#
+##           row.names=FALSE)#
+## save(plants, file=file.path(f.path, 'plants.Rdata'))#
+#
+## write.csv(pols, file.path(f.path, 'pollinators.csv'),#
+##           row.names=FALSE)#
+## save(pols, file=file.path(f.path, 'pols.Rdata'))#
+#
+## ## *******************************************************************#
+## ## species added between early and late stages#
+#
+## plant.diffs <- getColExt(plants)#
+## pol.diffs <- getColExt(pols)#
+#
+## f.path <- '../data/speciesChange'#
+## write.csv(plant.diffs, file.path(f.path, 'plants.csv'),#
+##           row.names=FALSE)#
+#
+## write.csv(pol.diffs, file.path(f.path, 'pollinators.csv'),#
+##           row.names=FALSE)#
+#
+## ## *******************************************************************#
+## ## total plants at a site#
+## f.path <- '../data/species'#
+## plants <- plants[,-2]#
+## plants <- unique(plants)#
+## write.csv(plants, file.path(f.path, 'plants_all.csv'),#
+##           row.names=FALSE)#
+#
+## ## *******************************************************************#
+## ## pollinator and plant degrees by years post restoration#
+## spec$all <- 'all'#
+#
+## yr.networks <- breakNet(spec, 'all', 'assem')#
+#
+## d.pol <- lapply(yr.networks, colSums)#
+## d.plant <- lapply(yr.networks, rowSums)#
+#
+## f.path <- '../data/degree'#
+## saveDats(d.pol, paste(names(d.pol), 'pollinators', sep="_"), f.path)#
+## saveDats(d.plant, paste(names(d.plant), 'plants', sep="_"), f.path)#
+#
+## by.year <- data.frame(t(sapply(c(d.plant, d.pol), calcStats)))#
+## by.year$group <- rep(c('plants','pollinators'), each=2)#
+## by.year$assembly <- rep(c('early', 'late'), 2)#
+#
+## write.csv(by.year, file.path(f.path, 'stats_by_yr.csv'))#
+#
+## ## *******************************************************************#
+## ## pollinator and plant degrees across all years and sites#
+#
+## all.networks <- breakNet(spec, 'all', 'all')#
+#
+## d.pol.all <- lapply(all.networks, colSums)#
+## d.plant.all <- lapply(all.networks, rowSums)#
+#
+## saveDats(d.pol.all, 'across_yrs_pollinators', f.path)#
+## saveDats(d.plant.all, 'across_yrs_plants', f.path)#
+#
+## all.dats <- data.frame(t(sapply(c(d.plant.all, d.pol.all), calcStats)))#
+## all.dats$group <- c('plants','pollinators')#
+#
+## write.csv(all.dats, file.path(f.path, 'stats_across_yrs.csv'))#
+#
+## ## *******************************************************************#
+## ## characteristics of plant colonists#
+## plant.col <- plant.diffs[plant.diffs$class == "colonist",]#
+#
+## plant.col$earlyAbund <- veg.sum$abundance[veg.sum$status ==#
+##                                           "early"][match(#
+##                                             plant.col$species,#
+##                                             veg.sum$species)]#
+## plant.col$lateAbund <- veg.sum$abundance[veg.sum$status ==#
+##                                          "late"][match(#
+##                                            plant.col$species,#
+##                                            veg.sum$species)]#
+#
+## plant.col$degree <- d.plant$all_late[match(plant.col$species,#
+##                                            names(d.plant$all_late))]#
+#
+## ## number of species that interact#
+## con.plant <- lapply(yr.networks, getCon, 1)#
+#
+## plant.col$partners <- con.plant$all_late[match(plant.col$species,#
+##                                                names(con.plant$all_late))]#
+## f.path <- '../data/speciesChange'#
+## write.csv(plant.col, file.path(f.path, 'plants_char.csv'),#
+##           row.names=FALSE)#
+#
+## ## *******************************************************************#
+## ## stable network structure#
+## networks.by.year <- breakNet(spec, 'Site', 'Year')#
+#
+## plant.species <- sapply(networks.by.year, nrow)#
+## plant.species <- data.frame(richness=plant.species,#
+##                             sites =#
+##                             sapply(strsplit(names(plant.species),#
+##                                             "_"),#
+##                                    function(x) x[1]),#
+##                             years =#
+##                             sapply(strsplit(names(plant.species),#
+##                                             "_"),#
+##                                    function(x) x[2]))#
+## write.csv(plant.species, file.path(f.path, 'plants_change.csv'),#
+##           row.names=FALSE)
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/speciesLevel')#
+source('src/initialize.R')#
+load('../../data/networks/all_networks_years.Rdata')#
+#
+## **********************************************************#
+## species importance#
+## **********************************************************#
+specs <- calcSpec(nets, spec, spec.metric = "d", 0.3)#
+save(specs, file=file.path(save.path, 'specs.Rdata'))#
+#
+## linear models#
+load(file=file.path(save.path, 'specs.Rdata'))#
+specs$closeness[specs$closeness == 0] <- 1*10^-6#
+specs$closeness.log <- log(specs$closeness)#
+#
+## SiteStatus or ypr#
+xvar <- "ypr"#
+#
+## anything outputted by specieslevel#
+ys <- c("proportional.generality", "d", "degree", "betweenness",#
+        "closeness.log")#
+#
+## formulas <-lapply(ys, function(x) {#
+##   as.formula(paste(x, "~",#
+##                    paste(paste(xvar, "specialization", sep="*"), #
+##                          "(1|Site)",#
+##                           "(1|GenusSpecies)",#
+##                          sep="+")))#
+## })#
+#
+formulas <-lapply(ys, function(x) {#
+  as.formula(paste(x, "~",#
+                   paste(xvar, #
+                         "(1|Site)",#
+                          "(1|GenusSpecies)",#
+                         sep="+")))#
+})#
+#
+mod.pols <- lapply(formulas, function(x){#
+  lmer(x,#
+       data=specs[specs$speciesType == "pollinator",])#
+})#
+#
+mod.plants <- lapply(formulas, function(x){#
+  lmer(x,#
+       data=specs[specs$speciesType == "plant",])#
+})#
+names(mod.pols) <- names(mod.plants) <- ys#
+lapply(mod.plants, summary)#
+lapply(mod.pols, summary)#
+#
+save(mod.pols, mod.plants, ys, file=file.path(save.path,#
+            sprintf('mods/specs_%s.Rdata', xvar)))#
+#
+## **********************************************************#
+## degree distributions (abundance distributions)#
+## **********************************************************#
+#
+baci.sites <- c("Barger", "Butler", "MullerB", "Sperandio", "Hrdy")#
+specs <- specs[specs$Site %in% baci.sites,]#
+#
+layout(matrix(1:6, nrow=2))#
+cols <- rainbow(length(unique(specs$ypr)))#
+lapply(unique(specs$Site), function(x){#
+  print(x)#
+  this.specs <- specs[specs$Site == x, c("degree", "ypr")]#
+  plot(NA, ylim=c(0,0.8), xlim=c(0,25),#
+       ylab="Frequency",#
+       xlab="Abundance",#
+       main=x)#
+  for(i in 1:length(unique(this.specs$ypr))){#
+    this.ypr <- unique(this.specs$ypr)[i]#
+    print(this.ypr)#
+    points(density(this.specs$degree[this.specs$ypr == this.ypr]),#
+           col=cols[i], type="l", lwd=2)#
+  }#
+})#
+#
+plot(NA, ylim=c(0,1), xlim=c(0,1), xaxt="n", yaxt="n", ylab="", xlab="")#
+legend("center", col=cols, lwd="2",#
+       legend=sort(unique(specs$ypr)),#
+       bty="n")
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/speciesLevel')#
+source('plotting/src/predictIntervals.R')#
+source('plotting/src/CIplotting.R')#
+source('plotting/src/plotPanels.R')#
+source('src/initialize.R')#
+#
+## ************************************************************#
+## specialization#
+## ************************************************************#
+#
+load(file=file.path(save.path, 'specs.Rdata'))#
+load(file=file.path(save.path, "mods/specs_ypr.Rdata"))#
+#
+ylabs <- c("Proportional Generality", "Specialization (d')", "Degree",#
+           "Betweenness", "Closeness" )#
+#
+dd <- expand.grid(ypr=seq(from= min(specs$ypr, na.rm=TRUE),#
+                          to= max(specs$ypr, na.rm=TRUE),#
+                          length=10))#
+pp <- c("plants", "pols")#
+mods <- list(mod.pols, mod.plants)#
+names(mods) <- pp#
+#
+for(j in pp){#
+  for(i in 1:length(ys)){#
+    dd.ypr <- cbind(dd, 0)#
+    colnames(dd.ypr) <- c("ypr", ys[i])#
+      ypr.pi <- predict.int(mod= mods[[j]][[i]],#
+                            dd=dd.ypr,#
+                            y=ys[i],#
+                            family="gaussian")#
+#
+    plot.predict.ypr(new.dd=ypr.pi,#
+                     ylabel=ylabs[i],#
+                     dats=specs,#
+                     y1=ys[i],#
+                     extinction.method=j,#
+                     agg.col="GenusSpecies")#
+  }#
+}#
+## closeness only#
+#
+ypr.pi.pol <- predict.int(mod= mods$pol$closeness.log,#
+                      dd=dd.ypr,#
+                      y="closeness.log",#
+                      family="gaussian")#
+ypr.pi.plant <- predict.int(mod= mods$plant$closeness.log,#
+                      dd=dd.ypr,#
+                      y="closeness.log",#
+                      family="gaussian")#
+#
+plot.panels()
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/networkLevel')#
+source('src/initialize.R')#
+load('../../data/networks/baci_networks_years.Rdata')#
+N <- 99
+ls()
+nets[[1]]
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/networkLevel')#
+source('src/initialize.R')#
+load('../../data/networks/baci_networks_years.Rdata')#
+N <- 99#
+#
+## ## ************************************************************#
+## ## calculate metrics and zscores#
+## ## ************************************************************#
+mets <- lapply(nets, network.metrics, N)#
+#
+cor.dats <- prep.dat(mets,  spec)#
+#
+cor.dats$tot.rich <- cor.dats$number.of.species.LL +#
+  cor.dats$number.of.species.HL#
+#
+save(cor.dats, file='saved/corMets.Rdata')#
+#
+## ************************************************************#
+## effect of years post restoration#
+## ************************************************************#
+load(file='saved/corMets.Rdata')#
+## nestedness#
+baci.nodf.mod <- lmer(zNODF ~ scale(ypr) +#
+                 (1|Site) + (1|Year),#
+                 data=cor.dats[!is.na(cor.dats$ypr),])#
+summary(baci.nodf.mod)#
+save(baci.nodf.mod, file='saved/mods/baci_nodf.Rdata')#
+#
+## modularity#
+baci.mod.mod <- lmer(zmod.met.D ~ scale(ypr) +#
+                 (1|Site) + (1|Year),#
+                 data=cor.dats[!is.na(cor.dats$ypr),])#
+summary(baci.mod.mod)#
+save(baci.mod.mod, file='saved/mods/baci_mod.Rdata')#
+#
+## h2#
+baci.h2.mod <- lmer(zH2 ~ scale(ypr) +#
+                 (1|Site) + (1|Year),#
+                 data=cor.dats[!is.na(cor.dats$ypr),])#
+summary(baci.h2.mod)#
+save(baci.h2.mod, file='saved/mods/baci_h2.Rdata')#
+## species richness pol#
+baci.rich.hl.mod <- glmer(number.of.species.HL ~ scale(ypr) +#
+                 (1|Site) + (1|Year), family="poisson",#
+                 data=cor.dats[!is.na(cor.dats$ypr),])#
+summary(baci.rich.hl.mod)#
+save(baci.rich.hl.mod, file='saved/mods/baci_rich_hl.Rdata')#
+#
+## species richness plants#
+baci.rich.ll.mod <- glmer(number.of.species.LL ~ scale(ypr) +#
+                 (1|Site) + (1|Year), family="poisson",#
+                 data=cor.dats[!is.na(cor.dats$ypr),])#
+summary(baci.rich.ll.mod)#
+save(baci.rich.ll.mod, file='saved/mods/baci_rich_ll.Rdata')#
+#
+## total species richness#
+baci.rich.tot.mod <- glmer(tot.rich ~ scale(ypr) +#
+                 (1|Site) + (1|Year), family="poisson",#
+                 data=cor.dats[!is.na(cor.dats$ypr),])#
+summary(baci.rich.tot.mod)#
+save(baci.rich.tot.mod, file='saved/mods/baci_rich_tot.Rdata')#
+#
+## connectance#
+baci.conn.mod <- lmer(connectance ~ scale(ypr) +#
+                 (1|Site) + (1|Year),#
+                 data=cor.dats[!is.na(cor.dats$ypr),])#
+summary(baci.conn.mod)#
+save(baci.conn.mod, file='saved/mods/baci_conn.Rdata')#
+#
+## weighted connectance#
+baci.wconn.mod <- lmer(weighted.connectance ~ scale(ypr) +#
+                 (1|Site) + (1|Year),#
+                 data=cor.dats[!is.na(cor.dats$ypr),])#
+summary(baci.wconn.mod)#
+save(baci.wconn.mod, file='saved/mods/baci_wconn.Rdata')#
+#
+## niche overlap pollinators#
+baci.no.pol.mod <- lmer(niche.overlap.HL ~ scale(ypr) +#
+                 (1|Site) + (1|Year),#
+                 data=cor.dats[!is.na(cor.dats$ypr),])#
+summary(baci.no.pol.mod)#
+save(baci.no.pol.mod, file='saved/mods/baci_no_pol.Rdata')#
+#
+## niche overlap plants#
+baci.no.plant.mod <- lmer(niche.overlap.LL ~ scale(ypr) +#
+                 (1|Site) + (1|Year),#
+                 data=cor.dats[!is.na(cor.dats$ypr),])#
+summary(baci.no.plant.mod)#
+save(baci.no.plant.mod, file='saved/mods/baci_no_plant.Rdata')#
+source('plotting/baci.R')#
+## distribution is niche overlap#
+#
+dis.mats <- lapply(lapply(nets, t), vegdist, method="chao")#
+#
+layout(matrix(1:6, nrow=2))#
+cols <- rainbow(length(unique(cor.dats$Year)))#
+lapply(unique(cor.dats$Site), function(x){#
+  this.mats <- dis.mats[cor.dats$Site == x]#
+  plot(NA, ylim=c(0,10), xlim=c(0,1.5),#
+       ylab="Frequency",#
+       xlab="Niche Overlap",#
+       main= x)#
+  for(i in 1:length(this.mats)){#
+    points(density(this.mats[[i]]), col=cols[i], type="l", lwd=2)#
+  }#
+})#
+#
+plot(NA, ylim=c(0,1), xlim=c(0,1), xaxt="n", yaxt="n", ylab="", xlab="")#
+legend("center", col=cols, lwd="2",#
+       legend=sort(unique(cor.dats$Year)),#
+       bty="n")
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/networkLevel')#
+source('src/initialize.R')#
+load('../../data/networks/baci_networks_years.Rdata')#
+N <- 999#
+#
+## ## ************************************************************#
+## ## calculate metrics and zscores#
+## ## ************************************************************#
+mets <- lapply(nets, network.metrics, N)#
+#
+cor.dats <- prep.dat(mets,  spec)#
+#
+cor.dats$tot.rich <- cor.dats$number.of.species.LL +#
+  cor.dats$number.of.species.HL#
+#
+save(cor.dats, file='saved/corMets.Rdata')#
+#
+## ************************************************************#
+## effect of years post restoration#
+## ************************************************************#
+load(file='saved/corMets.Rdata')#
+## nestedness#
+baci.nodf.mod <- lmer(zNODF ~ scale(ypr) +#
+                 (1|Site) + (1|Year),#
+                 data=cor.dats[!is.na(cor.dats$ypr),])#
+summary(baci.nodf.mod)#
+save(baci.nodf.mod, file='saved/mods/baci_nodf.Rdata')#
+#
+## modularity#
+baci.mod.mod <- lmer(zmod.met.D ~ scale(ypr) +#
+                 (1|Site) + (1|Year),#
+                 data=cor.dats[!is.na(cor.dats$ypr),])#
+summary(baci.mod.mod)#
+save(baci.mod.mod, file='saved/mods/baci_mod.Rdata')#
+#
+## h2#
+baci.h2.mod <- lmer(zH2 ~ scale(ypr) +#
+                 (1|Site) + (1|Year),#
+                 data=cor.dats[!is.na(cor.dats$ypr),])#
+summary(baci.h2.mod)#
+save(baci.h2.mod, file='saved/mods/baci_h2.Rdata')#
+## species richness pol#
+baci.rich.hl.mod <- glmer(number.of.species.HL ~ scale(ypr) +#
+                 (1|Site) + (1|Year), family="poisson",#
+                 data=cor.dats[!is.na(cor.dats$ypr),])#
+summary(baci.rich.hl.mod)#
+save(baci.rich.hl.mod, file='saved/mods/baci_rich_hl.Rdata')#
+#
+## species richness plants#
+baci.rich.ll.mod <- glmer(number.of.species.LL ~ scale(ypr) +#
+                 (1|Site) + (1|Year), family="poisson",#
+                 data=cor.dats[!is.na(cor.dats$ypr),])#
+summary(baci.rich.ll.mod)#
+save(baci.rich.ll.mod, file='saved/mods/baci_rich_ll.Rdata')#
+#
+## total species richness#
+baci.rich.tot.mod <- glmer(tot.rich ~ scale(ypr) +#
+                 (1|Site) + (1|Year), family="poisson",#
+                 data=cor.dats[!is.na(cor.dats$ypr),])#
+summary(baci.rich.tot.mod)#
+save(baci.rich.tot.mod, file='saved/mods/baci_rich_tot.Rdata')#
+#
+## connectance#
+baci.conn.mod <- lmer(connectance ~ scale(ypr) +#
+                 (1|Site) + (1|Year),#
+                 data=cor.dats[!is.na(cor.dats$ypr),])#
+summary(baci.conn.mod)#
+save(baci.conn.mod, file='saved/mods/baci_conn.Rdata')#
+#
+## weighted connectance#
+baci.wconn.mod <- lmer(weighted.connectance ~ scale(ypr) +#
+                 (1|Site) + (1|Year),#
+                 data=cor.dats[!is.na(cor.dats$ypr),])#
+summary(baci.wconn.mod)#
+save(baci.wconn.mod, file='saved/mods/baci_wconn.Rdata')#
+#
+## niche overlap pollinators#
+baci.no.pol.mod <- lmer(niche.overlap.HL ~ scale(ypr) +#
+                 (1|Site) + (1|Year),#
+                 data=cor.dats[!is.na(cor.dats$ypr),])#
+summary(baci.no.pol.mod)#
+save(baci.no.pol.mod, file='saved/mods/baci_no_pol.Rdata')#
+#
+## niche overlap plants#
+baci.no.plant.mod <- lmer(niche.overlap.LL ~ scale(ypr) +#
+                 (1|Site) + (1|Year),#
+                 data=cor.dats[!is.na(cor.dats$ypr),])#
+summary(baci.no.plant.mod)#
+save(baci.no.plant.mod, file='saved/mods/baci_no_plant.Rdata')#
+source('plotting/baci.R')#
+## distribution is niche overlap#
+#
+dis.mats <- lapply(lapply(nets, t), vegdist, method="chao")#
+#
+layout(matrix(1:6, nrow=2))#
+cols <- rainbow(length(unique(cor.dats$Year)))#
+lapply(unique(cor.dats$Site), function(x){#
+  this.mats <- dis.mats[cor.dats$Site == x]#
+  plot(NA, ylim=c(0,10), xlim=c(0,1.5),#
+       ylab="Frequency",#
+       xlab="Niche Overlap",#
+       main= x)#
+  for(i in 1:length(this.mats)){#
+    points(density(this.mats[[i]]), col=cols[i], type="l", lwd=2)#
+  }#
+})#
+#
+plot(NA, ylim=c(0,1), xlim=c(0,1), xaxt="n", yaxt="n", ylab="", xlab="")#
+legend("center", col=cols, lwd="2",#
+       legend=sort(unique(cor.dats$Year)),#
+       bty="n")
+rm(list=ls())#
+library(RColorBrewer)#
+setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
+source("plotting/src/predictIntervals.R")#
+source("plotting/src/CIplotting.R")#
+source('../networkLevel/src/misc.R', chdir = TRUE)#
+load('saved/dissMods.Rdata')#
+#
+## ************************************************************#
+## interaction dispersion, k, plants#
+## ************************************************************#
+plants$SiteStatus <- "all"#
+pols$SiteStatus <- "all"#
+#
+dd.plants.k <- expand.grid(k=seq(#
+                             from= min(plants$k),#
+                             to= max(plants$k),#
+                             length=10),#
+                           ## SiteStatus= c("control", "maturing",#
+                           ## "mature"),#
+                           SiteStatus= c("all"),#
+                           Dist= 0)#
+#
+plants.k.pi <- predict.int(mod= mod.plants,#
+                           dd=dd.plants.k,#
+                           y="Dist",#
+                           family="gaussian")#
+#
+plot.predict.div(new.dd=plants.k.pi,#
+                 ylabel="Interaction dispersion",#
+                 dats=plants,#
+                 xs="k",#
+                 y1="Dist",#
+                 xlabel="Plant network position (k)",#
+                 legend.loc="topright",#
+                 height=5,#
+                 width=5,#
+                 x.adj=0.5,#
+                 scaled=FALSE,#
+                 treatments="all",#
+                 col.lines="black",#
+                 f.path = 'figures/intdisper')#
+## ************************************************************#
+## interaction dispersion, closeness, plants#
+## ************************************************************#
+#
+dd.plants.closeness <- expand.grid(closeness=seq(#
+                                     from= min(plants$closeness),#
+                                     to= max(plants$closeness),#
+                                     length=10),#
+                                   SiteStatus= c("all"),#
+                                   Dist= 0)#
+#
+plants.closeness.pi <- predict.int(mod= mod.plants.close,#
+                                   dd=dd.plants.closeness,#
+                                   y="Dist",#
+                                   family="gaussian")#
+#
+plot.predict.div(new.dd=plants.closeness.pi,#
+                 ylabel="Interaction dispersion",#
+                 dats=plants,#
+                 xs="closeness",#
+                 y1="Dist",#
+                 xlabel="Plant closeness",#
+                 legend.loc="topright",#
+                 height=5,#
+                 width=5,#
+                 x.adj=0.5,#
+                 scaled=FALSE,#
+                 treatments="all",#
+                 col.lines="black",#
+                 f.path = 'figures/intdisper')#
+## ************************************************************#
+## interaction dispersion, dprime, plants#
+## ************************************************************#
+#
+dd.plants.d <- expand.grid(d=seq(#
+                             from= min(plants$d),#
+                             to= max(plants$d),#
+                             length=10),#
+                           SiteStatus= c("all"),#
+                           ## SiteStatus= c("control", "maturing", "mature"),#
+                           Dist= 0)#
+#
+plants.d.pi <- predict.int(mod= mod.plants.d,#
+                           dd=dd.plants.d,#
+                           y="Dist",#
+                           family="gaussian")#
+#
+plot.predict.div(new.dd=plants.d.pi,#
+                 ylabel="Interaction dispersion",#
+                 dats=plants,#
+                 xs="d",#
+                 y1="Dist",#
+                 xlabel="Plant specialization",#
+                 legend.loc="topright",#
+                 height=5,#
+                 width=5,#
+                 x.adj=0.5,#
+                 scaled=FALSE,#
+                 treatments="all",#
+                 col.lines="black",#
+                 f.path = 'figures/intdisper')#
+## ************************************************************#
+## interaction dispersion, k, pols#
+## ************************************************************#
+#
+dd.pols.k <- expand.grid(k=seq(#
+                           from= min(pols$k),#
+                           to= max(pols$k),#
+                           length=10),#
+                         SiteStatus= c("all"),#
+                         ## SiteStatus= c("control", "maturing", "mature"),#
+                         Dist= 0)#
+#
+pols.k.pi <- predict.int(mod= mod.pols,#
+                         dd=dd.pols.k,#
+                         y="Dist",#
+                         family="gaussian")#
+#
+plot.predict.div(new.dd=pols.k.pi,#
+                 ylabel="Interaction dispersion",#
+                 dats=pols,#
+                 xs="k",#
+                 y1="Dist",#
+                 xlabel="Pollinator network position (k)",#
+                 legend.loc="topright",#
+                 height=5,#
+                 width=5,#
+                 x.adj=0.5,#
+                 scaled=FALSE,#
+                 treatments="all",#
+                 col.lines="black",#
+                 f.path = 'figures/intdisper')#
+## ************************************************************#
+## interaction dispersion, dprime, pols#
+## ************************************************************#
+#
+dd.pols.d <- expand.grid(d=seq(#
+                           from= min(pols$d),#
+                           to= max(pols$d),#
+                           length=10),#
+                         SiteStatus= c("all"),#
+                         ## SiteStatus= c("control", "maturing", "mature"),#
+                         Dist= 0)#
+#
+pols.d.pi <- predict.int(mod= mod.pols.d,#
+                         dd=dd.pols.d,#
+                         y="Dist",#
+                         family="gaussian")#
+#
+plot.predict.div(new.dd=pols.d.pi,#
+                 ylabel="Interaction dispersion",#
+                 dats=pols,#
+                 xs="d",#
+                 y1="Dist",#
+                 xlabel="Pollinator specialization",#
+                 legend.loc="topright",#
+                 height=5,#
+                 width=5,#
+                 x.adj=0.5,#
+                 scaled=FALSE,#
+                 treatments="all",#
+                 col.lines="black",#
+                 f.path = 'figures/intdisper')#
+## ************************************************************#
+## interaction dispersion, closeness, pols#
+## ************************************************************#
+#
+dd.pols.closeness <- expand.grid(closeness=seq(#
+                                   from= min(pols$closeness),#
+                                   to= max(pols$closeness),#
+                                   length=10),#
+                                 SiteStatus= c("all"),#
+                                 ## SiteStatus= c("control", "maturing", "mature"),#
+                                 Dist= 0)#
+#
+pols.closeness.pi <- predict.int(mod= mod.pols.close,#
+                                 dd=dd.pols.closeness,#
+                                 y="Dist",#
+                                 family="gaussian")#
+#
+plot.predict.div(new.dd=pols.closeness.pi,#
+                 ylabel="Interaction dispersion",#
+                 dats=pols,#
+                 xs="closeness",#
+                 y1="Dist",#
+                 xlabel="Pollinator closeness",#
+                 legend.loc="topright",#
+                 height=5,#
+                 width=5,#
+                 x.adj=0.5,#
+                 scaled=FALSE,#
+                 treatments="all",#
+                 col.lines="black",#
+                 f.path = 'figures/intdisper')
+rm(list=ls())#
+library(RColorBrewer)#
+setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
+source("plotting/src/predictIntervals.R")#
+source("plotting/src/CIplotting.R")#
+source("plotting/src/plotPanels.R")#
+source('../networkLevel/src/misc.R', chdir = TRUE)#
+load('saved/contMods.Rdata')#
+#
+## ************************************************************#
+## persistence closeness#
+## ************************************************************#
+dd.occ.pol <- expand.grid(traits=seq(#
+                            from= min(occ.closeness.cv$data$traits,#
+                              na.rm=TRUE),#
+                            to= max(occ.closeness.cv$data$traits,#
+                              na.rm=TRUE),#
+                            length=20),#
+                          SiteStatus="all",#
+                          cv= 0)#
+#
+## pols#
+occ.closeness.cv$data$SiteStatus <- "all"#
+occ.pi.close <- predict.int(mod= occ.closeness.cv$lm.nss,#
+                            dd=dd.occ.pol,#
+                            y="cv",#
+                            family="gaussian")#
+#
+## plants#
+dd.occ.plants <- expand.grid(traits=seq(#
+                               from= min(plants.occ.closeness.cv$data$traits,#
+                                 na.rm=TRUE),#
+                               to= max(plants.occ.closeness.cv$data$traits,#
+                                 na.rm=TRUE),#
+                               length=20),#
+                             SiteStatus="all",#
+                             cv= 0)#
+plants.occ.closeness.cv$data$SiteStatus <- "all"#
+plants.occ.pi.close <- predict.int(mod= plants.occ.closeness.cv$lm.nss,#
+                                   dd=dd.occ.plants,#
+                                   y="cv",#
+                                   family="gaussian")#
+## ************************************************************#
+## degree closeness#
+## ************************************************************#
+dd.degree.pol <- expand.grid(traits=seq(#
+                               from=#
+                               min(degree.closeness.cv$data$traits,#
+                                   na.rm=TRUE),#
+                               to=#
+                               max(degree.closeness.cv$data$traits,#
+                                   na.rm=TRUE),#
+                               length=10),#
+                             SiteStatus="all",#
+                             cv= 0)#
+## pols#
+#
+degree.closeness.cv$data$SiteStatus <- "all"#
+#
+degree.pi <- predict.int(mod= degree.closeness.cv$lm.nss,#
+                         dd=dd.degree.pol,#
+                         y="cv",#
+                         family="gaussian")#
+#
+## plants#
+dd.degree.plants <- expand.grid(traits=seq(#
+                           from=#
+                           min(plants.degree.closeness.cv$data$traits,#
+                               na.rm=TRUE),#
+                           to=#
+                           max(plants.degree.closeness.cv$data$traits,#
+                               na.rm=TRUE),#
+                           length=10),#
+                         SiteStatus="all",#
+                         cv= 0)#
+#
+plants.degree.closeness.cv$data$SiteStatus <- "all"#
+#
+plants.degree.pi <- predict.int(mod= plants.degree.closeness.cv$lm.nss,#
+                                dd=dd.degree.plants,#
+                                y="cv",#
+                                family="gaussian")#
+plot.panels()#
+## ## ************************************************************#
+## ## dprime network position - k#
+## ## ************************************************************#
+#
+## dd.dprime <- expand.grid(traits=seq(#
+##                            from= min(dprime$data$traits),#
+##                            to= max(dprime$data$traits),#
+##                            length=10),#
+##                          SiteStatus= c("control", "maturing", "mature"),#
+##                          cv= 0)#
+#
+## dprime.pi <- predict.int(mod= dprime.k.cv$lm,#
+##                          dd=dd.dprime,#
+##                          y="cv",#
+##                          family="gaussian")#
+#
+## plot.predict.div(new.dd=dprime.pi,#
+##                  ylabel="Network position variability",#
+##                  dats=dprime.k.cv$data,#
+##                  xs="traits",#
+##                  y1="cv",#
+##                  xlabel="Specialization",#
+##                  legend.loc="topright",#
+##                  height=5,#
+##                  width=5,#
+##                  x.adj=0.5,#
+##                  f.path='figures/cv')#
+#
+## ## ************************************************************#
+## ## dprime network position - closeness#
+## ## ************************************************************#
+#
+## dprime.pi.cl <- predict.int(mod= dprime.closeness.cv$lm,#
+##                             dd=dd.dprime,#
+##                             y="cv",#
+##                             family="gaussian")#
+#
+## plot.predict.div(new.dd=dprime.pi.cl,#
+##                  ylabel="Closeness variability",#
+##                  dats=dprime.closeness.cv$data,#
+##                  xs="traits",#
+##                  y1="cv",#
+##                  xlabel="Specialization",#
+##                  legend.loc="topright",#
+##                  height=5,#
+##                  width=5,#
+##                  x.adj=0.5,#
+##                  f.path='figures/cv')#
+## ## ************************************************************#
+## ## itd abundance#
+## ## ************************************************************#
+#
+## dd.itd <- expand.grid(traits=seq(#
+##                         from= min(itd$data$traits, na.rm=TRUE),#
+##                         to= max(itd$data$traits, na.rm=TRUE),#
+##                         length=10),#
+##                       SiteStatus= c("control", "maturing", "mature"),#
+##                       cv= 0)#
+#
+## itd.pi <- predict.int(mod= itd$lm,#
+##                       dd=dd.itd,#
+##                       y="cv",#
+##                       family="gaussian")#
+#
+## plot.predict.div(new.dd=itd.pi,#
+##                  ylabel="Coefficient of variation",#
+##                  dats=itd$data,#
+##                  xs="traits",#
+##                  y1="cv",#
+##                  xlabel="Body size",#
+##                  legend.loc="bottomright",#
+##                  height=5,#
+##                  width=5,#
+##                  x.adj=0.5,#
+##                  f.path='figures/cv')#
+## ## ************************************************************#
+## ## dprime abundance#
+## ## ************************************************************#
+#
+## dprime.pi <- predict.int(mod= dprime$lm,#
+##                          dd=dd.dprime,#
+##                          y="cv",#
+##                          family="gaussian")#
+#
+## plot.predict.div(new.dd=dprime.pi,#
+##                  ylabel="Coefficient of variation",#
+##                  dats=dprime$data,#
+##                  xs="traits",#
+##                  y1="cv",#
+##                  xlabel="Specialization",#
+##                  legend.loc="bottomright",#
+##                  height=5,#
+##                  width=5,#
+##                  x.adj=0.5,#
+##                  f.path='figures/cv')
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
+source('src/initialize.R')#
+#
+## ************************************************************#
+## coefficient of variation of degree thingy through time#
+## ************************************************************#
+## ************************************************************#
+## occurrence#
+## ************************************************************#
+## pollinators and k#
+## sig!#
+occ.k.cv <- cv.trait(spec,#
+                     specs[specs$speciesType =="pollinator",],#
+                     trait="occ.date",#
+                     method= "time", time.col="assem",#
+                     abund.col="k",#
+                     cv.function=cv,#
+                     zero2na=TRUE,#
+                     standard.cv=TRUE,#
+                     na.rm=TRUE)#
+summary(occ.k.cv$lm.nss)#
+#
+## plants and k#
+## not sig!#
+plants.occ.k.cv <- cv.trait(spec,#
+                            specs[specs$speciesType =="plant",],#
+                            trait="occ.plant.date",#
+                            method= "time", time.col="assem",#
+                            abund.col="k",#
+                            cv.function=cv,#
+                            zero2na=TRUE,#
+                            standard.cv=TRUE,#
+                            na.rm=TRUE,#
+                            species.type="PlantGenusSpecies")#
+summary(plants.occ.k.cv$lm.nss)#
+#
+## pollinators and closeness#
+## sig#
+occ.closeness.cv <- cv.trait(spec,#
+                             specs[specs$speciesType =="pollinator",],#
+                             trait="occ.date",#
+                             method= "time", time.col="assem",#
+                             abund.col="weighted.closeness",#
+                             cv.function=cv,#
+                             zero2na=TRUE,#
+                             standard.cv=TRUE,#
+                             na.rm=TRUE)#
+summary(occ.closeness.cv$lm.nss)#
+## plants and closeness#
+## not sig#
+plants.occ.closeness.cv <- cv.trait(spec,#
+                                    specs[specs$speciesType =="plant",],#
+                                    trait="occ.plant.date",#
+                                    method= "time", time.col="assem",#
+                                    abund.col="weighted.closeness",#
+                                    cv.function=cv,#
+                                    zero2na=TRUE,#
+                                    standard.cv=TRUE,#
+                                    na.rm=TRUE,#
+                                    species.type="PlantGenusSpecies")#
+summary(plants.occ.closeness.cv$lm.nss)#
+#
+## ************************************************************#
+## degree#
+## ************************************************************#
+## pollinators and k#
+## sig#
+degree.k.cv <- cv.trait(spec,#
+                        specs[specs$speciesType =="pollinator",],#
+                        trait="degree",#
+                        method= "time", time.col="assem",#
+                        abund.col="k",#
+                        cv.function=cv,#
+                        zero2na=TRUE,#
+                        standard.cv=TRUE,#
+                        na.rm=TRUE)#
+summary(degree.k.cv$lm.nss)#
+#
+## plants and k#
+## sig#
+plants.degree.k.cv <- cv.trait(spec,#
+                               specs[specs$speciesType =="plant",],#
+                               trait="plant.degree",#
+                               method= "time", time.col="assem",#
+                               abund.col="k",#
+                               cv.function=cv,#
+                               zero2na=TRUE,#
+                               standard.cv=TRUE,#
+                               na.rm=TRUE,#
+                               species.type="PlantGenusSpecies")#
+summary(plants.degree.k.cv$lm.nss)#
+#
+## pollinators and closeness#
+## sig#
+degree.closeness.cv <- cv.trait(spec,#
+                                specs[specs$speciesType =="pollinator",],#
+                                trait="degree",#
+                                method= "time", time.col="assem",#
+                                abund.col="weighted.closeness",#
+                                cv.function=cv,#
+                                zero2na=TRUE,#
+                                standard.cv=TRUE,#
+                                na.rm=TRUE)#
+summary(degree.closeness.cv$lm.nss)#
+#
+## plants and closeness#
+## not sig!#
+plants.degree.closeness.cv <- cv.trait(spec,#
+                                       specs[specs$speciesType =="plant",],#
+                                       trait="plant.degree",#
+                                       method= "time", time.col="assem",#
+                                       abund.col="weighted.closeness",#
+                                       cv.function=cv,#
+                                       zero2na=TRUE,#
+                                       standard.cv=TRUE,#
+                                       na.rm=TRUE,#
+                                       species.type="PlantGenusSpecies")#
+summary(plants.degree.closeness.cv$lm.nss)#
+## check correlation of degree and occ #
+## pollinators#
+check.pol <- unique(cbind(spec$degree,#
+                          spec$occ.date))#
+plot(check.pol)#
+#
+cor.test(check.pol[,1], check.pol[,2])#
+check.plant <- unique(cbind(spec$plant.degree,#
+                            spec$occ.plant.date))#
+plot(check.plant)#
+#
+cor.test(check.plant[,1], check.plant[,2])#
+## ************************************************************#
+## dprime#
+## ************************************************************#
+## not sig#
+dprime.k.cv <- cv.trait(spec,#
+                        specs[specs$speciesType =="pollinator",],#
+                        trait="d",#
+                        method= "time", time.col="assem",#
+                        abund.col="k",#
+                        cv.function=cv,#
+                        zero2na=TRUE,#
+                        standard.cv=TRUE,#
+                        na.rm=TRUE)#
+summary(dprime.k.cv$lm.nss)#
+#
+## not sig#
+dprime.closeness.cv <- cv.trait(spec,#
+                                specs[specs$speciesType =="pollinator",],#
+                                trait="d",#
+                                method= "time", time.col="assem",#
+                                abund.col="weighted.closeness",#
+                                cv.function=cv,#
+                                zero2na=TRUE,#
+                                standard.cv=TRUE,#
+                                na.rm=TRUE)#
+summary(dprime.closeness.cv$lm.nss)#
+## ************************************************************#
+## coefficient of variation of abundance through time#
+## ************************************************************#
+byYear <- aggregate(list(Abund=spec$GenusSpecies),#
+                    list(GenusSpecies= spec$GenusSpecies,#
+                         Date=spec$Date,#
+                         SiteStatus= spec$SiteStatus,#
+                         Site=spec$Site), length)#
+#
+dprime <- cv.trait(spec, byYear, trait="d",#
+                   method= "time",#
+                   time.col="Date",#
+                   abund.col="Abund")#
+#
+degree <- cv.trait(spec, byYear, trait="degree",#
+                   method= "time",#
+                   time.col="Date",#
+                   abund.col="Abund")#
+#
+itd <- cv.trait(spec, byYear, trait="ITD",#
+                method= "time",#
+                time.col="Date",#
+                abund.col="Abund")#
+#
+## ************************************************************#
+## save#
+save(itd, dprime, degree,#
+     dprime.k.cv, dprime.closeness.cv,#
+     occ.k.cv, occ.closeness.cv,#
+     plants.occ.k.cv, plants.occ.closeness.cv,#
+     degree.k.cv, degree.closeness.cv, plants.degree.closeness.cv,#
+     file="saved/contMods.Rdata")#
+#
+## ************************************************************#
+## coefficient of variation through space#
+## ************************************************************#
+#
+## byYr <- aggregate(list(Abund=spec$GenusSpecies),#
+##                   list(GenSp= spec$GenusSpecies,#
+##                        status= spec$SiteStatus,#
+##                        date= spec$Site,#
+##                        site= spec$Year), length)#
+#
+## dprime.sp <- cv.trait(spec, byYr, trait="d", xlabel= "Specialization",#
+##                       method= "space")#
+## itd.sp <- cv.trait(spec, byYr, trait="ITD", xlabel= "Body size",#
+##                    method= "space")#
+## lecty.sp <-  cv.trait(spec, byYr, trait="Lecty", cont=FALSE,#
+##                       method= "space")#
+## excavate.sp <-  cv.trait(spec, byYr, trait="Excavate", cont=FALSE,#
+##                          method=" space")#
+## nest.sp <-  cv.trait(spec, byYr, trait="NestLoc", cont=FALSE,#
+##                      method= "space")#
+## soc.sp <- cv.trait(spec, byYr, trait="Sociality", cont=FALSE,#
+##                   method= "space")
+rm(list=ls())#
+library(RColorBrewer)#
+setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
+source("plotting/src/predictIntervals.R")#
+source("plotting/src/CIplotting.R")#
+source("plotting/src/plotPanels.R")#
+source('../networkLevel/src/misc.R', chdir = TRUE)#
+load('saved/contMods.Rdata')#
+#
+## ************************************************************#
+## persistence closeness#
+## ************************************************************#
+dd.occ.pol <- expand.grid(traits=seq(#
+                            from= min(occ.closeness.cv$data$traits,#
+                              na.rm=TRUE),#
+                            to= max(occ.closeness.cv$data$traits,#
+                              na.rm=TRUE),#
+                            length=20),#
+                          SiteStatus="all",#
+                          cv= 0)#
+#
+## pols#
+occ.closeness.cv$data$SiteStatus <- "all"#
+occ.pi.close <- predict.int(mod= occ.closeness.cv$lm.nss,#
+                            dd=dd.occ.pol,#
+                            y="cv",#
+                            family="gaussian")#
+#
+## plants#
+dd.occ.plants <- expand.grid(traits=seq(#
+                               from= min(plants.occ.closeness.cv$data$traits,#
+                                 na.rm=TRUE),#
+                               to= max(plants.occ.closeness.cv$data$traits,#
+                                 na.rm=TRUE),#
+                               length=20),#
+                             SiteStatus="all",#
+                             cv= 0)#
+plants.occ.closeness.cv$data$SiteStatus <- "all"#
+plants.occ.pi.close <- predict.int(mod= plants.occ.closeness.cv$lm.nss,#
+                                   dd=dd.occ.plants,#
+                                   y="cv",#
+                                   family="gaussian")#
+## ************************************************************#
+## degree closeness#
+## ************************************************************#
+dd.degree.pol <- expand.grid(traits=seq(#
+                               from=#
+                               min(degree.closeness.cv$data$traits,#
+                                   na.rm=TRUE),#
+                               to=#
+                               max(degree.closeness.cv$data$traits,#
+                                   na.rm=TRUE),#
+                               length=10),#
+                             SiteStatus="all",#
+                             cv= 0)#
+## pols#
+#
+degree.closeness.cv$data$SiteStatus <- "all"#
+#
+degree.pi <- predict.int(mod= degree.closeness.cv$lm.nss,#
+                         dd=dd.degree.pol,#
+                         y="cv",#
+                         family="gaussian")#
+#
+## plants#
+dd.degree.plants <- expand.grid(traits=seq(#
+                           from=#
+                           min(plants.degree.closeness.cv$data$traits,#
+                               na.rm=TRUE),#
+                           to=#
+                           max(plants.degree.closeness.cv$data$traits,#
+                               na.rm=TRUE),#
+                           length=10),#
+                         SiteStatus="all",#
+                         cv= 0)#
+#
+plants.degree.closeness.cv$data$SiteStatus <- "all"#
+#
+plants.degree.pi <- predict.int(mod= plants.degree.closeness.cv$lm.nss,#
+                                dd=dd.degree.plants,#
+                                y="cv",#
+                                family="gaussian")#
+plot.panels()#
+## ## ************************************************************#
+## ## dprime network position - k#
+## ## ************************************************************#
+#
+## dd.dprime <- expand.grid(traits=seq(#
+##                            from= min(dprime$data$traits),#
+##                            to= max(dprime$data$traits),#
+##                            length=10),#
+##                          SiteStatus= c("control", "maturing", "mature"),#
+##                          cv= 0)#
+#
+## dprime.pi <- predict.int(mod= dprime.k.cv$lm,#
+##                          dd=dd.dprime,#
+##                          y="cv",#
+##                          family="gaussian")#
+#
+## plot.predict.div(new.dd=dprime.pi,#
+##                  ylabel="Network position variability",#
+##                  dats=dprime.k.cv$data,#
+##                  xs="traits",#
+##                  y1="cv",#
+##                  xlabel="Specialization",#
+##                  legend.loc="topright",#
+##                  height=5,#
+##                  width=5,#
+##                  x.adj=0.5,#
+##                  f.path='figures/cv')#
+#
+## ## ************************************************************#
+## ## dprime network position - closeness#
+## ## ************************************************************#
+#
+## dprime.pi.cl <- predict.int(mod= dprime.closeness.cv$lm,#
+##                             dd=dd.dprime,#
+##                             y="cv",#
+##                             family="gaussian")#
+#
+## plot.predict.div(new.dd=dprime.pi.cl,#
+##                  ylabel="Closeness variability",#
+##                  dats=dprime.closeness.cv$data,#
+##                  xs="traits",#
+##                  y1="cv",#
+##                  xlabel="Specialization",#
+##                  legend.loc="topright",#
+##                  height=5,#
+##                  width=5,#
+##                  x.adj=0.5,#
+##                  f.path='figures/cv')#
+## ## ************************************************************#
+## ## itd abundance#
+## ## ************************************************************#
+#
+## dd.itd <- expand.grid(traits=seq(#
+##                         from= min(itd$data$traits, na.rm=TRUE),#
+##                         to= max(itd$data$traits, na.rm=TRUE),#
+##                         length=10),#
+##                       SiteStatus= c("control", "maturing", "mature"),#
+##                       cv= 0)#
+#
+## itd.pi <- predict.int(mod= itd$lm,#
+##                       dd=dd.itd,#
+##                       y="cv",#
+##                       family="gaussian")#
+#
+## plot.predict.div(new.dd=itd.pi,#
+##                  ylabel="Coefficient of variation",#
+##                  dats=itd$data,#
+##                  xs="traits",#
+##                  y1="cv",#
+##                  xlabel="Body size",#
+##                  legend.loc="bottomright",#
+##                  height=5,#
+##                  width=5,#
+##                  x.adj=0.5,#
+##                  f.path='figures/cv')#
+## ## ************************************************************#
+## ## dprime abundance#
+## ## ************************************************************#
+#
+## dprime.pi <- predict.int(mod= dprime$lm,#
+##                          dd=dd.dprime,#
+##                          y="cv",#
+##                          family="gaussian")#
+#
+## plot.predict.div(new.dd=dprime.pi,#
+##                  ylabel="Coefficient of variation",#
+##                  dats=dprime$data,#
+##                  xs="traits",#
+##                  y1="cv",#
+##                  xlabel="Specialization",#
+##                  legend.loc="bottomright",#
+##                  height=5,#
+##                  width=5,#
+##                  x.adj=0.5,#
+##                  f.path='figures/cv')
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
+source('src/initialize.R')
+ls()
+head(specs)
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/speciesLevel')#
+source('src/initialize.R')#
+load('../../data/networks/all_networks_years.Rdata')#
+#
+## **********************************************************#
+## species importance#
+## **********************************************************#
+specs <- calcSpec(nets, spec, spec.metric = "d", 0.3)#
+save(specs, file=file.path(save.path, 'specs.Rdata'))#
+#
+## linear models#
+load(file=file.path(save.path, 'specs.Rdata'))#
+specs$closeness[specs$closeness == 0] <- 1*10^-6#
+specs$closeness.log <- log(specs$closeness)#
+#
+## SiteStatus or ypr#
+xvar <- "ypr"#
+#
+## anything outputted by specieslevel#
+ys <- c("proportional.generality", "d", "degree", "betweenness",#
+        "closeness.log")#
+#
+## formulas <-lapply(ys, function(x) {#
+##   as.formula(paste(x, "~",#
+##                    paste(paste(xvar, "specialization", sep="*"), #
+##                          "(1|Site)",#
+##                           "(1|GenusSpecies)",#
+##                          sep="+")))#
+## })#
+#
+formulas <-lapply(ys, function(x) {#
+  as.formula(paste(x, "~",#
+                   paste(xvar, #
+                         "(1|Site)",#
+                          "(1|GenusSpecies)",#
+                         sep="+")))#
+})#
+#
+mod.pols <- lapply(formulas, function(x){#
+  lmer(x,#
+       data=specs[specs$speciesType == "pollinator",])#
+})#
+#
+mod.plants <- lapply(formulas, function(x){#
+  lmer(x,#
+       data=specs[specs$speciesType == "plant",])#
+})#
+names(mod.pols) <- names(mod.plants) <- ys#
+lapply(mod.plants, summary)#
+lapply(mod.pols, summary)#
+#
+save(mod.pols, mod.plants, ys, file=file.path(save.path,#
+            sprintf('mods/specs_%s.Rdata', xvar)))#
+#
+## **********************************************************#
+## degree distributions (abundance distributions)#
+## **********************************************************#
+#
+baci.sites <- c("Barger", "Butler", "MullerB", "Sperandio", "Hrdy")#
+specs <- specs[specs$Site %in% baci.sites,]#
+#
+layout(matrix(1:6, nrow=2))#
+cols <- rainbow(length(unique(specs$ypr)))#
+lapply(unique(specs$Site), function(x){#
+  print(x)#
+  this.specs <- specs[specs$Site == x, c("degree", "ypr")]#
+  plot(NA, ylim=c(0,0.8), xlim=c(0,25),#
+       ylab="Frequency",#
+       xlab="Abundance",#
+       main=x)#
+  for(i in 1:length(unique(this.specs$ypr))){#
+    this.ypr <- unique(this.specs$ypr)[i]#
+    print(this.ypr)#
+    points(density(this.specs$degree[this.specs$ypr == this.ypr]),#
+           col=cols[i], type="l", lwd=2)#
+  }#
+})#
+#
+plot(NA, ylim=c(0,1), xlim=c(0,1), xaxt="n", yaxt="n", ylab="", xlab="")#
+legend("center", col=cols, lwd="2",#
+       legend=sort(unique(specs$ypr)),#
+       bty="n")
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/dataPrep')#
+load('~/Dropbox/hedgerow/data_sets/traditional/specimens-complete.RData')#
+load("/Users/lcp/Dropbox/hedgerow_network/data/veg/veg.Rdata")#
+source('src/misc.R')#
+source('src/prepNets.R')#
+library(bipartite)#
+#
+trait.dir <- '~/Dropbox/hedgerow/data_sets/traditional/functional_traits'#
+bee.trait <-#
+  read.csv(file.path(trait.dir, 'bee.csv'),#
+           row.names=1)#
+syr.trait <-#
+  read.csv(file.path(trait.dir, 'syr.csv'),#
+           row.names=1)#
+#
+both.trait <-#
+  read.csv(file.path(trait.dir, 'bee.syr.csv'))#
+#
+spec <- dd#
+#
+## subset to net specimens#
+spec <- spec[spec$NetPan == 'net',]#
+## create species column#
+spec$PlantGenusSpecies <-  fix.white.space(paste(spec$PlantGenus,#
+                                                 spec$PlantSpecies))#
+#
+## drop pollinators and plants without identifications#
+spec <-  spec[spec$PlantGenusSpecies != '',]#
+#
+to.drop.status <- c("forb", "natural")#
+spec <- spec[!spec$SiteStatus %in% to.drop.status,]#
+tot.spec <- nrow(spec)#
+#
+nrow(spec[spec$Family == 'Syrphidae',])/tot.spec#
+nrow(spec[spec$BeeNonbee == 'bee',])/tot.spec#
+#
+## subset to just bees and syrphids#
+spec <- spec[spec$Family == 'Syrphidae' |#
+             spec$BeeNonbee == 'bee',]#
+#
+spec <-  spec[spec$Species != '',]#
+spec$SiteStatus[spec$SiteStatus == "restored"] <- "maturing"#
+## total specimens#
+nrow(spec)#
+#
+## total species#
+length(unique(spec$GenusSpecies))#
+#
+## sampling dates#
+length(unique(paste(spec$Site, spec$Date)))#
+#
+## families and genera#
+length(unique(spec$Family))#
+length(unique(spec$Genus))#
+#
+## interactions#
+length(unique(paste(spec$GenusSpecies, spec$PlantGenusSpecies)))#
+#
+## *************************************************#
+## create a giant network to calculate specialization#
+## *************************************************#
+agg.spec <- aggregate(list(abund=spec$GenusSpecies),#
+                      list(GenusSpecies=spec$GenusSpecies,#
+                           PlantGenusSpecies=spec$PlantGenusSpecies),#
+                      length)#
+#
+nets.all <- samp2site.spp(agg.spec$PlantGenusSpecies,#
+                          agg.spec$GenusSpecies, agg.spec$abund, FUN=sum)#
+#
+all.specializations <- specieslevel(nets.all,#
+                                    index=c("proportional generality",#
+                                      "degree",#
+                                      "d"))#
+#
+traits <- data.frame(GenusSpecies= unlist(sapply(all.specializations,#
+                       rownames)),#
+                     do.call(rbind, all.specializations))#
+rownames(traits) <- NULL#
+#
+## *************************************************#
+## thermal traits#
+## *************************************************#
+spec$AverageTemp <- apply(spec, 1, function(x){#
+  mean(as.numeric(c(x["TempStart"], x["TempEnd"])),#
+       na.rm=TRUE)#
+})#
+#
+temp.tol <- do.call(rbind, tapply(spec$AverageTemp, spec$GenusSpecies,#
+                                  function(x){#
+                                    temp.mean <- mean(x, na.rm=TRUE)#
+                                    temp.range <- range(x, na.rm=TRUE)#
+                                    max.temp <- temp.range[2]#
+                                    temp.range <- temp.range[2] - temp.range[1]#
+                                    return(c(temp.mean=temp.mean,#
+                                             max.temp=max.temp,#
+                                             temp.range=temp.range))#
+                                  }))#
+temp.tol <- as.data.frame(temp.tol)#
+temp.tol$GenusSpecies <- rownames(temp.tol)#
+rownames(temp.tol) <- NULL#
+#
+traits <- merge(traits, temp.tol, all.x=TRUE)#
+#
+## *************************************************#
+## sampling table for manuscript#
+## *************************************************#
+#
+site.table <- aggregate(list(Samples=spec$Date),#
+                        list(Year=spec$Year, Site=spec$Site),#
+                        function(x) length(unique(x)))#
+#
+ms.table <- samp2site.spp(site=site.table$Site,#
+                          spp=site.table$Year,#
+                          abund=site.table$Samples,#
+                          FUN=sum)#
+ms.table <- cbind(spec$SiteStatus[match(rownames(ms.table),#
+                                        spec$Site)], ms.table)#
+colnames(ms.table) <- c("Site type", colnames(ms.table)[-1])#
+#
+ms.table <- ms.table[order(ms.table[, "Site type"], decreasing=TRUE),]#
+#
+ms.table[, "Site type"][ms.table[, "Site type"] == "maturing"] <-#
+  "Assembling HR"#
+#
+ms.table[, "Site type"][ms.table[, "Site type"] == "mature"] <-#
+  "Non-assembling HR"#
+#
+ms.table[, "Site type"][ms.table[, "Site type"] == "control"] <-#
+  "Non-assembling FM"#
+#
+write.table(ms.table, file="~/Dropbox/hedgerow_assembly/ms/tables/samples.txt",#
+            sep=" & ")#
+#
+## *************************************************#
+## add various traits#
+## *************************************************#
+## specialization#
+spec$d <- traits$d[match(spec$GenusSpecies, traits$GenusSpecies)]#
+spec$degree <- traits$degree[match(spec$GenusSpecies,#
+                                   traits$GenusSpecies)]#
+spec$plant.degree <- traits$degree[match(spec$PlantGenusSpecies,#
+                                         traits$GenusSpecies)]#
+#
+## occurence#
+load('~/Dropbox/hedgerow/data_sets/matrices/net/bee.syr.RData')#
+#
+occ <- apply(mat, c(3,1), calcOccArray)#
+spec$occ.date <- apply(spec, 1, findOcc)#
+traits$occ.date <- spec$occ.date[match(traits$GenusSpecies,#
+                                       spec$GenusSpecies)]#
+## plant occurrence#
+## create sample matrix#
+site.date <- mat[,,1]#
+site.date[site.date > 0] <- 0#
+rownames(site.date) <- lapply(strsplit(rownames(site.date),":"),#
+                              function(x) x[1])#
+long.site.date <- comm.mat2sample(site.date)#
+long.site.date <- long.site.date[!is.na(long.site.date$Samp),]#
+#
+## create site by date matrices with plant presence#
+plant.mat <- make.by.species(spec, long.site.date, site.date)#
+pol.mat <- make.by.species(spec, long.site.date, site.date,#
+                           type="GenusSpecies")#
+#
+save(plant.mat, pol.mat, file='../data/species/allSamples.Rdata')#
+#
+occ.plant <- apply(plant.mat, c(3,1), calcOccArray)#
+## match to dataset!#
+spec$occ.plant.date <- apply(spec, 1, findOccPlant)#
+#
+## bee functional traits#
+spec$Lecty <-#
+  bee.trait$Lecty[match(spec$GenusSpecies, rownames(bee.trait))]#
+spec$NestLoc <-#
+  bee.trait$NestLoc[match(spec$GenusSpecies, rownames(bee.trait))]#
+spec$Excavate <-#
+  bee.trait$Excavate[match(spec$GenusSpecies, rownames(bee.trait))]#
+spec$ITD <-#
+  bee.trait$MeanITD[match(spec$GenusSpecies, rownames(bee.trait))]#
+spec$Sociality <-#
+  bee.trait$Sociality[match(spec$GenusSpecies, rownames(bee.trait))]#
+#
+## syrphid functional traits#
+#
+spec$LarvalDiet <- syr.trait$LarvalDiet[match(spec$GenusSpecies,#
+                                              rownames(syr.trait))]#
+spec$AdultDiet <- syr.trait$AdultDiet[match(spec$GenusSpecies,#
+                                            rownames(syr.trait))]#
+spec$WingLength <- syr.trait$WingLength[match(spec$GenusSpecies,#
+                                              rownames(syr.trait))]#
+#
+traits <- merge(traits, syr.trait[,c(5:7,10,33)], all.x=TRUE)#
+#
+traits <- merge(traits, bee.trait[,c(1:5,27)], all.x=TRUE)#
+#
+traits <- merge(traits, both.trait[,c(2:3,7)], all.x=TRUE)#
+#
+traits$bee.syr <- spec$BeeNonbee[match(traits$GenusSpecies,#
+                                       spec$GenusSpecies)]#
+#
+traits$bee.syr[is.na(traits$bee.syr)] <- "plant"#
+#
+mean.abund.pol <- apply(apply(pol.mat, c(1,3), mean, na.rm=TRUE), 2,#
+                        mean)#
+mean.abund.plant <- apply(apply(plant.mat, c(1,3), mean, na.rm=TRUE),#
+                          2, mean)#
+mean.abund <- c(mean.abund.pol, mean.abund.plant)#
+traits$mean.abun.net <- mean.abund[match(traits$GenusSpecies,#
+                                         names(mean.abund))]#
+save(spec, file='../data/networks/allSpecimens.Rdata')#
+write.csv(traits, file="../data/traits.csv", row.names=FALSE)#
+site.years <- aggregate(Year~ Site, data=spec,#
+                        function(x) length(unique(x)))#
+#
+sites.to.keep <- site.years$Site[site.years$Year >= 5]#
+#
+## *******************************************************************#
+## create networks#
+## all sites with > 5 years#
+#
+nets <- breakNet(spec[spec$Site %in% sites.to.keep,], 'Site', 'Year')#
+#
+## save networks for each site, timeframe#
+f.path <- '../data/networks'#
+save(nets, file=file.path(f.path, 'all_networks_years.Rdata'))#
+#
+## *******************************************************************#
+## keep only BACI sites#
+## *******************************************************************#
+#
+BACI.site <- c('Barger', 'Butler', 'Hrdy', 'MullerB', 'Sperandio')#
+spec <-  spec[spec$Site %in% BACI.site,]#
+veg <-  veg[veg$Site %in% BACI.site,]#
+#
+veg$ypr <- spec$ypr[match(paste(veg$Year, veg$Site),#
+                          paste(spec$Year, spec$Site))]#
+#
+save(spec, file='../data/networks/specimens.Rdata')#
+#
+## create a "year" columns grouping years 1-3 post restoration and 4-9#
+spec$assem <- 'early'#
+spec$assem[spec$ypr > 3] <- 'late'#
+#
+veg$assem <- 'early'#
+veg$assem[veg$ypr > 3] <- 'late'#
+#
+veg.sum <- aggregate(list(abundance=veg$NumQuads),#
+                     list(site=veg$Site,#
+                          status=veg$assem,#
+                          species=veg$PlantGenusSpecies),#
+                     sum)#
+#
+## *******************************************************************#
+## create networks#
+## *******************************************************************#
+#
+## ## by early/late assembly #
+## networks <- breakNet(spec, 'Site', 'assem')#
+#
+## ## save networks for each site, timeframe#
+## saveDats(networks, names(networks), f.path)#
+## save(networks, file=file.path(f.path, 'networks_stages.Rdata'))#
+#
+## for each year#
+nets <- breakNet(spec, 'Site', 'Year')#
+save(nets, file=file.path(f.path, 'baci_networks_years.Rdata'))#
+#
+## *******************************************************************#
+## specialization of each species at each site#
+## *******************************************************************#
+#
+## species.lev <- lapply(networks, function(x){#
+##   sl <- specieslevel(x)#
+##   sl$'higher level'$tot.int <- colSums(x)#
+##   sl$'lower level'$tot.int <- rowSums(x)#
+##   return(sl)#
+## })#
+#
+## specializations  <-  mapply(function(a, b)#
+##                             getSpec(species.lev = a,#
+##                                     names.net = b),#
+##                             a = species.lev,#
+##                             b = names(networks),#
+##                             SIMPLIFY = FALSE)#
+#
+## specializations <- do.call(rbind, specializations)#
+## rownames(specializations) <- NULL#
+#
+## f.path <- '../data/degree'#
+## save(specializations, file=file.path(f.path, 'specializations.Rdata'))#
+## ## *******************************************************************#
+## ## change in visits of by the generalized pollinators#
+#
+## ## hist(specializations$proportional.generality[specializations$speciesType ==#
+## ##                                              "pollinator"],#
+## ##      xlab="Generalization")#
+#
+## ## plants#
+## diff.gens.plants <- getVisitChange(0, 0.2, "proportional.generality",#
+##                                    "PlantGenusSpecies", "GenusSpecies")#
+#
+## diff.spec.plants <- getVisitChange(0.5, 1, "proportional.generality",#
+##                                    "PlantGenusSpecies", "GenusSpecies")#
+#
+## diff.all.plants <- getVisitChange(0, 1, "proportional.generality",#
+##                                   "PlantGenusSpecies", "GenusSpecies")#
+#
+## ## pollinators#
+## diff.gens.pol <- getVisitChange(0, 0.2, "proportional.generality",#
+##                                 "GenusSpecies", "PlantGenusSpecies")#
+#
+## diff.spec.pol <- getVisitChange(0.5, 1, "proportional.generality",#
+##                                 "GenusSpecies", "PlantGenusSpecies")#
+#
+## diff.all.pol <- getVisitChange(0, 1, "proportional.generality",#
+##                                "GenusSpecies", "PlantGenusSpecies")#
+#
+## f.path <- '../data/degree'#
+## save(diff.gens.plants, diff.spec.plants, diff.all.plants,#
+##      file=file.path(f.path, 'PlantVisitDiffs.Rdata'))#
+## write.csv(diff.all.plants,#
+##           file=file.path(f.path, 'PlantVisitDiffs.csv'), row.names=FALSE)#
+#
+## save(diff.gens.pol, diff.spec.pol, diff.all.pol,#
+##      file=file.path(f.path, 'PolVisitDiffs.Rdata'))#
+## write.csv(diff.all.pol,#
+##           file=file.path(f.path, 'PolVisitDiffs.csv'), row.names=FALSE)#
+## ## *******************************************************************#
+## ## species lists for each site#
+#
+## plants <- getSpecies(networks, rownames)#
+## pols <- getSpecies(networks, rownames)#
+#
+## f.path <- '../data/species'#
+## write.csv(plants, file.path(f.path, 'plants.csv'),#
+##           row.names=FALSE)#
+## save(plants, file=file.path(f.path, 'plants.Rdata'))#
+#
+## write.csv(pols, file.path(f.path, 'pollinators.csv'),#
+##           row.names=FALSE)#
+## save(pols, file=file.path(f.path, 'pols.Rdata'))#
+#
+## ## *******************************************************************#
+## ## species added between early and late stages#
+#
+## plant.diffs <- getColExt(plants)#
+## pol.diffs <- getColExt(pols)#
+#
+## f.path <- '../data/speciesChange'#
+## write.csv(plant.diffs, file.path(f.path, 'plants.csv'),#
+##           row.names=FALSE)#
+#
+## write.csv(pol.diffs, file.path(f.path, 'pollinators.csv'),#
+##           row.names=FALSE)#
+#
+## ## *******************************************************************#
+## ## total plants at a site#
+## f.path <- '../data/species'#
+## plants <- plants[,-2]#
+## plants <- unique(plants)#
+## write.csv(plants, file.path(f.path, 'plants_all.csv'),#
+##           row.names=FALSE)#
+#
+## ## *******************************************************************#
+## ## pollinator and plant degrees by years post restoration#
+## spec$all <- 'all'#
+#
+## yr.networks <- breakNet(spec, 'all', 'assem')#
+#
+## d.pol <- lapply(yr.networks, colSums)#
+## d.plant <- lapply(yr.networks, rowSums)#
+#
+## f.path <- '../data/degree'#
+## saveDats(d.pol, paste(names(d.pol), 'pollinators', sep="_"), f.path)#
+## saveDats(d.plant, paste(names(d.plant), 'plants', sep="_"), f.path)#
+#
+## by.year <- data.frame(t(sapply(c(d.plant, d.pol), calcStats)))#
+## by.year$group <- rep(c('plants','pollinators'), each=2)#
+## by.year$assembly <- rep(c('early', 'late'), 2)#
+#
+## write.csv(by.year, file.path(f.path, 'stats_by_yr.csv'))#
+#
+## ## *******************************************************************#
+## ## pollinator and plant degrees across all years and sites#
+#
+## all.networks <- breakNet(spec, 'all', 'all')#
+#
+## d.pol.all <- lapply(all.networks, colSums)#
+## d.plant.all <- lapply(all.networks, rowSums)#
+#
+## saveDats(d.pol.all, 'across_yrs_pollinators', f.path)#
+## saveDats(d.plant.all, 'across_yrs_plants', f.path)#
+#
+## all.dats <- data.frame(t(sapply(c(d.plant.all, d.pol.all), calcStats)))#
+## all.dats$group <- c('plants','pollinators')#
+#
+## write.csv(all.dats, file.path(f.path, 'stats_across_yrs.csv'))#
+#
+## ## *******************************************************************#
+## ## characteristics of plant colonists#
+## plant.col <- plant.diffs[plant.diffs$class == "colonist",]#
+#
+## plant.col$earlyAbund <- veg.sum$abundance[veg.sum$status ==#
+##                                           "early"][match(#
+##                                             plant.col$species,#
+##                                             veg.sum$species)]#
+## plant.col$lateAbund <- veg.sum$abundance[veg.sum$status ==#
+##                                          "late"][match(#
+##                                            plant.col$species,#
+##                                            veg.sum$species)]#
+#
+## plant.col$degree <- d.plant$all_late[match(plant.col$species,#
+##                                            names(d.plant$all_late))]#
+#
+## ## number of species that interact#
+## con.plant <- lapply(yr.networks, getCon, 1)#
+#
+## plant.col$partners <- con.plant$all_late[match(plant.col$species,#
+##                                                names(con.plant$all_late))]#
+## f.path <- '../data/speciesChange'#
+## write.csv(plant.col, file.path(f.path, 'plants_char.csv'),#
+##           row.names=FALSE)#
+#
+## ## *******************************************************************#
+## ## stable network structure#
+## networks.by.year <- breakNet(spec, 'Site', 'Year')#
+#
+## plant.species <- sapply(networks.by.year, nrow)#
+## plant.species <- data.frame(richness=plant.species,#
+##                             sites =#
+##                             sapply(strsplit(names(plant.species),#
+##                                             "_"),#
+##                                    function(x) x[1]),#
+##                             years =#
+##                             sapply(strsplit(names(plant.species),#
+##                                             "_"),#
+##                                    function(x) x[2]))#
+## write.csv(plant.species, file.path(f.path, 'plants_change.csv'),#
+##           row.names=FALSE)
+nets[[1]]
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/dataPrep')#
+load('~/Dropbox/hedgerow/data_sets/traditional/specimens-complete.RData')#
+load("/Users/lcp/Dropbox/hedgerow_network/data/veg/veg.Rdata")#
+source('src/misc.R')#
+source('src/prepNets.R')#
+library(bipartite)#
+#
+trait.dir <- '~/Dropbox/hedgerow/data_sets/traditional/functional_traits'#
+bee.trait <-#
+  read.csv(file.path(trait.dir, 'bee.csv'),#
+           row.names=1)#
+syr.trait <-#
+  read.csv(file.path(trait.dir, 'syr.csv'),#
+           row.names=1)#
+#
+both.trait <-#
+  read.csv(file.path(trait.dir, 'bee.syr.csv'))#
+#
+spec <- dd#
+#
+## subset to net specimens#
+spec <- spec[spec$NetPan == 'net',]#
+## create species column#
+spec$PlantGenusSpecies <-  fix.white.space(paste(spec$PlantGenus,#
+                                                 spec$PlantSpecies))#
+#
+## drop pollinators and plants without identifications#
+spec <-  spec[spec$PlantGenusSpecies != '',]#
+#
+to.drop.status <- c("forb", "natural")#
+spec <- spec[!spec$SiteStatus %in% to.drop.status,]#
+tot.spec <- nrow(spec)#
+#
+nrow(spec[spec$Family == 'Syrphidae',])/tot.spec#
+nrow(spec[spec$BeeNonbee == 'bee',])/tot.spec#
+#
+## subset to just bees and syrphids#
+spec <- spec[spec$Family == 'Syrphidae' |#
+             spec$BeeNonbee == 'bee',]#
+#
+spec <-  spec[spec$Species != '',]#
+spec$SiteStatus[spec$SiteStatus == "restored"] <- "maturing"#
+## total specimens#
+nrow(spec)#
+#
+## total species#
+length(unique(spec$GenusSpecies))#
+#
+## sampling dates#
+length(unique(paste(spec$Site, spec$Date)))#
+#
+## families and genera#
+length(unique(spec$Family))#
+length(unique(spec$Genus))#
+#
+## interactions#
+length(unique(paste(spec$GenusSpecies, spec$PlantGenusSpecies)))#
+#
+## *************************************************#
+## create a giant network to calculate specialization#
+## *************************************************#
+agg.spec <- aggregate(list(abund=spec$GenusSpecies),#
+                      list(GenusSpecies=spec$GenusSpecies,#
+                           PlantGenusSpecies=spec$PlantGenusSpecies),#
+                      length)#
+#
+nets.all <- samp2site.spp(agg.spec$PlantGenusSpecies,#
+                          agg.spec$GenusSpecies, agg.spec$abund, FUN=sum)#
+#
+all.specializations <- specieslevel(nets.all,#
+                                    index=c("proportional generality",#
+                                      "degree",#
+                                      "d"))#
+#
+traits <- data.frame(GenusSpecies= unlist(sapply(all.specializations,#
+                       rownames)),#
+                     do.call(rbind, all.specializations))#
+rownames(traits) <- NULL#
+#
+## *************************************************#
+## thermal traits#
+## *************************************************#
+spec$AverageTemp <- apply(spec, 1, function(x){#
+  mean(as.numeric(c(x["TempStart"], x["TempEnd"])),#
+       na.rm=TRUE)#
+})#
+#
+temp.tol <- do.call(rbind, tapply(spec$AverageTemp, spec$GenusSpecies,#
+                                  function(x){#
+                                    temp.mean <- mean(x, na.rm=TRUE)#
+                                    temp.range <- range(x, na.rm=TRUE)#
+                                    max.temp <- temp.range[2]#
+                                    temp.range <- temp.range[2] - temp.range[1]#
+                                    return(c(temp.mean=temp.mean,#
+                                             max.temp=max.temp,#
+                                             temp.range=temp.range))#
+                                  }))#
+temp.tol <- as.data.frame(temp.tol)#
+temp.tol$GenusSpecies <- rownames(temp.tol)#
+rownames(temp.tol) <- NULL#
+#
+traits <- merge(traits, temp.tol, all.x=TRUE)#
+#
+## *************************************************#
+## sampling table for manuscript#
+## *************************************************#
+#
+site.table <- aggregate(list(Samples=spec$Date),#
+                        list(Year=spec$Year, Site=spec$Site),#
+                        function(x) length(unique(x)))#
+#
+ms.table <- samp2site.spp(site=site.table$Site,#
+                          spp=site.table$Year,#
+                          abund=site.table$Samples,#
+                          FUN=sum)#
+ms.table <- cbind(spec$SiteStatus[match(rownames(ms.table),#
+                                        spec$Site)], ms.table)#
+colnames(ms.table) <- c("Site type", colnames(ms.table)[-1])#
+#
+ms.table <- ms.table[order(ms.table[, "Site type"], decreasing=TRUE),]#
+#
+ms.table[, "Site type"][ms.table[, "Site type"] == "maturing"] <-#
+  "Assembling HR"#
+#
+ms.table[, "Site type"][ms.table[, "Site type"] == "mature"] <-#
+  "Non-assembling HR"#
+#
+ms.table[, "Site type"][ms.table[, "Site type"] == "control"] <-#
+  "Non-assembling FM"#
+#
+write.table(ms.table, file="~/Dropbox/hedgerow_assembly/ms/tables/samples.txt",#
+            sep=" & ")#
+#
+## *************************************************#
+## add various traits#
+## *************************************************#
+## specialization#
+spec$d <- traits$d[match(spec$GenusSpecies, traits$GenusSpecies)]#
+spec$degree <- traits$degree[match(spec$GenusSpecies,#
+                                   traits$GenusSpecies)]#
+spec$plant.degree <- traits$degree[match(spec$PlantGenusSpecies,#
+                                         traits$GenusSpecies)]#
+#
+## occurence#
+load('~/Dropbox/hedgerow/data_sets/matrices/net/bee.syr.RData')#
+#
+occ <- apply(mat, c(3,1), calcOccArray)#
+spec$occ.date <- apply(spec, 1, findOcc)#
+traits$occ.date <- spec$occ.date[match(traits$GenusSpecies,#
+                                       spec$GenusSpecies)]#
+## plant occurrence#
+## create sample matrix#
+site.date <- mat[,,1]#
+site.date[site.date > 0] <- 0#
+rownames(site.date) <- lapply(strsplit(rownames(site.date),":"),#
+                              function(x) x[1])#
+long.site.date <- comm.mat2sample(site.date)#
+long.site.date <- long.site.date[!is.na(long.site.date$Samp),]#
+#
+## create site by date matrices with plant presence#
+plant.mat <- make.by.species(spec, long.site.date, site.date)#
+pol.mat <- make.by.species(spec, long.site.date, site.date,#
+                           type="GenusSpecies")#
+#
+save(plant.mat, pol.mat, file='../data/species/allSamples.Rdata')#
+#
+occ.plant <- apply(plant.mat, c(3,1), calcOccArray)#
+## match to dataset!#
+spec$occ.plant.date <- apply(spec, 1, findOccPlant)#
+#
+## bee functional traits#
+spec$Lecty <-#
+  bee.trait$Lecty[match(spec$GenusSpecies, rownames(bee.trait))]#
+spec$NestLoc <-#
+  bee.trait$NestLoc[match(spec$GenusSpecies, rownames(bee.trait))]#
+spec$Excavate <-#
+  bee.trait$Excavate[match(spec$GenusSpecies, rownames(bee.trait))]#
+spec$ITD <-#
+  bee.trait$MeanITD[match(spec$GenusSpecies, rownames(bee.trait))]#
+spec$Sociality <-#
+  bee.trait$Sociality[match(spec$GenusSpecies, rownames(bee.trait))]#
+#
+## syrphid functional traits#
+#
+spec$LarvalDiet <- syr.trait$LarvalDiet[match(spec$GenusSpecies,#
+                                              rownames(syr.trait))]#
+spec$AdultDiet <- syr.trait$AdultDiet[match(spec$GenusSpecies,#
+                                            rownames(syr.trait))]#
+spec$WingLength <- syr.trait$WingLength[match(spec$GenusSpecies,#
+                                              rownames(syr.trait))]#
+#
+traits <- merge(traits, syr.trait[,c(5:7,10,33)], all.x=TRUE)#
+#
+traits <- merge(traits, bee.trait[,c(1:5,27)], all.x=TRUE)#
+#
+traits <- merge(traits, both.trait[,c(2:3,7)], all.x=TRUE)#
+#
+traits$bee.syr <- spec$BeeNonbee[match(traits$GenusSpecies,#
+                                       spec$GenusSpecies)]#
+#
+traits$bee.syr[is.na(traits$bee.syr)] <- "plant"#
+#
+mean.abund.pol <- apply(apply(pol.mat, c(1,3), mean, na.rm=TRUE), 2,#
+                        mean)#
+mean.abund.plant <- apply(apply(plant.mat, c(1,3), mean, na.rm=TRUE),#
+                          2, mean)#
+mean.abund <- c(mean.abund.pol, mean.abund.plant)#
+traits$mean.abun.net <- mean.abund[match(traits$GenusSpecies,#
+                                         names(mean.abund))]#
+save(spec, file='../data/networks/allSpecimens.Rdata')#
+write.csv(traits, file="../data/traits.csv", row.names=FALSE)#
+site.years <- aggregate(Year~ Site, data=spec,#
+                        function(x) length(unique(x)))#
+#
+sites.to.keep <- site.years$Site[site.years$Year >= 5]#
+#
+## *******************************************************************#
+## create networks#
+## all sites with > 5 years#
+#
+nets <- breakNet(spec[spec$Site %in% sites.to.keep,], 'Site', 'Year')#
+#
+## save networks for each site, timeframe#
+f.path <- '../data/networks'#
+save(nets, file=file.path(f.path, 'all_networks_years.Rdata'))#
+#
+## *******************************************************************#
+## keep only BACI sites#
+## *******************************************************************#
+#
+BACI.site <- c('Barger', 'Butler', 'Hrdy', 'MullerB', 'Sperandio')#
+spec <-  spec[spec$Site %in% BACI.site,]#
+veg <-  veg[veg$Site %in% BACI.site,]#
+#
+veg$ypr <- spec$ypr[match(paste(veg$Year, veg$Site),#
+                          paste(spec$Year, spec$Site))]#
+#
+save(spec, file='../data/networks/specimens.Rdata')#
+#
+## create a "year" columns grouping years 1-3 post restoration and 4-9#
+spec$assem <- 'early'#
+spec$assem[spec$ypr > 3] <- 'late'#
+#
+veg$assem <- 'early'#
+veg$assem[veg$ypr > 3] <- 'late'#
+#
+veg.sum <- aggregate(list(abundance=veg$NumQuads),#
+                     list(site=veg$Site,#
+                          status=veg$assem,#
+                          species=veg$PlantGenusSpecies),#
+                     sum)#
+#
+## *******************************************************************#
+## create networks#
+## *******************************************************************#
+#
+## ## by early/late assembly #
+## networks <- breakNet(spec, 'Site', 'assem')#
+#
+## ## save networks for each site, timeframe#
+## saveDats(networks, names(networks), f.path)#
+## save(networks, file=file.path(f.path, 'networks_stages.Rdata'))#
+#
+## for each year#
+nets <- breakNet(spec, 'Site', 'Year')#
+save(nets, file=file.path(f.path, 'baci_networks_years.Rdata'))#
+#
+## *******************************************************************#
+## specialization of each species at each site#
+## *******************************************************************#
+#
+## species.lev <- lapply(networks, function(x){#
+##   sl <- specieslevel(x)#
+##   sl$'higher level'$tot.int <- colSums(x)#
+##   sl$'lower level'$tot.int <- rowSums(x)#
+##   return(sl)#
+## })#
+#
+## specializations  <-  mapply(function(a, b)#
+##                             getSpec(species.lev = a,#
+##                                     names.net = b),#
+##                             a = species.lev,#
+##                             b = names(networks),#
+##                             SIMPLIFY = FALSE)#
+#
+## specializations <- do.call(rbind, specializations)#
+## rownames(specializations) <- NULL#
+#
+## f.path <- '../data/degree'#
+## save(specializations, file=file.path(f.path, 'specializations.Rdata'))#
+## ## *******************************************************************#
+## ## change in visits of by the generalized pollinators#
+#
+## ## hist(specializations$proportional.generality[specializations$speciesType ==#
+## ##                                              "pollinator"],#
+## ##      xlab="Generalization")#
+#
+## ## plants#
+## diff.gens.plants <- getVisitChange(0, 0.2, "proportional.generality",#
+##                                    "PlantGenusSpecies", "GenusSpecies")#
+#
+## diff.spec.plants <- getVisitChange(0.5, 1, "proportional.generality",#
+##                                    "PlantGenusSpecies", "GenusSpecies")#
+#
+## diff.all.plants <- getVisitChange(0, 1, "proportional.generality",#
+##                                   "PlantGenusSpecies", "GenusSpecies")#
+#
+## ## pollinators#
+## diff.gens.pol <- getVisitChange(0, 0.2, "proportional.generality",#
+##                                 "GenusSpecies", "PlantGenusSpecies")#
+#
+## diff.spec.pol <- getVisitChange(0.5, 1, "proportional.generality",#
+##                                 "GenusSpecies", "PlantGenusSpecies")#
+#
+## diff.all.pol <- getVisitChange(0, 1, "proportional.generality",#
+##                                "GenusSpecies", "PlantGenusSpecies")#
+#
+## f.path <- '../data/degree'#
+## save(diff.gens.plants, diff.spec.plants, diff.all.plants,#
+##      file=file.path(f.path, 'PlantVisitDiffs.Rdata'))#
+## write.csv(diff.all.plants,#
+##           file=file.path(f.path, 'PlantVisitDiffs.csv'), row.names=FALSE)#
+#
+## save(diff.gens.pol, diff.spec.pol, diff.all.pol,#
+##      file=file.path(f.path, 'PolVisitDiffs.Rdata'))#
+## write.csv(diff.all.pol,#
+##           file=file.path(f.path, 'PolVisitDiffs.csv'), row.names=FALSE)#
+## ## *******************************************************************#
+## ## species lists for each site#
+#
+## plants <- getSpecies(networks, rownames)#
+## pols <- getSpecies(networks, rownames)#
+#
+## f.path <- '../data/species'#
+## write.csv(plants, file.path(f.path, 'plants.csv'),#
+##           row.names=FALSE)#
+## save(plants, file=file.path(f.path, 'plants.Rdata'))#
+#
+## write.csv(pols, file.path(f.path, 'pollinators.csv'),#
+##           row.names=FALSE)#
+## save(pols, file=file.path(f.path, 'pols.Rdata'))#
+#
+## ## *******************************************************************#
+## ## species added between early and late stages#
+#
+## plant.diffs <- getColExt(plants)#
+## pol.diffs <- getColExt(pols)#
+#
+## f.path <- '../data/speciesChange'#
+## write.csv(plant.diffs, file.path(f.path, 'plants.csv'),#
+##           row.names=FALSE)#
+#
+## write.csv(pol.diffs, file.path(f.path, 'pollinators.csv'),#
+##           row.names=FALSE)#
+#
+## ## *******************************************************************#
+## ## total plants at a site#
+## f.path <- '../data/species'#
+## plants <- plants[,-2]#
+## plants <- unique(plants)#
+## write.csv(plants, file.path(f.path, 'plants_all.csv'),#
+##           row.names=FALSE)#
+#
+## ## *******************************************************************#
+## ## pollinator and plant degrees by years post restoration#
+## spec$all <- 'all'#
+#
+## yr.networks <- breakNet(spec, 'all', 'assem')#
+#
+## d.pol <- lapply(yr.networks, colSums)#
+## d.plant <- lapply(yr.networks, rowSums)#
+#
+## f.path <- '../data/degree'#
+## saveDats(d.pol, paste(names(d.pol), 'pollinators', sep="_"), f.path)#
+## saveDats(d.plant, paste(names(d.plant), 'plants', sep="_"), f.path)#
+#
+## by.year <- data.frame(t(sapply(c(d.plant, d.pol), calcStats)))#
+## by.year$group <- rep(c('plants','pollinators'), each=2)#
+## by.year$assembly <- rep(c('early', 'late'), 2)#
+#
+## write.csv(by.year, file.path(f.path, 'stats_by_yr.csv'))#
+#
+## ## *******************************************************************#
+## ## pollinator and plant degrees across all years and sites#
+#
+## all.networks <- breakNet(spec, 'all', 'all')#
+#
+## d.pol.all <- lapply(all.networks, colSums)#
+## d.plant.all <- lapply(all.networks, rowSums)#
+#
+## saveDats(d.pol.all, 'across_yrs_pollinators', f.path)#
+## saveDats(d.plant.all, 'across_yrs_plants', f.path)#
+#
+## all.dats <- data.frame(t(sapply(c(d.plant.all, d.pol.all), calcStats)))#
+## all.dats$group <- c('plants','pollinators')#
+#
+## write.csv(all.dats, file.path(f.path, 'stats_across_yrs.csv'))#
+#
+## ## *******************************************************************#
+## ## characteristics of plant colonists#
+## plant.col <- plant.diffs[plant.diffs$class == "colonist",]#
+#
+## plant.col$earlyAbund <- veg.sum$abundance[veg.sum$status ==#
+##                                           "early"][match(#
+##                                             plant.col$species,#
+##                                             veg.sum$species)]#
+## plant.col$lateAbund <- veg.sum$abundance[veg.sum$status ==#
+##                                          "late"][match(#
+##                                            plant.col$species,#
+##                                            veg.sum$species)]#
+#
+## plant.col$degree <- d.plant$all_late[match(plant.col$species,#
+##                                            names(d.plant$all_late))]#
+#
+## ## number of species that interact#
+## con.plant <- lapply(yr.networks, getCon, 1)#
+#
+## plant.col$partners <- con.plant$all_late[match(plant.col$species,#
+##                                                names(con.plant$all_late))]#
+## f.path <- '../data/speciesChange'#
+## write.csv(plant.col, file.path(f.path, 'plants_char.csv'),#
+##           row.names=FALSE)#
+#
+## ## *******************************************************************#
+## ## stable network structure#
+## networks.by.year <- breakNet(spec, 'Site', 'Year')#
+#
+## plant.species <- sapply(networks.by.year, nrow)#
+## plant.species <- data.frame(richness=plant.species,#
+##                             sites =#
+##                             sapply(strsplit(names(plant.species),#
+##                                             "_"),#
+##                                    function(x) x[1]),#
+##                             years =#
+##                             sapply(strsplit(names(plant.species),#
+##                                             "_"),#
+##                                    function(x) x[2]))#
+## write.csv(plant.species, file.path(f.path, 'plants_change.csv'),#
+##           row.names=FALSE)
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/speciesLevel')#
+source('src/initialize.R')#
+load('../../data/networks/all_networks_years.Rdata')#
+#
+## **********************************************************#
+## species importance#
+## **********************************************************#
+specs <- calcSpec(nets, spec, spec.metric = "d", 0.3)#
+save(specs, file=file.path(save.path, 'specs.Rdata'))
+lapply(nets, dim)
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/dataPrep')#
+load('~/Dropbox/hedgerow/data_sets/traditional/specimens-complete.RData')#
+load("/Users/lcp/Dropbox/hedgerow_network/data/veg/veg.Rdata")#
+source('src/misc.R')#
+source('src/prepNets.R')#
+library(bipartite)#
+#
+trait.dir <- '~/Dropbox/hedgerow/data_sets/traditional/functional_traits'#
+bee.trait <-#
+  read.csv(file.path(trait.dir, 'bee.csv'),#
+           row.names=1)#
+syr.trait <-#
+  read.csv(file.path(trait.dir, 'syr.csv'),#
+           row.names=1)#
+#
+both.trait <-#
+  read.csv(file.path(trait.dir, 'bee.syr.csv'))#
+#
+spec <- dd#
+#
+## subset to net specimens#
+spec <- spec[spec$NetPan == 'net',]#
+## create species column#
+spec$PlantGenusSpecies <-  fix.white.space(paste(spec$PlantGenus,#
+                                                 spec$PlantSpecies))#
+#
+## drop pollinators and plants without identifications#
+spec <-  spec[spec$PlantGenusSpecies != '',]#
+#
+to.drop.status <- c("forb", "natural")#
+spec <- spec[!spec$SiteStatus %in% to.drop.status,]#
+tot.spec <- nrow(spec)#
+#
+nrow(spec[spec$Family == 'Syrphidae',])/tot.spec#
+nrow(spec[spec$BeeNonbee == 'bee',])/tot.spec#
+#
+## subset to just bees and syrphids#
+spec <- spec[spec$Family == 'Syrphidae' |#
+             spec$BeeNonbee == 'bee',]#
+#
+spec <-  spec[spec$Species != '',]#
+spec$SiteStatus[spec$SiteStatus == "restored"] <- "maturing"#
+## total specimens#
+nrow(spec)#
+#
+## total species#
+length(unique(spec$GenusSpecies))#
+#
+## sampling dates#
+length(unique(paste(spec$Site, spec$Date)))#
+#
+## families and genera#
+length(unique(spec$Family))#
+length(unique(spec$Genus))#
+#
+## interactions#
+length(unique(paste(spec$GenusSpecies, spec$PlantGenusSpecies)))#
+#
+## *************************************************#
+## create a giant network to calculate specialization#
+## *************************************************#
+agg.spec <- aggregate(list(abund=spec$GenusSpecies),#
+                      list(GenusSpecies=spec$GenusSpecies,#
+                           PlantGenusSpecies=spec$PlantGenusSpecies),#
+                      length)#
+#
+nets.all <- samp2site.spp(agg.spec$PlantGenusSpecies,#
+                          agg.spec$GenusSpecies, agg.spec$abund, FUN=sum)#
+#
+all.specializations <- specieslevel(nets.all,#
+                                    index=c("proportional generality",#
+                                      "degree",#
+                                      "d"))#
+#
+traits <- data.frame(GenusSpecies= unlist(sapply(all.specializations,#
+                       rownames)),#
+                     do.call(rbind, all.specializations))#
+rownames(traits) <- NULL#
+#
+## *************************************************#
+## thermal traits#
+## *************************************************#
+spec$AverageTemp <- apply(spec, 1, function(x){#
+  mean(as.numeric(c(x["TempStart"], x["TempEnd"])),#
+       na.rm=TRUE)#
+})#
+#
+temp.tol <- do.call(rbind, tapply(spec$AverageTemp, spec$GenusSpecies,#
+                                  function(x){#
+                                    temp.mean <- mean(x, na.rm=TRUE)#
+                                    temp.range <- range(x, na.rm=TRUE)#
+                                    max.temp <- temp.range[2]#
+                                    temp.range <- temp.range[2] - temp.range[1]#
+                                    return(c(temp.mean=temp.mean,#
+                                             max.temp=max.temp,#
+                                             temp.range=temp.range))#
+                                  }))#
+temp.tol <- as.data.frame(temp.tol)#
+temp.tol$GenusSpecies <- rownames(temp.tol)#
+rownames(temp.tol) <- NULL#
+#
+traits <- merge(traits, temp.tol, all.x=TRUE)#
+#
+## *************************************************#
+## sampling table for manuscript#
+## *************************************************#
+#
+site.table <- aggregate(list(Samples=spec$Date),#
+                        list(Year=spec$Year, Site=spec$Site),#
+                        function(x) length(unique(x)))#
+#
+ms.table <- samp2site.spp(site=site.table$Site,#
+                          spp=site.table$Year,#
+                          abund=site.table$Samples,#
+                          FUN=sum)#
+ms.table <- cbind(spec$SiteStatus[match(rownames(ms.table),#
+                                        spec$Site)], ms.table)#
+colnames(ms.table) <- c("Site type", colnames(ms.table)[-1])#
+#
+ms.table <- ms.table[order(ms.table[, "Site type"], decreasing=TRUE),]#
+#
+ms.table[, "Site type"][ms.table[, "Site type"] == "maturing"] <-#
+  "Assembling HR"#
+#
+ms.table[, "Site type"][ms.table[, "Site type"] == "mature"] <-#
+  "Non-assembling HR"#
+#
+ms.table[, "Site type"][ms.table[, "Site type"] == "control"] <-#
+  "Non-assembling FM"#
+#
+write.table(ms.table, file="~/Dropbox/hedgerow_assembly/ms/tables/samples.txt",#
+            sep=" & ")#
+#
+## *************************************************#
+## add various traits#
+## *************************************************#
+## specialization#
+spec$d <- traits$d[match(spec$GenusSpecies, traits$GenusSpecies)]#
+spec$degree <- traits$degree[match(spec$GenusSpecies,#
+                                   traits$GenusSpecies)]#
+spec$plant.degree <- traits$degree[match(spec$PlantGenusSpecies,#
+                                         traits$GenusSpecies)]#
+#
+## occurence#
+load('~/Dropbox/hedgerow/data_sets/matrices/net/bee.syr.RData')#
+#
+occ <- apply(mat, c(3,1), calcOccArray)#
+spec$occ.date <- apply(spec, 1, findOcc)#
+traits$occ.date <- spec$occ.date[match(traits$GenusSpecies,#
+                                       spec$GenusSpecies)]#
+## plant occurrence#
+## create sample matrix#
+site.date <- mat[,,1]#
+site.date[site.date > 0] <- 0#
+rownames(site.date) <- lapply(strsplit(rownames(site.date),":"),#
+                              function(x) x[1])#
+long.site.date <- comm.mat2sample(site.date)#
+long.site.date <- long.site.date[!is.na(long.site.date$Samp),]#
+#
+## create site by date matrices with plant presence#
+plant.mat <- make.by.species(spec, long.site.date, site.date)#
+pol.mat <- make.by.species(spec, long.site.date, site.date,#
+                           type="GenusSpecies")#
+#
+save(plant.mat, pol.mat, file='../data/species/allSamples.Rdata')#
+#
+occ.plant <- apply(plant.mat, c(3,1), calcOccArray)#
+## match to dataset!#
+spec$occ.plant.date <- apply(spec, 1, findOccPlant)#
+#
+## bee functional traits#
+spec$Lecty <-#
+  bee.trait$Lecty[match(spec$GenusSpecies, rownames(bee.trait))]#
+spec$NestLoc <-#
+  bee.trait$NestLoc[match(spec$GenusSpecies, rownames(bee.trait))]#
+spec$Excavate <-#
+  bee.trait$Excavate[match(spec$GenusSpecies, rownames(bee.trait))]#
+spec$ITD <-#
+  bee.trait$MeanITD[match(spec$GenusSpecies, rownames(bee.trait))]#
+spec$Sociality <-#
+  bee.trait$Sociality[match(spec$GenusSpecies, rownames(bee.trait))]#
+#
+## syrphid functional traits#
+#
+spec$LarvalDiet <- syr.trait$LarvalDiet[match(spec$GenusSpecies,#
+                                              rownames(syr.trait))]#
+spec$AdultDiet <- syr.trait$AdultDiet[match(spec$GenusSpecies,#
+                                            rownames(syr.trait))]#
+spec$WingLength <- syr.trait$WingLength[match(spec$GenusSpecies,#
+                                              rownames(syr.trait))]#
+#
+traits <- merge(traits, syr.trait[,c(5:7,10,33)], all.x=TRUE)#
+#
+traits <- merge(traits, bee.trait[,c(1:5,27)], all.x=TRUE)#
+#
+traits <- merge(traits, both.trait[,c(2:3,7)], all.x=TRUE)#
+#
+traits$bee.syr <- spec$BeeNonbee[match(traits$GenusSpecies,#
+                                       spec$GenusSpecies)]#
+#
+traits$bee.syr[is.na(traits$bee.syr)] <- "plant"#
+#
+mean.abund.pol <- apply(apply(pol.mat, c(1,3), mean, na.rm=TRUE), 2,#
+                        mean)#
+mean.abund.plant <- apply(apply(plant.mat, c(1,3), mean, na.rm=TRUE),#
+                          2, mean)#
+mean.abund <- c(mean.abund.pol, mean.abund.plant)#
+traits$mean.abun.net <- mean.abund[match(traits$GenusSpecies,#
+                                         names(mean.abund))]#
+save(spec, file='../data/networks/allSpecimens.Rdata')#
+write.csv(traits, file="../data/traits.csv", row.names=FALSE)#
+site.years <- aggregate(Year~ Site, data=spec,#
+                        function(x) length(unique(x)))#
+#
+sites.to.keep <- site.years$Site[site.years$Year >= 5]#
+#
+## *******************************************************************#
+## create networks#
+## all sites with > 5 years#
+#
+nets <- breakNet(spec[spec$Site %in% sites.to.keep,], 'Site', 'Year')#
+#
+## save networks for each site, timeframe#
+f.path <- '../data/networks'#
+save(nets, file=file.path(f.path, 'all_networks_years.Rdata'))#
+#
+## *******************************************************************#
+## keep only BACI sites#
+## *******************************************************************#
+#
+BACI.site <- c('Barger', 'Butler', 'Hrdy', 'MullerB', 'Sperandio')#
+spec <-  spec[spec$Site %in% BACI.site,]#
+veg <-  veg[veg$Site %in% BACI.site,]#
+#
+veg$ypr <- spec$ypr[match(paste(veg$Year, veg$Site),#
+                          paste(spec$Year, spec$Site))]#
+#
+save(spec, file='../data/networks/specimens.Rdata')#
+#
+## create a "year" columns grouping years 1-3 post restoration and 4-9#
+spec$assem <- 'early'#
+spec$assem[spec$ypr > 3] <- 'late'#
+#
+veg$assem <- 'early'#
+veg$assem[veg$ypr > 3] <- 'late'#
+#
+veg.sum <- aggregate(list(abundance=veg$NumQuads),#
+                     list(site=veg$Site,#
+                          status=veg$assem,#
+                          species=veg$PlantGenusSpecies),#
+                     sum)#
+#
+## *******************************************************************#
+## create networks#
+## *******************************************************************#
+#
+## ## by early/late assembly #
+## networks <- breakNet(spec, 'Site', 'assem')#
+#
+## ## save networks for each site, timeframe#
+## saveDats(networks, names(networks), f.path)#
+## save(networks, file=file.path(f.path, 'networks_stages.Rdata'))#
+#
+## for each year#
+nets <- breakNet(spec, 'Site', 'Year')#
+save(nets, file=file.path(f.path, 'baci_networks_years.Rdata'))#
+#
+## *******************************************************************#
+## specialization of each species at each site#
+## *******************************************************************#
+#
+## species.lev <- lapply(networks, function(x){#
+##   sl <- specieslevel(x)#
+##   sl$'higher level'$tot.int <- colSums(x)#
+##   sl$'lower level'$tot.int <- rowSums(x)#
+##   return(sl)#
+## })#
+#
+## specializations  <-  mapply(function(a, b)#
+##                             getSpec(species.lev = a,#
+##                                     names.net = b),#
+##                             a = species.lev,#
+##                             b = names(networks),#
+##                             SIMPLIFY = FALSE)#
+#
+## specializations <- do.call(rbind, specializations)#
+## rownames(specializations) <- NULL#
+#
+## f.path <- '../data/degree'#
+## save(specializations, file=file.path(f.path, 'specializations.Rdata'))#
+## ## *******************************************************************#
+## ## change in visits of by the generalized pollinators#
+#
+## ## hist(specializations$proportional.generality[specializations$speciesType ==#
+## ##                                              "pollinator"],#
+## ##      xlab="Generalization")#
+#
+## ## plants#
+## diff.gens.plants <- getVisitChange(0, 0.2, "proportional.generality",#
+##                                    "PlantGenusSpecies", "GenusSpecies")#
+#
+## diff.spec.plants <- getVisitChange(0.5, 1, "proportional.generality",#
+##                                    "PlantGenusSpecies", "GenusSpecies")#
+#
+## diff.all.plants <- getVisitChange(0, 1, "proportional.generality",#
+##                                   "PlantGenusSpecies", "GenusSpecies")#
+#
+## ## pollinators#
+## diff.gens.pol <- getVisitChange(0, 0.2, "proportional.generality",#
+##                                 "GenusSpecies", "PlantGenusSpecies")#
+#
+## diff.spec.pol <- getVisitChange(0.5, 1, "proportional.generality",#
+##                                 "GenusSpecies", "PlantGenusSpecies")#
+#
+## diff.all.pol <- getVisitChange(0, 1, "proportional.generality",#
+##                                "GenusSpecies", "PlantGenusSpecies")#
+#
+## f.path <- '../data/degree'#
+## save(diff.gens.plants, diff.spec.plants, diff.all.plants,#
+##      file=file.path(f.path, 'PlantVisitDiffs.Rdata'))#
+## write.csv(diff.all.plants,#
+##           file=file.path(f.path, 'PlantVisitDiffs.csv'), row.names=FALSE)#
+#
+## save(diff.gens.pol, diff.spec.pol, diff.all.pol,#
+##      file=file.path(f.path, 'PolVisitDiffs.Rdata'))#
+## write.csv(diff.all.pol,#
+##           file=file.path(f.path, 'PolVisitDiffs.csv'), row.names=FALSE)#
+## ## *******************************************************************#
+## ## species lists for each site#
+#
+## plants <- getSpecies(networks, rownames)#
+## pols <- getSpecies(networks, rownames)#
+#
+## f.path <- '../data/species'#
+## write.csv(plants, file.path(f.path, 'plants.csv'),#
+##           row.names=FALSE)#
+## save(plants, file=file.path(f.path, 'plants.Rdata'))#
+#
+## write.csv(pols, file.path(f.path, 'pollinators.csv'),#
+##           row.names=FALSE)#
+## save(pols, file=file.path(f.path, 'pols.Rdata'))#
+#
+## ## *******************************************************************#
+## ## species added between early and late stages#
+#
+## plant.diffs <- getColExt(plants)#
+## pol.diffs <- getColExt(pols)#
+#
+## f.path <- '../data/speciesChange'#
+## write.csv(plant.diffs, file.path(f.path, 'plants.csv'),#
+##           row.names=FALSE)#
+#
+## write.csv(pol.diffs, file.path(f.path, 'pollinators.csv'),#
+##           row.names=FALSE)#
+#
+## ## *******************************************************************#
+## ## total plants at a site#
+## f.path <- '../data/species'#
+## plants <- plants[,-2]#
+## plants <- unique(plants)#
+## write.csv(plants, file.path(f.path, 'plants_all.csv'),#
+##           row.names=FALSE)#
+#
+## ## *******************************************************************#
+## ## pollinator and plant degrees by years post restoration#
+## spec$all <- 'all'#
+#
+## yr.networks <- breakNet(spec, 'all', 'assem')#
+#
+## d.pol <- lapply(yr.networks, colSums)#
+## d.plant <- lapply(yr.networks, rowSums)#
+#
+## f.path <- '../data/degree'#
+## saveDats(d.pol, paste(names(d.pol), 'pollinators', sep="_"), f.path)#
+## saveDats(d.plant, paste(names(d.plant), 'plants', sep="_"), f.path)#
+#
+## by.year <- data.frame(t(sapply(c(d.plant, d.pol), calcStats)))#
+## by.year$group <- rep(c('plants','pollinators'), each=2)#
+## by.year$assembly <- rep(c('early', 'late'), 2)#
+#
+## write.csv(by.year, file.path(f.path, 'stats_by_yr.csv'))#
+#
+## ## *******************************************************************#
+## ## pollinator and plant degrees across all years and sites#
+#
+## all.networks <- breakNet(spec, 'all', 'all')#
+#
+## d.pol.all <- lapply(all.networks, colSums)#
+## d.plant.all <- lapply(all.networks, rowSums)#
+#
+## saveDats(d.pol.all, 'across_yrs_pollinators', f.path)#
+## saveDats(d.plant.all, 'across_yrs_plants', f.path)#
+#
+## all.dats <- data.frame(t(sapply(c(d.plant.all, d.pol.all), calcStats)))#
+## all.dats$group <- c('plants','pollinators')#
+#
+## write.csv(all.dats, file.path(f.path, 'stats_across_yrs.csv'))#
+#
+## ## *******************************************************************#
+## ## characteristics of plant colonists#
+## plant.col <- plant.diffs[plant.diffs$class == "colonist",]#
+#
+## plant.col$earlyAbund <- veg.sum$abundance[veg.sum$status ==#
+##                                           "early"][match(#
+##                                             plant.col$species,#
+##                                             veg.sum$species)]#
+## plant.col$lateAbund <- veg.sum$abundance[veg.sum$status ==#
+##                                          "late"][match(#
+##                                            plant.col$species,#
+##                                            veg.sum$species)]#
+#
+## plant.col$degree <- d.plant$all_late[match(plant.col$species,#
+##                                            names(d.plant$all_late))]#
+#
+## ## number of species that interact#
+## con.plant <- lapply(yr.networks, getCon, 1)#
+#
+## plant.col$partners <- con.plant$all_late[match(plant.col$species,#
+##                                                names(con.plant$all_late))]#
+## f.path <- '../data/speciesChange'#
+## write.csv(plant.col, file.path(f.path, 'plants_char.csv'),#
+##           row.names=FALSE)#
+#
+## ## *******************************************************************#
+## ## stable network structure#
+## networks.by.year <- breakNet(spec, 'Site', 'Year')#
+#
+## plant.species <- sapply(networks.by.year, nrow)#
+## plant.species <- data.frame(richness=plant.species,#
+##                             sites =#
+##                             sapply(strsplit(names(plant.species),#
+##                                             "_"),#
+##                                    function(x) x[1]),#
+##                             years =#
+##                             sapply(strsplit(names(plant.species),#
+##                                             "_"),#
+##                                    function(x) x[2]))#
+## write.csv(plant.species, file.path(f.path, 'plants_change.csv'),#
+##           row.names=FALSE)
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/dataPrep')#
+load('~/Dropbox/hedgerow/data_sets/traditional/specimens-complete.RData')#
+load("/Users/lcp/Dropbox/hedgerow_network/data/veg/veg.Rdata")#
+source('src/misc.R')#
+source('src/prepNets.R')#
+library(bipartite)#
+#
+trait.dir <- '~/Dropbox/hedgerow/data_sets/traditional/functional_traits'#
+bee.trait <-#
+  read.csv(file.path(trait.dir, 'bee.csv'),#
+           row.names=1)#
+syr.trait <-#
+  read.csv(file.path(trait.dir, 'syr.csv'),#
+           row.names=1)#
+#
+both.trait <-#
+  read.csv(file.path(trait.dir, 'bee.syr.csv'))#
+#
+spec <- dd#
+#
+## subset to net specimens#
+spec <- spec[spec$NetPan == 'net',]#
+## create species column#
+spec$PlantGenusSpecies <-  fix.white.space(paste(spec$PlantGenus,#
+                                                 spec$PlantSpecies))#
+#
+## drop pollinators and plants without identifications#
+spec <-  spec[spec$PlantGenusSpecies != '',]#
+#
+to.drop.status <- c("forb", "natural")#
+spec <- spec[!spec$SiteStatus %in% to.drop.status,]#
+tot.spec <- nrow(spec)#
+#
+nrow(spec[spec$Family == 'Syrphidae',])/tot.spec#
+nrow(spec[spec$BeeNonbee == 'bee',])/tot.spec#
+#
+## subset to just bees and syrphids#
+spec <- spec[spec$Family == 'Syrphidae' |#
+             spec$BeeNonbee == 'bee',]#
+#
+spec <-  spec[spec$Species != '',]#
+spec$SiteStatus[spec$SiteStatus == "restored"] <- "maturing"#
+## total specimens#
+nrow(spec)#
+#
+## total species#
+length(unique(spec$GenusSpecies))#
+#
+## sampling dates#
+length(unique(paste(spec$Site, spec$Date)))#
+#
+## families and genera#
+length(unique(spec$Family))#
+length(unique(spec$Genus))#
+#
+## interactions#
+length(unique(paste(spec$GenusSpecies, spec$PlantGenusSpecies)))#
+#
+## *************************************************#
+## create a giant network to calculate specialization#
+## *************************************************#
+agg.spec <- aggregate(list(abund=spec$GenusSpecies),#
+                      list(GenusSpecies=spec$GenusSpecies,#
+                           PlantGenusSpecies=spec$PlantGenusSpecies),#
+                      length)#
+#
+nets.all <- samp2site.spp(agg.spec$PlantGenusSpecies,#
+                          agg.spec$GenusSpecies, agg.spec$abund, FUN=sum)#
+#
+all.specializations <- specieslevel(nets.all,#
+                                    index=c("proportional generality",#
+                                      "degree",#
+                                      "d"))#
+#
+traits <- data.frame(GenusSpecies= unlist(sapply(all.specializations,#
+                       rownames)),#
+                     do.call(rbind, all.specializations))#
+rownames(traits) <- NULL#
+#
+## *************************************************#
+## thermal traits#
+## *************************************************#
+spec$AverageTemp <- apply(spec, 1, function(x){#
+  mean(as.numeric(c(x["TempStart"], x["TempEnd"])),#
+       na.rm=TRUE)#
+})#
+#
+temp.tol <- do.call(rbind, tapply(spec$AverageTemp, spec$GenusSpecies,#
+                                  function(x){#
+                                    temp.mean <- mean(x, na.rm=TRUE)#
+                                    temp.range <- range(x, na.rm=TRUE)#
+                                    max.temp <- temp.range[2]#
+                                    temp.range <- temp.range[2] - temp.range[1]#
+                                    return(c(temp.mean=temp.mean,#
+                                             max.temp=max.temp,#
+                                             temp.range=temp.range))#
+                                  }))#
+temp.tol <- as.data.frame(temp.tol)#
+temp.tol$GenusSpecies <- rownames(temp.tol)#
+rownames(temp.tol) <- NULL#
+#
+traits <- merge(traits, temp.tol, all.x=TRUE)#
+#
+## *************************************************#
+## sampling table for manuscript#
+## *************************************************#
+#
+site.table <- aggregate(list(Samples=spec$Date),#
+                        list(Year=spec$Year, Site=spec$Site),#
+                        function(x) length(unique(x)))#
+#
+ms.table <- samp2site.spp(site=site.table$Site,#
+                          spp=site.table$Year,#
+                          abund=site.table$Samples,#
+                          FUN=sum)#
+ms.table <- cbind(spec$SiteStatus[match(rownames(ms.table),#
+                                        spec$Site)], ms.table)#
+colnames(ms.table) <- c("Site type", colnames(ms.table)[-1])#
+#
+ms.table <- ms.table[order(ms.table[, "Site type"], decreasing=TRUE),]#
+#
+ms.table[, "Site type"][ms.table[, "Site type"] == "maturing"] <-#
+  "Assembling HR"#
+#
+ms.table[, "Site type"][ms.table[, "Site type"] == "mature"] <-#
+  "Non-assembling HR"#
+#
+ms.table[, "Site type"][ms.table[, "Site type"] == "control"] <-#
+  "Non-assembling FM"#
+#
+write.table(ms.table, file="~/Dropbox/hedgerow_assembly/ms/tables/samples.txt",#
+            sep=" & ")#
+#
+## *************************************************#
+## add various traits#
+## *************************************************#
+## specialization#
+spec$d <- traits$d[match(spec$GenusSpecies, traits$GenusSpecies)]#
+spec$degree <- traits$degree[match(spec$GenusSpecies,#
+                                   traits$GenusSpecies)]#
+spec$plant.degree <- traits$degree[match(spec$PlantGenusSpecies,#
+                                         traits$GenusSpecies)]#
+#
+## occurence#
+load('~/Dropbox/hedgerow/data_sets/matrices/net/bee.syr.RData')#
+#
+occ <- apply(mat, c(3,1), calcOccArray)#
+spec$occ.date <- apply(spec, 1, findOcc)#
+traits$occ.date <- spec$occ.date[match(traits$GenusSpecies,#
+                                       spec$GenusSpecies)]#
+## plant occurrence#
+## create sample matrix#
+site.date <- mat[,,1]#
+site.date[site.date > 0] <- 0#
+rownames(site.date) <- lapply(strsplit(rownames(site.date),":"),#
+                              function(x) x[1])#
+long.site.date <- comm.mat2sample(site.date)#
+long.site.date <- long.site.date[!is.na(long.site.date$Samp),]#
+#
+## create site by date matrices with plant presence#
+plant.mat <- make.by.species(spec, long.site.date, site.date)#
+pol.mat <- make.by.species(spec, long.site.date, site.date,#
+                           type="GenusSpecies")#
+#
+save(plant.mat, pol.mat, file='../data/species/allSamples.Rdata')#
+#
+occ.plant <- apply(plant.mat, c(3,1), calcOccArray)#
+## match to dataset!#
+spec$occ.plant.date <- apply(spec, 1, findOccPlant)#
+#
+## bee functional traits#
+spec$Lecty <-#
+  bee.trait$Lecty[match(spec$GenusSpecies, rownames(bee.trait))]#
+spec$NestLoc <-#
+  bee.trait$NestLoc[match(spec$GenusSpecies, rownames(bee.trait))]#
+spec$Excavate <-#
+  bee.trait$Excavate[match(spec$GenusSpecies, rownames(bee.trait))]#
+spec$ITD <-#
+  bee.trait$MeanITD[match(spec$GenusSpecies, rownames(bee.trait))]#
+spec$Sociality <-#
+  bee.trait$Sociality[match(spec$GenusSpecies, rownames(bee.trait))]#
+#
+## syrphid functional traits#
+#
+spec$LarvalDiet <- syr.trait$LarvalDiet[match(spec$GenusSpecies,#
+                                              rownames(syr.trait))]#
+spec$AdultDiet <- syr.trait$AdultDiet[match(spec$GenusSpecies,#
+                                            rownames(syr.trait))]#
+spec$WingLength <- syr.trait$WingLength[match(spec$GenusSpecies,#
+                                              rownames(syr.trait))]#
+#
+traits <- merge(traits, syr.trait[,c(5:7,10,33)], all.x=TRUE)#
+#
+traits <- merge(traits, bee.trait[,c(1:5,27)], all.x=TRUE)#
+#
+traits <- merge(traits, both.trait[,c(2:3,7)], all.x=TRUE)#
+#
+traits$bee.syr <- spec$BeeNonbee[match(traits$GenusSpecies,#
+                                       spec$GenusSpecies)]#
+#
+traits$bee.syr[is.na(traits$bee.syr)] <- "plant"#
+#
+mean.abund.pol <- apply(apply(pol.mat, c(1,3), mean, na.rm=TRUE), 2,#
+                        mean)#
+mean.abund.plant <- apply(apply(plant.mat, c(1,3), mean, na.rm=TRUE),#
+                          2, mean)#
+mean.abund <- c(mean.abund.pol, mean.abund.plant)#
+traits$mean.abun.net <- mean.abund[match(traits$GenusSpecies,#
+                                         names(mean.abund))]#
+save(spec, file='../data/networks/allSpecimens.Rdata')#
+write.csv(traits, file="../data/traits.csv", row.names=FALSE)#
+site.years <- aggregate(Year~ Site, data=spec,#
+                        function(x) length(unique(x)))#
+#
+sites.to.keep <- site.years$Site[site.years$Year >= 5]#
+#
+## *******************************************************************#
+## create networks#
+## all sites with > 5 years#
+#
+nets <- breakNet(spec[spec$Site %in% sites.to.keep,], 'Site', 'Year')#
+#
+## save networks for each site, timeframe#
+f.path <- '../data/networks'#
+save(nets, file=file.path(f.path, 'all_networks_years.Rdata'))#
+#
+## *******************************************************************#
+## keep only BACI sites#
+## *******************************************************************#
+#
+BACI.site <- c('Barger', 'Butler', 'Hrdy', 'MullerB', 'Sperandio')#
+spec <-  spec[spec$Site %in% BACI.site,]#
+veg <-  veg[veg$Site %in% BACI.site,]#
+#
+veg$ypr <- spec$ypr[match(paste(veg$Year, veg$Site),#
+                          paste(spec$Year, spec$Site))]#
+#
+save(spec, file='../data/networks/specimens.Rdata')#
+#
+## create a "year" columns grouping years 1-3 post restoration and 4-9#
+spec$assem <- 'early'#
+spec$assem[spec$ypr > 3] <- 'late'#
+#
+veg$assem <- 'early'#
+veg$assem[veg$ypr > 3] <- 'late'#
+#
+veg.sum <- aggregate(list(abundance=veg$NumQuads),#
+                     list(site=veg$Site,#
+                          status=veg$assem,#
+                          species=veg$PlantGenusSpecies),#
+                     sum)#
+#
+## *******************************************************************#
+## create networks#
+## *******************************************************************#
+#
+## ## by early/late assembly #
+## networks <- breakNet(spec, 'Site', 'assem')#
+#
+## ## save networks for each site, timeframe#
+## saveDats(networks, names(networks), f.path)#
+## save(networks, file=file.path(f.path, 'networks_stages.Rdata'))#
+#
+## for each year#
+nets <- breakNet(spec, 'Site', 'Year')#
+save(nets, file=file.path(f.path, 'baci_networks_years.Rdata'))#
+#
+## *******************************************************************#
+## specialization of each species at each site#
+## *******************************************************************#
+#
+## species.lev <- lapply(networks, function(x){#
+##   sl <- specieslevel(x)#
+##   sl$'higher level'$tot.int <- colSums(x)#
+##   sl$'lower level'$tot.int <- rowSums(x)#
+##   return(sl)#
+## })#
+#
+## specializations  <-  mapply(function(a, b)#
+##                             getSpec(species.lev = a,#
+##                                     names.net = b),#
+##                             a = species.lev,#
+##                             b = names(networks),#
+##                             SIMPLIFY = FALSE)#
+#
+## specializations <- do.call(rbind, specializations)#
+## rownames(specializations) <- NULL#
+#
+## f.path <- '../data/degree'#
+## save(specializations, file=file.path(f.path, 'specializations.Rdata'))#
+## ## *******************************************************************#
+## ## change in visits of by the generalized pollinators#
+#
+## ## hist(specializations$proportional.generality[specializations$speciesType ==#
+## ##                                              "pollinator"],#
+## ##      xlab="Generalization")#
+#
+## ## plants#
+## diff.gens.plants <- getVisitChange(0, 0.2, "proportional.generality",#
+##                                    "PlantGenusSpecies", "GenusSpecies")#
+#
+## diff.spec.plants <- getVisitChange(0.5, 1, "proportional.generality",#
+##                                    "PlantGenusSpecies", "GenusSpecies")#
+#
+## diff.all.plants <- getVisitChange(0, 1, "proportional.generality",#
+##                                   "PlantGenusSpecies", "GenusSpecies")#
+#
+## ## pollinators#
+## diff.gens.pol <- getVisitChange(0, 0.2, "proportional.generality",#
+##                                 "GenusSpecies", "PlantGenusSpecies")#
+#
+## diff.spec.pol <- getVisitChange(0.5, 1, "proportional.generality",#
+##                                 "GenusSpecies", "PlantGenusSpecies")#
+#
+## diff.all.pol <- getVisitChange(0, 1, "proportional.generality",#
+##                                "GenusSpecies", "PlantGenusSpecies")#
+#
+## f.path <- '../data/degree'#
+## save(diff.gens.plants, diff.spec.plants, diff.all.plants,#
+##      file=file.path(f.path, 'PlantVisitDiffs.Rdata'))#
+## write.csv(diff.all.plants,#
+##           file=file.path(f.path, 'PlantVisitDiffs.csv'), row.names=FALSE)#
+#
+## save(diff.gens.pol, diff.spec.pol, diff.all.pol,#
+##      file=file.path(f.path, 'PolVisitDiffs.Rdata'))#
+## write.csv(diff.all.pol,#
+##           file=file.path(f.path, 'PolVisitDiffs.csv'), row.names=FALSE)#
+## ## *******************************************************************#
+## ## species lists for each site#
+#
+## plants <- getSpecies(networks, rownames)#
+## pols <- getSpecies(networks, rownames)#
+#
+## f.path <- '../data/species'#
+## write.csv(plants, file.path(f.path, 'plants.csv'),#
+##           row.names=FALSE)#
+## save(plants, file=file.path(f.path, 'plants.Rdata'))#
+#
+## write.csv(pols, file.path(f.path, 'pollinators.csv'),#
+##           row.names=FALSE)#
+## save(pols, file=file.path(f.path, 'pols.Rdata'))#
+#
+## ## *******************************************************************#
+## ## species added between early and late stages#
+#
+## plant.diffs <- getColExt(plants)#
+## pol.diffs <- getColExt(pols)#
+#
+## f.path <- '../data/speciesChange'#
+## write.csv(plant.diffs, file.path(f.path, 'plants.csv'),#
+##           row.names=FALSE)#
+#
+## write.csv(pol.diffs, file.path(f.path, 'pollinators.csv'),#
+##           row.names=FALSE)#
+#
+## ## *******************************************************************#
+## ## total plants at a site#
+## f.path <- '../data/species'#
+## plants <- plants[,-2]#
+## plants <- unique(plants)#
+## write.csv(plants, file.path(f.path, 'plants_all.csv'),#
+##           row.names=FALSE)#
+#
+## ## *******************************************************************#
+## ## pollinator and plant degrees by years post restoration#
+## spec$all <- 'all'#
+#
+## yr.networks <- breakNet(spec, 'all', 'assem')#
+#
+## d.pol <- lapply(yr.networks, colSums)#
+## d.plant <- lapply(yr.networks, rowSums)#
+#
+## f.path <- '../data/degree'#
+## saveDats(d.pol, paste(names(d.pol), 'pollinators', sep="_"), f.path)#
+## saveDats(d.plant, paste(names(d.plant), 'plants', sep="_"), f.path)#
+#
+## by.year <- data.frame(t(sapply(c(d.plant, d.pol), calcStats)))#
+## by.year$group <- rep(c('plants','pollinators'), each=2)#
+## by.year$assembly <- rep(c('early', 'late'), 2)#
+#
+## write.csv(by.year, file.path(f.path, 'stats_by_yr.csv'))#
+#
+## ## *******************************************************************#
+## ## pollinator and plant degrees across all years and sites#
+#
+## all.networks <- breakNet(spec, 'all', 'all')#
+#
+## d.pol.all <- lapply(all.networks, colSums)#
+## d.plant.all <- lapply(all.networks, rowSums)#
+#
+## saveDats(d.pol.all, 'across_yrs_pollinators', f.path)#
+## saveDats(d.plant.all, 'across_yrs_plants', f.path)#
+#
+## all.dats <- data.frame(t(sapply(c(d.plant.all, d.pol.all), calcStats)))#
+## all.dats$group <- c('plants','pollinators')#
+#
+## write.csv(all.dats, file.path(f.path, 'stats_across_yrs.csv'))#
+#
+## ## *******************************************************************#
+## ## characteristics of plant colonists#
+## plant.col <- plant.diffs[plant.diffs$class == "colonist",]#
+#
+## plant.col$earlyAbund <- veg.sum$abundance[veg.sum$status ==#
+##                                           "early"][match(#
+##                                             plant.col$species,#
+##                                             veg.sum$species)]#
+## plant.col$lateAbund <- veg.sum$abundance[veg.sum$status ==#
+##                                          "late"][match(#
+##                                            plant.col$species,#
+##                                            veg.sum$species)]#
+#
+## plant.col$degree <- d.plant$all_late[match(plant.col$species,#
+##                                            names(d.plant$all_late))]#
+#
+## ## number of species that interact#
+## con.plant <- lapply(yr.networks, getCon, 1)#
+#
+## plant.col$partners <- con.plant$all_late[match(plant.col$species,#
+##                                                names(con.plant$all_late))]#
+## f.path <- '../data/speciesChange'#
+## write.csv(plant.col, file.path(f.path, 'plants_char.csv'),#
+##           row.names=FALSE)#
+#
+## ## *******************************************************************#
+## ## stable network structure#
+## networks.by.year <- breakNet(spec, 'Site', 'Year')#
+#
+## plant.species <- sapply(networks.by.year, nrow)#
+## plant.species <- data.frame(richness=plant.species,#
+##                             sites =#
+##                             sapply(strsplit(names(plant.species),#
+##                                             "_"),#
+##                                    function(x) x[1]),#
+##                             years =#
+##                             sapply(strsplit(names(plant.species),#
+##                                             "_"),#
+##                                    function(x) x[2]))#
+## write.csv(plant.species, file.path(f.path, 'plants_change.csv'),#
+##           row.names=FALSE)

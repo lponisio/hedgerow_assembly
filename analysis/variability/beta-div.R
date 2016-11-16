@@ -1,9 +1,9 @@
-rm(list=ls())
+## rm(list=ls())
 setwd('~/Dropbox/hedgerow_assembly/analysis/variability')
 binary <- FALSE
 alpha <- TRUE
 ## int or pols
-type <- "pols"
+## type <- "plants"
 source('src/initialize_beta.R')
 
 ## ************************************************************
@@ -57,4 +57,4 @@ plot.coeffs(dis.method =dis.method, mod=summary(mod),
             sub= type, occ=occ)
 
 
-plotDistPanels()
+## plotDistPanels()

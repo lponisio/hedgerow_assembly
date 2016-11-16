@@ -12,10 +12,10 @@ edges.com <- aggregate(list(abund=spec$GenusSpecies),
                             PlantGenusSpecies=spec$PlantGenusSpecies),
                        length)
 
-## lc <- getLinkCommunities(edges.com,
-##                          hcmethod = "average",
-##                          bipartite=TRUE)
-## save(lc, file="saved/lc.Rdata")
+lc <- getLinkCommunities(edges.com,
+                         hcmethod = "average",
+                         bipartite=TRUE)
+save(lc, file="saved/lc.Rdata")
 
 ## ************************************************************
 ## turnover of phylo interactions through time
@@ -26,9 +26,9 @@ spec$Int <- paste(spec$GenusSpecies,
 phylo.int <- calcCommDis(spec, "Int", lc, abund.w=TRUE)
 save(phylo.int, file="saved/phyloInt.Rdata")
 
-## linear model of phylo int by years between samples
-## mature and maturing hedgerows have more intearction turnover
-## between years
+## linear model of phylo int by years between samples mature and
+## maturing hedgerows have more intearction turnover between years
+
 load(file="saved/phyloInt.Rdata")
 phylo.int.mod <- lmer(PhyloInt ~ SiteStatus +
                       (1|Site),
@@ -38,13 +38,13 @@ summary(phylo.int.mod)
 ## ## for comparing maturing and mature
 ## ## mature and maturing are not sig different
 
-## phylo.int$phylo.int$SiteStatus <-
-##   factor(phylo.int$phylo.int$SiteStatus,
-##          levels=c("mature", "control", "maturing"))
-## phylo.int.mod <- lmer(PhyloInt ~ SiteStatus +
-##                       (1|Site),
-##                       data=phylo.int$phylo.int)
-## summary(phylo.int.mod)
+phylo.int$phylo.int$SiteStatus <-
+  factor(phylo.int$phylo.int$SiteStatus,
+         levels=c("mature", "control", "maturing"))
+phylo.int.mod <- lmer(PhyloInt ~ SiteStatus +
+                      (1|Site),
+                      data=phylo.int$phylo.int)
+summary(phylo.int.mod)
 
 
 plot.node.box(ylabel="Weighted interaction turnover",

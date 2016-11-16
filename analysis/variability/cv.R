@@ -197,8 +197,7 @@ save(itd, dprime, degree,
      dprime.k.cv, dprime.closeness.cv,
      occ.k.cv, occ.closeness.cv,
      plants.occ.k.cv, plants.occ.closeness.cv,
-     degree.k.cv, degree.closeness.cv,
-     plants.degree.k.cv, plants.degree.closeness.cv,
+     degree.k.cv, degree.closeness.cv, plants.degree.closeness.cv,
      file="saved/contMods.Rdata")
 
 ## ************************************************************

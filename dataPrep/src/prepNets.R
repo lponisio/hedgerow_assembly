@@ -71,32 +71,45 @@ getVisitChange <- function(cut.off1, cut.off2, metric, type, type2){
 
 
 ## the purpose of this function is to break up data with many
-## sites/years and prepare it for network analysis.
+## sites/years and prepre it for network analysis.
 
 dropNet <- function(z){
   z[!sapply(z, FUN=function(q){
-    any(dim(q) < 3)
+    any(dim(q) < 5)
   })]
 }
 
 breakNet <- function(spec.dat, site, year){
   ## puts data together in a list and removes empty matrices
-  sites <- split(spec.dat, spec.dat[,site])
+  agg.spec <- aggregate(list(abund=spec.dat$GenusSpecies),
+                        list(GenusSpecies=spec.dat$GenusSpecies,
+                             SampleRound=spec.dat$SampleRound,
+                             Site=spec.dat[,site],
+                             Year=spec.dat[,year],
+                             PlantGenusSpecies=spec.dat$PlantGenusSpecies),
+                        length)
+  agg.spec <- aggregate(list(abund=agg.spec$abund),
+                        list(GenusSpecies=agg.spec$GenusSpecies,
+                             Site=agg.spec$Site,
+                             Year=agg.spec$Year,
+                             PlantGenusSpecies=agg.spec$PlantGenusSpecies),
+                        mean)
+  sites <- split(agg.spec, agg.spec[,site])
   networks <- lapply(sites, function(x){
-    lapply(split(x, f=x[,year]), as.matrix)
+    split(x, f=x[,year])
   })
   ## formats data matrices appropriate for network analysis
-  comms <- rapply(networks, function(y){
+  comms <- lapply(unlist(networks, recursive=FALSE), function(y){
     samp2site.spp(site=y[,"PlantGenusSpecies"],
                   spp=y[,"GenusSpecies"],
-                  abund=rep(1, nrow(y)))
-  }, how="replace")
-  adj.mat <- unlist(lapply(comms, dropNet), recursive=FALSE)
+                  abund=y[,"abund"])
+  })
+  comms <- dropNet(comms)
   if(year == "assem"){
-    names(adj.mat) <- sub("\\.", "_", names(adj.mat),
-                          perl=TRUE)
+    names(comms) <- sub("\\.", "_", names(comms),
+                        perl=TRUE)
   }
-  return(adj.mat)
+  return(comms)
 }
 
 

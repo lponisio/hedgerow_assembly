@@ -5,7 +5,7 @@ library(bipartite)
 source('src/calcDis.R')
 traits <- read.csv("../../data/traits.csv")
 ## ************************************************************
-## the variability fo interactions of plants and pols
+## the variability of interactions of plants and pols
 ## ************************************************************
 ## for each species at each site, 1) create a interaction partner by
 ## year matrix, 2) calculate the dissimilarity of interaction partners

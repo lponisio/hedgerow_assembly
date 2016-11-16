@@ -65,7 +65,7 @@ EigenRatio.mod.ypr <- lmer(EigenRatio ~ ypr +  Ncomp +
 summary(EigenRatio.mod.ypr)
 
 save(alg.con.mod.ypr, all.alg.Con.status, EigenRatio.mod.ypr,
-     file="saved/mods/AlgCon2.Rdata")
+     file="saved/mods/AlgCon.Rdata")
 
 ## look at correlation between AlgCon and species richness
 

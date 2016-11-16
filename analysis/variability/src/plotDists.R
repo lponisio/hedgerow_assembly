@@ -168,7 +168,7 @@ plotDistPanels <- function(){
     
     ## interaction turnover
     load(file= file.path('saved/speciesTurnover', sprintf('%s.pdf',
-           paste(dis.method, alpha, occ, type="int", sep='_'))))
+           paste(dis.method, alpha, occ, type="ints", sep='_'))))
     dists <- dats$dist
     status <- dats$status
     status <- factor(status,

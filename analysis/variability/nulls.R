@@ -1,4 +1,3 @@
-rm(list=ls())
 library(vegan)
 library(bipartite)
 library(fields)
@@ -16,7 +15,7 @@ sites <- unique(spec$Site)
 spec$Int <- paste(spec$GenusSpecies,
                   spec$PlantGenusSpecies)
 ## pols, int or plants
-type <- "pols"
+## type <- "plants"
 if(type=="pols"){
   species.type="GenusSpecies"
 }
