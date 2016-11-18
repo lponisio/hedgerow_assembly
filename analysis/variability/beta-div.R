@@ -46,7 +46,7 @@ load(file= file.path('saved/speciesTurnover', sprintf('%s.pdf',
 
 mod <- lmer(dist ~ status +  (1|site),
             data=dats)
-summary(mod)
+print(summary(mod))
 
 plot.beta.div(dis.method =dis.method, dists= dats$dist,
               status= dats$status, type= "time",

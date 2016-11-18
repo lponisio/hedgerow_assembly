@@ -32,3 +32,5 @@ mod.ypr <- lmer(Robustness ~ ypr
 summary(mod.ypr)
 save(mod.ypr, file=file.path(save.path,
             sprintf('mods/resilience_ypr_%s.Rdata', extinction.method)))
+
+print(summary(mod.ypr))
