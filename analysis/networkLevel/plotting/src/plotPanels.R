@@ -11,8 +11,9 @@ plot.panels <- function(){
                dats=cor.dats,
                y1="zNODF",
                xs="ypr",
-               col.fill=col.fill,
-               col.lines=col.lines,
+              col.fill=col.white,
+               col.lines=col.white,
+               col.points=col.fill,
                plotPoints=TRUE)
     mtext("Nestedness", 2, line=4, cex=1.5)
     ## modularity
@@ -34,8 +35,9 @@ plot.panels <- function(){
                dats=cor.dats,
                y1="zH2",
                xs="ypr",
-               col.fill=col.fill,
-               col.lines=col.lines,
+                   col.fill=col.white,
+               col.lines=col.white,
+               col.points=col.fill,
                plotPoints=TRUE)
     mtext("Specialization", 2, line=4, cex=1.5)
 

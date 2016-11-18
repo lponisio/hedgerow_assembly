@@ -26,7 +26,7 @@ ys <- c("proportional.generality", "d", "degree", "betweenness",
 
 formulas <-lapply(ys, function(x) {
   as.formula(paste(x, "~",
-                   paste(xvar, 
+                   paste(xvar, ## paste0("I(", xvar, "^2)"),
                          "(1|Site)",
                           "(1|GenusSpecies)",
                          sep="+")))

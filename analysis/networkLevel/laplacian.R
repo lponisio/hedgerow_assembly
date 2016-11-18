@@ -58,6 +58,8 @@ alg.con.mod.ypr <- lmer(AlgCon ~ ypr +
                         data=all.alg.Con.status)
 summary(alg.con.mod.ypr)
 
+print(summary(alg.con.mod.ypr))
+
 # Eigenvalue ratio  x Ypr
 EigenRatio.mod.ypr <- lmer(EigenRatio ~ ypr +  Ncomp +
                           (1|Site) + (1|Year),    

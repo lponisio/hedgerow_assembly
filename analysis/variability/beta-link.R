@@ -12,10 +12,10 @@ edges.com <- aggregate(list(abund=spec$GenusSpecies),
                             PlantGenusSpecies=spec$PlantGenusSpecies),
                        length)
 
-lc <- getLinkCommunities(edges.com,
-                         hcmethod = "average",
-                         bipartite=TRUE)
-save(lc, file="saved/lc.Rdata")
+## lc <- getLinkCommunities(edges.com,
+##                          hcmethod = "average",
+##                          bipartite=TRUE)
+## save(lc, file="saved/lc.Rdata")
 
 ## ************************************************************
 ## turnover of phylo interactions through time

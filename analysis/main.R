@@ -39,6 +39,7 @@ extinction.method <- "degree"
 source('~/Dropbox/hedgerow_assembly/analysis/networkLevel/resilience.R')
 extinction.method <- "abund"
 source('~/Dropbox/hedgerow_assembly/analysis/networkLevel/resilience.R')
+
 ## sensitivity to perturbation
 source('~/Dropbox/hedgerow_assembly/analysis/networkLevel/laplacian.R')
 
