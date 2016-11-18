@@ -1,1529 +1,2080 @@
 rm(list=ls())#
-setwd('~/Dropbox/nimble/occupancy/analysis/multiSpp-singleSea')#
+setwd('~/Dropbox/hedgerow_assembly/dataPrep')#
+load('~/Dropbox/hedgerow/data_sets/traditional/specimens-complete.RData')#
+load("/Users/lcp/Dropbox/hedgerow_network/data/veg/veg.Rdata")#
+source('src/misc.R')#
+source('src/prepNets.R')#
+library(bipartite)#
 #
+trait.dir <- '~/Dropbox/hedgerow/data_sets/traditional/functional_traits'#
+bee.trait <-#
+  read.csv(file.path(trait.dir, 'bee.csv'),#
+           row.names=1)#
+syr.trait <-#
+  read.csv(file.path(trait.dir, 'syr.csv'),#
+           row.names=1)#
+#
+both.trait <-#
+  read.csv(file.path(trait.dir, 'bee.syr.csv'))#
+#
+spec <- dd#
+#
+spec <-  spec[spec$Year != "2015",]
+dim(spec)
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/dataPrep')#
+load('~/Dropbox/hedgerow/data_sets/traditional/specimens-complete.RData')#
+load("/Users/lcp/Dropbox/hedgerow_network/data/veg/veg.Rdata")#
+source('src/misc.R')#
+source('src/prepNets.R')#
+library(bipartite)#
+#
+trait.dir <- '~/Dropbox/hedgerow/data_sets/traditional/functional_traits'#
+bee.trait <-#
+  read.csv(file.path(trait.dir, 'bee.csv'),#
+           row.names=1)#
+syr.trait <-#
+  read.csv(file.path(trait.dir, 'syr.csv'),#
+           row.names=1)#
+#
+both.trait <-#
+  read.csv(file.path(trait.dir, 'bee.syr.csv'))#
+#
+spec <- dd
+dim(spec)
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/dataPrep')#
+load('~/Dropbox/hedgerow/data_sets/traditional/specimens-complete.RData')#
+load("/Users/lcp/Dropbox/hedgerow_network/data/veg/veg.Rdata")#
+source('src/misc.R')#
+source('src/prepNets.R')#
+library(bipartite)#
+#
+trait.dir <- '~/Dropbox/hedgerow/data_sets/traditional/functional_traits'#
+bee.trait <-#
+  read.csv(file.path(trait.dir, 'bee.csv'),#
+           row.names=1)#
+syr.trait <-#
+  read.csv(file.path(trait.dir, 'syr.csv'),#
+           row.names=1)#
+#
+both.trait <-#
+  read.csv(file.path(trait.dir, 'bee.syr.csv'))#
+#
+spec <- dd#
+#
+spec <-  spec[spec$Year != "2015",]#
+#
+## subset to net specimens#
+spec <- spec[spec$NetPan == 'net',]#
+## create species column#
+spec$PlantGenusSpecies <-  fix.white.space(paste(spec$PlantGenus,#
+                                                 spec$PlantSpecies))#
+#
+## drop pollinators and plants without identifications#
+spec <-  spec[spec$PlantGenusSpecies != '',]#
+#
+to.drop.status <- c("forb", "natural")#
+spec <- spec[!spec$SiteStatus %in% to.drop.status,]#
+tot.spec <- nrow(spec)#
+#
+nrow(spec[spec$Family == 'Syrphidae',])/tot.spec#
+nrow(spec[spec$BeeNonbee == 'bee',])/tot.spec#
+#
+## subset to just bees and syrphids#
+spec <- spec[spec$Family == 'Syrphidae' |#
+             spec$BeeNonbee == 'bee',]#
+#
+spec <-  spec[spec$Species != '',]#
+spec$SiteStatus[spec$SiteStatus == "restored"] <- "maturing"#
+## total specimens#
+nrow(spec)#
+#
+## total species#
+length(unique(spec$GenusSpecies))#
+#
+## sampling dates#
+length(unique(paste(spec$Site, spec$Date)))#
+#
+## families and genera#
+length(unique(spec$Family))#
+length(unique(spec$Genus))#
+#
+## interactions#
+length(unique(paste(spec$GenusSpecies, spec$PlantGenusSpecies)))#
+#
+## *************************************************#
+## create a giant network to calculate specialization#
+## *************************************************#
+agg.spec <- aggregate(list(abund=spec$GenusSpecies),#
+                      list(GenusSpecies=spec$GenusSpecies,#
+                           PlantGenusSpecies=spec$PlantGenusSpecies),#
+                      length)#
+#
+nets.all <- samp2site.spp(agg.spec$PlantGenusSpecies,#
+                          agg.spec$GenusSpecies, agg.spec$abund, FUN=sum)#
+#
+all.specializations <- specieslevel(nets.all,#
+                                    index=c("proportional generality",#
+                                      "degree",#
+                                      "d"))#
+#
+traits <- data.frame(GenusSpecies= unlist(sapply(all.specializations,#
+                       rownames)),#
+                     do.call(rbind, all.specializations))#
+rownames(traits) <- NULL#
+#
+## *************************************************#
+## thermal traits#
+## *************************************************#
+spec$AverageTemp <- apply(spec, 1, function(x){#
+  mean(as.numeric(c(x["TempStart"], x["TempEnd"])),#
+       na.rm=TRUE)#
+})#
+#
+temp.tol <- do.call(rbind, tapply(spec$AverageTemp, spec$GenusSpecies,#
+                                  function(x){#
+                                    temp.mean <- mean(x, na.rm=TRUE)#
+                                    temp.range <- range(x, na.rm=TRUE)#
+                                    max.temp <- temp.range[2]#
+                                    temp.range <- temp.range[2] - temp.range[1]#
+                                    return(c(temp.mean=temp.mean,#
+                                             max.temp=max.temp,#
+                                             temp.range=temp.range))#
+                                  }))#
+temp.tol <- as.data.frame(temp.tol)#
+temp.tol$GenusSpecies <- rownames(temp.tol)#
+rownames(temp.tol) <- NULL#
+#
+traits <- merge(traits, temp.tol, all.x=TRUE)#
+#
+## *************************************************#
+## sampling table for manuscript#
+## *************************************************#
+#
+site.table <- aggregate(list(Samples=spec$Date),#
+                        list(Year=spec$Year, Site=spec$Site),#
+                        function(x) length(unique(x)))#
+#
+ms.table <- samp2site.spp(site=site.table$Site,#
+                          spp=site.table$Year,#
+                          abund=site.table$Samples,#
+                          FUN=sum)#
+ms.table <- cbind(spec$SiteStatus[match(rownames(ms.table),#
+                                        spec$Site)], ms.table)#
+colnames(ms.table) <- c("Site type", colnames(ms.table)[-1])#
+#
+ms.table <- ms.table[order(ms.table[, "Site type"], decreasing=TRUE),]#
+#
+ms.table[, "Site type"][ms.table[, "Site type"] == "maturing"] <-#
+  "Assembling HR"#
+#
+ms.table[, "Site type"][ms.table[, "Site type"] == "mature"] <-#
+  "Non-assembling HR"#
+#
+ms.table[, "Site type"][ms.table[, "Site type"] == "control"] <-#
+  "Non-assembling FM"#
+#
+write.table(ms.table, file="~/Dropbox/hedgerow_assembly/ms/tables/samples.txt",#
+            sep=" & ")#
+#
+## *************************************************#
+## add various traits#
+## *************************************************#
+## specialization#
+spec$d <- traits$d[match(spec$GenusSpecies, traits$GenusSpecies)]#
+spec$degree <- traits$degree[match(spec$GenusSpecies,#
+                                   traits$GenusSpecies)]#
+spec$plant.degree <- traits$degree[match(spec$PlantGenusSpecies,#
+                                         traits$GenusSpecies)]#
+#
+## occurence#
+load('~/Dropbox/hedgerow/data_sets/matrices/net/bee.syr.RData')#
+#
+occ <- apply(mat, c(3,1), calcOccArray)#
+spec$occ.date <- apply(spec, 1, findOcc)#
+traits$occ.date <- spec$occ.date[match(traits$GenusSpecies,#
+                                       spec$GenusSpecies)]#
+## plant occurrence#
+## create sample matrix#
+site.date <- mat[,,1]#
+site.date[site.date > 0] <- 0#
+rownames(site.date) <- lapply(strsplit(rownames(site.date),":"),#
+                              function(x) x[1])#
+long.site.date <- comm.mat2sample(site.date)#
+long.site.date <- long.site.date[!is.na(long.site.date$Samp),]#
+#
+## create site by date matrices with plant presence#
+plant.mat <- make.by.species(spec, long.site.date, site.date)#
+pol.mat <- make.by.species(spec, long.site.date, site.date,#
+                           type="GenusSpecies")#
+#
+save(plant.mat, pol.mat, file='../data/species/allSamples.Rdata')#
+#
+occ.plant <- apply(plant.mat, c(3,1), calcOccArray)#
+## match to dataset!#
+spec$occ.plant.date <- apply(spec, 1, findOccPlant)#
+#
+## bee functional traits#
+spec$Lecty <-#
+  bee.trait$Lecty[match(spec$GenusSpecies, rownames(bee.trait))]#
+spec$NestLoc <-#
+  bee.trait$NestLoc[match(spec$GenusSpecies, rownames(bee.trait))]#
+spec$Excavate <-#
+  bee.trait$Excavate[match(spec$GenusSpecies, rownames(bee.trait))]#
+spec$ITD <-#
+  bee.trait$MeanITD[match(spec$GenusSpecies, rownames(bee.trait))]#
+spec$Sociality <-#
+  bee.trait$Sociality[match(spec$GenusSpecies, rownames(bee.trait))]#
+#
+## syrphid functional traits#
+#
+spec$LarvalDiet <- syr.trait$LarvalDiet[match(spec$GenusSpecies,#
+                                              rownames(syr.trait))]#
+spec$AdultDiet <- syr.trait$AdultDiet[match(spec$GenusSpecies,#
+                                            rownames(syr.trait))]#
+spec$WingLength <- syr.trait$WingLength[match(spec$GenusSpecies,#
+                                              rownames(syr.trait))]#
+#
+traits <- merge(traits, syr.trait[,c(5:7,10,33)], all.x=TRUE)#
+#
+traits <- merge(traits, bee.trait[,c(1:5,27)], all.x=TRUE)#
+#
+traits <- merge(traits, both.trait[,c(2:3,7)], all.x=TRUE)#
+#
+traits$bee.syr <- spec$BeeNonbee[match(traits$GenusSpecies,#
+                                       spec$GenusSpecies)]#
+#
+traits$bee.syr[is.na(traits$bee.syr)] <- "plant"#
+#
+mean.abund.pol <- apply(apply(pol.mat, c(1,3), mean, na.rm=TRUE), 2,#
+                        mean)#
+mean.abund.plant <- apply(apply(plant.mat, c(1,3), mean, na.rm=TRUE),#
+                          2, mean)#
+mean.abund <- c(mean.abund.pol, mean.abund.plant)#
+traits$mean.abun.net <- mean.abund[match(traits$GenusSpecies,#
+                                         names(mean.abund))]#
+save(spec, file='../data/networks/allSpecimens.Rdata')#
+write.csv(traits, file="../data/traits.csv", row.names=FALSE)#
+site.years <- aggregate(Year~ Site, data=spec,#
+                        function(x) length(unique(x)))#
+#
+sites.to.keep <- site.years$Site[site.years$Year >= 5]#
+#
+## *******************************************************************#
+## create networks#
+## all sites with > 5 years#
+spec.for.nets <- spec[spec$Site %in% sites.to.keep,]#
+#
+nets <- breakNet(spec.dat=spec.for.nets, 'Site', 'Year')#
+## save networks for each site, timeframe#
+f.path <- '../data/networks'#
+save(nets, file=file.path(f.path, 'all_networks_years.Rdata'))#
+#
+## *******************************************************************#
+## keep only BACI sites#
+## *******************************************************************#
+#
+BACI.site <- c('Barger', 'Butler', 'Hrdy', 'MullerB', 'Sperandio')#
+spec <-  spec[spec$Site %in% BACI.site,]#
+veg <-  veg[veg$Site %in% BACI.site,]#
+#
+veg$ypr <- spec$ypr[match(paste(veg$Year, veg$Site),#
+                          paste(spec$Year, spec$Site))]#
+#
+save(spec, file='../data/networks/specimens.Rdata')#
+#
+## create a "year" columns grouping years 1-3 post restoration and 4-9#
+spec$assem <- 'early'#
+spec$assem[spec$ypr > 3] <- 'late'#
+#
+veg$assem <- 'early'#
+veg$assem[veg$ypr > 3] <- 'late'#
+#
+veg.sum <- aggregate(list(abundance=veg$NumQuads),#
+                     list(site=veg$Site,#
+                          status=veg$assem,#
+                          species=veg$PlantGenusSpecies),#
+                     sum)#
+#
+## *******************************************************************#
+## create networks#
+## *******************************************************************#
+#
+## ## by early/late assembly #
+## networks <- breakNet(spec, 'Site', 'assem')#
+#
+## ## save networks for each site, timeframe#
+## saveDats(networks, names(networks), f.path)#
+## save(networks, file=file.path(f.path, 'networks_stages.Rdata'))#
+#
+## for each year#
+nets <- breakNet(spec, 'Site', 'Year')#
+save(nets, file=file.path(f.path, 'baci_networks_years.Rdata'))#
+#
+## *******************************************************************#
+## specialization of each species at each site#
+## *******************************************************************#
+#
+## species.lev <- lapply(networks, function(x){#
+##   sl <- specieslevel(x)#
+##   sl$'higher level'$tot.int <- colSums(x)#
+##   sl$'lower level'$tot.int <- rowSums(x)#
+##   return(sl)#
+## })#
+#
+## specializations  <-  mapply(function(a, b)#
+##                             getSpec(species.lev = a,#
+##                                     names.net = b),#
+##                             a = species.lev,#
+##                             b = names(networks),#
+##                             SIMPLIFY = FALSE)#
+#
+## specializations <- do.call(rbind, specializations)#
+## rownames(specializations) <- NULL#
+#
+## f.path <- '../data/degree'#
+## save(specializations, file=file.path(f.path, 'specializations.Rdata'))#
+## ## *******************************************************************#
+## ## change in visits of by the generalized pollinators#
+#
+## ## hist(specializations$proportional.generality[specializations$speciesType ==#
+## ##                                              "pollinator"],#
+## ##      xlab="Generalization")#
+#
+## ## plants#
+## diff.gens.plants <- getVisitChange(0, 0.2, "proportional.generality",#
+##                                    "PlantGenusSpecies", "GenusSpecies")#
+#
+## diff.spec.plants <- getVisitChange(0.5, 1, "proportional.generality",#
+##                                    "PlantGenusSpecies", "GenusSpecies")#
+#
+## diff.all.plants <- getVisitChange(0, 1, "proportional.generality",#
+##                                   "PlantGenusSpecies", "GenusSpecies")#
+#
+## ## pollinators#
+## diff.gens.pol <- getVisitChange(0, 0.2, "proportional.generality",#
+##                                 "GenusSpecies", "PlantGenusSpecies")#
+#
+## diff.spec.pol <- getVisitChange(0.5, 1, "proportional.generality",#
+##                                 "GenusSpecies", "PlantGenusSpecies")#
+#
+## diff.all.pol <- getVisitChange(0, 1, "proportional.generality",#
+##                                "GenusSpecies", "PlantGenusSpecies")#
+#
+## f.path <- '../data/degree'#
+## save(diff.gens.plants, diff.spec.plants, diff.all.plants,#
+##      file=file.path(f.path, 'PlantVisitDiffs.Rdata'))#
+## write.csv(diff.all.plants,#
+##           file=file.path(f.path, 'PlantVisitDiffs.csv'), row.names=FALSE)#
+#
+## save(diff.gens.pol, diff.spec.pol, diff.all.pol,#
+##      file=file.path(f.path, 'PolVisitDiffs.Rdata'))#
+## write.csv(diff.all.pol,#
+##           file=file.path(f.path, 'PolVisitDiffs.csv'), row.names=FALSE)#
+## ## *******************************************************************#
+## ## species lists for each site#
+#
+## plants <- getSpecies(networks, rownames)#
+## pols <- getSpecies(networks, rownames)#
+#
+## f.path <- '../data/species'#
+## write.csv(plants, file.path(f.path, 'plants.csv'),#
+##           row.names=FALSE)#
+## save(plants, file=file.path(f.path, 'plants.Rdata'))#
+#
+## write.csv(pols, file.path(f.path, 'pollinators.csv'),#
+##           row.names=FALSE)#
+## save(pols, file=file.path(f.path, 'pols.Rdata'))#
+#
+## ## *******************************************************************#
+## ## species added between early and late stages#
+#
+## plant.diffs <- getColExt(plants)#
+## pol.diffs <- getColExt(pols)#
+#
+## f.path <- '../data/speciesChange'#
+## write.csv(plant.diffs, file.path(f.path, 'plants.csv'),#
+##           row.names=FALSE)#
+#
+## write.csv(pol.diffs, file.path(f.path, 'pollinators.csv'),#
+##           row.names=FALSE)#
+#
+## ## *******************************************************************#
+## ## total plants at a site#
+## f.path <- '../data/species'#
+## plants <- plants[,-2]#
+## plants <- unique(plants)#
+## write.csv(plants, file.path(f.path, 'plants_all.csv'),#
+##           row.names=FALSE)#
+#
+## ## *******************************************************************#
+## ## pollinator and plant degrees by years post restoration#
+## spec$all <- 'all'#
+#
+## yr.networks <- breakNet(spec, 'all', 'assem')#
+#
+## d.pol <- lapply(yr.networks, colSums)#
+## d.plant <- lapply(yr.networks, rowSums)#
+#
+## f.path <- '../data/degree'#
+## saveDats(d.pol, paste(names(d.pol), 'pollinators', sep="_"), f.path)#
+## saveDats(d.plant, paste(names(d.plant), 'plants', sep="_"), f.path)#
+#
+## by.year <- data.frame(t(sapply(c(d.plant, d.pol), calcStats)))#
+## by.year$group <- rep(c('plants','pollinators'), each=2)#
+## by.year$assembly <- rep(c('early', 'late'), 2)#
+#
+## write.csv(by.year, file.path(f.path, 'stats_by_yr.csv'))#
+#
+## ## *******************************************************************#
+## ## pollinator and plant degrees across all years and sites#
+#
+## all.networks <- breakNet(spec, 'all', 'all')#
+#
+## d.pol.all <- lapply(all.networks, colSums)#
+## d.plant.all <- lapply(all.networks, rowSums)#
+#
+## saveDats(d.pol.all, 'across_yrs_pollinators', f.path)#
+## saveDats(d.plant.all, 'across_yrs_plants', f.path)#
+#
+## all.dats <- data.frame(t(sapply(c(d.plant.all, d.pol.all), calcStats)))#
+## all.dats$group <- c('plants','pollinators')#
+#
+## write.csv(all.dats, file.path(f.path, 'stats_across_yrs.csv'))#
+#
+## ## *******************************************************************#
+## ## characteristics of plant colonists#
+## plant.col <- plant.diffs[plant.diffs$class == "colonist",]#
+#
+## plant.col$earlyAbund <- veg.sum$abundance[veg.sum$status ==#
+##                                           "early"][match(#
+##                                             plant.col$species,#
+##                                             veg.sum$species)]#
+## plant.col$lateAbund <- veg.sum$abundance[veg.sum$status ==#
+##                                          "late"][match(#
+##                                            plant.col$species,#
+##                                            veg.sum$species)]#
+#
+## plant.col$degree <- d.plant$all_late[match(plant.col$species,#
+##                                            names(d.plant$all_late))]#
+#
+## ## number of species that interact#
+## con.plant <- lapply(yr.networks, getCon, 1)#
+#
+## plant.col$partners <- con.plant$all_late[match(plant.col$species,#
+##                                                names(con.plant$all_late))]#
+## f.path <- '../data/speciesChange'#
+## write.csv(plant.col, file.path(f.path, 'plants_char.csv'),#
+##           row.names=FALSE)#
+#
+## ## *******************************************************************#
+## ## stable network structure#
+## networks.by.year <- breakNet(spec, 'Site', 'Year')#
+#
+## plant.species <- sapply(networks.by.year, nrow)#
+## plant.species <- data.frame(richness=plant.species,#
+##                             sites =#
+##                             sapply(strsplit(names(plant.species),#
+##                                             "_"),#
+##                                    function(x) x[1]),#
+##                             years =#
+##                             sapply(strsplit(names(plant.species),#
+##                                             "_"),#
+##                                    function(x) x[2]))#
+## write.csv(plant.species, file.path(f.path, 'plants_change.csv'),#
+##           row.names=FALSE)
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/dataPrep')#
+load('~/Dropbox/hedgerow/data_sets/traditional/specimens-complete.RData')#
+load("/Users/lcp/Dropbox/hedgerow_network/data/veg/veg.Rdata")#
+source('src/misc.R')#
+source('src/prepNets.R')#
+library(bipartite)#
+#
+trait.dir <- '~/Dropbox/hedgerow/data_sets/traditional/functional_traits'#
+bee.trait <-#
+  read.csv(file.path(trait.dir, 'bee.csv'),#
+           row.names=1)#
+syr.trait <-#
+  read.csv(file.path(trait.dir, 'syr.csv'),#
+           row.names=1)#
+#
+both.trait <-#
+  read.csv(file.path(trait.dir, 'bee.syr.csv'))#
+#
+spec <- dd#
+#
+spec <-  spec[spec$Year != "2015",]#
+#
+## subset to net specimens#
+spec <- spec[spec$NetPan == 'net',]#
+## create species column#
+spec$PlantGenusSpecies <-  fix.white.space(paste(spec$PlantGenus,#
+                                                 spec$PlantSpecies))#
+#
+## drop pollinators and plants without identifications#
+spec <-  spec[spec$PlantGenusSpecies != '',]#
+#
+to.drop.status <- c("forb", "natural")#
+spec <- spec[!spec$SiteStatus %in% to.drop.status,]#
+tot.spec <- nrow(spec)#
+#
+nrow(spec[spec$Family == 'Syrphidae',])/tot.spec#
+nrow(spec[spec$BeeNonbee == 'bee',])/tot.spec#
+#
+## subset to just bees and syrphids#
+spec <- spec[spec$Family == 'Syrphidae' |#
+             spec$BeeNonbee == 'bee',]#
+#
+spec <-  spec[spec$Species != '',]#
+spec$SiteStatus[spec$SiteStatus == "restored"] <- "maturing"#
+## total specimens#
+nrow(spec)#
+#
+## total species#
+length(unique(spec$GenusSpecies))#
+#
+## sampling dates#
+length(unique(paste(spec$Site, spec$Date)))#
+#
+## families and genera#
+length(unique(spec$Family))#
+length(unique(spec$Genus))#
+#
+## interactions#
+length(unique(paste(spec$GenusSpecies, spec$PlantGenusSpecies)))#
+#
+## *************************************************#
+## create a giant network to calculate specialization#
+## *************************************************#
+agg.spec <- aggregate(list(abund=spec$GenusSpecies),#
+                      list(GenusSpecies=spec$GenusSpecies,#
+                           PlantGenusSpecies=spec$PlantGenusSpecies),#
+                      length)#
+#
+nets.all <- samp2site.spp(agg.spec$PlantGenusSpecies,#
+                          agg.spec$GenusSpecies, agg.spec$abund, FUN=sum)#
+#
+all.specializations <- specieslevel(nets.all,#
+                                    index=c("proportional generality",#
+                                      "degree",#
+                                      "d"))#
+#
+traits <- data.frame(GenusSpecies= unlist(sapply(all.specializations,#
+                       rownames)),#
+                     do.call(rbind, all.specializations))#
+rownames(traits) <- NULL#
+#
+## *************************************************#
+## thermal traits#
+## *************************************************#
+spec$AverageTemp <- apply(spec, 1, function(x){#
+  mean(as.numeric(c(x["TempStart"], x["TempEnd"])),#
+       na.rm=TRUE)#
+})#
+#
+temp.tol <- do.call(rbind, tapply(spec$AverageTemp, spec$GenusSpecies,#
+                                  function(x){#
+                                    temp.mean <- mean(x, na.rm=TRUE)#
+                                    temp.range <- range(x, na.rm=TRUE)#
+                                    max.temp <- temp.range[2]#
+                                    temp.range <- temp.range[2] - temp.range[1]#
+                                    return(c(temp.mean=temp.mean,#
+                                             max.temp=max.temp,#
+                                             temp.range=temp.range))#
+                                  }))#
+temp.tol <- as.data.frame(temp.tol)#
+temp.tol$GenusSpecies <- rownames(temp.tol)#
+rownames(temp.tol) <- NULL#
+#
+traits <- merge(traits, temp.tol, all.x=TRUE)#
+#
+## *************************************************#
+## sampling table for manuscript#
+## *************************************************#
+#
+site.table <- aggregate(list(Samples=spec$Date),#
+                        list(Year=spec$Year, Site=spec$Site),#
+                        function(x) length(unique(x)))#
+#
+ms.table <- samp2site.spp(site=site.table$Site,#
+                          spp=site.table$Year,#
+                          abund=site.table$Samples,#
+                          FUN=sum)#
+ms.table <- cbind(spec$SiteStatus[match(rownames(ms.table),#
+                                        spec$Site)], ms.table)#
+colnames(ms.table) <- c("Site type", colnames(ms.table)[-1])#
+#
+ms.table <- ms.table[order(ms.table[, "Site type"], decreasing=TRUE),]#
+#
+ms.table[, "Site type"][ms.table[, "Site type"] == "maturing"] <-#
+  "Assembling HR"#
+#
+ms.table[, "Site type"][ms.table[, "Site type"] == "mature"] <-#
+  "Non-assembling HR"#
+#
+ms.table[, "Site type"][ms.table[, "Site type"] == "control"] <-#
+  "Non-assembling FM"#
+#
+write.table(ms.table, file="~/Dropbox/hedgerow_assembly/ms/tables/samples.txt",#
+            sep=" & ")#
+#
+## *************************************************#
+## add various traits#
+## *************************************************#
+## specialization#
+spec$d <- traits$d[match(spec$GenusSpecies, traits$GenusSpecies)]#
+spec$degree <- traits$degree[match(spec$GenusSpecies,#
+                                   traits$GenusSpecies)]#
+spec$plant.degree <- traits$degree[match(spec$PlantGenusSpecies,#
+                                         traits$GenusSpecies)]#
+#
+## occurence#
+load('~/Dropbox/hedgerow/data_sets/matrices/net/bee.syr.RData')#
+#
+occ <- apply(mat, c(3,1), calcOccArray)#
+spec$occ.date <- apply(spec, 1, findOcc)#
+traits$occ.date <- spec$occ.date[match(traits$GenusSpecies,#
+                                       spec$GenusSpecies)]#
+## plant occurrence#
+## create sample matrix#
+site.date <- mat[,,1]#
+site.date[site.date > 0] <- 0#
+rownames(site.date) <- lapply(strsplit(rownames(site.date),":"),#
+                              function(x) x[1])#
+long.site.date <- comm.mat2sample(site.date)#
+long.site.date <- long.site.date[!is.na(long.site.date$Samp),]#
+#
+## create site by date matrices with plant presence#
+plant.mat <- make.by.species(spec, long.site.date, site.date)#
+pol.mat <- make.by.species(spec, long.site.date, site.date,#
+                           type="GenusSpecies")#
+#
+save(plant.mat, pol.mat, file='../data/species/allSamples.Rdata')#
+#
+occ.plant <- apply(plant.mat, c(3,1), calcOccArray)#
+## match to dataset!#
+spec$occ.plant.date <- apply(spec, 1, findOccPlant)#
+#
+## bee functional traits#
+spec$Lecty <-#
+  bee.trait$Lecty[match(spec$GenusSpecies, rownames(bee.trait))]#
+spec$NestLoc <-#
+  bee.trait$NestLoc[match(spec$GenusSpecies, rownames(bee.trait))]#
+spec$Excavate <-#
+  bee.trait$Excavate[match(spec$GenusSpecies, rownames(bee.trait))]#
+spec$ITD <-#
+  bee.trait$MeanITD[match(spec$GenusSpecies, rownames(bee.trait))]#
+spec$Sociality <-#
+  bee.trait$Sociality[match(spec$GenusSpecies, rownames(bee.trait))]#
+#
+## syrphid functional traits#
+#
+spec$LarvalDiet <- syr.trait$LarvalDiet[match(spec$GenusSpecies,#
+                                              rownames(syr.trait))]#
+spec$AdultDiet <- syr.trait$AdultDiet[match(spec$GenusSpecies,#
+                                            rownames(syr.trait))]#
+spec$WingLength <- syr.trait$WingLength[match(spec$GenusSpecies,#
+                                              rownames(syr.trait))]#
+#
+traits <- merge(traits, syr.trait[,c(5:7,10,33)], all.x=TRUE)#
+#
+traits <- merge(traits, bee.trait[,c(1:5,27)], all.x=TRUE)#
+#
+traits <- merge(traits, both.trait[,c(2:3,7)], all.x=TRUE)#
+#
+traits$bee.syr <- spec$BeeNonbee[match(traits$GenusSpecies,#
+                                       spec$GenusSpecies)]#
+#
+traits$bee.syr[is.na(traits$bee.syr)] <- "plant"#
+#
+mean.abund.pol <- apply(apply(pol.mat, c(1,3), mean, na.rm=TRUE), 2,#
+                        mean)#
+mean.abund.plant <- apply(apply(plant.mat, c(1,3), mean, na.rm=TRUE),#
+                          2, mean)#
+mean.abund <- c(mean.abund.pol, mean.abund.plant)#
+traits$mean.abun.net <- mean.abund[match(traits$GenusSpecies,#
+                                         names(mean.abund))]#
+save(spec, file='../data/networks/allSpecimens.Rdata')#
+write.csv(traits, file="../data/traits.csv", row.names=FALSE)#
+site.years <- aggregate(Year~ Site, data=spec,#
+                        function(x) length(unique(x)))#
+#
+sites.to.keep <- site.years$Site[site.years$Year >= 5]#
+#
+## *******************************************************************#
+## create networks#
+## all sites with > 5 years#
+spec.for.nets <- spec[spec$Site %in% sites.to.keep,]#
+#
+nets <- breakNet(spec.dat=spec.for.nets, 'Site', 'Year')#
+## save networks for each site, timeframe#
+f.path <- '../data/networks'#
+save(nets, file=file.path(f.path, 'all_networks_years.Rdata'))
+specs <- calcSpec(nets, spec, spec.metric = "d", 0.3)#
+specs$closeness[specs$closeness == 0] <- 1*10^-6#
+specs$closeness.log <- log(specs$closeness)#
+specs.save.path <- 'speciesLevel/saved'
+source('src/specialization.R')
+specs <- calcSpec(nets, spec, spec.metric = "d", 0.3)#
+specs$closeness[specs$closeness == 0] <- 1*10^-6#
+specs$closeness.log <- log(specs$closeness)#
+specs.save.path <- 'speciesLevel/saved'
+save(specs, file=file.path(specs.save.path, 'specs.Rdata'))
+getwd()
+specs.save.path <- '../analysis/speciesLevel/saved'#
+save(specs, file=file.path(specs.save.path, 'specs.Rdata'))
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/dataPrep')#
+load('~/Dropbox/hedgerow/data_sets/traditional/specimens-complete.RData')#
+load("/Users/lcp/Dropbox/hedgerow_network/data/veg/veg.Rdata")#
+source('src/misc.R')#
+source('src/prepNets.R')#
+source('src/specialization.R')#
+library(bipartite)#
+#
+trait.dir <- '~/Dropbox/hedgerow/data_sets/traditional/functional_traits'#
+bee.trait <-#
+  read.csv(file.path(trait.dir, 'bee.csv'),#
+           row.names=1)#
+syr.trait <-#
+  read.csv(file.path(trait.dir, 'syr.csv'),#
+           row.names=1)#
+#
+both.trait <-#
+  read.csv(file.path(trait.dir, 'bee.syr.csv'))#
+#
+spec <- dd#
+#
+spec <-  spec[spec$Year != "2015",]#
+#
+## subset to net specimens#
+spec <- spec[spec$NetPan == 'net',]#
+## create species column#
+spec$PlantGenusSpecies <-  fix.white.space(paste(spec$PlantGenus,#
+                                                 spec$PlantSpecies))#
+#
+## drop pollinators and plants without identifications#
+spec <-  spec[spec$PlantGenusSpecies != '',]#
+#
+to.drop.status <- c("forb", "natural")#
+spec <- spec[!spec$SiteStatus %in% to.drop.status,]#
+tot.spec <- nrow(spec)#
+#
+nrow(spec[spec$Family == 'Syrphidae',])/tot.spec#
+nrow(spec[spec$BeeNonbee == 'bee',])/tot.spec#
+#
+## subset to just bees and syrphids#
+spec <- spec[spec$Family == 'Syrphidae' |#
+             spec$BeeNonbee == 'bee',]#
+#
+spec <-  spec[spec$Species != '',]#
+spec$SiteStatus[spec$SiteStatus == "restored"] <- "maturing"#
+## total specimens#
+nrow(spec)#
+#
+## total species#
+length(unique(spec$GenusSpecies))#
+#
+## sampling dates#
+length(unique(paste(spec$Site, spec$Date)))#
+#
+## families and genera#
+length(unique(spec$Family))#
+length(unique(spec$Genus))#
+#
+## interactions#
+length(unique(paste(spec$GenusSpecies, spec$PlantGenusSpecies)))#
+#
+## *************************************************#
+## create a giant network to calculate specialization#
+## *************************************************#
+agg.spec <- aggregate(list(abund=spec$GenusSpecies),#
+                      list(GenusSpecies=spec$GenusSpecies,#
+                           PlantGenusSpecies=spec$PlantGenusSpecies),#
+                      length)#
+#
+nets.all <- samp2site.spp(agg.spec$PlantGenusSpecies,#
+                          agg.spec$GenusSpecies, agg.spec$abund, FUN=sum)#
+#
+all.specializations <- specieslevel(nets.all,#
+                                    index=c("proportional generality",#
+                                      "degree",#
+                                      "d"))#
+#
+traits <- data.frame(GenusSpecies= unlist(sapply(all.specializations,#
+                       rownames)),#
+                     do.call(rbind, all.specializations))#
+rownames(traits) <- NULL#
+#
+## *************************************************#
+## thermal traits#
+## *************************************************#
+spec$AverageTemp <- apply(spec, 1, function(x){#
+  mean(as.numeric(c(x["TempStart"], x["TempEnd"])),#
+       na.rm=TRUE)#
+})#
+#
+temp.tol <- do.call(rbind, tapply(spec$AverageTemp, spec$GenusSpecies,#
+                                  function(x){#
+                                    temp.mean <- mean(x, na.rm=TRUE)#
+                                    temp.range <- range(x, na.rm=TRUE)#
+                                    max.temp <- temp.range[2]#
+                                    temp.range <- temp.range[2] - temp.range[1]#
+                                    return(c(temp.mean=temp.mean,#
+                                             max.temp=max.temp,#
+                                             temp.range=temp.range))#
+                                  }))#
+temp.tol <- as.data.frame(temp.tol)#
+temp.tol$GenusSpecies <- rownames(temp.tol)#
+rownames(temp.tol) <- NULL#
+#
+traits <- merge(traits, temp.tol, all.x=TRUE)#
+#
+## *************************************************#
+## sampling table for manuscript#
+## *************************************************#
+#
+site.table <- aggregate(list(Samples=spec$Date),#
+                        list(Year=spec$Year, Site=spec$Site),#
+                        function(x) length(unique(x)))#
+#
+ms.table <- samp2site.spp(site=site.table$Site,#
+                          spp=site.table$Year,#
+                          abund=site.table$Samples,#
+                          FUN=sum)#
+ms.table <- cbind(spec$SiteStatus[match(rownames(ms.table),#
+                                        spec$Site)], ms.table)#
+colnames(ms.table) <- c("Site type", colnames(ms.table)[-1])#
+#
+ms.table <- ms.table[order(ms.table[, "Site type"], decreasing=TRUE),]#
+#
+ms.table[, "Site type"][ms.table[, "Site type"] == "maturing"] <-#
+  "Assembling HR"#
+#
+ms.table[, "Site type"][ms.table[, "Site type"] == "mature"] <-#
+  "Non-assembling HR"#
+#
+ms.table[, "Site type"][ms.table[, "Site type"] == "control"] <-#
+  "Non-assembling FM"#
+#
+write.table(ms.table, file="~/Dropbox/hedgerow_assembly/ms/tables/samples.txt",#
+            sep=" & ")#
+#
+## *************************************************#
+## add various traits#
+## *************************************************#
+## specialization#
+spec$d <- traits$d[match(spec$GenusSpecies, traits$GenusSpecies)]#
+spec$degree <- traits$degree[match(spec$GenusSpecies,#
+                                   traits$GenusSpecies)]#
+spec$plant.degree <- traits$degree[match(spec$PlantGenusSpecies,#
+                                         traits$GenusSpecies)]#
+#
+## occurence#
+load('~/Dropbox/hedgerow/data_sets/matrices/net/bee.syr.RData')#
+#
+occ <- apply(mat, c(3,1), calcOccArray)#
+spec$occ.date <- apply(spec, 1, findOcc)#
+traits$occ.date <- spec$occ.date[match(traits$GenusSpecies,#
+                                       spec$GenusSpecies)]#
+## plant occurrence#
+## create sample matrix#
+site.date <- mat[,,1]#
+site.date[site.date > 0] <- 0#
+rownames(site.date) <- lapply(strsplit(rownames(site.date),":"),#
+                              function(x) x[1])#
+long.site.date <- comm.mat2sample(site.date)#
+long.site.date <- long.site.date[!is.na(long.site.date$Samp),]#
+#
+## create site by date matrices with plant presence#
+plant.mat <- make.by.species(spec, long.site.date, site.date)#
+pol.mat <- make.by.species(spec, long.site.date, site.date,#
+                           type="GenusSpecies")#
+#
+save(plant.mat, pol.mat, file='../data/species/allSamples.Rdata')#
+#
+occ.plant <- apply(plant.mat, c(3,1), calcOccArray)#
+## match to dataset!#
+spec$occ.plant.date <- apply(spec, 1, findOccPlant)#
+#
+## bee functional traits#
+spec$Lecty <-#
+  bee.trait$Lecty[match(spec$GenusSpecies, rownames(bee.trait))]#
+spec$NestLoc <-#
+  bee.trait$NestLoc[match(spec$GenusSpecies, rownames(bee.trait))]#
+spec$Excavate <-#
+  bee.trait$Excavate[match(spec$GenusSpecies, rownames(bee.trait))]#
+spec$ITD <-#
+  bee.trait$MeanITD[match(spec$GenusSpecies, rownames(bee.trait))]#
+spec$Sociality <-#
+  bee.trait$Sociality[match(spec$GenusSpecies, rownames(bee.trait))]#
+#
+## syrphid functional traits#
+#
+spec$LarvalDiet <- syr.trait$LarvalDiet[match(spec$GenusSpecies,#
+                                              rownames(syr.trait))]#
+spec$AdultDiet <- syr.trait$AdultDiet[match(spec$GenusSpecies,#
+                                            rownames(syr.trait))]#
+spec$WingLength <- syr.trait$WingLength[match(spec$GenusSpecies,#
+                                              rownames(syr.trait))]#
+#
+traits <- merge(traits, syr.trait[,c(5:7,10,33)], all.x=TRUE)#
+#
+traits <- merge(traits, bee.trait[,c(1:5,27)], all.x=TRUE)#
+#
+traits <- merge(traits, both.trait[,c(2:3,7)], all.x=TRUE)#
+#
+traits$bee.syr <- spec$BeeNonbee[match(traits$GenusSpecies,#
+                                       spec$GenusSpecies)]#
+#
+traits$bee.syr[is.na(traits$bee.syr)] <- "plant"#
+#
+mean.abund.pol <- apply(apply(pol.mat, c(1,3), mean, na.rm=TRUE), 2,#
+                        mean)#
+mean.abund.plant <- apply(apply(plant.mat, c(1,3), mean, na.rm=TRUE),#
+                          2, mean)#
+mean.abund <- c(mean.abund.pol, mean.abund.plant)#
+traits$mean.abun.net <- mean.abund[match(traits$GenusSpecies,#
+                                         names(mean.abund))]#
+save(spec, file='../data/networks/allSpecimens.Rdata')#
+write.csv(traits, file="../data/traits.csv", row.names=FALSE)#
+site.years <- aggregate(Year~ Site, data=spec,#
+                        function(x) length(unique(x)))#
+#
+sites.to.keep <- site.years$Site[site.years$Year >= 5]#
+#
+## *******************************************************************#
+## create networks#
+## all sites with > 5 years#
+spec.for.nets <- spec[spec$Site %in% sites.to.keep,]#
+#
+nets <- breakNet(spec.dat=spec.for.nets, 'Site', 'Year')#
+## save networks for each site, timeframe#
+f.path <- '../data/networks'#
+save(nets, file=file.path(f.path, 'all_networks_years.Rdata'))#
+#
+## *******************************************************************#
+## site-species level metric calculation #
+## *******************************************************************#
+specs <- calcSpec(nets, spec, spec.metric = "d", 0.3)#
+specs$closeness[specs$closeness == 0] <- 1*10^-6#
+specs$closeness.log <- log(specs$closeness)#
+specs.save.path <- '../analysis/speciesLevel/saved'#
+save(specs, file=file.path(specs.save.path, 'specs.Rdata'))#
+## *******************************************************************#
+## keep only BACI sites#
+## *******************************************************************#
+#
+BACI.site <- c('Barger', 'Butler', 'Hrdy', 'MullerB', 'Sperandio')#
+spec <-  spec[spec$Site %in% BACI.site,]#
+veg <-  veg[veg$Site %in% BACI.site,]#
+#
+veg$ypr <- spec$ypr[match(paste(veg$Year, veg$Site),#
+                          paste(spec$Year, spec$Site))]#
+#
+save(spec, file='../data/networks/specimens.Rdata')#
+#
+## create a "year" columns grouping years 1-3 post restoration and 4-9#
+spec$assem <- 'early'#
+spec$assem[spec$ypr > 3] <- 'late'#
+#
+veg$assem <- 'early'#
+veg$assem[veg$ypr > 3] <- 'late'#
+#
+veg.sum <- aggregate(list(abundance=veg$NumQuads),#
+                     list(site=veg$Site,#
+                          status=veg$assem,#
+                          species=veg$PlantGenusSpecies),#
+                     sum)#
+#
+## *******************************************************************#
+## create networks#
+## *******************************************************************#
+#
+## ## by early/late assembly #
+## networks <- breakNet(spec, 'Site', 'assem')#
+#
+## ## save networks for each site, timeframe#
+## saveDats(networks, names(networks), f.path)#
+## save(networks, file=file.path(f.path, 'networks_stages.Rdata'))#
+#
+## for each year#
+nets <- breakNet(spec, 'Site', 'Year')#
+save(nets, file=file.path(f.path, 'baci_networks_years.Rdata'))#
+#
+## *******************************************************************#
+## specialization of each species at each site#
+## *******************************************************************#
+#
+## species.lev <- lapply(networks, function(x){#
+##   sl <- specieslevel(x)#
+##   sl$'higher level'$tot.int <- colSums(x)#
+##   sl$'lower level'$tot.int <- rowSums(x)#
+##   return(sl)#
+## })#
+#
+## specializations  <-  mapply(function(a, b)#
+##                             getSpec(species.lev = a,#
+##                                     names.net = b),#
+##                             a = species.lev,#
+##                             b = names(networks),#
+##                             SIMPLIFY = FALSE)#
+#
+## specializations <- do.call(rbind, specializations)#
+## rownames(specializations) <- NULL#
+#
+## f.path <- '../data/degree'#
+## save(specializations, file=file.path(f.path, 'specializations.Rdata'))#
+## ## *******************************************************************#
+## ## change in visits of by the generalized pollinators#
+#
+## ## hist(specializations$proportional.generality[specializations$speciesType ==#
+## ##                                              "pollinator"],#
+## ##      xlab="Generalization")#
+#
+## ## plants#
+## diff.gens.plants <- getVisitChange(0, 0.2, "proportional.generality",#
+##                                    "PlantGenusSpecies", "GenusSpecies")#
+#
+## diff.spec.plants <- getVisitChange(0.5, 1, "proportional.generality",#
+##                                    "PlantGenusSpecies", "GenusSpecies")#
+#
+## diff.all.plants <- getVisitChange(0, 1, "proportional.generality",#
+##                                   "PlantGenusSpecies", "GenusSpecies")#
+#
+## ## pollinators#
+## diff.gens.pol <- getVisitChange(0, 0.2, "proportional.generality",#
+##                                 "GenusSpecies", "PlantGenusSpecies")#
+#
+## diff.spec.pol <- getVisitChange(0.5, 1, "proportional.generality",#
+##                                 "GenusSpecies", "PlantGenusSpecies")#
+#
+## diff.all.pol <- getVisitChange(0, 1, "proportional.generality",#
+##                                "GenusSpecies", "PlantGenusSpecies")#
+#
+## f.path <- '../data/degree'#
+## save(diff.gens.plants, diff.spec.plants, diff.all.plants,#
+##      file=file.path(f.path, 'PlantVisitDiffs.Rdata'))#
+## write.csv(diff.all.plants,#
+##           file=file.path(f.path, 'PlantVisitDiffs.csv'), row.names=FALSE)#
+#
+## save(diff.gens.pol, diff.spec.pol, diff.all.pol,#
+##      file=file.path(f.path, 'PolVisitDiffs.Rdata'))#
+## write.csv(diff.all.pol,#
+##           file=file.path(f.path, 'PolVisitDiffs.csv'), row.names=FALSE)#
+## ## *******************************************************************#
+## ## species lists for each site#
+#
+## plants <- getSpecies(networks, rownames)#
+## pols <- getSpecies(networks, rownames)#
+#
+## f.path <- '../data/species'#
+## write.csv(plants, file.path(f.path, 'plants.csv'),#
+##           row.names=FALSE)#
+## save(plants, file=file.path(f.path, 'plants.Rdata'))#
+#
+## write.csv(pols, file.path(f.path, 'pollinators.csv'),#
+##           row.names=FALSE)#
+## save(pols, file=file.path(f.path, 'pols.Rdata'))#
+#
+## ## *******************************************************************#
+## ## species added between early and late stages#
+#
+## plant.diffs <- getColExt(plants)#
+## pol.diffs <- getColExt(pols)#
+#
+## f.path <- '../data/speciesChange'#
+## write.csv(plant.diffs, file.path(f.path, 'plants.csv'),#
+##           row.names=FALSE)#
+#
+## write.csv(pol.diffs, file.path(f.path, 'pollinators.csv'),#
+##           row.names=FALSE)#
+#
+## ## *******************************************************************#
+## ## total plants at a site#
+## f.path <- '../data/species'#
+## plants <- plants[,-2]#
+## plants <- unique(plants)#
+## write.csv(plants, file.path(f.path, 'plants_all.csv'),#
+##           row.names=FALSE)#
+#
+## ## *******************************************************************#
+## ## pollinator and plant degrees by years post restoration#
+## spec$all <- 'all'#
+#
+## yr.networks <- breakNet(spec, 'all', 'assem')#
+#
+## d.pol <- lapply(yr.networks, colSums)#
+## d.plant <- lapply(yr.networks, rowSums)#
+#
+## f.path <- '../data/degree'#
+## saveDats(d.pol, paste(names(d.pol), 'pollinators', sep="_"), f.path)#
+## saveDats(d.plant, paste(names(d.plant), 'plants', sep="_"), f.path)#
+#
+## by.year <- data.frame(t(sapply(c(d.plant, d.pol), calcStats)))#
+## by.year$group <- rep(c('plants','pollinators'), each=2)#
+## by.year$assembly <- rep(c('early', 'late'), 2)#
+#
+## write.csv(by.year, file.path(f.path, 'stats_by_yr.csv'))#
+#
+## ## *******************************************************************#
+## ## pollinator and plant degrees across all years and sites#
+#
+## all.networks <- breakNet(spec, 'all', 'all')#
+#
+## d.pol.all <- lapply(all.networks, colSums)#
+## d.plant.all <- lapply(all.networks, rowSums)#
+#
+## saveDats(d.pol.all, 'across_yrs_pollinators', f.path)#
+## saveDats(d.plant.all, 'across_yrs_plants', f.path)#
+#
+## all.dats <- data.frame(t(sapply(c(d.plant.all, d.pol.all), calcStats)))#
+## all.dats$group <- c('plants','pollinators')#
+#
+## write.csv(all.dats, file.path(f.path, 'stats_across_yrs.csv'))#
+#
+## ## *******************************************************************#
+## ## characteristics of plant colonists#
+## plant.col <- plant.diffs[plant.diffs$class == "colonist",]#
+#
+## plant.col$earlyAbund <- veg.sum$abundance[veg.sum$status ==#
+##                                           "early"][match(#
+##                                             plant.col$species,#
+##                                             veg.sum$species)]#
+## plant.col$lateAbund <- veg.sum$abundance[veg.sum$status ==#
+##                                          "late"][match(#
+##                                            plant.col$species,#
+##                                            veg.sum$species)]#
+#
+## plant.col$degree <- d.plant$all_late[match(plant.col$species,#
+##                                            names(d.plant$all_late))]#
+#
+## ## number of species that interact#
+## con.plant <- lapply(yr.networks, getCon, 1)#
+#
+## plant.col$partners <- con.plant$all_late[match(plant.col$species,#
+##                                                names(con.plant$all_late))]#
+## f.path <- '../data/speciesChange'#
+## write.csv(plant.col, file.path(f.path, 'plants_char.csv'),#
+##           row.names=FALSE)#
+#
+## ## *******************************************************************#
+## ## stable network structure#
+## networks.by.year <- breakNet(spec, 'Site', 'Year')#
+#
+## plant.species <- sapply(networks.by.year, nrow)#
+## plant.species <- data.frame(richness=plant.species,#
+##                             sites =#
+##                             sapply(strsplit(names(plant.species),#
+##                                             "_"),#
+##                                    function(x) x[1]),#
+##                             years =#
+##                             sapply(strsplit(names(plant.species),#
+##                                             "_"),#
+##                                    function(x) x[2]))#
+## write.csv(plant.species, file.path(f.path, 'plants_change.csv'),#
+##           row.names=FALSE)
+## robustness#
+source('~/Dropbox/hedgerow_assembly/analysis/networkLevel/resilence.R')#
+## sensitivity to perturbation#
+source('~/Dropbox/hedgerow_assembly/analysis/networkLevel/laplacian.R')#
+#
+## plotting#
+source('~/Dropbox/hedgerow_assembly/analysis/networkLevel/plotting/baci.R')#
+source('~/Dropbox/hedgerow_assembly/analysis/networkLevel/plotting/resilence.R')
+## robustness#
+source('~/Dropbox/hedgerow_assembly/analysis/networkLevel/resilience.R')#
+## sensitivity to perturbation#
+source('~/Dropbox/hedgerow_assembly/analysis/networkLevel/laplacian.R')#
+#
+## plotting#
+source('~/Dropbox/hedgerow_assembly/analysis/networkLevel/plotting/baci.R')#
+source('~/Dropbox/hedgerow_assembly/analysis/networkLevel/plotting/resilience.R')
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/networkLevel')#
 source('src/initialize.R')#
-## don't agument data#
-n.zeroes <- 0#
-model.input <- prepMutiSpData(survey.data,#
-                              survey.dates,#
-                              species.groups,#
-                              habitat,#
-                              n.zeros)
-ms.ss.occ <- nimbleCode({#
-  ## Define prior distributions for community-level model parameters#
-  cato.occ.mean ~ dunif(0,1)#
-  mu.ucato <- log(cato.occ.mean) - log(1-cato.occ.mean)#
+load('../../data/networks/all_networks_years.Rdata')#
 #
-  fcw.occ.mean ~ dunif(0,1)#
-  mu.ufcw <- log(fcw.occ.mean) - log(1-fcw.occ.mean)#
+## either "abund" or "degree"#
+extinction.method <- "degree"#
 #
-  cato.det.mean ~ dunif(0,1)#
-  mu.vcato <- log(cato.det.mean) - log(1-cato.det.mean)#
+## **********************************************************#
+## robustness#
+## **********************************************************#
+## simulation plant extinction#
 #
-  fcw.det.mean ~ dunif(0,1)#
-  mu.vfcw <- log(fcw.det.mean) - log(1-fcw.det.mean)#
+res <- simExtinction(nets, extinction.method, spec)#
 #
-  ## random effects#
-  sigma.ucato ~ dunif(0, 100)#
-  tau.ucato <-  1/(sigma.ucato*sigma.ucato)#
+save(res, file=file.path(save.path,#
+            sprintf('resilience_%s.Rdata', extinction.method)))#
 #
-  sigma.ufcw ~ dunif(0, 100)#
-  tau.ufcw <-  1/(sigma.ufcw*sigma.ufcw)#
+## no change in robustness by site status#
+mod.status <- lmer(Robustness ~ SiteStatus#
+             + (1|Site) + (1|Year),#
+             data=res)#
+summary(mod.status)#
+save(mod.status, file=file.path(save.path,#
+            sprintf('mods/resilience_status_%s.Rdata', extinction.method)))#
+## no effect of ypr on robustness#
+mod.ypr <- lmer(Robustness ~ ypr#
+             + (1|Site) + (1|Year),#
+             data=res[!is.na(res$ypr),])#
+summary(mod.ypr)#
+save(mod.ypr, file=file.path(save.path,#
+            sprintf('mods/resilience_ypr_%s.Rdata', extinction.method)))
+source('~/Dropbox/hedgerow_assembly/analysis/networkLevel/plotting/resilience.R')
+extinction.method <- "degree"#
+source('~/Dropbox/hedgerow_assembly/analysis/networkLevel/resilience.R')#
+extinction.method <- "abund"#
+source('~/Dropbox/hedgerow_assembly/analysis/networkLevel/resilience.R')#
+## sensitivity to perturbation#
+source('~/Dropbox/hedgerow_assembly/analysis/networkLevel/laplacian.R')
+## robustness#
+## either "abund" or "degree"#
+extinction.method <- "degree"#
+source('~/Dropbox/hedgerow_assembly/analysis/networkLevel/resilience.R')#
+extinction.method <- "abund"#
+source('~/Dropbox/hedgerow_assembly/analysis/networkLevel/resilience.R')#
+## sensitivity to perturbation#
+source('~/Dropbox/hedgerow_assembly/analysis/networkLevel/laplacian.R')
+source('~/Dropbox/hedgerow_assembly/analysis/networkLevel/plotting/resilience.R')
+rm(list=ls())#
+library(lme4)#
+library(lmerTest)#
+setwd('~/Dropbox/hedgerow_assembly/analysis/networkLevel')#
 #
-  mu.a1 ~ dnorm(0, 0.001)#
-  sigma.a1 ~ dunif(0, 100)#
-  tau.a1 <-  1/(sigma.a1*sigma.a1)#
+load('../../data/networks/allSpecimens.Rdata')#
+f.path <- "../changePoint/cptPeel/baci"#
+load(file=file.path(f.path, "graphs.Rdata"))#
 #
-  mu.a2 ~ dnorm(0, 0.001)#
-  sigma.a2 ~ dunif(0, 100)#
-  tau.a2 <-  1/(sigma.a2*sigma.a2)#
+source('src/laplacian_functions.R')#
 #
-  mu.a3 ~ dnorm(0, 0.001)#
-  sigma.a3 ~ dunif(0, 100)#
-  tau.a3 <-  1/(sigma.a3*sigma.a3)#
+fig.path <- '../speciesLevel/Figures'#
+sites <- sapply(strsplit(names(nets), "[.]"), function(x) x[1])#
+years <- sapply(strsplit(names(nets), "[.]"), function(x) x[2])#
 #
-  mu.a4 ~ dnorm(0, 0.001)#
-  sigma.a4 ~ dunif(0, 100)#
-  tau.a4 <-  1/(sigma.a4*sigma.a4)#
+status.table <- table(spec$Site, spec$SiteStatus)#
+status.table <- as.data.frame(cbind(rownames(status.table),#
+                                    colnames(status.table)[apply(status.table,#
+                                                            1, which.max)]))#
+colnames(status.table)<- c("Site", "SiteStatus")#
 #
-  sigma.vcato ~ dunif(0, 100)#
-  sigma.vfcw ~ dunif(0, 100)#
-  tau.vcato <-  1/(sigma.vcato*sigma.vcato)#
-  tau.vfcw <-  1/(sigma.vfcw*sigma.vfcw)#
+all.alg.Con <- t(do.call(cbind.data.frame, lapply(nets, algCone)))#
+all.alg.Con <- as.data.frame(cbind(sites,years, all.alg.Con))#
+colnames(all.alg.Con) <- c("Site", "Year","Ncomp", "AlgCon", "EigenRatio")#
 #
-  mu.b1 ~ dnorm(0, 0.001)#
-  sigma.b1 ~ dunif(0, 100)#
-  tau.b1 <-  1/(sigma.b1*sigma.b1)#
+## add status#
+all.alg.Con.status <- merge(x=all.alg.Con,#
+                            y= status.table,#
+                            by.x="Site",#
+                            by.y="Site")#
 #
-  mu.b2 ~ dnorm(0, 0.001)#
-  sigma.b2 ~ dunif(0, 100)#
-  tau.b2 <-  1/(sigma.b2*sigma.b2)#
+## add ypr#
+all.alg.Con.status$ypr <- spec$ypr[match(paste(all.alg.Con.status$Site,#
+                                               all.alg.Con.status$Year),#
+                                         paste(spec$Site, spec$Year))]#
 #
-  for (i in 1:(num.species)) {#
-    ## Create priors for species i from the community level prior#
-    ## distributions#
+baci.sites <- c("MullerB", "Sperandio", "Barger", "Butler", "Hrdy")#
 #
-    u.cato[i] ~ dnorm(mu.ucato, tau.ucato)#
-    u.fcw[i] ~ dnorm(mu.ufcw, tau.ufcw)#
-    a1[i] ~ dnorm(mu.a1, tau.a1)#
-    a2[i] ~ dnorm(mu.a2, tau.a2)#
-    a3[i] ~ dnorm(mu.a3, tau.a3)#
-    a4[i] ~ dnorm(mu.a4, tau.a4)#
+all.alg.Con.status$ypr[!all.alg.Con.status$Site %in% baci.sites] <- NA#
 #
-    v.cato[i] ~ dnorm(mu.vcato, tau.vcato)#
-    v.fcw[i] ~ dnorm(mu.vfcw, tau.vfcw)#
-    b1[i] ~ dnorm(mu.b1, tau.b1)#
-    b2[i] ~ dnorm(mu.b2, tau.b2)#
+## change AlgCon to numeric (it is a factor for some reason..)#
+all.alg.Con.status$AlgCon <- as.numeric(as.character(#
+  all.alg.Con.status$AlgCon))#
+all.alg.Con.status$EigenRatio <- as.numeric(as.character(#
+  all.alg.Con.status$EigenRatio))#
+all.alg.Con.status$Ncomp <- as.numeric(as.character(#
+  all.alg.Con.status$Ncomp))#
 #
-    ## Create a loop to estimate the Z matrix (true occurrence for#
-    ## species i at point j).#
-    for (j in 1:num.points) {#
-      ## Occurence model: u.cato and u.fcw are the occurrence#
-      ## probabilities (on the logit scale) for species i at points in#
-      ## the CATO and FCW study area, respectively, for average values#
-      ## of UFC and BA. The coefficients for the four 'a' terms are#
-      ## the linear and squared effects of understory foliage and tree#
-      ## basal area on species i.#
-      logit(psi[j,i]) <- u.cato[i]*(1-habitat.ind[j]) +#
-        u.fcw[i]*habitat.ind[j] +#
-        a1[i]*ufc.linear[j] +#
-        a2[i]*ufc.quadratic[j] +#
-        a3[i]*ba.linear[j] +#
-        a4[i]*ba.quadratic[j]#
+alg.con.mod <- lmer(AlgCon ~ SiteStatus +#
+                    (1|Site) + (1|Year),    #
+                    data=all.alg.Con.status)#
 #
-      mu.psi[j,i] <- psi[j,i]#
-      Z[j,i] ~ dbern(mu.psi[j,i])#
+summary(alg.con.mod)#
 #
-      ## Create a loop to estimate detection for species i at point k#
-      ## during sampling period k.#
-      for (k in 1:num.reps[j]) {#
-        ## Detection model for the observed data X: v.cato and v.fcw#
-        ## are the detection probabilities (on the logit scale) for#
-        ## species i at points j during sampling periods k in the CATO#
-        ## and FCW study area, respectively, for for linear and#
-        ## squared terms of Julian dates.#
-        logit(p[j,k,i]) <-  v.cato[i]*(1-habitat.ind[j]) +#
-          v.fcw[i]*habitat.ind[j] +#
-          b1[i]*date.linear[j,k] +#
-          b2[i]*date.quadratic[j,k]#
+# Algebrain connectivity x Ypr#
+alg.con.mod.ypr <- lmer(AlgCon ~ ypr + #
+                        (1|Site) + (1|Year),    #
+                        data=all.alg.Con.status)#
+summary(alg.con.mod.ypr)#
 #
-        mu.p[j,k,i] <- p[j,k,i]*Z[j,i]#
-        X[j,k,i] ~ dbern(mu.p[j,k,i])#
-      }#
+# Eigenvalue ratio  x Ypr#
+EigenRatio.mod.ypr <- lmer(EigenRatio ~ ypr +  Ncomp +#
+                          (1|Site) + (1|Year),    #
+                        data=all.alg.Con.status)#
+summary(EigenRatio.mod.ypr)#
+#
+save(alg.con.mod.ypr, all.alg.Con.status, EigenRatio.mod.ypr,#
+     file="saved/mods/AlgCon.Rdata")#
+#
+## look at correlation between AlgCon and species richness#
+#
+net.mets <- sapply(nets, function(x) sum(dim(empty(x))))#
+#
+all.alg.Con.status$tot.rich <- net.mets[match(names(net.mets),#
+                                              paste(all.alg.Con.status$Site,#
+                                                    all.alg.Con.status$Year,#
+                                                    sep="."))]#
+#
+cor.test(all.alg.Con.status$tot.rich, all.alg.Con.status$AlgCon)#
+#
+cor.test(all.alg.Con.status$tot.rich[!is.na(all.alg.Con.status$ypr)],#
+         all.alg.Con.status$AlgCon[!is.na(all.alg.Con.status$ypr)])
+source('~/Dropbox/hedgerow_assembly/analysis/networkLevel/laplacian.R')
+source('~/Dropbox/hedgerow_assembly/analysis/networkLevel/plotting/resilience.R')
+##***************************************************************#
+## turnover metrics#
+##***************************************************************#
+## coefficient of variation#
+source('~/Dropbox/hedgerow_assembly/analysis/variability/cv.R')#
+source('~/Dropbox/hedgerow_assembly/analysis/variability/plotting/cv.R')#
+#
+## nulls for computing stats#
+source('~/Dropbox/hedgerow_assembly/analysis/variability/nulls.R')#
+## "link" turnover#
+source('~/Dropbox/hedgerow_assembly/analysis/variability/beta-link.R')#
+#
+## species turnover through years#
+source('~/Dropbox/hedgerow_assembly/analysis/variability/beta-div.R')#
+#
+## interaction partner variation#
+source('~/Dropbox/hedgerow_assembly/analysis/variability/beta-disp.R')#
+#
+## plotting#
+source('~/Dropbox/hedgerow_assembly/analysis/variability/plotting/beta-int.R')
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
+binary <- TRUE#
+alpha <- TRUE#
+## int or pols#
+type <- "pols"#
+source('src/initialize_beta.R')#
+#
+## ************************************************************#
+## beta diversity as variation between years,#
+## centroid for each site#
+## ************************************************************#
+dis <- mapply(function(a, b, c, d)#
+              beta.status(comm= a,#
+                          status= b,#
+                          dis.method,#
+                          nulls=c,#
+                          occ=binary,#
+                          years=d,#
+                          sub=type),#
+              a=comm$comm,#
+              b=comm$status,#
+              c= nulls,#
+              d= comm$comm,#
+              SIMPLIFY=FALSE)#
+#
+dats <- data.frame(site=comm$sites,#
+                   status=unlist(comm$status),#
+                   year=unlist(comm$years),#
+                   dist=unlist(sapply(dis, function(x)#
+                     x$distances)))#
+rownames(dats) <- NULL#
+#
+save(dats, file= file.path('saved/speciesTurnover',#
+             sprintf('%s.pdf', paste(dis.method, alpha, occ, type,#
+                                     sep='_'))))#
+#
+## invid nulls all not sig, alpha nulls mature marginally sig less,#
+## occurrence nulls all not sig#
+#
+## run model, plot#
+#
+load(file= file.path('saved/speciesTurnover', sprintf('%s.pdf',#
+       paste(dis.method, alpha, occ, type, sep='_'))))#
+mod <- lmer(dist ~ status +  (1|site),#
+            data=dats)#
+summary(mod)#
+#
+plot.beta.div(dis.method =dis.method, dists= dats$dist,#
+              status= dats$status, type= "time",#
+              sub= type, occ=occ, ylabel=ylabel)#
+#
+plot.coeffs(dis.method =dis.method, mod=summary(mod),#
+            status= dats$status, type= "space",#
+            sub= type, occ=occ)#
+plotDistPanels()
+library(lme4)#
+library(vegan)#
+library(lmerTest)#
+library(beeswarm)#
+source('src/misc.R')#
+source('src/beta.R')#
+source('src/plotDists.R')#
+#
+if(!binary & alpha){#
+  occ <- "abund"#
+  dis.method <- "chao"#
+  load(file=file.path('saved/communities',#
+         sprintf('%s-abund.Rdata', type)))#
+  load(file=file.path('saved/nulls',#
+         sprintf('%s-alpha.Rdata', type)))#
+}#
+#
+if(!binary & !alpha){#
+  occ <- "indiv"#
+  dis.method <- "chao"#
+  load(file=file.path('saved/communities',#
+         sprintf('%s-abund.Rdata', type)))#
+  load(file=file.path('saved/nulls',#
+         sprintf('%s-indiv.Rdata', type)))#
+}#
+#
+if(binary){#
+  occ <- "occ"#
+  dis.method <- "jaccard"#
+  load(file=file.path('saved/communities',#
+         sprintf('%s-abund.Rdata', type)))#
+  load(file=file.path('saved/nulls',#
+         sprintf('%s-occ.Rdata', type)))#
+}#
+#
+if(type=="pols"){#
+  ylabel <- "Pollinator species turnover"#
+}#
+if(type=="int"){#
+  ylabel <- "Interaction turnover"#
+}#
+if(type=="plants"){#
+  ylabel <- "Plant species turnover"#
+}
+## ************************************************************#
+## beta diversity as variation between years,#
+## centroid for each site#
+## ************************************************************#
+dis <- mapply(function(a, b, c, d)#
+              beta.status(comm= a,#
+                          status= b,#
+                          dis.method,#
+                          nulls=c,#
+                          occ=binary,#
+                          years=d,#
+                          sub=type),#
+              a=comm$comm,#
+              b=comm$status,#
+              c= nulls,#
+              d= comm$comm,#
+              SIMPLIFY=FALSE)#
+#
+dats <- data.frame(site=comm$sites,#
+                   status=unlist(comm$status),#
+                   year=unlist(comm$years),#
+                   dist=unlist(sapply(dis, function(x)#
+                     x$distances)))#
+rownames(dats) <- NULL#
+#
+save(dats, file= file.path('saved/speciesTurnover',#
+             sprintf('%s.pdf', paste(dis.method, alpha, occ, type,#
+                                     sep='_'))))
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
+binary <- TRUE#
+alpha <- TRUE#
+## int or pols#
+type <- "pols"#
+source('src/initialize_beta.R')#
+#
+## ************************************************************#
+## beta diversity as variation between years,#
+## centroid for each site#
+## ************************************************************#
+dis <- mapply(function(a, b, c, d)#
+              beta.status(comm= a,#
+                          status= b,#
+                          dis.method,#
+                          nulls=c,#
+                          occ=binary,#
+                          years=d,#
+                          sub=type),#
+              a=comm$comm,#
+              b=comm$status,#
+              c= nulls,#
+              d= comm$comm,#
+              SIMPLIFY=FALSE)#
+#
+dats <- data.frame(site=comm$sites,#
+                   status=unlist(comm$status),#
+                   year=unlist(comm$years),#
+                   dist=unlist(sapply(dis, function(x)#
+                     x$distances)))#
+rownames(dats) <- NULL#
+#
+save(dats, file= file.path('saved/speciesTurnover',#
+             sprintf('%s.pdf', paste(dis.method, alpha, occ, type,#
+                                     sep='_'))))#
+#
+## invid nulls all not sig, alpha nulls mature marginally sig less,#
+## occurrence nulls all not sig#
+#
+## run model, plot#
+#
+load(file= file.path('saved/speciesTurnover', sprintf('%s.pdf',#
+       paste(dis.method, alpha, occ, type, sep='_'))))#
+mod <- lmer(dist ~ status +  (1|site),#
+            data=dats)#
+summary(mod)#
+#
+plot.beta.div(dis.method =dis.method, dists= dats$dist,#
+              status= dats$status, type= "time",#
+              sub= type, occ=occ, ylabel=ylabel)#
+#
+plot.coeffs(dis.method =dis.method, mod=summary(mod),#
+            status= dats$status, type= "space",#
+            sub= type, occ=occ)#
+plotDistPanels()
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
+binary <- FALSE#
+alpha <- TRUE#
+## int or pols#
+type <- "pols"#
+source('src/initialize_beta.R')#
+#
+## ************************************************************#
+## beta diversity as variation between years,#
+## centroid for each site#
+## ************************************************************#
+dis <- mapply(function(a, b, c, d)#
+              beta.status(comm= a,#
+                          status= b,#
+                          dis.method,#
+                          nulls=c,#
+                          occ=binary,#
+                          years=d,#
+                          sub=type),#
+              a=comm$comm,#
+              b=comm$status,#
+              c= nulls,#
+              d= comm$comm,#
+              SIMPLIFY=FALSE)#
+#
+dats <- data.frame(site=comm$sites,#
+                   status=unlist(comm$status),#
+                   year=unlist(comm$years),#
+                   dist=unlist(sapply(dis, function(x)#
+                     x$distances)))#
+rownames(dats) <- NULL#
+#
+save(dats, file= file.path('saved/speciesTurnover',#
+             sprintf('%s.pdf', paste(dis.method, alpha, occ, type,#
+                                     sep='_'))))#
+#
+## invid nulls all not sig, alpha nulls mature marginally sig less,#
+## occurrence nulls all not sig#
+#
+## run model, plot#
+#
+load(file= file.path('saved/speciesTurnover', sprintf('%s.pdf',#
+       paste(dis.method, alpha, occ, type, sep='_'))))#
+mod <- lmer(dist ~ status +  (1|site),#
+            data=dats)#
+summary(mod)#
+#
+plot.beta.div(dis.method =dis.method, dists= dats$dist,#
+              status= dats$status, type= "time",#
+              sub= type, occ=occ, ylabel=ylabel)#
+#
+plot.coeffs(dis.method =dis.method, mod=summary(mod),#
+            status= dats$status, type= "space",#
+            sub= type, occ=occ)#
+plotDistPanels()
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
+binary <- FALSE#
+alpha <- FALSE#
+## int or pols#
+type <- "pols"#
+source('src/initialize_beta.R')#
+#
+## ************************************************************#
+## beta diversity as variation between years,#
+## centroid for each site#
+## ************************************************************#
+dis <- mapply(function(a, b, c, d)#
+              beta.status(comm= a,#
+                          status= b,#
+                          dis.method,#
+                          nulls=c,#
+                          occ=binary,#
+                          years=d,#
+                          sub=type),#
+              a=comm$comm,#
+              b=comm$status,#
+              c= nulls,#
+              d= comm$comm,#
+              SIMPLIFY=FALSE)#
+#
+dats <- data.frame(site=comm$sites,#
+                   status=unlist(comm$status),#
+                   year=unlist(comm$years),#
+                   dist=unlist(sapply(dis, function(x)#
+                     x$distances)))#
+rownames(dats) <- NULL#
+#
+save(dats, file= file.path('saved/speciesTurnover',#
+             sprintf('%s.pdf', paste(dis.method, alpha, occ, type,#
+                                     sep='_'))))#
+#
+## invid nulls all not sig, alpha nulls mature marginally sig less,#
+## occurrence nulls all not sig#
+#
+## run model, plot#
+#
+load(file= file.path('saved/speciesTurnover', sprintf('%s.pdf',#
+       paste(dis.method, alpha, occ, type, sep='_'))))#
+mod <- lmer(dist ~ status +  (1|site),#
+            data=dats)#
+summary(mod)#
+#
+plot.beta.div(dis.method =dis.method, dists= dats$dist,#
+              status= dats$status, type= "time",#
+              sub= type, occ=occ, ylabel=ylabel)#
+#
+plot.coeffs(dis.method =dis.method, mod=summary(mod),#
+            status= dats$status, type= "space",#
+            sub= type, occ=occ)#
+plotDistPanels()
+load(file= file.path('saved/speciesTurnover', sprintf('%s.pdf',#
+       paste(dis.method, alpha, occ, type, sep='_'))))
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
+binary <- FALSE#
+alpha <- FALSE#
+## int or pols#
+type <- "plants"#
+source('src/initialize_beta.R')#
+#
+## ************************************************************#
+## beta diversity as variation between years,#
+## centroid for each site#
+## ************************************************************#
+dis <- mapply(function(a, b, c, d)#
+              beta.status(comm= a,#
+                          status= b,#
+                          dis.method,#
+                          nulls=c,#
+                          occ=binary,#
+                          years=d,#
+                          sub=type),#
+              a=comm$comm,#
+              b=comm$status,#
+              c= nulls,#
+              d= comm$comm,#
+              SIMPLIFY=FALSE)#
+#
+dats <- data.frame(site=comm$sites,#
+                   status=unlist(comm$status),#
+                   year=unlist(comm$years),#
+                   dist=unlist(sapply(dis, function(x)#
+                     x$distances)))#
+rownames(dats) <- NULL#
+#
+save(dats, file= file.path('saved/speciesTurnover',#
+             sprintf('%s.pdf', paste(dis.method, alpha, occ, type,#
+                                     sep='_'))))#
+#
+## invid nulls all not sig, alpha nulls mature marginally sig less,#
+## occurrence nulls all not sig#
+#
+## run model, plot#
+#
+load(file= file.path('saved/speciesTurnover', sprintf('%s.pdf',#
+       paste(dis.method, alpha, occ, type, sep='_'))))#
+mod <- lmer(dist ~ status +  (1|site),#
+            data=dats)#
+summary(mod)#
+#
+plot.beta.div(dis.method =dis.method, dists= dats$dist,#
+              status= dats$status, type= "time",#
+              sub= type, occ=occ, ylabel=ylabel)#
+#
+plot.coeffs(dis.method =dis.method, mod=summary(mod),#
+            status= dats$status, type= "space",#
+            sub= type, occ=occ)#
+plotDistPanels()
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
+binary <- FALSE#
+alpha <- TRUE#
+## int or pols#
+type <- "plants"#
+source('src/initialize_beta.R')#
+#
+## ************************************************************#
+## beta diversity as variation between years,#
+## centroid for each site#
+## ************************************************************#
+dis <- mapply(function(a, b, c, d)#
+              beta.status(comm= a,#
+                          status= b,#
+                          dis.method,#
+                          nulls=c,#
+                          occ=binary,#
+                          years=d,#
+                          sub=type),#
+              a=comm$comm,#
+              b=comm$status,#
+              c= nulls,#
+              d= comm$comm,#
+              SIMPLIFY=FALSE)#
+#
+dats <- data.frame(site=comm$sites,#
+                   status=unlist(comm$status),#
+                   year=unlist(comm$years),#
+                   dist=unlist(sapply(dis, function(x)#
+                     x$distances)))#
+rownames(dats) <- NULL#
+#
+save(dats, file= file.path('saved/speciesTurnover',#
+             sprintf('%s.pdf', paste(dis.method, alpha, occ, type,#
+                                     sep='_'))))#
+#
+## invid nulls all not sig, alpha nulls mature marginally sig less,#
+## occurrence nulls all not sig#
+#
+## run model, plot#
+#
+load(file= file.path('saved/speciesTurnover', sprintf('%s.pdf',#
+       paste(dis.method, alpha, occ, type, sep='_'))))#
+mod <- lmer(dist ~ status +  (1|site),#
+            data=dats)#
+summary(mod)#
+#
+plot.beta.div(dis.method =dis.method, dists= dats$dist,#
+              status= dats$status, type= "time",#
+              sub= type, occ=occ, ylabel=ylabel)#
+#
+plot.coeffs(dis.method =dis.method, mod=summary(mod),#
+            status= dats$status, type= "space",#
+            sub= type, occ=occ)#
+plotDistPanels()
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
+binary <- TRUE#
+alpha <- TRUE#
+## int or pols#
+type <- "plants"#
+source('src/initialize_beta.R')#
+#
+## ************************************************************#
+## beta diversity as variation between years,#
+## centroid for each site#
+## ************************************************************#
+dis <- mapply(function(a, b, c, d)#
+              beta.status(comm= a,#
+                          status= b,#
+                          dis.method,#
+                          nulls=c,#
+                          occ=binary,#
+                          years=d,#
+                          sub=type),#
+              a=comm$comm,#
+              b=comm$status,#
+              c= nulls,#
+              d= comm$comm,#
+              SIMPLIFY=FALSE)#
+#
+dats <- data.frame(site=comm$sites,#
+                   status=unlist(comm$status),#
+                   year=unlist(comm$years),#
+                   dist=unlist(sapply(dis, function(x)#
+                     x$distances)))#
+rownames(dats) <- NULL#
+#
+save(dats, file= file.path('saved/speciesTurnover',#
+             sprintf('%s.pdf', paste(dis.method, alpha, occ, type,#
+                                     sep='_'))))#
+#
+## invid nulls all not sig, alpha nulls mature marginally sig less,#
+## occurrence nulls all not sig#
+#
+## run model, plot#
+#
+load(file= file.path('saved/speciesTurnover', sprintf('%s.pdf',#
+       paste(dis.method, alpha, occ, type, sep='_'))))#
+mod <- lmer(dist ~ status +  (1|site),#
+            data=dats)#
+summary(mod)#
+#
+plot.beta.div(dis.method =dis.method, dists= dats$dist,#
+              status= dats$status, type= "time",#
+              sub= type, occ=occ, ylabel=ylabel)#
+#
+plot.coeffs(dis.method =dis.method, mod=summary(mod),#
+            status= dats$status, type= "space",#
+            sub= type, occ=occ)#
+plotDistPanels()
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
+binary <- TRUE#
+alpha <- TRUE#
+## int or pols#
+type <- "plants"#
+source('src/initialize_beta.R')#
+#
+## ************************************************************#
+## beta diversity as variation between years,#
+## centroid for each site#
+## ************************************************************#
+dis <- mapply(function(a, b, c, d)#
+              beta.status(comm= a,#
+                          status= b,#
+                          dis.method,#
+                          nulls=c,#
+                          occ=binary,#
+                          years=d,#
+                          sub=type),#
+              a=comm$comm,#
+              b=comm$status,#
+              c= nulls,#
+              d= comm$comm,#
+              SIMPLIFY=FALSE)#
+#
+dats <- data.frame(site=comm$sites,#
+                   status=unlist(comm$status),#
+                   year=unlist(comm$years),#
+                   dist=unlist(sapply(dis, function(x)#
+                     x$distances)))#
+rownames(dats) <- NULL
+source('~/Dropbox/hedgerow_assembly/analysis/variability/beta-div.R')
+type <- "pols"#
+source('~/Dropbox/hedgerow_assembly/analysis/variability/nulls.R')#
+## species turnover through years#
+source('~/Dropbox/hedgerow_assembly/analysis/variability/beta-div.R')#
+plotDistPanels()
+## species turnover through years#
+source('~/Dropbox/hedgerow_assembly/analysis/variability/beta-div.R')
+plotDistPanels()
+library(RColorBrewer)#
+library(beeswarm)#
+## box plot#
+#
+plot.beta.div <- function(dis.method, ## dissmiliarity method for file name#
+                          dists, ## beta-div estimate (box data)#
+                          status, ## vector of site statuses (box catagoties)#
+                          type, ## time or space for ylab#
+                          sub, ## bees/syrphids for file name#
+                          occ,## occ data? TRUE/FALSE#
+                          fig.path = 'figures/betadisper',#
+                          ylabel){#
+  makeBetaBox <- function(){#
+#
+    par(oma=c(2,6,1,1), mar=c(5,0,2,0.5), mgp=c(2,1,0),#
+        cex.axis=1.5)#
+    status <- factor(status,#
+                     levels=c('control', 'maturing',#
+                       'mature'))#
+    cols <- brewer.pal(4, "Greys")[c(2,3,4)]#
+    cols.fills <- add.alpha(cols, alpha=0.5)#
+    boxplot(dists ~ status, col=cols.fills,#
+            xlab='', ylab='',#
+            names=c("","",""),#
+            las=1,#
+            ylim=c(0,1))#
+    mtext(c("Non-assembling \n field margin",#
+            "Assembling \n  hedgerow",#
+            "Non-assembling \n hedgerow"),#
+          side = 1, line= 2, at = 1:3)#
+    beeswarm(dists ~ status, col = cols, add = TRUE)#
+#
+    mtext(ylabel,#
+          2, line=3.5, cex=1.5)#
+#
+  }#
+  pdf.f(makeBetaBox,#
+        file= file.path(fig.path, sprintf('%s.pdf',#
+          paste(type,#
+                occ,#
+                dis.method,#
+                sub,#
+                sep='_'))),#
+        width=6, height=6)#
+}#
+#
+## extracts model coefficients and SE and plots them as points and#
+## lines#
+#
+plot.coeffs <- function(dis.method, ## dissmiliarity method for file name#
+                        mod, ## model object#
+                        status, ## vector of site statuses #
+                        type,  ## time or space for ylab#
+                        sub, ## bees/syrphids for file name#
+                        occ, ## occ data? TRUE/FALSE#
+                        fig.path = 'figures/betadisper',#
+                        add.labels=TRUE){  #
+  ## cols <-brewer.pal(6, 'Dark2')[c(6,2,1)]#
+  cols <- brewer.pal(4, "Greys")[c(2,3,4)]#
+  f <- function(){#
+    par(oma=c(2,6,1,1), mar=c(5,0,2,0.5), mgp=c(2,1,0),#
+        cex.axis=1.5)#
+    means <- c(coef(mod)[1,1],#
+               coef(mod)[1,1] + coef(mod)[3,1],#
+               coef(mod)[1,1] + coef(mod)[2,1])#
+    ci.ub <- means +#
+      c(coef(mod)[1,2], coef(mod)[3,2], coef(mod)[2,2])#
+    ci.lb <- means -#
+      c(coef(mod)[1,2], coef(mod)[3,2], coef(mod)[2,2])#
+    plot(x=1:3, y=means,#
+         col=cols,#
+         pch=16,#
+         ylim=c(0,0.6),#
+         xlim=c(0.5,3.5),#
+         xlab='',#
+         xaxt='n',#
+         cex=1.5, las=1)#
+    arrows(x0=1:3,#
+           y0= ci.lb, y1=ci.ub, angle=90,#
+           length=0, code=3, col=cols, lwd=1.5)#
+    mtext("Species temporal turnover", 2, line=3.5 , cex=2)#
+    if(add.labels){#
+      axis(1, at= 1:3,#
+           labels=c("Non-assembling \n field margin",#
+             "Assembling \n  hedgerow",#
+             "Non-assembling \n hedgerow"))#
     }#
   }#
-#
-  ## Derived quantities:#
-  ## Create a loop to determine point level#
-  ## richness estimates for the whole community#
-  ## and for subsets or assemblages of interest.#
-  ## for(j in 1:num.points){#
-  ##   N.site[j]<- sum(mu.psi[j,1:(num.species)])#
-  ##   N.ground[j]<- inprod(Z[j,1:num.species],ground[1:num.species])#
-  ##   N.mid[j]<- inprod(Z[j,1:num.species],mid[1:num.species])#
-  ## }#
-})
-model.input$data[["onesRow"]] <- NULL#
-model.input$constants[["max.num.reps"]] <- NULL#
-#
-input1 <- c(code=ms.ss.occ, model.input)#
-occ.R.model <- nimbleModel(code=ms.ss.occ,#
-                           constants=input1$constants,#
-                           data=input1$data,#
-                           inits=input1$inits,#
-                           check=FALSE)
-ms.ss.orig <- compareMCMCs(input1,#
-                           MCMCs=c('jags'),#
-                           niter=niter,#
-                           burnin = burnin,#
-                           summary=FALSE,#
-                           check=FALSE)
-occ.R.model <- nimbleModel(code=ms.ss.occ,#
-                           constants=input1$constants,#
-                           data=input1$data,#
-                           inits=input1$inits,#
-                           check=FALSE)
-ms.ss.orig <- compareMCMCs(input1,#
-                           MCMCs=c('nimble'),#
-                           niter=niter,#
-                           burnin = burnin,#
-                           summary=FALSE,#
-                           check=FALSE)
-ms.ss.orig
-library(bipartite)
-?specieslevel
-library(sna)
-?closeness
-?lmer
-library(lme4)
-?lmer
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/speciesLevel')#
-source('src/initialize.R')#
-load('../../data/networks/all_networks_years.Rdata')#
-#
-## **********************************************************#
-## species importance#
-## **********************************************************#
-## specs <- calcSpec(nets, spec, spec.metric = "d", 0.3)#
-## save(specs, file=file.path(save.path, 'specs.Rdata'))#
-#
-## linear models#
-load(file=file.path(save.path, 'specs.Rdata'))#
-## SiteStatus or ypr#
-xvar <- "ypr"#
-#
-## anything outputted by specieslevel#
-ys <- c("proportional.generality", "d", "degree", "betweenness",#
-        "log(closeness)")#
-#
-## formulas <-lapply(ys, function(x) {#
-##   as.formula(paste(x, "~",#
-##                    paste(paste(xvar, "specialization", sep="*"), #
-##                          "(1|Site)",#
-##                           "(1|GenusSpecies)",#
-##                          sep="+")))#
-## })#
-#
-formulas <-lapply(ys, function(x) {#
-  as.formula(paste(x, "~",#
-                   paste(xvar, #
-                         "(1|Site)",#
-                          "(1|GenusSpecies)",#
-                         sep="+")))#
-})
-formulas
-mod.pols <- lapply(formulas, function(x){#
-  lmer(x,#
-       data=specs[specs$speciesType == "pollinator",])#
-})#
-#
-mod.plants <- lapply(formulas, function(x){#
-  lmer(x,#
-       data=specs[specs$speciesType == "plant",])#
-})#
-names(mod.pols) <- names(mod.plants) <- ys
-unique(spec$closeness)
-unique(specs$closeness)
-range(specs$closeness)
-specs$closeness[specs$closeness == 0]
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/speciesLevel')#
-source('src/initialize.R')#
-load('../../data/networks/all_networks_years.Rdata')#
-#
-## **********************************************************#
-## species importance#
-## **********************************************************#
-## specs <- calcSpec(nets, spec, spec.metric = "d", 0.3)#
-## save(specs, file=file.path(save.path, 'specs.Rdata'))#
-#
-specs$closeness[specs$closeness == 0] <- 1*10^-6
-## linear models#
-load(file=file.path(save.path, 'specs.Rdata'))#
-specs$closeness[specs$closeness == 0] <- 1*10^-6
-specs$closeness[specs$closeness == 0]
-## anything outputted by specieslevel#
-ys <- c("proportional.generality", "d", "degree", "betweenness",#
-        "log(closeness)")#
-#
-## formulas <-lapply(ys, function(x) {#
-##   as.formula(paste(x, "~",#
-##                    paste(paste(xvar, "specialization", sep="*"), #
-##                          "(1|Site)",#
-##                           "(1|GenusSpecies)",#
-##                          sep="+")))#
-## })#
-#
-formulas <-lapply(ys, function(x) {#
-  as.formula(paste(x, "~",#
-                   paste(xvar, #
-                         "(1|Site)",#
-                          "(1|GenusSpecies)",#
-                         sep="+")))#
-})#
-#
-mod.pols <- lapply(formulas, function(x){#
-  lmer(x,#
-       data=specs[specs$speciesType == "pollinator",])#
-})#
-#
-mod.plants <- lapply(formulas, function(x){#
-  lmer(x,#
-       data=specs[specs$speciesType == "plant",])#
-})#
-names(mod.pols) <- names(mod.plants) <- ys#
-lapply(mod.plants, summary)#
-lapply(mod.pols, summary)#
-#
-save(mod.pols, mod.plants, ys, file=file.path(save.path,#
-            sprintf('mods/specs_%s.Rdata', xvar)))
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/speciesLevel')#
-source('src/initialize.R')#
-load('../../data/networks/all_networks_years.Rdata')#
-#
-## **********************************************************#
-## species importance#
-## **********************************************************#
-## specs <- calcSpec(nets, spec, spec.metric = "d", 0.3)#
-## save(specs, file=file.path(save.path, 'specs.Rdata'))#
-#
-## linear models#
-load(file=file.path(save.path, 'specs.Rdata'))#
-specs$closeness[specs$closeness == 0] <- 1*10^-6#
-#
-## SiteStatus or ypr#
-xvar <- "ypr"#
-#
-## anything outputted by specieslevel#
-ys <- c("proportional.generality", "d", "degree", "betweenness",#
-        "log(closeness)")#
-#
-## formulas <-lapply(ys, function(x) {#
-##   as.formula(paste(x, "~",#
-##                    paste(paste(xvar, "specialization", sep="*"), #
-##                          "(1|Site)",#
-##                           "(1|GenusSpecies)",#
-##                          sep="+")))#
-## })#
-#
-formulas <-lapply(ys, function(x) {#
-  as.formula(paste(x, "~",#
-                   paste(xvar, #
-                         "(1|Site)",#
-                          "(1|GenusSpecies)",#
-                         sep="+")))#
-})#
-#
-mod.pols <- lapply(formulas, function(x){#
-  lmer(x,#
-       data=specs[specs$speciesType == "pollinator",])#
-})#
-#
-mod.plants <- lapply(formulas, function(x){#
-  lmer(x,#
-       data=specs[specs$speciesType == "plant",])#
-})#
-names(mod.pols) <- names(mod.plants) <- ys#
-lapply(mod.plants, summary)#
-lapply(mod.pols, summary)#
-#
-save(mod.pols, mod.plants, ys, file=file.path(save.path,#
-            sprintf('mods/specs_%s.Rdata', xvar)))
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/speciesLevel')#
-source('plotting/src/predictIntervals.R')#
-source('plotting/src/CIplotting.R')#
-source('plotting/src/plotPanels.R')#
-source('src/initialize.R')#
-#
-## ************************************************************#
-## specialization#
-## ************************************************************#
-#
-load(file=file.path(save.path, 'specs.Rdata'))#
-load(file=file.path(save.path, "mods/specs_ypr.Rdata"))#
-#
-ylabs <- c("Proportional Generality", "Specialization (d')", "Degree",#
-           "Betweenness", "Closeness" )#
-#
-dd <- expand.grid(ypr=seq(from= min(specs$ypr, na.rm=TRUE),#
-                          to= max(specs$ypr, na.rm=TRUE),#
-                          length=10))#
-pp <- c("plants", "pols")#
-mods <- list(mod.pols, mod.plants)#
-names(mods) <- pp#
-#
-for(j in pp){#
-  for(i in 1:length(ys)){#
-    dd.ypr <- cbind(dd, 0)#
-    colnames(dd.ypr) <- c("ypr", ys[i])#
-      ypr.pi <- predict.int(mod= mods[[j]][[i]],#
-                            dd=dd.ypr,#
-                            y=ys[i],#
-                            family="gaussian")#
-#
-    plot.predict.ypr(new.dd=ypr.pi,#
-                     ylabel=ylabs[i],#
-                     dats=specs,#
-                     y1=ys[i],#
-                     extinction.method=j,#
-                     agg.col="GenusSpecies")#
-  }#
+  pdf.f(f, file= file.path(fig.path, sprintf('%s.pdf',#
+             paste('coeff', type,#
+                   occ,#
+                   dis.method,#
+                   sub,#
+                   sep='_'))),#
+        width=6, height=6)#
 }#
-## closeness only#
-#
-ypr.pi.pol <- predict.int(mod= mods$pol$closeness,#
-                      dd=dd.ypr,#
-                      y="closeness",#
-                      family="gaussian")#
-ypr.pi.plant <- predict.int(mod= mods$plant$closeness,#
-                      dd=dd.ypr,#
-                      y="closeness",#
-                      family="gaussian")#
-#
-plot.panels()
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/speciesLevel')#
-source('src/initialize.R')#
-load('../../data/networks/all_networks_years.Rdata')#
-#
-## **********************************************************#
-## species importance#
-## **********************************************************#
-## specs <- calcSpec(nets, spec, spec.metric = "d", 0.3)#
-## save(specs, file=file.path(save.path, 'specs.Rdata'))#
-#
-## linear models#
-load(file=file.path(save.path, 'specs.Rdata'))#
-specs$closeness[specs$closeness == 0] <- 1*10^-6#
-specs$closeness.log <- log(specs$closeness)
-## anything outputted by specieslevel#
-ys <- c("proportional.generality", "d", "degree", "betweenness",#
-        "closeness.log")#
-#
-## formulas <-lapply(ys, function(x) {#
-##   as.formula(paste(x, "~",#
-##                    paste(paste(xvar, "specialization", sep="*"), #
-##                          "(1|Site)",#
-##                           "(1|GenusSpecies)",#
-##                          sep="+")))#
-## })#
-#
-formulas <-lapply(ys, function(x) {#
-  as.formula(paste(x, "~",#
-                   paste(xvar, #
-                         "(1|Site)",#
-                          "(1|GenusSpecies)",#
-                         sep="+")))#
-})#
-#
-mod.pols <- lapply(formulas, function(x){#
-  lmer(x,#
-       data=specs[specs$speciesType == "pollinator",])#
-})#
-#
-mod.plants <- lapply(formulas, function(x){#
-  lmer(x,#
-       data=specs[specs$speciesType == "plant",])#
-})#
-names(mod.pols) <- names(mod.plants) <- ys#
-lapply(mod.plants, summary)#
-lapply(mod.pols, summary)#
-#
-save(mod.pols, mod.plants, ys, file=file.path(save.path,#
-            sprintf('mods/specs_%s.Rdata', xvar)))#
-#
-## **********************************************************#
-## degree distributions (abundance distributions)#
-## **********************************************************#
-#
-baci.sites <- c("Barger", "Butler", "MullerB", "Sperandio", "Hrdy")#
-specs <- specs[specs$Site %in% baci.sites,]#
-#
-layout(matrix(1:6, nrow=2))#
-cols <- rainbow(length(unique(specs$ypr)))#
-lapply(unique(specs$Site), function(x){#
-  print(x)#
-  this.specs <- specs[specs$Site == x, c("degree", "ypr")]#
-  plot(NA, ylim=c(0,0.8), xlim=c(0,25),#
-       ylab="Frequency",#
-       xlab="Abundance",#
-       main=x)#
-  for(i in 1:length(unique(this.specs$ypr))){#
-    this.ypr <- unique(this.specs$ypr)[i]#
-    print(this.ypr)#
-    points(density(this.specs$degree[this.specs$ypr == this.ypr]),#
-           col=cols[i], type="l", lwd=2)#
+plot.node.box <- function(ylabel,#
+                          dats,#
+                          y1){#
+  makeNodeBox <- function(){#
+    par(oma=c(2,6,1,1), mar=c(5,0,2,0.5), mgp=c(2,1,0),#
+        cex.axis=1.5)#
+    cols <- brewer.pal(4, "Greys")[c(2,3,4)]#
+    cols.fills <- add.alpha(cols, alpha=0.5)#
+    boxplot(dats[,y1]~ dats$SiteStatus,#
+            col=cols.fills,#
+            names=c("","",""))#
+    mtext(c("Non-assembling \n field margin",#
+            "Assembling \n  hedgerow",#
+            "Non-assembling \n hedgerow"),#
+          side = 1, line= 2, at = 1:3)#
+    beeswarm(dats[,y1]~ dats$SiteStatus, col = cols, add = TRUE)#
+    mtext(ylabel, 2, line=3.5, cex=1.5)#
   }#
-})#
-#
-plot(NA, ylim=c(0,1), xlim=c(0,1), xaxt="n", yaxt="n", ylab="", xlab="")#
-legend("center", col=cols, lwd="2",#
-       legend=sort(unique(specs$ypr)),#
-       bty="n")
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/speciesLevel')#
-source('src/initialize.R')#
-load('../../data/networks/all_networks_years.Rdata')#
-#
-## **********************************************************#
-## species importance#
-## **********************************************************#
-## specs <- calcSpec(nets, spec, spec.metric = "d", 0.3)#
-## save(specs, file=file.path(save.path, 'specs.Rdata'))#
-#
-## linear models#
-load(file=file.path(save.path, 'specs.Rdata'))#
-specs$closeness[specs$closeness == 0] <- 1*10^-6#
-specs$closeness.log <- log(specs$closeness)#
-#
-## SiteStatus or ypr#
-xvar <- "ypr"#
-#
-## anything outputted by specieslevel#
-ys <- c("proportional.generality", "d", "degree", "betweenness",#
-        "closeness.log")#
-#
-## formulas <-lapply(ys, function(x) {#
-##   as.formula(paste(x, "~",#
-##                    paste(paste(xvar, "specialization", sep="*"), #
-##                          "(1|Site)",#
-##                           "(1|GenusSpecies)",#
-##                          sep="+")))#
-## })#
-#
-formulas <-lapply(ys, function(x) {#
-  as.formula(paste(x, "~",#
-                   paste(xvar, #
-                         "(1|Site)",#
-                          "(1|GenusSpecies)",#
-                         sep="+")))#
-})#
-#
-mod.pols <- lapply(formulas, function(x){#
-  lmer(x,#
-       data=specs[specs$speciesType == "pollinator",])#
-})#
-#
-mod.plants <- lapply(formulas, function(x){#
-  lmer(x,#
-       data=specs[specs$speciesType == "plant",])#
-})#
-names(mod.pols) <- names(mod.plants) <- ys#
-lapply(mod.plants, summary)#
-lapply(mod.pols, summary)#
-#
-save(mod.pols, mod.plants, ys, file=file.path(save.path,#
-            sprintf('mods/specs_%s.Rdata', xvar)))#
-#
-## **********************************************************#
-## degree distributions (abundance distributions)#
-## **********************************************************#
-#
-baci.sites <- c("Barger", "Butler", "MullerB", "Sperandio", "Hrdy")#
-specs <- specs[specs$Site %in% baci.sites,]#
-#
-layout(matrix(1:6, nrow=2))#
-cols <- rainbow(length(unique(specs$ypr)))#
-lapply(unique(specs$Site), function(x){#
-  print(x)#
-  this.specs <- specs[specs$Site == x, c("degree", "ypr")]#
-  plot(NA, ylim=c(0,0.8), xlim=c(0,25),#
-       ylab="Frequency",#
-       xlab="Abundance",#
-       main=x)#
-  for(i in 1:length(unique(this.specs$ypr))){#
-    this.ypr <- unique(this.specs$ypr)[i]#
-    print(this.ypr)#
-    points(density(this.specs$degree[this.specs$ypr == this.ypr]),#
-           col=cols[i], type="l", lwd=2)#
-  }#
-})#
-#
-plot(NA, ylim=c(0,1), xlim=c(0,1), xaxt="n", yaxt="n", ylab="", xlab="")#
-legend("center", col=cols, lwd="2",#
-       legend=sort(unique(specs$ypr)),#
-       bty="n")
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/speciesLevel')#
-source('plotting/src/predictIntervals.R')#
-source('plotting/src/CIplotting.R')#
-source('plotting/src/plotPanels.R')#
-source('src/initialize.R')#
-#
-## ************************************************************#
-## specialization#
-## ************************************************************#
-#
-load(file=file.path(save.path, 'specs.Rdata'))#
-load(file=file.path(save.path, "mods/specs_ypr.Rdata"))#
-#
-ylabs <- c("Proportional Generality", "Specialization (d')", "Degree",#
-           "Betweenness", "Closeness" )#
-#
-dd <- expand.grid(ypr=seq(from= min(specs$ypr, na.rm=TRUE),#
-                          to= max(specs$ypr, na.rm=TRUE),#
-                          length=10))#
-pp <- c("plants", "pols")#
-mods <- list(mod.pols, mod.plants)#
-names(mods) <- pp#
-#
-for(j in pp){#
-  for(i in 1:length(ys)){#
-    dd.ypr <- cbind(dd, 0)#
-    colnames(dd.ypr) <- c("ypr", ys[i])#
-      ypr.pi <- predict.int(mod= mods[[j]][[i]],#
-                            dd=dd.ypr,#
-                            y=ys[i],#
-                            family="gaussian")#
-#
-    plot.predict.ypr(new.dd=ypr.pi,#
-                     ylabel=ylabs[i],#
-                     dats=specs,#
-                     y1=ys[i],#
-                     extinction.method=j,#
-                     agg.col="GenusSpecies")#
-  }#
+  path <- 'figures'#
+  pdf.f(makeNodeBox, file=file.path(path,#
+                       sprintf("%s.pdf", paste(#
+                         gsub(" ", "", ylabel),#
+                         "box", sep="_"))),#
+        width=6, height=6)#
 }#
-## closeness only#
+plotDistPanels <- function(){#
+  f3 <- function(){#
+    layout(matrix(1:4, ncol=2, byrow=TRUE))#
+    par(oma=c(2.5, 6, 1, 1),#
+        mar=c(1, 1, 2, 1), cex.axis=1.5)#
+    cols <- brewer.pal(4, "Greys")[c(2,3,4)]#
+    cols.fills <- add.alpha(cols, alpha=0.5)#
 #
-ypr.pi.pol <- predict.int(mod= mods$pol$closeness,#
-                      dd=dd.ypr,#
-                      y="closeness",#
-                      family="gaussian")#
-ypr.pi.plant <- predict.int(mod= mods$plant$closeness,#
-                      dd=dd.ypr,#
-                      y="closeness",#
-                      family="gaussian")#
+    ## pollinator species turnover#
+    load(file= file.path('saved/speciesTurnover', sprintf('%s.pdf',#
+           paste(dis.method, alpha, occ, type="pols", sep='_'))))#
+    dists <- dats$dist#
+    status <- dats$status#
+    status <- factor(status,#
+                     levels=c('control', 'maturing',#
+                       'mature'))#
+    boxplot(dists ~ status, col=cols.fills,#
+            xlab='', ylab='', ylim=c(0,1),#
+            names=c("","",""),#
+            las=1, xaxt="n")#
+    beeswarm(dists ~ status, col = cols.fills,#
+             add = TRUE, method="hex", corral="gutter")#
+    mtext("Pollinators",#
+          3, line=0.9, cex=1.5)#
 #
-plot.panels()
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/speciesLevel')#
-source('plotting/src/predictIntervals.R')#
-source('plotting/src/CIplotting.R')#
-source('plotting/src/plotPanels.R')#
-source('src/initialize.R')#
-#
-## ************************************************************#
-## specialization#
-## ************************************************************#
-#
-load(file=file.path(save.path, 'specs.Rdata'))#
-load(file=file.path(save.path, "mods/specs_ypr.Rdata"))#
-#
-ylabs <- c("Proportional Generality", "Specialization (d')", "Degree",#
-           "Betweenness", "Closeness" )#
-#
-dd <- expand.grid(ypr=seq(from= min(specs$ypr, na.rm=TRUE),#
-                          to= max(specs$ypr, na.rm=TRUE),#
-                          length=10))#
-pp <- c("plants", "pols")#
-mods <- list(mod.pols, mod.plants)#
-names(mods) <- pp#
-#
-for(j in pp){#
-  for(i in 1:length(ys)){#
-    dd.ypr <- cbind(dd, 0)#
-    colnames(dd.ypr) <- c("ypr", ys[i])#
-      ypr.pi <- predict.int(mod= mods[[j]][[i]],#
-                            dd=dd.ypr,#
-                            y=ys[i],#
-                            family="gaussian")#
-#
-    plot.predict.ypr(new.dd=ypr.pi,#
-                     ylabel=ylabs[i],#
-                     dats=specs,#
-                     y1=ys[i],#
-                     extinction.method=j,#
-                     agg.col="GenusSpecies")#
+    ## plant species turnover#
+    load(file= file.path('saved/speciesTurnover', sprintf('%s.pdf',#
+           paste(dis.method, alpha, occ, type="plants", sep='_'))))#
+    dists <- dats$dist#
+    status <- dats$status#
+    status <- factor(status,#
+                     levels=c('control', 'maturing',#
+                       'mature'))#
+    boxplot(dists ~ status, col=cols.fills,#
+            xlab='', ylab='',ylim=c(0,1),#
+            names=c("","",""),#
+            las=1, xaxt="n", yaxt="n")#
+    beeswarm(dists ~ status, col = cols.fills, add = TRUE,#
+             method="hex", corral="gutter")#
+    mtext("Plants",#
+          3, line=0.9, cex=1.5)#
+    ## interaction turnover#
+    load(file= file.path('saved/speciesTurnover', sprintf('%s.pdf',#
+           paste(dis.method, alpha, occ, type="ints", sep='_'))))#
+    dists <- dats$dist#
+    status <- dats$status#
+    status <- factor(status,#
+                     levels=c('control', 'maturing',#
+                       'mature'))#
+    boxplot(dists ~ status, col=cols.fills,#
+            xlab='', ylab='',ylim=c(0,1),#
+            names=c("","",""),#
+            las=1)#
+    beeswarm(dists ~ status, col = cols.fills, add = TRUE,#
+             method="hex", corral="gutter")#
+    mtext("Interactions",#
+          3, line=0.9, cex=1.5)#
+    mtext(c("Non-assembling \n field margin",#
+            "Assembling \n  hedgerow",#
+            "Non-assembling \n hedgerow"),#
+          side = 1, line= 2, at = 1:3, cex=0.9)#
+    mtext("Turnover", 2, line=4, cex=2, adj=1.35)#
+    ## weighted link turnover#
+    load(file="saved/phyloInt.Rdata")#
+    dats <- phylo.int$phylo.int#
+    y1 <- "PhyloInt"#
+    boxplot(dats[,y1]~ dats$SiteStatus,#
+            col=cols.fills,#
+            names=c("","",""), las=1,#
+            ylim=c(0,1), yaxt="n")#
+    mtext(c("Non-assembling \n field margin",#
+            "Assembling \n  hedgerow",#
+            "Non-assembling \n hedgerow"),#
+          side = 1, line= 2, at = 1:3, cex=0.9)#
+    beeswarm(dats[,y1]~ dats$SiteStatus, col = cols.fills, add = TRUE,#
+             method="hex", corral="gutter")#
+    mtext("Weighted interactions", 3, line=0.9, cex=1.5)#
   }#
-}#
-## closeness only#
-#
-ypr.pi.pol <- predict.int(mod= mods$pol$closeness,#
-                      dd=dd.ypr,#
-                      y="closeness.log",#
-                      family="gaussian")#
-ypr.pi.plant <- predict.int(mod= mods$plant$closeness,#
-                      dd=dd.ypr,#
-                      y="closeness.log",#
-                      family="gaussian")#
-#
-plot.panels()
-ys
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/speciesLevel')#
-source('src/initialize.R')#
-load('../../data/networks/all_networks_years.Rdata')#
-#
-## **********************************************************#
-## species importance#
-## **********************************************************#
-## specs <- calcSpec(nets, spec, spec.metric = "d", 0.3)#
-## save(specs, file=file.path(save.path, 'specs.Rdata'))#
-#
-## linear models#
-load(file=file.path(save.path, 'specs.Rdata'))#
-specs$closeness[specs$closeness == 0] <- 1*10^-6#
-specs$closeness.log <- log(specs$closeness)
-save(specs, file=file.path(save.path, 'specs.Rdata'))
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/speciesLevel')#
-source('plotting/src/predictIntervals.R')#
-source('plotting/src/CIplotting.R')#
-source('plotting/src/plotPanels.R')#
-source('src/initialize.R')#
-#
-## ************************************************************#
-## specialization#
-## ************************************************************#
-#
-load(file=file.path(save.path, 'specs.Rdata'))#
-load(file=file.path(save.path, "mods/specs_ypr.Rdata"))#
-#
-ylabs <- c("Proportional Generality", "Specialization (d')", "Degree",#
-           "Betweenness", "Closeness" )#
-#
-dd <- expand.grid(ypr=seq(from= min(specs$ypr, na.rm=TRUE),#
-                          to= max(specs$ypr, na.rm=TRUE),#
-                          length=10))#
-pp <- c("plants", "pols")#
-mods <- list(mod.pols, mod.plants)#
-names(mods) <- pp#
-#
-for(j in pp){#
-  for(i in 1:length(ys)){#
-    dd.ypr <- cbind(dd, 0)#
-    colnames(dd.ypr) <- c("ypr", ys[i])#
-      ypr.pi <- predict.int(mod= mods[[j]][[i]],#
-                            dd=dd.ypr,#
-                            y=ys[i],#
-                            family="gaussian")#
-#
-    plot.predict.ypr(new.dd=ypr.pi,#
-                     ylabel=ylabs[i],#
-                     dats=specs,#
-                     y1=ys[i],#
-                     extinction.method=j,#
-                     agg.col="GenusSpecies")#
-  }#
-}#
-## closeness only#
-#
-ypr.pi.pol <- predict.int(mod= mods$pol$closeness,#
-                      dd=dd.ypr,#
-                      y="closeness.log",#
-                      family="gaussian")#
-ypr.pi.plant <- predict.int(mod= mods$plant$closeness,#
-                      dd=dd.ypr,#
-                      y="closeness.log",#
-                      family="gaussian")#
-#
-plot.panels()
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/speciesLevel')#
-source('plotting/src/predictIntervals.R')#
-source('plotting/src/CIplotting.R')#
-source('plotting/src/plotPanels.R')#
-source('src/initialize.R')#
-#
-## ************************************************************#
-## specialization#
-## ************************************************************#
-#
-load(file=file.path(save.path, 'specs.Rdata'))#
-load(file=file.path(save.path, "mods/specs_ypr.Rdata"))#
-#
-ylabs <- c("Proportional Generality", "Specialization (d')", "Degree",#
-           "Betweenness", "Closeness" )#
-#
-dd <- expand.grid(ypr=seq(from= min(specs$ypr, na.rm=TRUE),#
-                          to= max(specs$ypr, na.rm=TRUE),#
-                          length=10))#
-pp <- c("plants", "pols")#
-mods <- list(mod.pols, mod.plants)#
-names(mods) <- pp#
-#
-for(j in pp){#
-  for(i in 1:length(ys)){#
-    dd.ypr <- cbind(dd, 0)#
-    colnames(dd.ypr) <- c("ypr", ys[i])#
-      ypr.pi <- predict.int(mod= mods[[j]][[i]],#
-                            dd=dd.ypr,#
-                            y=ys[i],#
-                            family="gaussian")#
-#
-    plot.predict.ypr(new.dd=ypr.pi,#
-                     ylabel=ylabs[i],#
-                     dats=specs,#
-                     y1=ys[i],#
-                     extinction.method=j,#
-                     agg.col="GenusSpecies")#
-  }#
-}#
-## closeness only#
-#
-ypr.pi.pol <- predict.int(mod= mods$pol$closeness.log,#
-                      dd=dd.ypr,#
-                      y="closeness.log",#
-                      family="gaussian")#
-ypr.pi.plant <- predict.int(mod= mods$plant$closeness.log,#
-                      dd=dd.ypr,#
-                      y="closeness.log",#
-                      family="gaussian")#
-#
-plot.panels()
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/speciesLevel')#
-source('plotting/src/predictIntervals.R')#
-source('plotting/src/CIplotting.R')#
-source('plotting/src/plotPanels.R')#
-source('src/initialize.R')#
-#
-## ************************************************************#
-## specialization#
-## ************************************************************#
-#
-load(file=file.path(save.path, 'specs.Rdata'))#
-load(file=file.path(save.path, "mods/specs_ypr.Rdata"))#
-#
-ylabs <- c("Proportional Generality", "Specialization (d')", "Degree",#
-           "Betweenness", "Closeness" )#
-#
-dd <- expand.grid(ypr=seq(from= min(specs$ypr, na.rm=TRUE),#
-                          to= max(specs$ypr, na.rm=TRUE),#
-                          length=10))#
-pp <- c("plants", "pols")#
-mods <- list(mod.pols, mod.plants)#
-names(mods) <- pp#
-#
-for(j in pp){#
-  for(i in 1:length(ys)){#
-    dd.ypr <- cbind(dd, 0)#
-    colnames(dd.ypr) <- c("ypr", ys[i])#
-      ypr.pi <- predict.int(mod= mods[[j]][[i]],#
-                            dd=dd.ypr,#
-                            y=ys[i],#
-                            family="gaussian")#
-#
-    plot.predict.ypr(new.dd=ypr.pi,#
-                     ylabel=ylabs[i],#
-                     dats=specs,#
-                     y1=ys[i],#
-                     extinction.method=j,#
-                     agg.col="GenusSpecies")#
-  }#
-}#
-## closeness only#
-#
-ypr.pi.pol <- predict.int(mod= mods$pol$closeness.log,#
-                      dd=dd.ypr,#
-                      y="closeness.log",#
-                      family="gaussian")#
-ypr.pi.plant <- predict.int(mod= mods$plant$closeness.log,#
-                      dd=dd.ypr,#
-                      y="closeness.log",#
-                      family="gaussian")#
-#
-plot.panels()
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/speciesLevel')#
-source('plotting/src/predictIntervals.R')#
-source('plotting/src/CIplotting.R')#
-source('plotting/src/plotPanels.R')#
-source('src/initialize.R')#
-#
-## ************************************************************#
-## specialization#
-## ************************************************************#
-#
-load(file=file.path(save.path, 'specs.Rdata'))#
-load(file=file.path(save.path, "mods/specs_ypr.Rdata"))#
-#
-ylabs <- c("Proportional Generality", "Specialization (d')", "Degree",#
-           "Betweenness", "Closeness" )#
-#
-dd <- expand.grid(ypr=seq(from= min(specs$ypr, na.rm=TRUE),#
-                          to= max(specs$ypr, na.rm=TRUE),#
-                          length=10))#
-pp <- c("plants", "pols")#
-mods <- list(mod.pols, mod.plants)#
-names(mods) <- pp#
-#
-for(j in pp){#
-  for(i in 1:length(ys)){#
-    dd.ypr <- cbind(dd, 0)#
-    colnames(dd.ypr) <- c("ypr", ys[i])#
-      ypr.pi <- predict.int(mod= mods[[j]][[i]],#
-                            dd=dd.ypr,#
-                            y=ys[i],#
-                            family="gaussian")#
-#
-    plot.predict.ypr(new.dd=ypr.pi,#
-                     ylabel=ylabs[i],#
-                     dats=specs,#
-                     y1=ys[i],#
-                     extinction.method=j,#
-                     agg.col="GenusSpecies")#
-  }#
-}#
-## closeness only#
-#
-ypr.pi.pol <- predict.int(mod= mods$pol$closeness.log,#
-                      dd=dd.ypr,#
-                      y="closeness.log",#
-                      family="gaussian")#
-ypr.pi.plant <- predict.int(mod= mods$plant$closeness.log,#
-                      dd=dd.ypr,#
-                      y="closeness.log",#
-                      family="gaussian")#
-#
-plot.panels()
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/speciesLevel')#
-source('src/initialize.R')#
-load('../../data/networks/all_networks_years.Rdata')#
-#
-## **********************************************************#
-## species importance#
-## **********************************************************#
-## specs <- calcSpec(nets, spec, spec.metric = "d", 0.3)#
-## save(specs, file=file.path(save.path, 'specs.Rdata'))#
-#
-## linear models#
-load(file=file.path(save.path, 'specs.Rdata'))#
-specs$closeness[specs$closeness == 0] <- 1*10^-6#
-specs$closeness.log <- log(specs$closeness)#
-#
-## SiteStatus or ypr#
-xvar <- "ypr"#
-#
-## anything outputted by specieslevel#
-ys <- c("proportional.generality", "d", "degree", "betweenness",#
-        "closeness.log")#
-#
-## formulas <-lapply(ys, function(x) {#
-##   as.formula(paste(x, "~",#
-##                    paste(paste(xvar, "specialization", sep="*"), #
-##                          "(1|Site)",#
-##                           "(1|GenusSpecies)",#
-##                          sep="+")))#
-## })#
-#
-formulas <-lapply(ys, function(x) {#
-  as.formula(paste(x, "~",#
-                   paste(xvar, #
-                         "(1|Site)",#
-                          "(1|GenusSpecies)",#
-                         sep="+")))#
-})#
-#
-mod.pols <- lapply(formulas, function(x){#
-  lmer(x,#
-       data=specs[specs$speciesType == "pollinator",])#
-})#
-#
-mod.plants <- lapply(formulas, function(x){#
-  lmer(x,#
-       data=specs[specs$speciesType == "plant",])#
-})#
-names(mod.pols) <- names(mod.plants) <- ys#
-lapply(mod.plants, summary)#
-lapply(mod.pols, summary)#
-#
-save(mod.pols, mod.plants, ys, file=file.path(save.path,#
-            sprintf('mods/specs_%s.Rdata', xvar)))#
-#
-## **********************************************************#
-## degree distributions (abundance distributions)#
-## **********************************************************#
-#
-baci.sites <- c("Barger", "Butler", "MullerB", "Sperandio", "Hrdy")#
-specs <- specs[specs$Site %in% baci.sites,]#
-#
-layout(matrix(1:6, nrow=2))#
-cols <- rainbow(length(unique(specs$ypr)))#
-lapply(unique(specs$Site), function(x){#
-  print(x)#
-  this.specs <- specs[specs$Site == x, c("degree", "ypr")]#
-  plot(NA, ylim=c(0,0.8), xlim=c(0,25),#
-       ylab="Frequency",#
-       xlab="Abundance",#
-       main=x)#
-  for(i in 1:length(unique(this.specs$ypr))){#
-    this.ypr <- unique(this.specs$ypr)[i]#
-    print(this.ypr)#
-    points(density(this.specs$degree[this.specs$ypr == this.ypr]),#
-           col=cols[i], type="l", lwd=2)#
-  }#
-})#
-#
-plot(NA, ylim=c(0,1), xlim=c(0,1), xaxt="n", yaxt="n", ylab="", xlab="")#
-legend("center", col=cols, lwd="2",#
-       legend=sort(unique(specs$ypr)),#
-       bty="n")
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/speciesLevel')#
-source('plotting/src/predictIntervals.R')#
-source('plotting/src/CIplotting.R')#
-source('plotting/src/plotPanels.R')#
-source('src/initialize.R')#
-#
-## ************************************************************#
-## specialization#
-## ************************************************************#
-#
-load(file=file.path(save.path, 'specs.Rdata'))#
-load(file=file.path(save.path, "mods/specs_ypr.Rdata"))#
-#
-ylabs <- c("Proportional Generality", "Specialization (d')", "Degree",#
-           "Betweenness", "Closeness" )#
-#
-dd <- expand.grid(ypr=seq(from= min(specs$ypr, na.rm=TRUE),#
-                          to= max(specs$ypr, na.rm=TRUE),#
-                          length=10))#
-pp <- c("plants", "pols")#
-mods <- list(mod.pols, mod.plants)#
-names(mods) <- pp#
-#
-for(j in pp){#
-  for(i in 1:length(ys)){#
-    dd.ypr <- cbind(dd, 0)#
-    colnames(dd.ypr) <- c("ypr", ys[i])#
-      ypr.pi <- predict.int(mod= mods[[j]][[i]],#
-                            dd=dd.ypr,#
-                            y=ys[i],#
-                            family="gaussian")#
-#
-    plot.predict.ypr(new.dd=ypr.pi,#
-                     ylabel=ylabs[i],#
-                     dats=specs,#
-                     y1=ys[i],#
-                     extinction.method=j,#
-                     agg.col="GenusSpecies")#
-  }#
-}#
-## closeness only#
-#
-ypr.pi.pol <- predict.int(mod= mods$pol$closeness.log,#
-                      dd=dd.ypr,#
-                      y="closeness.log",#
-                      family="gaussian")#
-ypr.pi.plant <- predict.int(mod= mods$plant$closeness.log,#
-                      dd=dd.ypr,#
-                      y="closeness.log",#
-                      family="gaussian")#
-#
-plot.panels()
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/speciesLevel')#
-source('plotting/src/predictIntervals.R')#
-source('plotting/src/CIplotting.R')#
-source('plotting/src/plotPanels.R')#
-source('src/initialize.R')#
-#
-## ************************************************************#
-## specialization#
-## ************************************************************#
-#
-load(file=file.path(save.path, 'specs.Rdata'))#
-load(file=file.path(save.path, "mods/specs_ypr.Rdata"))#
-#
-ylabs <- c("Proportional Generality", "Specialization (d')", "Degree",#
-           "Betweenness", "Closeness" )#
-#
-dd <- expand.grid(ypr=seq(from= min(specs$ypr, na.rm=TRUE),#
-                          to= max(specs$ypr, na.rm=TRUE),#
-                          length=10))#
-pp <- c("plants", "pols")#
-mods <- list(mod.pols, mod.plants)#
-names(mods) <- pp#
-#
-for(j in pp){#
-  for(i in 1:length(ys)){#
-    dd.ypr <- cbind(dd, 0)#
-    colnames(dd.ypr) <- c("ypr", ys[i])#
-      ypr.pi <- predict.int(mod= mods[[j]][[i]],#
-                            dd=dd.ypr,#
-                            y=ys[i],#
-                            family="gaussian")#
-#
-    plot.predict.ypr(new.dd=ypr.pi,#
-                     ylabel=ylabs[i],#
-                     dats=specs,#
-                     y1=ys[i],#
-                     extinction.method=j,#
-                     agg.col="GenusSpecies")#
-  }#
-}#
-## closeness only#
-#
-ypr.pi.pol <- predict.int(mod= mods$pol$closeness.log,#
-                      dd=dd.ypr,#
-                      y="closeness.log",#
-                      family="gaussian")#
-ypr.pi.plant <- predict.int(mod= mods$plant$closeness.log,#
-                      dd=dd.ypr,#
-                      y="closeness.log",#
-                      family="gaussian")#
-#
-plot.panels()
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/speciesLevel')#
-source('plotting/src/predictIntervals.R')#
-source('plotting/src/CIplotting.R')#
-source('plotting/src/plotPanels.R')#
-source('src/initialize.R')#
-#
-## ************************************************************#
-## specialization#
-## ************************************************************#
-#
-load(file=file.path(save.path, 'specs.Rdata'))#
-load(file=file.path(save.path, "mods/specs_ypr.Rdata"))#
-#
-ylabs <- c("Proportional Generality", "Specialization (d')", "Degree",#
-           "Betweenness", "Closeness" )#
-#
-dd <- expand.grid(ypr=seq(from= min(specs$ypr, na.rm=TRUE),#
-                          to= max(specs$ypr, na.rm=TRUE),#
-                          length=10))#
-pp <- c("plants", "pols")#
-mods <- list(mod.pols, mod.plants)#
-names(mods) <- pp#
-#
-for(j in pp){#
-  for(i in 1:length(ys)){#
-    dd.ypr <- cbind(dd, 0)#
-    colnames(dd.ypr) <- c("ypr", ys[i])#
-      ypr.pi <- predict.int(mod= mods[[j]][[i]],#
-                            dd=dd.ypr,#
-                            y=ys[i],#
-                            family="gaussian")#
-#
-    plot.predict.ypr(new.dd=ypr.pi,#
-                     ylabel=ylabs[i],#
-                     dats=specs,#
-                     y1=ys[i],#
-                     extinction.method=j,#
-                     agg.col="GenusSpecies")#
-  }#
-}#
-## closeness only#
-#
-ypr.pi.pol <- predict.int(mod= mods$pol$closeness.log,#
-                      dd=dd.ypr,#
-                      y="closeness.log",#
-                      family="gaussian")#
-ypr.pi.plant <- predict.int(mod= mods$plant$closeness.log,#
-                      dd=dd.ypr,#
-                      y="closeness.log",#
-                      family="gaussian")#
-#
-plot.panels()
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/speciesLevel')#
-source('plotting/src/predictIntervals.R')#
-source('plotting/src/CIplotting.R')#
-source('plotting/src/plotPanels.R')#
-source('src/initialize.R')#
-#
-## ************************************************************#
-## specialization#
-## ************************************************************#
-#
-load(file=file.path(save.path, 'specs.Rdata'))#
-load(file=file.path(save.path, "mods/specs_ypr.Rdata"))#
-#
-ylabs <- c("Proportional Generality", "Specialization (d')", "Degree",#
-           "Betweenness", "Closeness" )#
-#
-dd <- expand.grid(ypr=seq(from= min(specs$ypr, na.rm=TRUE),#
-                          to= max(specs$ypr, na.rm=TRUE),#
-                          length=10))#
-pp <- c("plants", "pols")#
-mods <- list(mod.pols, mod.plants)#
-names(mods) <- pp#
-#
-for(j in pp){#
-  for(i in 1:length(ys)){#
-    dd.ypr <- cbind(dd, 0)#
-    colnames(dd.ypr) <- c("ypr", ys[i])#
-      ypr.pi <- predict.int(mod= mods[[j]][[i]],#
-                            dd=dd.ypr,#
-                            y=ys[i],#
-                            family="gaussian")#
-#
-    plot.predict.ypr(new.dd=ypr.pi,#
-                     ylabel=ylabs[i],#
-                     dats=specs,#
-                     y1=ys[i],#
-                     extinction.method=j,#
-                     agg.col="GenusSpecies")#
-  }#
-}#
-## closeness only#
-#
-ypr.pi.pol <- predict.int(mod= mods$pol$closeness.log,#
-                      dd=dd.ypr,#
-                      y="closeness.log",#
-                      family="gaussian")#
-ypr.pi.plant <- predict.int(mod= mods$plant$closeness.log,#
-                      dd=dd.ypr,#
-                      y="closeness.log",#
-                      family="gaussian")#
-#
-plot.panels()
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/speciesLevel')#
-source('plotting/src/predictIntervals.R')#
-source('plotting/src/CIplotting.R')#
-source('plotting/src/plotPanels.R')#
-source('src/initialize.R')#
-#
-## ************************************************************#
-## specialization#
-## ************************************************************#
-#
-load(file=file.path(save.path, 'specs.Rdata'))#
-load(file=file.path(save.path, "mods/specs_ypr.Rdata"))#
-#
-ylabs <- c("Proportional Generality", "Specialization (d')", "Degree",#
-           "Betweenness", "Closeness" )#
-#
-dd <- expand.grid(ypr=seq(from= min(specs$ypr, na.rm=TRUE),#
-                          to= max(specs$ypr, na.rm=TRUE),#
-                          length=10))#
-pp <- c("plants", "pols")#
-mods <- list(mod.pols, mod.plants)#
-names(mods) <- pp#
-#
-for(j in pp){#
-  for(i in 1:length(ys)){#
-    dd.ypr <- cbind(dd, 0)#
-    colnames(dd.ypr) <- c("ypr", ys[i])#
-      ypr.pi <- predict.int(mod= mods[[j]][[i]],#
-                            dd=dd.ypr,#
-                            y=ys[i],#
-                            family="gaussian")#
-#
-    plot.predict.ypr(new.dd=ypr.pi,#
-                     ylabel=ylabs[i],#
-                     dats=specs,#
-                     y1=ys[i],#
-                     extinction.method=j,#
-                     agg.col="GenusSpecies")#
-  }#
-}#
-## closeness only#
-#
-ypr.pi.pol <- predict.int(mod= mods$pol$closeness.log,#
-                      dd=dd.ypr,#
-                      y="closeness.log",#
-                      family="gaussian")#
-ypr.pi.plant <- predict.int(mod= mods$plant$closeness.log,#
-                      dd=dd.ypr,#
-                      y="closeness.log",#
-                      family="gaussian")#
-#
-plot.panels()
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/speciesLevel')#
-source('plotting/src/predictIntervals.R')#
-source('plotting/src/CIplotting.R')#
-source('plotting/src/plotPanels.R')#
-source('src/initialize.R')#
-#
-## ************************************************************#
-## specialization#
-## ************************************************************#
-#
-load(file=file.path(save.path, 'specs.Rdata'))#
-load(file=file.path(save.path, "mods/specs_ypr.Rdata"))#
-#
-ylabs <- c("Proportional Generality", "Specialization (d')", "Degree",#
-           "Betweenness", "Closeness" )#
-#
-dd <- expand.grid(ypr=seq(from= min(specs$ypr, na.rm=TRUE),#
-                          to= max(specs$ypr, na.rm=TRUE),#
-                          length=10))#
-pp <- c("plants", "pols")#
-mods <- list(mod.pols, mod.plants)#
-names(mods) <- pp#
-#
-for(j in pp){#
-  for(i in 1:length(ys)){#
-    dd.ypr <- cbind(dd, 0)#
-    colnames(dd.ypr) <- c("ypr", ys[i])#
-      ypr.pi <- predict.int(mod= mods[[j]][[i]],#
-                            dd=dd.ypr,#
-                            y=ys[i],#
-                            family="gaussian")#
-#
-    plot.predict.ypr(new.dd=ypr.pi,#
-                     ylabel=ylabs[i],#
-                     dats=specs,#
-                     y1=ys[i],#
-                     extinction.method=j,#
-                     agg.col="GenusSpecies")#
-  }#
-}#
-## closeness only#
-#
-ypr.pi.pol <- predict.int(mod= mods$pol$closeness.log,#
-                      dd=dd.ypr,#
-                      y="closeness.log",#
-                      family="gaussian")#
-ypr.pi.plant <- predict.int(mod= mods$plant$closeness.log,#
-                      dd=dd.ypr,#
-                      y="closeness.log",#
-                      family="gaussian")#
-#
-plot.panels()
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/speciesLevel')#
-source('plotting/src/predictIntervals.R')#
-source('plotting/src/CIplotting.R')#
-source('plotting/src/plotPanels.R')#
-source('src/initialize.R')#
-#
-## ************************************************************#
-## specialization#
-## ************************************************************#
-#
-load(file=file.path(save.path, 'specs.Rdata'))#
-load(file=file.path(save.path, "mods/specs_ypr.Rdata"))#
-#
-ylabs <- c("Proportional Generality", "Specialization (d')", "Degree",#
-           "Betweenness", "Closeness" )#
-#
-dd <- expand.grid(ypr=seq(from= min(specs$ypr, na.rm=TRUE),#
-                          to= max(specs$ypr, na.rm=TRUE),#
-                          length=10))#
-pp <- c("plants", "pols")#
-mods <- list(mod.pols, mod.plants)#
-names(mods) <- pp#
-#
-for(j in pp){#
-  for(i in 1:length(ys)){#
-    dd.ypr <- cbind(dd, 0)#
-    colnames(dd.ypr) <- c("ypr", ys[i])#
-      ypr.pi <- predict.int(mod= mods[[j]][[i]],#
-                            dd=dd.ypr,#
-                            y=ys[i],#
-                            family="gaussian")#
-#
-    plot.predict.ypr(new.dd=ypr.pi,#
-                     ylabel=ylabs[i],#
-                     dats=specs,#
-                     y1=ys[i],#
-                     extinction.method=j,#
-                     agg.col="GenusSpecies")#
-  }#
-}#
-## closeness only#
-#
-ypr.pi.pol <- predict.int(mod= mods$pol$closeness.log,#
-                      dd=dd.ypr,#
-                      y="closeness.log",#
-                      family="gaussian")#
-ypr.pi.plant <- predict.int(mod= mods$plant$closeness.log,#
-                      dd=dd.ypr,#
-                      y="closeness.log",#
-                      family="gaussian")#
-#
-plot.panels()
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/speciesLevel')#
-source('plotting/src/predictIntervals.R')#
-source('plotting/src/CIplotting.R')#
-source('plotting/src/plotPanels.R')#
-source('src/initialize.R')#
-#
-## ************************************************************#
-## specialization#
-## ************************************************************#
-#
-load(file=file.path(save.path, 'specs.Rdata'))#
-load(file=file.path(save.path, "mods/specs_ypr.Rdata"))#
-#
-ylabs <- c("Proportional Generality", "Specialization (d')", "Degree",#
-           "Betweenness", "Closeness" )#
-#
-dd <- expand.grid(ypr=seq(from= min(specs$ypr, na.rm=TRUE),#
-                          to= max(specs$ypr, na.rm=TRUE),#
-                          length=10))#
-pp <- c("plants", "pols")#
-mods <- list(mod.pols, mod.plants)#
-names(mods) <- pp#
-#
-for(j in pp){#
-  for(i in 1:length(ys)){#
-    dd.ypr <- cbind(dd, 0)#
-    colnames(dd.ypr) <- c("ypr", ys[i])#
-      ypr.pi <- predict.int(mod= mods[[j]][[i]],#
-                            dd=dd.ypr,#
-                            y=ys[i],#
-                            family="gaussian")#
-#
-    plot.predict.ypr(new.dd=ypr.pi,#
-                     ylabel=ylabs[i],#
-                     dats=specs,#
-                     y1=ys[i],#
-                     extinction.method=j,#
-                     agg.col="GenusSpecies")#
-  }#
-}#
-## closeness only#
-#
-ypr.pi.pol <- predict.int(mod= mods$pol$closeness.log,#
-                      dd=dd.ypr,#
-                      y="closeness.log",#
-                      family="gaussian")#
-ypr.pi.plant <- predict.int(mod= mods$plant$closeness.log,#
-                      dd=dd.ypr,#
-                      y="closeness.log",#
-                      family="gaussian")#
-#
-plot.panels()
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/speciesLevel')#
-source('plotting/src/predictIntervals.R')#
-source('plotting/src/CIplotting.R')#
-source('plotting/src/plotPanels.R')#
-source('src/initialize.R')#
-#
-## ************************************************************#
-## specialization#
-## ************************************************************#
-#
-load(file=file.path(save.path, 'specs.Rdata'))#
-load(file=file.path(save.path, "mods/specs_ypr.Rdata"))#
-#
-ylabs <- c("Proportional Generality", "Specialization (d')", "Degree",#
-           "Betweenness", "Closeness" )#
-#
-dd <- expand.grid(ypr=seq(from= min(specs$ypr, na.rm=TRUE),#
-                          to= max(specs$ypr, na.rm=TRUE),#
-                          length=10))#
-pp <- c("plants", "pols")#
-mods <- list(mod.pols, mod.plants)#
-names(mods) <- pp#
-#
-for(j in pp){#
-  for(i in 1:length(ys)){#
-    dd.ypr <- cbind(dd, 0)#
-    colnames(dd.ypr) <- c("ypr", ys[i])#
-      ypr.pi <- predict.int(mod= mods[[j]][[i]],#
-                            dd=dd.ypr,#
-                            y=ys[i],#
-                            family="gaussian")#
-#
-    plot.predict.ypr(new.dd=ypr.pi,#
-                     ylabel=ylabs[i],#
-                     dats=specs,#
-                     y1=ys[i],#
-                     extinction.method=j,#
-                     agg.col="GenusSpecies")#
-  }#
-}#
-## closeness only#
-#
-ypr.pi.pol <- predict.int(mod= mods$pol$closeness.log,#
-                      dd=dd.ypr,#
-                      y="closeness.log",#
-                      family="gaussian")#
-ypr.pi.plant <- predict.int(mod= mods$plant$closeness.log,#
-                      dd=dd.ypr,#
-                      y="closeness.log",#
-                      family="gaussian")#
-#
-plot.panels()
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/speciesLevel')#
-source('plotting/src/predictIntervals.R')#
-source('plotting/src/CIplotting.R')#
-source('plotting/src/plotPanels.R')#
-source('src/initialize.R')#
-#
-## ************************************************************#
-## specialization#
-## ************************************************************#
-#
-load(file=file.path(save.path, 'specs.Rdata'))#
-load(file=file.path(save.path, "mods/specs_ypr.Rdata"))#
-#
-ylabs <- c("Proportional Generality", "Specialization (d')", "Degree",#
-           "Betweenness", "Closeness" )#
-#
-dd <- expand.grid(ypr=seq(from= min(specs$ypr, na.rm=TRUE),#
-                          to= max(specs$ypr, na.rm=TRUE),#
-                          length=10))#
-pp <- c("plants", "pols")#
-mods <- list(mod.pols, mod.plants)#
-names(mods) <- pp#
-#
-for(j in pp){#
-  for(i in 1:length(ys)){#
-    dd.ypr <- cbind(dd, 0)#
-    colnames(dd.ypr) <- c("ypr", ys[i])#
-      ypr.pi <- predict.int(mod= mods[[j]][[i]],#
-                            dd=dd.ypr,#
-                            y=ys[i],#
-                            family="gaussian")#
-#
-    plot.predict.ypr(new.dd=ypr.pi,#
-                     ylabel=ylabs[i],#
-                     dats=specs,#
-                     y1=ys[i],#
-                     extinction.method=j,#
-                     agg.col="GenusSpecies")#
-  }#
-}#
-## closeness only#
-#
-ypr.pi.pol <- predict.int(mod= mods$pol$closeness.log,#
-                      dd=dd.ypr,#
-                      y="closeness.log",#
-                      family="gaussian")#
-ypr.pi.plant <- predict.int(mod= mods$plant$closeness.log,#
-                      dd=dd.ypr,#
-                      y="closeness.log",#
-                      family="gaussian")#
-#
-plot.panels()
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/speciesLevel')#
-source('plotting/src/predictIntervals.R')#
-source('plotting/src/CIplotting.R')#
-source('plotting/src/plotPanels.R')#
-source('src/initialize.R')#
-#
-## ************************************************************#
-## specialization#
-## ************************************************************#
-#
-load(file=file.path(save.path, 'specs.Rdata'))#
-load(file=file.path(save.path, "mods/specs_ypr.Rdata"))#
-#
-ylabs <- c("Proportional Generality", "Specialization (d')", "Degree",#
-           "Betweenness", "Closeness" )#
-#
-dd <- expand.grid(ypr=seq(from= min(specs$ypr, na.rm=TRUE),#
-                          to= max(specs$ypr, na.rm=TRUE),#
-                          length=10))#
-pp <- c("plants", "pols")#
-mods <- list(mod.pols, mod.plants)#
-names(mods) <- pp#
-#
-for(j in pp){#
-  for(i in 1:length(ys)){#
-    dd.ypr <- cbind(dd, 0)#
-    colnames(dd.ypr) <- c("ypr", ys[i])#
-      ypr.pi <- predict.int(mod= mods[[j]][[i]],#
-                            dd=dd.ypr,#
-                            y=ys[i],#
-                            family="gaussian")#
-#
-    plot.predict.ypr(new.dd=ypr.pi,#
-                     ylabel=ylabs[i],#
-                     dats=specs,#
-                     y1=ys[i],#
-                     extinction.method=j,#
-                     agg.col="GenusSpecies")#
-  }#
-}#
-## closeness only#
-#
-ypr.pi.pol <- predict.int(mod= mods$pol$closeness.log,#
-                      dd=dd.ypr,#
-                      y="closeness.log",#
-                      family="gaussian")#
-ypr.pi.plant <- predict.int(mod= mods$plant$closeness.log,#
-                      dd=dd.ypr,#
-                      y="closeness.log",#
-                      family="gaussian")#
-#
-plot.panels()
+  path <- 'figures'#
+  pdf.f(f3, file=file.path(path,#
+              sprintf("%s.pdf", "turnover_panels")),#
+        width=10, height=9)#
+}
+plotDistPanels()
+##***************************************************************#
+## species level metrics#
+##***************************************************************#
+## calcualte species level metrics, run linear models#
+source('~/Dropbox/hedgerow_assembly/analysis/speciesLevel/specMets.R')#
+## make species level metric plots#
+source('~/Dropbox/hedgerow_assembly/analysis/speciesLevel/plotting/specMets.R')
+source('~/Dropbox/hedgerow_assembly/analysis/speciesLevel/specMets.R')
+summary(mod.pols$closeness.log)
+print(paste("pollinators", summary(mod.pols$closeness.log)))
+print(summary(mod.pols$closeness.log))
+message(summary(mod.pols$closeness.log))
+print(summary(mod.pols$closeness.log))#
+print("**************************************************")#
+print(summary(mod.plants$closeness.log))
+##***************************************************************#
+## species level metrics#
+##***************************************************************#
+## calcualte species level metrics, run linear models#
+source('~/Dropbox/hedgerow_assembly/analysis/speciesLevel/specMets.R')#
+## make species level metric plots#
+source('~/Dropbox/hedgerow_assembly/analysis/speciesLevel/plotting/specMets.R')
