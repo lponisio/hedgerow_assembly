@@ -21,8 +21,9 @@ plot.panels <- function(){
                dats=all.alg.Con.status,
                y1="AlgCon",
                xs="ypr",
-               col.fill=col.fill,
-               col.lines=col.lines,
+               col.fill=col.white,
+               col.lines=col.white,
+               col.points=col.fill,
                plotPoints=TRUE)
     mtext("Sensitivity to \n perturbations", 2, line=4, cex=1.5)
 

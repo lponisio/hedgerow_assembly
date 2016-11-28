@@ -14,7 +14,8 @@ load('../../data/networks/all_networks_years.Rdata')
 res <- simExtinction(nets, extinction.method, spec)
 
 save(res, file=file.path(save.path,
-            sprintf('resilience_%s.Rdata', extinction.method)))
+            sprintf('resilience_%s.Rdata',
+                    extinction.method)))
 
 ## no change in robustness by site status
 mod.status <- lmer(Robustness ~ SiteStatus
@@ -22,7 +23,8 @@ mod.status <- lmer(Robustness ~ SiteStatus
              data=res)
 summary(mod.status)
 save(mod.status, file=file.path(save.path,
-            sprintf('mods/resilience_status_%s.Rdata', extinction.method)))
+            sprintf('mods/resilience_status_%s.Rdata',
+                    extinction.method)))
 
 
 ## no effect of ypr on robustness
@@ -31,6 +33,7 @@ mod.ypr <- lmer(Robustness ~ ypr
              data=res[!is.na(res$ypr),])
 summary(mod.ypr)
 save(mod.ypr, file=file.path(save.path,
-            sprintf('mods/resilience_ypr_%s.Rdata', extinction.method)))
+            sprintf('mods/resilience_ypr_%s.Rdata',
+                    extinction.method)))
 
 print(summary(mod.ypr))
