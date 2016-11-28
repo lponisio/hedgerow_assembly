@@ -409,7 +409,7 @@ linear mixed models to test whether the species closeness variability
 (log) is related to the persistence or degree of that species
 \citep{lme4, lmetest}. We included random effects for species and
 site. Because the degree and persistence of pollinators were strongly
-correlated, ($\rho = 0.84$, $p$-value $<$ $2*10^{-16}$), we include
+correlated, ($\rho = 0.071$, $p$-value $<$ $2*10^{-16}$), we include
 each explanatory variable in separate models. Plant degree and
 persistence were not significantly correlated, but we use the same
 models as we did for the pollinators for consistency.  Because an
@@ -620,9 +620,9 @@ In contradiction to the predictions of assembly by preferential
 attachment, both pollinator persistence and degree were positively
 related to network position variability (Fig.~\ref{fig:cv}, estimate
 of the slope of closeness centrality variability and persistence $\pm$
-standard error of the estimate, $0.653 \pm 0.225$, $p$-value=$0.009$;
-slope of closeness centrality variability and degree, $0.008 \pm
-0.002$, $p$-value=$0.002$). The slope of these relationships remained
+standard error of the estimate, $0.496 \pm 0.182$, $p$-value=$0.016$;
+slope of closeness centrality variability and degree, $0.004 \pm
+0.002$, $p$-value=$0.056$). The slope of these relationships remained
 significant when the species with the top $10$ persistence and degree
 scores were dropped. In addition, plant persistence and degree were
 not significantly related to network position variability
@@ -634,9 +634,9 @@ The variability of species network position was not the result of
 closeness linearly increasing through time, and, in fact, plant and
 pollinator closeness decreased slightly through time (Fig.~S2,
 estimate of the slope of closeness through time $\pm$ SE, pollinators:
-$-0.0003 \pm 0.00005$, $p$-value=$2.7*10^{-12}$; plants $-0.007 \pm
-0.001$, $p$-value=$1.4*10^{-6}$). Through statistically significant,
-the slopes are so slight they may not be biologically significant.
+$-0.082 \pm 0.021$, $p$-value=$0.003$; plants $-0.089 \pm
+0.044$, $p$-value=$0.04$). Though statistically significant,
+the models seems to be a poor fit to the data. 
 
 \subsection*{Species and interaction turnover}
 The rates of plant, pollinator and interaction temporal turnover were
@@ -644,7 +644,7 @@ similar across assembling hedgerows, non-assembling hedgerows and
 field margins, though mature hedgerows has marginally significantly
 less pollinator turnover than field margins (Fig.~\ref{fig:beta},
 estimate $\pm$ SE of the difference in turnover between field margins
-and mature hedgerows, $-0.0498 \pm 0.026$, $p$-value=$0.058$). When
+and mature hedgerows, $-0.051 \pm 0.026$, $p$-value=$0.049$). The turnover of plants and interactions was not significantly different between site types. When
 interactions where weighted by their similarity, both assembling and
 mature hedgerows had higher rates of turnover than field margins
 (Fig.~\ref{fig:beta}, estimate $\pm$ SE of the difference in turnover
@@ -652,34 +652,35 @@ between field margins and assembling hedgerows, $0.115 \pm 0.027$,
 $p$-value=$0.0002$; field margins and mature hedgerows, $0.082 \pm
 0.024$, $p$-value=$0.002$). The weighted interaction turnover at
 assembling hedgerows, however, was not significantly higher than in
-non-assembling, mature hedgerows.
+non-assembling, mature hedgerows. 
 
 \section*{Temporal changes in interaction patterns}
 \subsection*{Network structure}
-Network nestedness significantly increased with assembly
-(Fig.~\ref{fig:baci}, estimate of the slope of nestedness through time
-$\pm$ SE, $1.834 \pm 0.6142$, $p$-value=$0.022$). All of the networks
-were significantly nested ($z$-scores $>$ 2,
-Fig.~\ref{fig:baci}). Modularity decreased (Fig.~\ref{fig:baci}),
-though the slope was not significantly different from
-zero. % (estimate
+%Network nestedness significantly increased with assembly
+%(Fig.~\ref{fig:baci}, estimate of the slope of nestedness through time
+%$\pm$ SE, $1.834 \pm 0.6142$, $p$-value=$0.022$). 
+Nestedness and modularity did not change in any predictable pattern with assembly (Fig.~\ref{fig:baci}). All of the networks were significantly nested ($z$-scores $>$ 2), but not modular ($z$-scores $<$ 2, Fig.~\ref{fig:baci}). 
+
+%though the slope was not significantly different from
+%zero.(estimate
 % of the slope of modularity through time $\pm$ standard error of the
 % estimate, $-0.524$ $\pm$ $0.295$, $p$-value=$0.124$).
-In addition, none of the networks were significantly modular
-($z$-scores $<$ 2, Fig.~\ref{fig:baci}). Connectance decreased as the
+%In addition, none of the networks were significantly modular
+% Fig.~\ref{fig:baci}). 
+
+Connectance decreased as the
 community assembled (Fig.~\ref{fig:baci}, estimate of the slope of
 connectance through time $\pm$ standard error of the estimate,
-$-0.0434$ $\pm$ $0.0152$, $p$-value=$0.03$). Specialization also
-decreased, though the slope was only marginally significantly
-different from zero (estimate of the slope of specialization through
-time $\pm$ SE, $-0.926$ $\pm$ $0.450$, $p$-value=$0.078$). Most
-communities were more generalized than expected when interactions were
+$-0.023$ $\pm$ $0.008$, $p$-value=$0.007$). Specialization also
+decreased, though the slope was not significantly
+different from zero. %(estimate of the slope of specialization through time $\pm$ SE, $-0.926$ $\pm$ $0.450$, $p$-value=$0.078$). 
+Most communities were more generalized than expected when interactions were
 randomized (Fig.~\ref{fig:baci}).
 
 Both plant and pollinator species richness increased through time
 (Fig.~\ref{fig:baci}, estimate of the slope of richness through time
-$\pm$ SE, pollinators: $0.193$ $\pm$ $0.0729$, $p$-value=$0.008$;
-plants: $0.212$ $\pm$ $0.0653$, $p$-value=$0.001$). Unsurprisingly,
+$\pm$ SE, pollinators: $0.136$ $\pm$ $0.064$, $p$-value=$0.034$;
+plants: $0.140$ $\pm$ $0.060$, $p$-value=$0.012$). Unsurprisingly,
 pollinator species are colonizing and persisting at the assembling
 hedgerows. Plant species richness in the networks is based on the
 flowers actually visited by pollinators and not the presence of a
