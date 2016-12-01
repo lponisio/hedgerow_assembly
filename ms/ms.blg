@@ -1,51 +1,46 @@
-This is BibTeX, Version 0.99d (TeX Live 2015)
+This is BibTeX, Version 0.99d (TeX Live 2016)
 Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
 The top-level auxiliary file: ms.aux
-The style file: unsrtnat.bst
-Illegal, another \bibstyle command---line 103 of file ms.aux
- : \bibstyle
- :          {ecol_let}
-I'm skipping whatever remains of this command
+The style file: ecol_let.bst
 Database file #1: refs.bib
-You've used 66 entries,
-            2481 wiz_defined-function locations,
-            963 strings with 17075 characters,
-and the built_in function-call counts, 27527 in all, are:
-= -- 2267
-> -- 1638
+You've used 67 entries,
+            2997 wiz_defined-function locations,
+            1038 strings with 17170 characters,
+and the built_in function-call counts, 42245 in all, are:
+= -- 3390
+> -- 2158
 < -- 22
-+ -- 616
-- -- 484
-* -- 2367
-:= -- 4478
-add.period$ -- 202
-call.type$ -- 66
-change.case$ -- 129
-chr.to.int$ -- 66
-cite$ -- 66
-duplicate$ -- 1267
-empty$ -- 2393
-format.name$ -- 576
-if$ -- 5714
++ -- 852
+- -- 759
+* -- 3458
+:= -- 6883
+add.period$ -- 201
+call.type$ -- 67
+change.case$ -- 584
+chr.to.int$ -- 67
+cite$ -- 67
+duplicate$ -- 2822
+empty$ -- 2769
+format.name$ -- 974
+if$ -- 7964
 int.to.chr$ -- 1
-int.to.str$ -- 67
-missing$ -- 63
-newline$ -- 342
-num.names$ -- 198
-pop$ -- 471
+int.to.str$ -- 1
+missing$ -- 640
+newline$ -- 339
+num.names$ -- 268
+pop$ -- 1107
 preamble$ -- 1
-purify$ -- 66
+purify$ -- 518
 quote$ -- 0
-skip$ -- 728
+skip$ -- 789
 stack$ -- 0
-substring$ -- 1507
-swap$ -- 162
+substring$ -- 2161
+swap$ -- 1600
 text.length$ -- 3
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 462
+type$ -- 603
 warning$ -- 0
-while$ -- 237
+while$ -- 308
 width$ -- 0
-write$ -- 868
-(There was 1 error message)
+write$ -- 869
