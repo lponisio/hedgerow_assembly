@@ -1,1413 +1,178 @@
-rm(list=ls())#
-setwd("~/Dropbox/hedgerow_assembly/analysis/changePoint")#
-load('cptPeel/baci/graphs.Rdata')#
-load('../../data/networks/allSpecimens.Rdata')#
-library(MASS)#
-library(nlme)#
-dats <- read.csv('cptPeel/changing_points.csv')#
-BACI.site <- c('Barger', 'Butler', 'Hrdy', 'MullerB', 'Sperandio')#
-## **********************************************************#
-## binomial #
-## **********************************************************#
-chpt.trial <- aggregate(spec$Year, list(Site=spec$Site),#
-                           FUN=function(x) length(unique(x)))#
-chpt.trial$x <- chpt.trial$x - 1#
-#
-chpt.trial <- chpt.trial[chpt.trial$x >= 4,]#
-#
-change.points.site <- tapply(dats$cp, dats$sites, length)#
-#
-chpt.trial$chpts <- change.points.site[match(chpt.trial$Site,#
-                                                rownames(change.points.site))]#
-chpt.trial$chpts[is.na(chpt.trial$chpts)] <- 0#
-colnames(chpt.trial) <- c("Site", "trial", "chpts")#
-#
-chpt.trial$status <- spec$SiteStatus[match(chpt.trial$Site, spec$Site)]#
-chpt.trial$status[chpt.trial$Site %in% BACI.site] <- "maturing"#
-#
-## binomial model with change points as successes#
-mod.chpt <- glm(cbind(chpt.trial$chpts, chpt.trial$trial - chpt.trial$chpts) ~#
-    chpt.trial$status, family="binomial")#
-summary(mod.chpt)#
-#
-exp(cbind(coef(mod.chpt), confint(mod.chpt)))
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
-source('src/initialize.R')#
-#
-## ************************************************************#
-## coefficient of variation of degree thingy through time#
-## ************************************************************#
-## ************************************************************#
-## occurrence#
-## ************************************************************#
-## pollinators and k#
-## sig!#
-occ.k.cv <- cv.trait(spec,#
-                     specs[specs$speciesType =="pollinator",],#
-                     trait="occ.date",#
-                     method= "time", time.col="assem",#
-                     abund.col="k",#
-                     cv.function=cv,#
-                     zero2na=TRUE,#
-                     standard.cv=TRUE,#
-                     na.rm=TRUE)#
-summary(occ.k.cv$lm.nss)#
-#
-## plants and k#
-## not sig!#
-plants.occ.k.cv <- cv.trait(spec,#
-                            specs[specs$speciesType =="plant",],#
-                            trait="occ.plant.date",#
-                            method= "time", time.col="assem",#
-                            abund.col="k",#
-                            cv.function=cv,#
-                            zero2na=TRUE,#
-                            standard.cv=TRUE,#
-                            na.rm=TRUE,#
-                            species.type="PlantGenusSpecies")#
-summary(plants.occ.k.cv$lm.nss)#
-#
-## pollinators and closeness#
-## sig#
-occ.closeness.cv <- cv.trait(spec,#
-                             specs[specs$speciesType =="pollinator",],#
-                             trait="occ.date",#
-                             method= "time", time.col="assem",#
-                             abund.col="weighted.closeness",#
-                             cv.function=cv,#
-                             zero2na=TRUE,#
-                             standard.cv=TRUE,#
-                             na.rm=TRUE)#
-summary(occ.closeness.cv$lm.nss)#
-## plants and closeness#
-## not sig#
-plants.occ.closeness.cv <- cv.trait(spec,#
-                                    specs[specs$speciesType =="plant",],#
-                                    trait="occ.plant.date",#
-                                    method= "time", time.col="assem",#
-                                    abund.col="weighted.closeness",#
-                                    cv.function=cv,#
-                                    zero2na=TRUE,#
-                                    standard.cv=TRUE,#
-                                    na.rm=TRUE,#
-                                    species.type="PlantGenusSpecies")#
-summary(plants.occ.closeness.cv$lm.nss)#
-#
-## ************************************************************#
-## degree#
-## ************************************************************#
-## pollinators and k#
-## sig#
-degree.k.cv <- cv.trait(spec,#
-                        specs[specs$speciesType =="pollinator",],#
-                        trait="degree",#
-                        method= "time", time.col="assem",#
-                        abund.col="k",#
-                        cv.function=cv,#
-                        zero2na=TRUE,#
-                        standard.cv=TRUE,#
-                        na.rm=TRUE)#
-summary(degree.k.cv$lm.nss)#
-#
-## plants and k#
-## sig#
-plants.degree.k.cv <- cv.trait(spec,#
-                               specs[specs$speciesType =="plant",],#
-                               trait="plant.degree",#
-                               method= "time", time.col="assem",#
-                               abund.col="k",#
-                               cv.function=cv,#
-                               zero2na=TRUE,#
-                               standard.cv=TRUE,#
-                               na.rm=TRUE,#
-                               species.type="PlantGenusSpecies")#
-summary(plants.degree.k.cv$lm.nss)#
-#
-## pollinators and closeness#
-## sig#
-degree.closeness.cv <- cv.trait(spec,#
-                                specs[specs$speciesType =="pollinator",],#
-                                trait="degree",#
-                                method= "time", time.col="assem",#
-                                abund.col="weighted.closeness",#
-                                cv.function=cv,#
-                                zero2na=TRUE,#
-                                standard.cv=TRUE,#
-                                na.rm=TRUE)#
-summary(degree.closeness.cv$lm.nss)#
-#
-## plants and closeness#
-## not sig!#
-plants.degree.closeness.cv <- cv.trait(spec,#
-                                       specs[specs$speciesType =="plant",],#
-                                       trait="plant.degree",#
-                                       method= "time", time.col="assem",#
-                                       abund.col="weighted.closeness",#
-                                       cv.function=cv,#
-                                       zero2na=TRUE,#
-                                       standard.cv=TRUE,#
-                                       na.rm=TRUE,#
-                                       species.type="PlantGenusSpecies")#
-summary(plants.degree.closeness.cv$lm.nss)#
-## check correlation of degree and occ #
-## pollinators#
-check.pol <- unique(cbind(spec$degree,#
-                          spec$occ.date))#
-plot(check.pol)#
-#
-cor.test(check.pol[,1], check.pol[,2])#
-check.plant <- unique(cbind(spec$plant.degree,#
-                            spec$occ.plant.date))#
-plot(check.plant)#
-#
-cor.test(check.plant[,1], check.plant[,2])#
-## ************************************************************#
-## dprime#
-## ************************************************************#
-## not sig#
-dprime.k.cv <- cv.trait(spec,#
-                        specs[specs$speciesType =="pollinator",],#
-                        trait="d",#
-                        method= "time", time.col="assem",#
-                        abund.col="k",#
-                        cv.function=cv,#
-                        zero2na=TRUE,#
-                        standard.cv=TRUE,#
-                        na.rm=TRUE)#
-summary(dprime.k.cv$lm.nss)#
-#
-## not sig#
-dprime.closeness.cv <- cv.trait(spec,#
-                                specs[specs$speciesType =="pollinator",],#
-                                trait="d",#
-                                method= "time", time.col="assem",#
-                                abund.col="weighted.closeness",#
-                                cv.function=cv,#
-                                zero2na=TRUE,#
-                                standard.cv=TRUE,#
-                                na.rm=TRUE)#
-summary(dprime.closeness.cv$lm.nss)#
-## ************************************************************#
-## coefficient of variation of abundance through time#
-## ************************************************************#
-byYear <- aggregate(list(Abund=spec$GenusSpecies),#
-                    list(GenusSpecies= spec$GenusSpecies,#
-                         Date=spec$Date,#
-                         SiteStatus= spec$SiteStatus,#
-                         Site=spec$Site), length)#
-#
-dprime <- cv.trait(spec, byYear, trait="d",#
-                   method= "time",#
-                   time.col="Date",#
-                   abund.col="Abund")#
-#
-degree <- cv.trait(spec, byYear, trait="degree",#
-                   method= "time",#
-                   time.col="Date",#
-                   abund.col="Abund")#
-#
-itd <- cv.trait(spec, byYear, trait="ITD",#
-                method= "time",#
-                time.col="Date",#
-                abund.col="Abund")#
-#
-## ************************************************************#
-## save#
-save(itd, dprime, degree,#
-     dprime.k.cv, dprime.closeness.cv,#
-     occ.k.cv, occ.closeness.cv,#
-     plants.occ.k.cv, plants.occ.closeness.cv,#
-     degree.k.cv, degree.closeness.cv, plants.degree.closeness.cv,#
-     file="saved/contMods.Rdata")#
-#
-## ************************************************************#
-## coefficient of variation through space#
-## ************************************************************#
-#
-## byYr <- aggregate(list(Abund=spec$GenusSpecies),#
-##                   list(GenSp= spec$GenusSpecies,#
-##                        status= spec$SiteStatus,#
-##                        date= spec$Site,#
-##                        site= spec$Year), length)#
-#
-## dprime.sp <- cv.trait(spec, byYr, trait="d", xlabel= "Specialization",#
-##                       method= "space")#
-## itd.sp <- cv.trait(spec, byYr, trait="ITD", xlabel= "Body size",#
-##                    method= "space")#
-## lecty.sp <-  cv.trait(spec, byYr, trait="Lecty", cont=FALSE,#
-##                       method= "space")#
-## excavate.sp <-  cv.trait(spec, byYr, trait="Excavate", cont=FALSE,#
-##                          method=" space")#
-## nest.sp <-  cv.trait(spec, byYr, trait="NestLoc", cont=FALSE,#
-##                      method= "space")#
-## soc.sp <- cv.trait(spec, byYr, trait="Sociality", cont=FALSE,#
-##                   method= "space")
-summary(occ.closeness.cv$lm.nss)
-summary(plants.occ.closeness.cv$lm.nss)
-summary(degree.closeness.cv$lm.nss)
-occ.closeness.cv <- cv.trait(spec,#
-                             specs[specs$speciesType =="pollinator",],#
-                             trait="occ.date",#
-                             method= "time", time.col="assem",#
-                             abund.col="weighted.closeness",#
-                             cv.function=cv,#
-                             zero2na=TRUE,#
-                             standard.cv=TRUE,#
-                             na.rm=TRUE)#
-summary(occ.closeness.cv$lm.nss)
-## sig#
-degree.closeness.cv <- cv.trait(spec,#
-                                specs[specs$speciesType =="pollinator",],#
-                                trait="degree",#
-                                method= "time", time.col="assem",#
-                                abund.col="weighted.closeness",#
-                                cv.function=cv,#
-                                zero2na=TRUE,#
-                                standard.cv=TRUE,#
-                                na.rm=TRUE)#
-summary(degree.closeness.cv$lm.nss)
-summary(plants.degree.closeness.cv$lm.nss)
-check.pol <- unique(cbind(spec$degree,#
-                          spec$occ.date))#
-plot(check.pol)#
-#
-cor.test(check.pol[,1], check.pol[,2])
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/speciesLevel')#
+setwd('~/Dropbox/hedgerow_assembly/analysis/networkLevel')#
 source('src/initialize.R')#
 load('../../data/networks/all_networks_years.Rdata')#
 #
-## **********************************************************#
-## species importance#
-## **********************************************************#
-## linear models#
-load(file=file.path(save.path, 'specs.Rdata'))#
-#
-## SiteStatus or ypr#
-xvar <- "ypr"#
-#
-## anything outputted by specieslevel#
-ys <- c("proportional.generality", "d", "degree", "betweenness",#
-        "closeness.log")#
-#
-## formulas <-lapply(ys, function(x) {#
-##   as.formula(paste(x, "~",#
-##                    paste(paste(xvar, "specialization", sep="*"), #
-##                          "(1|Site)",#
-##                           "(1|GenusSpecies)",#
-##                          sep="+")))#
-## })#
-#
-formulas <-lapply(ys, function(x) {#
-  as.formula(paste(x, "~",#
-                   paste(xvar, #
-                         "(1|Site)",#
-                          "(1|GenusSpecies)",#
-                         sep="+")))#
-})#
-#
-mod.pols <- lapply(formulas, function(x){#
-  lmer(x,#
-       data=specs[specs$speciesType == "pollinator",])#
-})
-summary(mod.pols$closeness.log)
-mod.pols <- lapply(formulas, function(x){#
-  lmer(x,#
-       data=specs[specs$speciesType == "pollinator",])#
-})#
-#
-mod.plants <- lapply(formulas, function(x){#
-  lmer(x,#
-       data=specs[specs$speciesType == "plant",])#
-})#
-names(mod.pols) <- names(mod.plants) <- ys
-summary(mod.pols$closeness.log)
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/speciesLevel')#
-source('plotting/src/predictIntervals.R')#
-source('plotting/src/CIplotting.R')#
-source('plotting/src/plotPanels.R')#
-source('src/initialize.R')#
-#
-## ************************************************************#
-## specialization#
-## ************************************************************#
-#
-load(file=file.path(save.path, 'specs.Rdata'))#
-load(file=file.path(save.path, "mods/specs_ypr.Rdata"))#
-#
-ylabs <- c("Proportional Generality", "Specialization (d')", "Degree",#
-           "Betweenness", "Closeness" )#
-#
-dd <- expand.grid(ypr=seq(from= min(specs$ypr, na.rm=TRUE),#
-                          to= max(specs$ypr, na.rm=TRUE),#
-                          length=10))#
-pp <- c("plants", "pols")#
-mods <- list(mod.pols, mod.plants)#
-names(mods) <- pp#
-#
-for(j in pp){#
-  for(i in 1:length(ys)){#
-    dd.ypr <- cbind(dd, 0)#
-    colnames(dd.ypr) <- c("ypr", ys[i])#
-      ypr.pi <- predict.int(mod= mods[[j]][[i]],#
-                            dd=dd.ypr,#
-                            y=ys[i],#
-                            family="gaussian")#
-#
-    plot.predict.ypr(new.dd=ypr.pi,#
-                     ylabel=ylabs[i],#
-                     dats=specs,#
-                     y1=ys[i],#
-                     extinction.method=j,#
-                     agg.col="GenusSpecies")#
-  }#
-}#
-## closeness only#
-dd.ypr <- cbind(dd, closeness.log=0)#
-#
-ypr.pi.pol <- predict.int(mod= mods$pol$closeness.log,#
-                          dd=dd.ypr,#
-                          y="closeness.log",#
-                          family="gaussian")#
-ypr.pi.plant <- predict.int(mod= mods$plant$closeness.log,#
-                            dd=dd.ypr,#
-                            y="closeness.log",#
-                            family="gaussian")#
-#
-plot.panels()
-lapply(mod.pols, AIC)
-formulas <-lapply(ys, function(x) {#
-  as.formula(paste(x, "~",#
-                   paste(xvar, paste0("I(", xvar ")",#
-                         "(1|Site)",#
-                          "(1|GenusSpecies)",#
-                         sep="+")))#
-})
-formulas <-lapply(ys, function(x) {#
-  as.formula(paste(x, "~",#
-                   paste(xvar, paste0("I(", xvar, ")"),#
-                         "(1|Site)",#
-                          "(1|GenusSpecies)",#
-                         sep="+")))#
-})
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/speciesLevel')#
-source('src/initialize.R')#
-load('../../data/networks/all_networks_years.Rdata')#
+## either "abund" or "degree"#
+## extinction.method <- "degree"#
 #
 ## **********************************************************#
-## species importance#
-## **********************************************************#
-## linear models#
-load(file=file.path(save.path, 'specs.Rdata'))#
-#
-## SiteStatus or ypr#
-xvar <- "ypr"#
-#
-## anything outputted by specieslevel#
-ys <- c("proportional.generality", "d", "degree", "betweenness",#
-        "closeness.log")#
-#
-## formulas <-lapply(ys, function(x) {#
-##   as.formula(paste(x, "~",#
-##                    paste(paste(xvar, "specialization", sep="*"), #
-##                          "(1|Site)",#
-##                           "(1|GenusSpecies)",#
-##                          sep="+")))#
-## })#
-#
-formulas <-lapply(ys, function(x) {#
-  as.formula(paste(x, "~",#
-                   paste(xvar, paste0("I(", xvar, ")"),#
-                         "(1|Site)",#
-                          "(1|GenusSpecies)",#
-                         sep="+")))#
-})
-mod.pols <- lapply(formulas, function(x){#
-  lmer(x,#
-       data=specs[specs$speciesType == "pollinator",])#
-})
-formulas <-lapply(ys, function(x) {#
-  as.formula(paste(x, "~",#
-                   paste(xvar, paste0("I(", xvar^2, ")"),#
-                         "(1|Site)",#
-                          "(1|GenusSpecies)",#
-                         sep="+")))#
-})
-formulas <-lapply(ys, function(x) {#
-  as.formula(paste(x, "~",#
-                   paste(xvar, paste0("I(", xvar, ")^2"),#
-                         "(1|Site)",#
-                          "(1|GenusSpecies)",#
-                         sep="+")))#
-})#
-#
-mod.pols <- lapply(formulas, function(x){#
-  lmer(x,#
-       data=specs[specs$speciesType == "pollinator",])#
-})
-formulas <-lapply(ys, function(x) {#
-  as.formula(paste(x, "~",#
-                   paste(xvar, paste0("I(", xvar, "^2)"),#
-                         "(1|Site)",#
-                          "(1|GenusSpecies)",#
-                         sep="+")))#
-})#
-#
-mod.pols <- lapply(formulas, function(x){#
-  lmer(x,#
-       data=specs[specs$speciesType == "pollinator",])#
-})
-summary(mod.pols$closeness.log)
-mod.pols <- lapply(formulas, function(x){#
-  lmer(x,#
-       data=specs[specs$speciesType == "pollinator",])#
-})#
-#
-mod.plants <- lapply(formulas, function(x){#
-  lmer(x,#
-       data=specs[specs$speciesType == "plant",])#
-})#
-names(mod.pols) <- names(mod.plants) <- ys#
-lapply(mod.plants, summary)#
-lapply(mod.pols, summary)#
-#
-print(summary(mod.pols$closeness.log))#
-print("**************************************************")#
-print(summary(mod.plants$closeness.log))
-AIC(mod.pols$closeness.log)
-formulas <-lapply(ys, function(x) {#
-  as.formula(paste(x, "~",#
-                   paste(xvar, ## paste0("I(", xvar, "^2)"),#
-                         "(1|Site)",#
-                          "(1|GenusSpecies)",#
-                         sep="+")))#
-})
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/speciesLevel')#
-source('src/initialize.R')#
-load('../../data/networks/all_networks_years.Rdata')#
-#
-## **********************************************************#
-## species importance#
-## **********************************************************#
-## linear models#
-load(file=file.path(save.path, 'specs.Rdata'))#
-#
-## SiteStatus or ypr#
-xvar <- "ypr"#
-#
-## anything outputted by specieslevel#
-ys <- c("proportional.generality", "d", "degree", "betweenness",#
-        "closeness.log")#
-#
-## formulas <-lapply(ys, function(x) {#
-##   as.formula(paste(x, "~",#
-##                    paste(paste(xvar, "specialization", sep="*"), #
-##                          "(1|Site)",#
-##                           "(1|GenusSpecies)",#
-##                          sep="+")))#
-## })#
-#
-formulas <-lapply(ys, function(x) {#
-  as.formula(paste(x, "~",#
-                   paste(xvar, ## paste0("I(", xvar, "^2)"),#
-                         "(1|Site)",#
-                          "(1|GenusSpecies)",#
-                         sep="+")))#
-})#
-#
-mod.pols <- lapply(formulas, function(x){#
-  lmer(x,#
-       data=specs[specs$speciesType == "pollinator",])#
-})#
-#
-mod.plants <- lapply(formulas, function(x){#
-  lmer(x,#
-       data=specs[specs$speciesType == "plant",])#
-})#
-names(mod.pols) <- names(mod.plants) <- ys
-print(summary(mod.plants$closeness.log))
-source('~/Dropbox/hedgerow_assembly/analysis/variability/beta-div.R')
-type <- "plants"
-source('~/Dropbox/hedgerow_assembly/analysis/variability/beta-div.R')
-type <- "pols"
-source('~/Dropbox/hedgerow_assembly/analysis/variability/beta-div.R')
-type <- "ints"
-source('~/Dropbox/hedgerow_assembly/analysis/variability/beta-div.R')
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
-source('src/initialize.R')#
-source('src/phyloIntBeta.R')#
-source('src/plotDists.R')#
-#
-## ************************************************************#
-## prepare link community in terminal#
-## ************************************************************#
-edges.com <- aggregate(list(abund=spec$GenusSpecies),#
-                       list(GenusSpecies=spec$GenusSpecies,#
-                            PlantGenusSpecies=spec$PlantGenusSpecies),#
-                       length)#
-#
-## lc <- getLinkCommunities(edges.com,#
-##                          hcmethod = "average",#
-##                          bipartite=TRUE)#
-## save(lc, file="saved/lc.Rdata")#
-#
-## ************************************************************#
-## turnover of phylo interactions through time#
-## ************************************************************#
-load(file="saved/lc.Rdata")#
-spec$Int <- paste(spec$GenusSpecies,#
-                  spec$PlantGenusSpecies)#
-phylo.int <- calcCommDis(spec, "Int", lc, abund.w=TRUE)#
-save(phylo.int, file="saved/phyloInt.Rdata")#
-#
-## linear model of phylo int by years between samples mature and#
-## maturing hedgerows have more intearction turnover between years#
-#
-load(file="saved/phyloInt.Rdata")#
-phylo.int.mod <- lmer(PhyloInt ~ SiteStatus +#
-                      (1|Site),#
-                      data=phylo.int$phylo.int)#
-summary(phylo.int.mod)
-phylo.int$phylo.int$SiteStatus <-#
-  factor(phylo.int$phylo.int$SiteStatus,#
-         levels=c("mature", "control", "maturing"))#
-phylo.int.mod <- lmer(PhyloInt ~ SiteStatus +#
-                      (1|Site),#
-                      data=phylo.int$phylo.int)#
-summary(phylo.int.mod)
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/networkLevel')#
-source('src/initialize.R')#
-load('../../data/networks/baci_networks_years.Rdata')#
-N <- 999#
-#
-## ## ************************************************************#
-## ## calculate metrics and zscores#
-## ## ************************************************************#
-## mets <- lapply(nets, network.metrics, N)#
-#
-## cor.dats <- prep.dat(mets,  spec)#
-#
-## cor.dats$tot.rich <- cor.dats$number.of.species.LL +#
-##   cor.dats$number.of.species.HL#
-#
-## save(cor.dats, file='saved/corMets.Rdata')#
-#
-## ************************************************************#
-## effect of years post restoration#
-## ************************************************************#
-load(file='saved/corMets.Rdata')#
-## nestedness#
-baci.nodf.mod <- lmer(zNODF ~ scale(ypr) +#
-                 (1|Site) + (1|Year),#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.nodf.mod)#
-save(baci.nodf.mod, file='saved/mods/baci_nodf.Rdata')
-## nestedness#
-baci.nodf.mod <- lmer(zNODF ~ scale(ypr) +#
-                 (1|Site) + (1|Year),#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.nodf.mod)#
-save(baci.nodf.mod, file='saved/mods/baci_nodf.Rdata')
-baci.mod.mod <- lmer(zmod.met.D ~ scale(ypr) +#
-                 (1|Site) + (1|Year),#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.mod.mod)#
-save(baci.mod.mod, file='saved/mods/baci_mod.Rdata')
-## h2#
-baci.h2.mod <- lmer(zH2 ~ scale(ypr) +#
-                 (1|Site) + (1|Year),#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.h2.mod)#
-save(baci.h2.mod, file='saved/mods/baci_h2.Rdata')
-## species richness pol#
-baci.rich.hl.mod <- glmer(number.of.species.HL ~ scale(ypr) +#
-                 (1|Site) + (1|Year), family="poisson",#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.rich.hl.mod)#
-save(baci.rich.hl.mod, file='saved/mods/baci_rich_hl.Rdata')#
-#
-## species richness plants#
-baci.rich.ll.mod <- glmer(number.of.species.LL ~ scale(ypr) +#
-                 (1|Site) + (1|Year), family="poisson",#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.rich.ll.mod)#
-save(baci.rich.ll.mod, file='saved/mods/baci_rich_ll.Rdata')
-baci.conn.mod <- lmer(connectance ~ scale(ypr) +#
-                 (1|Site) + (1|Year),#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.conn.mod)#
-save(baci.conn.mod, file='saved/mods/baci_conn.Rdata')
-h2#
-baci.h2.mod <- lmer(zH2 ~ scale(ypr) +#
-                 (1|Site) + (1|Year),#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.h2.mod)#
-save(baci.h2.mod, file='saved/mods/baci_h2.Rdata')
-library(RColorBrewer)#
-library(lme4)#
-library(lmerTest)#
-setwd('~/Dropbox/hedgerow_assembly/analysis/networkLevel')#
-source('plotting/src/predictIntervals.R')#
-source('plotting/src/CIplotting.R')#
-source('plotting/src/plotPanels.R')#
-source('src/misc.R')#
-load(file='saved/corMets.Rdata')#
-#
-dd <- expand.grid(ypr=seq(from= min(cor.dats$ypr, na.rm=TRUE),#
-                          to= max(cor.dats$ypr, na.rm=TRUE),#
-                          length=10))#
-#
-## ************************************************************#
-## nodf#
-## ************************************************************#
-load(file='saved/mods/baci_nodf.Rdata')#
-#
-dd.nodf <- cbind(dd, zNODF=0)#
-#
-nodf.pi <- predict.int(mod= baci.nodf.mod,#
-                        dd=dd.nodf,#
-                        y="zNODF",#
-                       family="gaussian")#
-## ************************************************************#
-## modularity#
-## ************************************************************#
-load(file='saved/mods/baci_mod.Rdata')#
-dd.mod <- cbind(dd, zmod.met.D=0)#
-mod.pi <- predict.int(mod= baci.mod.mod,#
-                        dd=dd.mod,#
-                        y="zmod.met.D",#
-                      family="gaussian")#
-## ************************************************************#
-## specialization#
-## ************************************************************#
-load(file='saved/mods/baci_h2.Rdata')#
-dd.h2 <- cbind(dd, zH2=0)#
-h2.pi <- predict.int(mod= baci.h2.mod,#
-                        dd=dd.h2,#
-                        y="zH2",#
-                        family="gaussian")#
-## ************************************************************#
-## niche overlap - Plants#
-## ************************************************************#
-load(file='saved/mods/baci_no_plant.Rdata')#
-#
-dd.nop <- cbind(dd, niche.overlap.LL =0)#
-#
-nop.pi <- predict.int(mod= baci.no.plant.mod,#
-                        dd=dd.nop,#
-                        y="niche.overlap.plants",#
-                        family="gaussian")#
-## ************************************************************#
-## niche overlap - Polinators#
-## ************************************************************#
-load(file='saved/mods/baci_no_pol.Rdata')#
-#
-dd.nopol <- cbind(dd, niche.overlap.HL =0)#
-nopol.pi <- predict.int(mod= baci.no.pol.mod,#
-                        dd=dd.nopol,#
-                        y="niche.overlap.pol",#
-                        family="gaussian")#
-#
-## ************************************************************#
-## connectance#
-## ************************************************************#
-load(file='saved/mods/baci_conn.Rdata')#
-#
-dd.conn <- cbind(dd, connectance =0)#
-conn.pi <- predict.int(mod= baci.conn.mod,#
-                        dd=dd.conn,#
-                        y="connectance",#
-                        family="gaussian")#
-#
-## ************************************************************#
-## plant richness#
-## ************************************************************#
-load(file='saved/mods/baci_rich_ll.Rdata')#
-#
-dd.rich.ll <- cbind(dd, number.of.species.LL =0)#
-rich.ll.pi <- predict.int(mod= baci.rich.ll.mod,#
-                        dd=dd.rich.ll,#
-                        y="number.of.species.LL",#
-                        family="poisson")#
-## ************************************************************#
-## pol richness#
-## ************************************************************#
-load(file='saved/mods/baci_rich_hl.Rdata')#
-#
-dd.rich.hl <- cbind(dd, number.of.species.HL =0)#
-rich.hl.pi <- predict.int(mod= baci.rich.hl.mod,#
-                        dd=dd.rich.hl,#
-                        y="number.of.species.HL",#
-                        family="poisson")#
-## ************************************************************#
-## all panels#
-## ************************************************************#
-plot.panels()
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/networkLevel')#
-source('src/initialize.R')#
-load('../../data/networks/baci_networks_years.Rdata')#
-N <- 999#
-#
-## ## ************************************************************#
-## ## calculate metrics and zscores#
-## ## ************************************************************#
-## mets <- lapply(nets, network.metrics, N)#
-#
-## cor.dats <- prep.dat(mets,  spec)#
-#
-## cor.dats$tot.rich <- cor.dats$number.of.species.LL +#
-##   cor.dats$number.of.species.HL#
-#
-## save(cor.dats, file='saved/corMets.Rdata')#
-#
-## ************************************************************#
-## effect of years post restoration#
-## ************************************************************#
-load(file='saved/corMets.Rdata')#
-## nestedness#
-baci.nodf.mod <- lmer(zNODF ~ scale(ypr) +#
-                 (1|Site) + (1|Year),#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.nodf.mod)#
-save(baci.nodf.mod, file='saved/mods/baci_nodf.Rdata')#
-#
-## modularity#
-baci.mod.mod <- lmer(zmod.met.D ~ scale(ypr) +#
-                 (1|Site) + (1|Year),#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.mod.mod)#
-save(baci.mod.mod, file='saved/mods/baci_mod.Rdata')#
-#
-## h2#
-baci.h2.mod <- lmer(zH2 ~ scale(ypr) +#
-                 (1|Site) + (1|Year),#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.h2.mod)#
-save(baci.h2.mod, file='saved/mods/baci_h2.Rdata')#
-## species richness pol#
-baci.rich.hl.mod <- glmer(number.of.species.HL ~ scale(ypr) +#
-                 (1|Site) + (1|Year), family="poisson",#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.rich.hl.mod)#
-save(baci.rich.hl.mod, file='saved/mods/baci_rich_hl.Rdata')#
-#
-## species richness plants#
-baci.rich.ll.mod <- glmer(number.of.species.LL ~ scale(ypr) +#
-                 (1|Site) + (1|Year), family="poisson",#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.rich.ll.mod)#
-save(baci.rich.ll.mod, file='saved/mods/baci_rich_ll.Rdata')#
-#
-## total species richness#
-baci.rich.tot.mod <- glmer(tot.rich ~ scale(ypr) +#
-                 (1|Site) + (1|Year), family="poisson",#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.rich.tot.mod)#
-save(baci.rich.tot.mod, file='saved/mods/baci_rich_tot.Rdata')#
-#
-## connectance#
-baci.conn.mod <- lmer(connectance ~ scale(ypr) +#
-                 (1|Site) + (1|Year),#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.conn.mod)#
-save(baci.conn.mod, file='saved/mods/baci_conn.Rdata')#
-#
-## weighted connectance#
-baci.wconn.mod <- lmer(weighted.connectance ~ scale(ypr) +#
-                 (1|Site) + (1|Year),#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.wconn.mod)#
-save(baci.wconn.mod, file='saved/mods/baci_wconn.Rdata')#
-#
-## niche overlap pollinators#
-baci.no.pol.mod <- lmer(niche.overlap.HL ~ scale(ypr) +#
-                 (1|Site) + (1|Year),#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.no.pol.mod)#
-save(baci.no.pol.mod, file='saved/mods/baci_no_pol.Rdata')#
-#
-## niche overlap plants#
-baci.no.plant.mod <- lmer(niche.overlap.LL ~ scale(ypr) +#
-                 (1|Site) + (1|Year),#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.no.plant.mod)#
-save(baci.no.plant.mod, file='saved/mods/baci_no_plant.Rdata')#
-source('plotting/baci.R')#
-## distribution is niche overlap#
-#
-## dis.mats <- lapply(lapply(nets, t), vegdist, method="chao")#
-#
-## layout(matrix(1:6, nrow=2))#
-## cols <- rainbow(length(unique(cor.dats$Year)))#
-## lapply(unique(cor.dats$Site), function(x){#
-##   this.mats <- dis.mats[cor.dats$Site == x]#
-##   plot(NA, ylim=c(0,10), xlim=c(0,1.5),#
-##        ylab="Frequency",#
-##        xlab="Niche Overlap",#
-##        main= x)#
-##   for(i in 1:length(this.mats)){#
-##     points(density(this.mats[[i]]), col=cols[i], type="l", lwd=2)#
-##   }#
-## })#
-#
-## plot(NA, ylim=c(0,1), xlim=c(0,1), xaxt="n", yaxt="n", ylab="", xlab="")#
-## legend("center", col=cols, lwd="2",#
-##        legend=sort(unique(cor.dats$Year)),#
-##        bty="n")
-library(RColorBrewer)#
-library(lme4)#
-library(lmerTest)#
-setwd('~/Dropbox/hedgerow_assembly/analysis/networkLevel')#
-source('plotting/src/predictIntervals.R')#
-source('plotting/src/CIplotting.R')#
-source('plotting/src/plotPanels.R')#
-source('src/misc.R')#
-load(file='saved/corMets.Rdata')#
-#
-dd <- expand.grid(ypr=seq(from= min(cor.dats$ypr, na.rm=TRUE),#
-                          to= max(cor.dats$ypr, na.rm=TRUE),#
-                          length=10))#
-#
-## ************************************************************#
-## nodf#
-## ************************************************************#
-load(file='saved/mods/baci_nodf.Rdata')#
-#
-dd.nodf <- cbind(dd, zNODF=0)#
-#
-nodf.pi <- predict.int(mod= baci.nodf.mod,#
-                        dd=dd.nodf,#
-                        y="zNODF",#
-                       family="gaussian")#
-## ************************************************************#
-## modularity#
-## ************************************************************#
-load(file='saved/mods/baci_mod.Rdata')#
-dd.mod <- cbind(dd, zmod.met.D=0)#
-mod.pi <- predict.int(mod= baci.mod.mod,#
-                        dd=dd.mod,#
-                        y="zmod.met.D",#
-                      family="gaussian")#
-## ************************************************************#
-## specialization#
-## ************************************************************#
-load(file='saved/mods/baci_h2.Rdata')#
-dd.h2 <- cbind(dd, zH2=0)#
-h2.pi <- predict.int(mod= baci.h2.mod,#
-                        dd=dd.h2,#
-                        y="zH2",#
-                        family="gaussian")#
-## ************************************************************#
-## niche overlap - Plants#
-## ************************************************************#
-load(file='saved/mods/baci_no_plant.Rdata')#
-#
-dd.nop <- cbind(dd, niche.overlap.LL =0)#
-#
-nop.pi <- predict.int(mod= baci.no.plant.mod,#
-                        dd=dd.nop,#
-                        y="niche.overlap.plants",#
-                        family="gaussian")#
-## ************************************************************#
-## niche overlap - Polinators#
-## ************************************************************#
-load(file='saved/mods/baci_no_pol.Rdata')#
-#
-dd.nopol <- cbind(dd, niche.overlap.HL =0)#
-nopol.pi <- predict.int(mod= baci.no.pol.mod,#
-                        dd=dd.nopol,#
-                        y="niche.overlap.pol",#
-                        family="gaussian")#
-#
-## ************************************************************#
-## connectance#
-## ************************************************************#
-load(file='saved/mods/baci_conn.Rdata')#
-#
-dd.conn <- cbind(dd, connectance =0)#
-conn.pi <- predict.int(mod= baci.conn.mod,#
-                        dd=dd.conn,#
-                        y="connectance",#
-                        family="gaussian")#
-#
-## ************************************************************#
-## plant richness#
-## ************************************************************#
-load(file='saved/mods/baci_rich_ll.Rdata')#
-#
-dd.rich.ll <- cbind(dd, number.of.species.LL =0)#
-rich.ll.pi <- predict.int(mod= baci.rich.ll.mod,#
-                        dd=dd.rich.ll,#
-                        y="number.of.species.LL",#
-                        family="poisson")#
-## ************************************************************#
-## pol richness#
-## ************************************************************#
-load(file='saved/mods/baci_rich_hl.Rdata')#
-#
-dd.rich.hl <- cbind(dd, number.of.species.HL =0)#
-rich.hl.pi <- predict.int(mod= baci.rich.hl.mod,#
-                        dd=dd.rich.hl,#
-                        y="number.of.species.HL",#
-                        family="poisson")#
-## ************************************************************#
-## all panels#
-## ************************************************************#
-plot.panels()
-## nestedness#
-baci.nodf.mod <- lmer(zNODF ~ scale(ypr) +#
-                 (1|Site) + (1|Year),#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.nodf.mod)
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/networkLevel')#
-source('src/initialize.R')#
-load('../../data/networks/baci_networks_years.Rdata')#
-N <- 999#
-#
-## ## ************************************************************#
-## ## calculate metrics and zscores#
-## ## ************************************************************#
-## mets <- lapply(nets, network.metrics, N)#
-#
-## cor.dats <- prep.dat(mets,  spec)#
-#
-## cor.dats$tot.rich <- cor.dats$number.of.species.LL +#
-##   cor.dats$number.of.species.HL#
-#
-## save(cor.dats, file='saved/corMets.Rdata')#
-#
-## ************************************************************#
-## effect of years post restoration#
-## ************************************************************#
-load(file='saved/corMets.Rdata')#
-## nestedness#
-baci.nodf.mod <- lmer(zNODF ~ scale(ypr) +#
-                 (1|Site) + (1|Year),#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.nodf.mod)#
-save(baci.nodf.mod, file='saved/mods/baci_nodf.Rdata')#
-#
-## modularity#
-baci.mod.mod <- lmer(zmod.met.D ~ scale(ypr) +#
-                 (1|Site) + (1|Year),#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.mod.mod)#
-save(baci.mod.mod, file='saved/mods/baci_mod.Rdata')#
-#
-## h2#
-baci.h2.mod <- lmer(zH2 ~ scale(ypr) +#
-                 (1|Site) + (1|Year),#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.h2.mod)#
-save(baci.h2.mod, file='saved/mods/baci_h2.Rdata')#
-## species richness pol#
-baci.rich.hl.mod <- glmer(number.of.species.HL ~ scale(ypr) +#
-                 (1|Site) + (1|Year), family="poisson",#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.rich.hl.mod)#
-save(baci.rich.hl.mod, file='saved/mods/baci_rich_hl.Rdata')#
-#
-## species richness plants#
-baci.rich.ll.mod <- glmer(number.of.species.LL ~ scale(ypr) +#
-                 (1|Site) + (1|Year), family="poisson",#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.rich.ll.mod)#
-save(baci.rich.ll.mod, file='saved/mods/baci_rich_ll.Rdata')#
-#
-## total species richness#
-baci.rich.tot.mod <- glmer(tot.rich ~ scale(ypr) +#
-                 (1|Site) + (1|Year), family="poisson",#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.rich.tot.mod)#
-save(baci.rich.tot.mod, file='saved/mods/baci_rich_tot.Rdata')#
-#
-## connectance#
-baci.conn.mod <- lmer(connectance ~ scale(ypr) +#
-                 (1|Site) + (1|Year),#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.conn.mod)#
-save(baci.conn.mod, file='saved/mods/baci_conn.Rdata')#
-#
-## weighted connectance#
-baci.wconn.mod <- lmer(weighted.connectance ~ scale(ypr) +#
-                 (1|Site) + (1|Year),#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.wconn.mod)#
-save(baci.wconn.mod, file='saved/mods/baci_wconn.Rdata')#
-#
-## niche overlap pollinators#
-baci.no.pol.mod <- lmer(niche.overlap.HL ~ scale(ypr) +#
-                 (1|Site) + (1|Year),#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.no.pol.mod)#
-save(baci.no.pol.mod, file='saved/mods/baci_no_pol.Rdata')#
-#
-## niche overlap plants#
-baci.no.plant.mod <- lmer(niche.overlap.LL ~ scale(ypr) +#
-                 (1|Site) + (1|Year),#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.no.plant.mod)#
-save(baci.no.plant.mod, file='saved/mods/baci_no_plant.Rdata')#
-source('plotting/baci.R')#
-## distribution is niche overlap#
-#
-## dis.mats <- lapply(lapply(nets, t), vegdist, method="chao")#
-#
-## layout(matrix(1:6, nrow=2))#
-## cols <- rainbow(length(unique(cor.dats$Year)))#
-## lapply(unique(cor.dats$Site), function(x){#
-##   this.mats <- dis.mats[cor.dats$Site == x]#
-##   plot(NA, ylim=c(0,10), xlim=c(0,1.5),#
-##        ylab="Frequency",#
-##        xlab="Niche Overlap",#
-##        main= x)#
-##   for(i in 1:length(this.mats)){#
-##     points(density(this.mats[[i]]), col=cols[i], type="l", lwd=2)#
-##   }#
-## })#
-#
-## plot(NA, ylim=c(0,1), xlim=c(0,1), xaxt="n", yaxt="n", ylab="", xlab="")#
-## legend("center", col=cols, lwd="2",#
-##        legend=sort(unique(cor.dats$Year)),#
-##        bty="n")
-summary(baci.nodf.mod)
-summary(baci.mod.mod)
-summary(baci.h2.mod)
-summary(baci.conn.mod)
-library(RColorBrewer)#
-library(lme4)#
-library(lmerTest)#
-setwd('~/Dropbox/hedgerow_assembly/analysis/networkLevel')#
-source('plotting/src/predictIntervals.R')#
-source('plotting/src/CIplotting.R')#
-source('plotting/src/plotPanels.R')#
-source('src/misc.R')#
-load(file='saved/corMets.Rdata')#
-#
-dd <- expand.grid(ypr=seq(from= min(cor.dats$ypr, na.rm=TRUE),#
-                          to= max(cor.dats$ypr, na.rm=TRUE),#
-                          length=10))#
-#
-## ************************************************************#
-## nodf#
-## ************************************************************#
-load(file='saved/mods/baci_nodf.Rdata')#
-#
-dd.nodf <- cbind(dd, zNODF=0)#
-#
-nodf.pi <- predict.int(mod= baci.nodf.mod,#
-                        dd=dd.nodf,#
-                        y="zNODF",#
-                       family="gaussian")#
-## ************************************************************#
-## modularity#
-## ************************************************************#
-load(file='saved/mods/baci_mod.Rdata')#
-dd.mod <- cbind(dd, zmod.met.D=0)#
-mod.pi <- predict.int(mod= baci.mod.mod,#
-                        dd=dd.mod,#
-                        y="zmod.met.D",#
-                      family="gaussian")#
-## ************************************************************#
-## specialization#
-## ************************************************************#
-load(file='saved/mods/baci_h2.Rdata')#
-dd.h2 <- cbind(dd, zH2=0)#
-h2.pi <- predict.int(mod= baci.h2.mod,#
-                        dd=dd.h2,#
-                        y="zH2",#
-                        family="gaussian")#
-## ************************************************************#
-## niche overlap - Plants#
-## ************************************************************#
-load(file='saved/mods/baci_no_plant.Rdata')#
-#
-dd.nop <- cbind(dd, niche.overlap.LL =0)#
-#
-nop.pi <- predict.int(mod= baci.no.plant.mod,#
-                        dd=dd.nop,#
-                        y="niche.overlap.plants",#
-                        family="gaussian")#
-## ************************************************************#
-## niche overlap - Polinators#
-## ************************************************************#
-load(file='saved/mods/baci_no_pol.Rdata')#
-#
-dd.nopol <- cbind(dd, niche.overlap.HL =0)#
-nopol.pi <- predict.int(mod= baci.no.pol.mod,#
-                        dd=dd.nopol,#
-                        y="niche.overlap.pol",#
-                        family="gaussian")#
-#
-## ************************************************************#
-## connectance#
-## ************************************************************#
-load(file='saved/mods/baci_conn.Rdata')#
-#
-dd.conn <- cbind(dd, connectance =0)#
-conn.pi <- predict.int(mod= baci.conn.mod,#
-                        dd=dd.conn,#
-                        y="connectance",#
-                        family="gaussian")#
-#
-## ************************************************************#
-## plant richness#
-## ************************************************************#
-load(file='saved/mods/baci_rich_ll.Rdata')#
-#
-dd.rich.ll <- cbind(dd, number.of.species.LL =0)#
-rich.ll.pi <- predict.int(mod= baci.rich.ll.mod,#
-                        dd=dd.rich.ll,#
-                        y="number.of.species.LL",#
-                        family="poisson")#
-## ************************************************************#
-## pol richness#
-## ************************************************************#
-load(file='saved/mods/baci_rich_hl.Rdata')#
-#
-dd.rich.hl <- cbind(dd, number.of.species.HL =0)#
-rich.hl.pi <- predict.int(mod= baci.rich.hl.mod,#
-                        dd=dd.rich.hl,#
-                        y="number.of.species.HL",#
-                        family="poisson")#
-## ************************************************************#
-## all panels#
-## ************************************************************#
-plot.panels()
-library(RColorBrewer)#
-library(lme4)#
-library(lmerTest)#
-setwd('~/Dropbox/hedgerow_assembly/analysis/networkLevel')#
-source('plotting/src/predictIntervals.R')#
-source('plotting/src/CIplotting.R')#
-source('plotting/src/plotPanels.R')#
-source('src/misc.R')#
-load(file='saved/corMets.Rdata')#
-#
-dd <- expand.grid(ypr=seq(from= min(cor.dats$ypr, na.rm=TRUE),#
-                          to= max(cor.dats$ypr, na.rm=TRUE),#
-                          length=10))#
-#
-## ************************************************************#
-## nodf#
-## ************************************************************#
-load(file='saved/mods/baci_nodf.Rdata')#
-#
-dd.nodf <- cbind(dd, zNODF=0)#
-#
-nodf.pi <- predict.int(mod= baci.nodf.mod,#
-                        dd=dd.nodf,#
-                        y="zNODF",#
-                       family="gaussian")#
-## ************************************************************#
-## modularity#
-## ************************************************************#
-load(file='saved/mods/baci_mod.Rdata')#
-dd.mod <- cbind(dd, zmod.met.D=0)#
-mod.pi <- predict.int(mod= baci.mod.mod,#
-                        dd=dd.mod,#
-                        y="zmod.met.D",#
-                      family="gaussian")#
-## ************************************************************#
-## specialization#
-## ************************************************************#
-load(file='saved/mods/baci_h2.Rdata')#
-dd.h2 <- cbind(dd, zH2=0)#
-h2.pi <- predict.int(mod= baci.h2.mod,#
-                        dd=dd.h2,#
-                        y="zH2",#
-                        family="gaussian")#
-## ************************************************************#
-## niche overlap - Plants#
-## ************************************************************#
-load(file='saved/mods/baci_no_plant.Rdata')#
-#
-dd.nop <- cbind(dd, niche.overlap.LL =0)#
-#
-nop.pi <- predict.int(mod= baci.no.plant.mod,#
-                        dd=dd.nop,#
-                        y="niche.overlap.plants",#
-                        family="gaussian")#
-## ************************************************************#
-## niche overlap - Polinators#
-## ************************************************************#
-load(file='saved/mods/baci_no_pol.Rdata')#
-#
-dd.nopol <- cbind(dd, niche.overlap.HL =0)#
-nopol.pi <- predict.int(mod= baci.no.pol.mod,#
-                        dd=dd.nopol,#
-                        y="niche.overlap.pol",#
-                        family="gaussian")#
-#
-## ************************************************************#
-## connectance#
-## ************************************************************#
-load(file='saved/mods/baci_conn.Rdata')#
-#
-dd.conn <- cbind(dd, connectance =0)#
-conn.pi <- predict.int(mod= baci.conn.mod,#
-                        dd=dd.conn,#
-                        y="connectance",#
-                        family="gaussian")#
-#
-## ************************************************************#
-## plant richness#
-## ************************************************************#
-load(file='saved/mods/baci_rich_ll.Rdata')#
-#
-dd.rich.ll <- cbind(dd, number.of.species.LL =0)#
-rich.ll.pi <- predict.int(mod= baci.rich.ll.mod,#
-                        dd=dd.rich.ll,#
-                        y="number.of.species.LL",#
-                        family="poisson")#
-## ************************************************************#
-## pol richness#
-## ************************************************************#
-load(file='saved/mods/baci_rich_hl.Rdata')#
-#
-dd.rich.hl <- cbind(dd, number.of.species.HL =0)#
-rich.hl.pi <- predict.int(mod= baci.rich.hl.mod,#
-                        dd=dd.rich.hl,#
-                        y="number.of.species.HL",#
-                        family="poisson")#
-## ************************************************************#
-## all panels#
-## ************************************************************#
-plot.panels()
-library(RColorBrewer)#
-library(lme4)#
-library(lmerTest)#
-setwd('~/Dropbox/hedgerow_assembly/analysis/networkLevel')#
-source('plotting/src/predictIntervals.R')#
-source('plotting/src/CIplotting.R')#
-source('plotting/src/plotPanels.R')#
-source('src/misc.R')#
-load(file='saved/corMets.Rdata')#
-#
-dd <- expand.grid(ypr=seq(from= min(cor.dats$ypr, na.rm=TRUE),#
-                          to= max(cor.dats$ypr, na.rm=TRUE),#
-                          length=10))#
-#
-## ************************************************************#
-## nodf#
-## ************************************************************#
-load(file='saved/mods/baci_nodf.Rdata')#
-#
-dd.nodf <- cbind(dd, zNODF=0)#
-#
-nodf.pi <- predict.int(mod= baci.nodf.mod,#
-                        dd=dd.nodf,#
-                        y="zNODF",#
-                       family="gaussian")#
-## ************************************************************#
-## modularity#
-## ************************************************************#
-load(file='saved/mods/baci_mod.Rdata')#
-dd.mod <- cbind(dd, zmod.met.D=0)#
-mod.pi <- predict.int(mod= baci.mod.mod,#
-                        dd=dd.mod,#
-                        y="zmod.met.D",#
-                      family="gaussian")#
-## ************************************************************#
-## specialization#
-## ************************************************************#
-load(file='saved/mods/baci_h2.Rdata')#
-dd.h2 <- cbind(dd, zH2=0)#
-h2.pi <- predict.int(mod= baci.h2.mod,#
-                        dd=dd.h2,#
-                        y="zH2",#
-                        family="gaussian")#
-## ************************************************************#
-## niche overlap - Plants#
-## ************************************************************#
-load(file='saved/mods/baci_no_plant.Rdata')#
-#
-dd.nop <- cbind(dd, niche.overlap.LL =0)#
-#
-nop.pi <- predict.int(mod= baci.no.plant.mod,#
-                        dd=dd.nop,#
-                        y="niche.overlap.plants",#
-                        family="gaussian")#
-## ************************************************************#
-## niche overlap - Polinators#
-## ************************************************************#
-load(file='saved/mods/baci_no_pol.Rdata')#
-#
-dd.nopol <- cbind(dd, niche.overlap.HL =0)#
-nopol.pi <- predict.int(mod= baci.no.pol.mod,#
-                        dd=dd.nopol,#
-                        y="niche.overlap.pol",#
-                        family="gaussian")#
-#
-## ************************************************************#
-## connectance#
-## ************************************************************#
-load(file='saved/mods/baci_conn.Rdata')#
-#
-dd.conn <- cbind(dd, connectance =0)#
-conn.pi <- predict.int(mod= baci.conn.mod,#
-                        dd=dd.conn,#
-                        y="connectance",#
-                        family="gaussian")#
-#
-## ************************************************************#
-## plant richness#
-## ************************************************************#
-load(file='saved/mods/baci_rich_ll.Rdata')#
-#
-dd.rich.ll <- cbind(dd, number.of.species.LL =0)#
-rich.ll.pi <- predict.int(mod= baci.rich.ll.mod,#
-                        dd=dd.rich.ll,#
-                        y="number.of.species.LL",#
-                        family="poisson")#
-## ************************************************************#
-## pol richness#
-## ************************************************************#
-load(file='saved/mods/baci_rich_hl.Rdata')#
-#
-dd.rich.hl <- cbind(dd, number.of.species.HL =0)#
-rich.hl.pi <- predict.int(mod= baci.rich.hl.mod,#
-                        dd=dd.rich.hl,#
-                        y="number.of.species.HL",#
-                        family="poisson")#
-## ************************************************************#
-## all panels#
-## ************************************************************#
-plot.panels()
-baci.rich.hl.mod <- glmer(number.of.species.HL ~ scale(ypr) +#
-                 (1|Site) + (1|Year), family="poisson",#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.rich.hl.mod)#
-save(baci.rich.hl.mod, file='saved/mods/baci_rich_hl.Rdata')
-baci.rich.ll.mod <- glmer(number.of.species.LL ~ scale(ypr) +#
-                 (1|Site) + (1|Year), family="poisson",#
-                 data=cor.dats[!is.na(cor.dats$ypr),])#
-summary(baci.rich.ll.mod)#
-save(baci.rich.ll.mod, file='saved/mods/baci_rich_ll.Rdata')
-load('~/Dropbox/hedgerow_assembly/data/networks/baci_networks_years.Rdata')
-ls()
-nets[[1]]
-nets[[3]]
 ## robustness#
+## **********************************************************#
+## simulation plant extinction#
+#
+res <- simExtinction(nets, extinction.method, spec)#
+#
+save(res, file=file.path(save.path,#
+            sprintf('resilience_%s.Rdata', extinction.method)))#
+#
+## no change in robustness by site status#
+mod.status <- lmer(Robustness ~ SiteStatus#
+             + (1|Site) + (1|Year),#
+             data=res)#
+summary(mod.status)#
+save(mod.status, file=file.path(save.path,#
+            sprintf('mods/resilience_status_%s.Rdata', extinction.method)))#
+## no effect of ypr on robustness#
+mod.ypr <- lmer(Robustness ~ ypr#
+             + (1|Site) + (1|Year),#
+             data=res[!is.na(res$ypr),])#
+summary(mod.ypr)#
+save(mod.ypr, file=file.path(save.path,#
+            sprintf('mods/resilience_ypr_%s.Rdata', extinction.method)))#
+#
+print(summary(mod.ypr))
+rm(list=ls())#
+library(lme4)#
+library(lmerTest)#
+setwd('~/Dropbox/hedgerow_assembly/analysis/networkLevel')#
+#
+load('../../data/networks/allSpecimens.Rdata')#
+f.path <- "../changePoint/cptPeel/baci"#
+load(file=file.path(f.path, "graphs.Rdata"))#
+#
+source('src/laplacian_functions.R')#
+#
+fig.path <- '../speciesLevel/Figures'#
+sites <- sapply(strsplit(names(nets), "[.]"), function(x) x[1])#
+years <- sapply(strsplit(names(nets), "[.]"), function(x) x[2])#
+#
+status.table <- table(spec$Site, spec$SiteStatus)#
+status.table <- as.data.frame(cbind(rownames(status.table),#
+                                    colnames(status.table)[apply(status.table,#
+                                                            1, which.max)]))#
+colnames(status.table)<- c("Site", "SiteStatus")#
+#
+all.alg.Con <- t(do.call(cbind.data.frame, lapply(nets, algCone)))#
+all.alg.Con <- as.data.frame(cbind(sites,years, all.alg.Con))#
+colnames(all.alg.Con) <- c("Site", "Year","Ncomp", "AlgCon", "EigenRatio")#
+#
+## add status#
+all.alg.Con.status <- merge(x=all.alg.Con,#
+                            y= status.table,#
+                            by.x="Site",#
+                            by.y="Site")#
+#
+## add ypr#
+all.alg.Con.status$ypr <- spec$ypr[match(paste(all.alg.Con.status$Site,#
+                                               all.alg.Con.status$Year),#
+                                         paste(spec$Site, spec$Year))]#
+#
+baci.sites <- c("MullerB", "Sperandio", "Barger", "Butler", "Hrdy")#
+#
+all.alg.Con.status$ypr[!all.alg.Con.status$Site %in% baci.sites] <- NA#
+#
+## change AlgCon to numeric (it is a factor for some reason..)#
+all.alg.Con.status$AlgCon <- as.numeric(as.character(#
+  all.alg.Con.status$AlgCon))#
+all.alg.Con.status$EigenRatio <- as.numeric(as.character(#
+  all.alg.Con.status$EigenRatio))#
+all.alg.Con.status$Ncomp <- as.numeric(as.character(#
+  all.alg.Con.status$Ncomp))#
+#
+alg.con.mod <- lmer(AlgCon ~ SiteStatus +#
+                    (1|Site) + (1|Year),    #
+                    data=all.alg.Con.status)#
+#
+summary(alg.con.mod)#
+#
+# Algebrain connectivity x Ypr#
+alg.con.mod.ypr <- lmer(AlgCon ~ ypr + #
+                        (1|Site) + (1|Year),    #
+                        data=all.alg.Con.status)#
+summary(alg.con.mod.ypr)#
+#
+print(summary(alg.con.mod.ypr))#
+#
+# Eigenvalue ratio  x Ypr#
+EigenRatio.mod.ypr <- lmer(EigenRatio ~ ypr +  Ncomp +#
+                          (1|Site) + (1|Year),    #
+                        data=all.alg.Con.status)#
+summary(EigenRatio.mod.ypr)#
+#
+save(alg.con.mod.ypr, all.alg.Con.status, EigenRatio.mod.ypr,#
+     file="saved/mods/AlgCon.Rdata")#
+#
+## look at correlation between AlgCon and species richness#
+#
+net.mets <- sapply(nets, function(x) sum(dim(empty(x))))#
+#
+all.alg.Con.status$tot.rich <- net.mets[match(names(net.mets),#
+                                              paste(all.alg.Con.status$Site,#
+                                                    all.alg.Con.status$Year,#
+                                                    sep="."))]#
+#
+cor.test(all.alg.Con.status$tot.rich, all.alg.Con.status$AlgCon)#
+#
+cor.test(all.alg.Con.status$tot.rich[!is.na(all.alg.Con.status$ypr)],#
+         all.alg.Con.status$AlgCon[!is.na(all.alg.Con.status$ypr)])
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/networkLevel')#
+source('plotting/src/predictIntervals.R')#
+source('plotting/src/CIplotting.R')#
+source('plotting/src/plotPanels_resilence.R')#
+source('src/initialize.R')#
+#
+## ************************************************************#
+## robustness to species extinction#
+## ************************************************************#
 ## either "abund" or "degree"#
 extinction.method <- "degree"#
-source('~/Dropbox/hedgerow_assembly/analysis/networkLevel/resilience.R')
-extinction.method <- "abund"#
-source('~/Dropbox/hedgerow_assembly/analysis/networkLevel/resilience.R')
-## sensitivity to perturbation#
-source('~/Dropbox/hedgerow_assembly/analysis/networkLevel/laplacian.R')
-## sensitivity to perturbation#
-source('~/Dropbox/hedgerow_assembly/analysis/networkLevel/laplacian.R')
-nets
-nets[[[1]]]
-nets[[1]]
-sum(nets[[1]])
-nets[[1]][nets[[1]] > 0]
+#
+load(file=file.path(save.path,#
+            sprintf('resilience_%s.Rdata', extinction.method)))#
+#
+dd <- expand.grid(ypr=seq(from= min(res$ypr, na.rm=TRUE),#
+                          to= max(res$ypr, na.rm=TRUE),#
+                          length=10))#
+load(file=file.path(save.path,#
+            sprintf('mods/resilience_ypr_%s.Rdata',#
+                    extinction.method)))#
+#
+dd.ypr <- cbind(dd, Robustness=0)#
+#
+ypr.pi <- predict.int(mod= mod.ypr,#
+                        dd=dd.ypr,#
+                        y="Robustness",#
+                        family="gaussian")#
+#
+## plot.predict.ypr(new.dd=ypr.pi,#
+##                  ylabel="Robustness to \n species extinction",#
+##                  dats=res,#
+##                  y1="Robustness",#
+##                  extinction.method=extinction.method)#
+#
+## ************************************************************#
+## robustness to perturbation#
+## ************************************************************#
+#
+load(file=file.path(save.path, 'mods/AlgCon.Rdata'))#
+#
+dd.ypr.alg <- expand.grid(ypr=seq(from= min(all.alg.Con.status$ypr,#
+                                    na.rm=TRUE),#
+                    to= max(all.alg.Con.status$ypr,#
+                      na.rm=TRUE),#
+                    length=10),#
+                  AlgCon=0)#
+#
+ypr.pi.alg <- predict.int(mod= alg.con.mod.ypr,#
+                        dd=dd.ypr.alg,#
+                        y="AlgCon",#
+                        family="gaussian")#
+#
+## plot.predict.ypr(new.dd=ypr.pi.alg,#
+##                  ylabel="Robustness to \n cascading effects",#
+##                  dats=all.alg.Con.status,#
+##                  y1="AlgCon",#
+##                  extinction.method="perturb")#
+#
+plot.panels()

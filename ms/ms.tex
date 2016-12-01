@@ -1,6 +1,6 @@
 \documentclass[12pt]{article} 
 \usepackage[pdftex]{graphicx}
-\usepackage[numbers]{natbib} 
+\usepackage[numbers,sort&compress]{natbib} 
 \usepackage{color}
 \usepackage{amsmath} 
 \usepackage{amssymb} 
@@ -14,16 +14,11 @@
 \usepackage[normalem]{ulem} 
 \usepackage{hyperref}
 \usepackage[parfill]{parskip}
-\usepackage{graphicx}
-\usepackage{longtable}
-\usepackage{times}
-\usepackage{textcomp}
 \usepackage{xr}
-\usepackage{etoolbox}
-\usepackage{filecontents}
+\externaldocument{SI}
 \usepackage{url}
 \usepackage{rotating}
-\externaldocument{SI}
+
 \hypersetup{colorlinks=true, linkcolor=black, citecolor=black}
 \RequirePackage{lineno}
 
@@ -32,19 +27,21 @@
 }
 
 
-\def\title{Major interaction reorganizations punctuate the assembly of
-  pollination networks} \def\author{Lauren C.\ Ponisio$^{1,2,3}$,
-  Marilia P. Gaiarsa$^4$, Claire Kremen$^1$}
+\def\title{Major network reorganizations punctuate the assembly of
+  plant-pollinator communities} 
+
+\def\author{Lauren C.\
+  Ponisio$^{1,2,3}$, Marilia P. Gaiarsa$^4$, Claire Kremen$^1$}
 
 \def\runninghead{Plant-pollinator network assembly}
-\def\keywords{community assembly, change points, specialization,
+\def\keywords{community assembly, change points, robustness,
   nestedness, modularity, bipartite, preferential attachment}
 
 \def\extras{
   \begin{itemize}
   \item Submitted as a Letter
   \item Abstract word count: 148
-  \item Main text word count: 5152
+  \item Main text word count: 4967
   \item Number of references: 65
   \item Number of figures: 6
   \item Author contributions: CK designed the study, LCP and CK
@@ -55,6 +52,7 @@
     upon publication
   \end{itemize}
 }
+
 
 \def\affiliation{
   \begin{enumerate}
@@ -104,36 +102,25 @@
 \clearpage
 
 \begin{abstract}  
-  % The ability of communities to maintain function in the face of
-  % species extinction is related to the structure of networks. Lauren
-  % - i changed the phrasing because structure of network and network
-  % structure were too close.
-  The structure of interaction networks is related to the ability of communities to maintain function in the face of
-  species extinction. Understanding network structure and how it relates to
-  network assembly, therefore, is a priority for conservation
-  biology. Using a nine-year-dataset comprising nearly $20,000$
-  pollinator visitation records, we explore the assembly of
-  plant-pollinator communities at native plant restorations in the
-  Central Valley of California. Across years, species are highly
-  dynamic in their network position, causing community assembly to be
-  punctuated by major interaction reorganizations.%  In contrast, the
-  % non-assembling networks did not restructure as frequently.
-  % Across all communities, pollinator species were opportunistic in the
-  % flowers they visited.
-   Generalist species were the most persistent and 
-also the most variable in their network positions, contrary to
-  what is expected through prefereantial attachment theory. % High
-  % species and interaction turnover was ubiquitous across assembling
-  % and non-assembling communities, though unique interactions turned
-  % over at higher rates in assembling hedgerows as the networks
-  % continually reorganized.
-  % Nestedness of assembling networks also increased through time, but
-  The sensitivity of networks to cascading perturbations,
-  increased with assembly, at least partially due to accumulating
-  species richness. We elucidate some of the mechanisms underlying
-  plant-pollinator network assembly and restoration --- challenging
-  the widely-held hypothesis that mutualistic networks assemble
-  through preferential attachment.
+  As the world continues to lose species at an alarming rate,
+  anticipating a community's ability to resist collapse will depend on
+  the strength of interaction networks. We know little, however, about
+  how to re-assemble interacting communities through restoration, or
+  the process of ecological network assembly more generally. Using an
+  eight-year dataset comprising nearly $20,000$ pollinator visitation
+  records, we explore the assembly of plant-pollinator communities at
+  native plant restorations sites in an agricultural landscape. We
+  find that species occupy highly dynamic network positions through
+  time, causing the community assembly process to be punctuated by
+  major network reorganizations. In contrast, the non-assembling
+  networks do not restructure as frequently. The most persistent and
+  generalized species are also the most variable in their network
+  positions, contrary to what is expected by assembly following
+  preferential attachment --- a widly supported assembly
+  mechanism. Our results fundamentally alter our understanding of how
+  communities assembly and how species interactions change through
+  time while helping to inform efforts to re-assembly robust
+  communities through restoration.
 \end{abstract}
 
 \keywords
@@ -144,23 +131,47 @@ also the most variable in their network positions, contrary to
 \label{sec:introduction}
 
 %% introduce mutualisms, restoration, network assembly
-Global change has created a severe biodiversity crisis, and as species
-are lost, so are their interactions \citep{dunn2009sixth,
-  barnosky2011has}. Because mutualistic interactions are essential for
-maintaining the diversity of their component guilds, these systems are
-particularly at risk from coextinction cascades. The nature of these
-cascades will depend on the interaction patterns within a community
-\citep{Memmott2004, Rezende2007, Bascompte2009, Thebault2010}. To
-safeguard ecological function, it has become increasingly imperative
-to aid the recovery of lost interactions and component biodviersity
-through ecological restoration, and a key restoration aim is to
-facilitate assembly of robust interaction networks
-\citep{menz-2010-4}. We know little, however, about how to re-assemble
-interacting communities through restoration, or the process of
-ecological network assembly more generally.
+When a species goes extinct, more than a species is lost. That species
+interacted with other species in its community, likely in ways that
+were important or even crucial to others' survival. When a community
+--- a unique combination of interacting species --- loses one species,
+the system becomes weaker. Global change has created a severe
+biodiversity crisis, and as species are lost, so are their
+interactions \citep{dunn2009sixth, barnosky2011has}. A community's
+ability to resist collapse will depend on the strength of each
+interaction network \citep{Memmott2004, Rezende2007, Bascompte2009,
+  Thebault2010}. To safeguard ecological function, it has become
+increasingly imperative to aid the recovery of lost interactions and
+component biodiversity and by facilitating the assembly of robust
+interaction networks via ecological restoration
+\citep{menz-2010-4}. However, we know very little about how ecological
+networks assemble in general, rendering restoration of interacting
+communities quite difficult.
 
 %% most people think network assemble via preferential attachment, and
 %% there is some evidence of that. (other studies on mutualisms?)
+
+Preferential attachment, the most widely explored mechanism of network
+assembly, predicts that species entering a network are more likely to
+interact with species that are already well-connected \citep[the
+``rich-get-richer'' principle,][]{barabasi1999emergence}. In
+pollination systems --- a particularly ubiquitous mutualism
+\citep{ollerton-2011-321, klein-2007-303} --- some studies have found
+support for this assembly mechanism. Investigating the day-to-day,
+temporal assembly of a plant-pollinator network within a season,
+\cite{Olesen2008} found that phenologically new plant and pollinator
+species tended to interact with already well-connected species,
+potentially because these species are either more abundant or
+temporally persistent. Using a space-for-time substitution to study
+primary succession, \cite{albrecht2010plant} also found evidence that
+assembly along a glacier foreland occurred through preferential
+attachment. Specifically, network nestedness (i.e, a core group of
+generalists interacts with both specialist and generalist species)
+increased as the community aged \citep{albrecht2010plant}. An increase
+in nestedness could have occurred via the preferential attachment
+process, whereby specialist species attach to the well-connected,
+generalist core.
+
 Preferential attachment, the most widely explored mechanism of network
 assembly, \citep{barabasi1999emergence}, predicts that species
 entering a network are more likely to interact with species that are
@@ -178,7 +189,7 @@ primary succession along a glacier foreland, \cite{albrecht2010plant}
 also found some evidence that assembly occurred through preferential
 attachment. Specifically, network nestedness (i.e, a core group of
 generalists interacts with both specialist and generalist species)
-increased as the community aged \citep{albrecht2010plant}.  An
+increased as the community aged \citep{albrecht2010plant}. An
 increase in nestedness could result from the preferential attachment
 process where specialist species attach to the well-connected,
 generalist core.
@@ -187,258 +198,249 @@ generalist core.
 %% attchment, particularly vis big reorganizations of interactions
 %% Lauren I love this paragraph!
 In contrast to the network build-up described by preferential
-attachment, significant reorganizations of interactions can punctuate
-assembly \citep{peel2014detecting}. Such significant reorganizations
-of interactions, or network changing points, are observed in social
-networks that respond to abrupt shifts in the behavior of interactors
-\citep{peel2014detecting}. In ecolo% gical communities, such shifts may
-% occur if, as new species colonize, resident species change their
-% interaction partners to optimize their foraging effort. In
-% plant-pollinator communities, theory predicts that pollinators
-% optimize their use of floral resources to reduce interspecific
-% competition and improve resource-use efficiency
-% \citep{pyke1984optimal, valdovinos2010consequences,
-%   valdovinos2013adaptive, albrecht2010plant, Bluthgen2007}. No
-% studies, however, have examined whether network changing points occur
-% during ecological network assembly, and how these changes relate to
-% the species behavior.
+attachment, significant reorganizations of interactions can also
+punctuate assembly \citep{peel2014detecting}. Such significant
+reorganizations of interactions, or network changing points, are
+observed in social networks that respond to abrupt shifts in the
+behavior of interactors \citep{peel2014detecting}. A change point is
+caused by a merge, split, fragmentation or formation of modules within
+a network. In ecological communities, such shifts may occur if, as new
+species colonize, resident species change their interaction partners
+to optimize their foraging effort. In plant-pollinator communities,
+theory predicts that pollinators optimize their use of floral
+resources to reduce interspecific competition and improve resource-use
+efficiency \citep{pyke1984optimal, valdovinos2010consequences,
+  valdovinos2013adaptive, albrecht2010plant, Bluthgen2007}. No
+studies, however, have examined if network changing points occur
+during ecological network assembly and/or how these changes relate to
+species behavior.
 
-% %% restoration
-% Understanding network assembly is particularly relevant to ecological
-% restoration, which is essentially ``applied succession''
-% \citep[e.g.,][]{parker1997scale}. In pollination systems, the time
-% since an area was restored has been shown to affect the structure of
-% networks \citep{forup-2008-742, devoto2012understanding}, suggesting
-% interactions are changing as the community develops. Understanding the
-% mechanisms of network assembly will help to guide community
-% restoration. Facilitating network restoration is especially imperative
-% in areas where species interactions provide essential ecosystem
-% services, such as crop pollination. To ensure the continued provision
-% of ecosystem services and curb biodiversity loss, it is critical to
-% restore pollinators and their interactions in agricultural
-% landscapes. To promote pollinator services in agriculture, farmers may
-% chose to plant strips of native plants along farm edges (hedgerows) to
-% help provide habitat for pollinators without removing arable land from
-% production. Hedgerows augment the richness, abundance and trait
-% diversity of pollinators in agricultural landscapes
-% \citep{morandin-2013-829, kremen-2015-602, ponisio2015farm}, and
-% promote the persistence and colonization of floral resource
-% specialists \citep{mgonigle-2015-x}. It is important to understand how
-% these new species are being incorporated into the network as the
-% community assembles, and the consequences for interaction patterns and
-% robustness.
+%% restoration
+Understanding network assembly is particularly relevant to ecological
+restoration, which is essentially ``applied succession''
+\citep[e.g.,][]{parker1997scale}.  In pollination systems, time has
+been shown to affect the structure of networks in restored areas
+\citep{forup-2008-742, devoto2012understanding}, suggesting that
+interactions change as a community develops. Facilitating network
+restoration is especially imperative in areas where species
+interactions provide essential ecosystem services, such as crop
+pollination in agricultural landscapes. To promote pollinator services
+in agriculture, some farmers plant strips of native plants along farm
+edges (hedgerows).  By providing habitat, hedgerows augment the
+richness, abundance and trait diversity of pollinators in agricultural
+landscapes \citep{morandin-2013-829, kremen-2015-602,
+  ponisio2015farm}, and promote the persistence and colonization of
+floral resource specialists \citep{mgonigle-2015-x}. As the community
+assembles, it is important to understand how these new species are
+incorporated into the network as well as the consequences of adding
+species for interaction patterns and robustness.
 
-% %% Lauren I would put 10 year dataset; and I *loved* the way you
-% %% organized the ideas here!!
-% We explore the process of network development using a nine year
-% dataset of plant-pollinator community assembly following hedgerow
-% restoration in the highly simplified and intensively managed
-% agricultural landscape of California's Central Valley.  We first
-% determine whether the mechanism underlying network assembly is a build
-% up of interactions as would be predicted by preferential attachment,
-% or instead is punctuated by significant reorganizations of
-% interactions (i.e., network changing points). Even with changing
-% points in interaction organization, networks could still be assembling
-% via preferential attachment if the network reorganizations were
-% primarily driven by peripheral, temporally variable species while a
-% stable, well-connected core of species persist. We test whether the
-% species that are most variable in their network position --- and thus
-% important contributors to network reorganizations --- are less
-% persistent and connected species. To further explore the mechanisms
-% underlying the temporal dynamics of the networks, we examine patterns
-% in the species and interaction temporal turnover. Lastly, we
-% investigate whether networks are assembling toward predictable
-% interaction patterns, and the ramifications for the robustness of the
-% networks to species extinction and cascading perturbations.
+%% Lauren I would put 10 year dataset; and I *loved* the way you
+%% organized the ideas here!!
+We explore the process of network development using a nine-year
+dataset of plant-pollinator community assembly following hedgerow
+restoration in the highly simplified and intensively managed
+agricultural landscape of California’s Central Valley. We first
+determine whether the mechanism underlying network assembly represents
+a buildup of interactions as would be predicted by preferential
+attachment or significant reorganizations of interactions (i.e.,
+network changing points). Even with changing points in interaction
+organization, networks could still assemble via preferential
+attachment if the network reorganizations were primarily driven by
+peripheral, temporally variable species while a stable, well-connected
+core of species persist. Therefore, we tested whether the species that
+are most variable in their network position --- and thus important
+contributors to network reorganizations -- are less persistent and
+connected species. To further explore the mechanisms underlying the
+temporal dynamics of the networks, also we examine patterns in the
+species and interaction temporal turnover. Finally, we investigate
+whether networks assemble toward predictable interaction patterns, and
+the ramifications for the robustness of the networks.
 
-% %% objectives
-% % 1) Are hedgerows assembling by preferential attachment, or are there
-% % more abrupt reorganizations of network structure?
-% % 2) Who are the species responsible for interaction reorganizations?
-% % how to incorporate this? 
-% % 3) Are the changing points a product of turnover in species
-% % composition, or are more substantial changes in the verticles of the
-% % networks?
-% % 4) Is the structure of interactions changing? Does this change the
-% % robustness of the network to species extinction and/or perturbation?
+%% objectives
+% 1) Are hedgerows assembling by preferential attachment, or are there
+% more abrupt reorganizations of network structure?
+% 2) Who are the species responsible for interaction reorganizations?
+% how to incorporate this? 
+% 3) Are the changing points a product of turnover in species
+% composition, or are more substantial changes in the verticles of the
+% networks?
+% 4) Is the structure of interactions changing? Does this change the
+% robustness of the network to species extinction and/or perturbation?
 
-% \section*{Materials \& Methods}
-% \label{sec:methods}
+\section*{Materials \& Methods}
+\label{sec:methods}
 
-% \subsection*{Study sites and collection methods}
-% \label{sec:study-sites}
+\subsection*{Study sites and collection methods}
+\label{sec:study-sites}
 
-% We surveyed plant-pollinator interaction networks of independent
-% assembling hedgerows communities (N=5), and of two types of
-% non-assembling communities to serve as controls: unrestored, weedy
-% field margins (N=19) and mature hedgerows (greater than 10 years since
-% planting, N=29). The sites were located in the Central Valley of
-% California in Yolo, Colusa and Solano Counties. This area is composed
-% of intensively managed agriculture --- primarily monocultures of
-% conventional row crops, vineyards and orchards. Hedgerows are ca.~3--6
-% m wide and approximately 350 m long, bordering large (ca.\
-% 30--hectare) crop fields. Hedgerows consist of native, perennial,
-% shrub and tree plantings including \textit{Rosa californica},
-% \textit{Cercis occidentalis}, \textit{Ceanothus spp.},
-% \textit{Heteromeles arbutifolia}, \textit{Sambucus mexicana},
-% \textit{Eriogonum spp.}, \textit{Baccharis spp.}, \textit{Salvia
-%   spp}. and others \citep[Fig.~S1, ][]{menz-2010-4, kremen-2015-602,
-%   mgonigle-2015-x}. The mean distance between monitoring sites was
-% $15$ km, and the minimum distance between sites sampled in the same
-% year was 1 km.  The entire area surveyed spanned almost $300$
-% km$^2$. The crop fields adjacent to all sites were similarly managed
-% as intensive, high-input monoculture.
+Study sites were located in the Central Valley of California in Yolo,
+Colusa and Solano Counties. This area is composed of intensively
+managed agriculture --- primarily monocultures of conventional row
+crops, vineyards and orchards. Hedgerows border large
+(ca. $30$-hectare) crop fields and measured between $3-6$ m wide and
+approximately $350$ m long. Hedgerows consist of native, perennial,
+shrub and tree plantings \citep[Fig.~S1, ][]{menz-2010-4,
+  kremen-2015-602, mgonigle-2015-x}.
 
-% Monitoring of assembling hedgerows began in 2006 and continued through
-% 2014. Surveys of these sites began the year before the area was
-% restored. For logistical reasons, no sampling of assembling hedgerows
-% was conducted in 2010. Sites were sampled between two and five times
-% per year (Tables S1-S3, mean $3.4$ samples per year). In each round of
-% sampling, the order in which sites were sampled was
-% randomized. Surveys were conducted under sunny conditions when the
-% temperature was above $21^{\circ}\mathrm{C}$ and wind speed was below
-% $2.5$ meters/second.
+We selected five farm edges to be restored as hedgerows. We monitored
+those locations before the hedgerow was planted, and tracked the
+assembly of the community for up to seven years as the hedgerow
+matured (from $2006-2014$). For controls, we concurrently monitored
+non-assembling communities within mature hedgerows (greater than $10$
+years since planting, $N=29$) and unrestored, weedy field margins
+($N=19$). The mean distance between monitoring sites was $15$ km, and
+the minimum distance between sites sampled in the same year was $1$
+km. The entire area surveyed spanned almost $300$ $km^2$. The crop
+fields adjacent to all sites were similarly managed as intensive,
+high-input monoculture.
 
-% Flower-visitors to plants in hedgerows and unrestored controls were
-% netted for one hour of active search time (the timer was paused when
-% handling specimens). Honeybees (\textit{Apis mellifera}) were not
-% collected because their abundance is determined largely by hive
-% placement by bee-keepers. All other insect flower visitors that
-% touched the reproductive parts of the flower were collected; however,
-% here we focus only on wild bees and syrphids --- the most abundant and
-% effective pollinators in the system (representing 49 and 19 percent of
-% records, respectively, C.~Kremen, A.~Klein and L.~Morandin,
-% unpublished data). Bee and syrphid specimens were identified to
-% species (or morpho-species for some bee specimens in the genera
-% \textit{Nomada} and \textit{Sphecodes}) by expert taxonomists.
+Sites were sampled between two and five times per year (Tables S1-S3,
+mean $3.4$ samples per year). In each round of sampling, the order in
+which sites were sampled was randomized. Surveys were conducted under
+sunny conditions when the temperature was above $21^{\circ}\mathrm{C}$
+and wind speed was below $2.5$ meters/second.
 
-% Quantitative networks were generated for each site through time. To
-% account for the unequal number of surveys between years (Tables
-% S1-S3), we use the mean of the interactions between a pair of plants
-% and pollinators across surveys within a year to represent interaction
-% frequency.
+During each sampling round, flower-visitors to plants in assembling
+hedgerows and non-assembling controls were netted for one hour of
+active search time (the timer was paused when handling specimens). The
+identify of the plant being visited was recorded for each floral
+visitor. Honeybees (\textit{Apis mellifera}) were not collected
+because their abundance is determined largely by hive placement by
+bee-keepers. All other insect flower visitors that touched the
+reproductive parts of the flower were collected; however, here we
+focus only on wild bees and syrphids --- the most abundant and
+effective pollinators in the system (representing 49 and 19 percent of
+records, respectively, C.~Kremen, A.~Klein and L.~Morandin,
+unpublished data). Bee and syrphid specimens were identified to
+species (or morpho-species for some bee specimens in the genera
+\textit{Nomada} and \textit{Sphecodes}) by expert taxonomists.
 
-% \subsection*{Change point analysis}
-% \subsubsection*{Identifying change points}
-% We employed a change point detection method \citep{peel2014detecting}
-% to identify fundamental reorganizations in large-scale interaction
-% patterns. A change point is caused by a merge, split, fragmentation or
-% formation of modules (also called compartments). Change point
-% detection methods have yet to be generalized to quantitative networks,
-% so for this analysis we focused on qualitative (binary)
-% networks. Following \cite{peel2014detecting}, we first defined a
-% probability distribution over the networks using the generalized
-% hierarchical random graph model (GHRG). The GHRG model is able to
-% capture both assortative and disassortative structure patterns at all
-% scales in the network \citep{peel2014detecting}. A network $G$ is
-% composed of vertices $V$ and edges $E$. The GHRG model decomposes the
-% $N$ vertices into a series of nested groups, the relationships among
-% which are represented by the dendrogram $T$. The tips of $T$ are the
-% vertices of $G$, and the probability that two vertices $u$ and $v$
-% connect is given by the parameter $p_r$. The probability distribution
-% of the network $G$ is thus defined as:
+Quantitative networks were generated for each site through
+time. Because the nuber of sampling rounds varied between years
+(Tables S1-S3), we used the mean of the interactions between a pair of
+plants and pollinators within a year to represent interaction
+frequency.
 
-% \begin{equation}
-%   \label{eq:lik}
-%   P(G|T,{pr}) = p_r^{E_r}(1-p_r)^{N_r-E_r}
-% \end{equation}
-% % 
-% Where $E_r$ is the observed number of edges between vertices with the
-% common ancestor $r$, and $N_r$ is the total possible edges.
+\subsection*{Change point analysis}
+\subsubsection*{Identifying change points}
+We employed a change point detection method \citep{peel2014detecting}
+to identify fundamental reorganizations in large-scale interaction
+patterns. Change point detection methods have yet to be generalized to
+quantitative networks, so for this analysis we focused on qualitative
+(binary) networks. Following \cite{peel2014detecting}, we first
+defined a probability distribution over the networks using the
+generalized hierarchical random graph model (GHRG). The GHRG model
+captures both assortative and disassortative structure patterns at all
+scales in the network \citep{peel2014detecting}. A network $G$ is
+composed of vertices $V$ and edges $E$. The GHRG model decomposes the
+$N$ vertices into a series of nested groups, the relationships among
+which are represented by the dendrogram $T$. The tips of $T$ are the
+vertices of $G$, and the probability that two vertices $u$ and $v$
+connect is given by the parameter $p_r$. The probability distribution
+of the network $G$ is thus defined as:
 
-% Using Bayesian posterior inference and techniques from phylogenetic
-% tree reconstruction, we fit the GHRG model to the networks
-% \citep{peel2014detecting}. This is accomplished by using a Markov
-% chain Monte Carlo (MCMC) procedure to first sample the posterior
-% distribution of bipartitions, from which a consensus tree is derived
-% \citep{peel2014detecting}. We use $\beta$ distributions with the
-% hyperparameters $\alpha=\beta=1$ to define priors for $p_r$.
+\begin{equation}
+  \label{eq:lik}
+  P(G|T,{pr}) = p_r^{E_r}(1-p_r)^{N_r-E_r}
+\end{equation}
+% 
+Where $E_r$ is the observed number of edges between vertices with the
+common ancestor $r$, and $N_r$ is the total possible edges, and the
+rest of the notation is described above.
 
-% Once the GHRG model has been fit to the networks, we determine whether
-% a change point occurred between two time slices. To detect a change
-% point, we use Bayes factors to compare the fit of two models --- one
-% where a change point occurred between two networks, and one where no
-% change occurred. We chose a sliding window of length, $w$, of four,
-% within which to find change points. Larger windows allow for more
-% gradual changes, and four was the maximum possible with our eight
-% years of data. Lastly, to calculate a $p$-value for the Bayes factors,
-% we use parametric bootstrapping to numerically estimate the null
-% distribution \citep{peel2014detecting}. We employed code published
-% online by L.~Peel for the change point analysis. Analyses were
-% conducted in Python 3.4.
+Using Bayesian posterior inference and techniques from phylogenetic
+tree reconstruction, we fit the GHRG model to the networks
+\citep{peel2014detecting}. This is accomplished by using a Markov
+chain Monte Carlo (MCMC) procedure to first sample the posterior
+distribution of bipartitions, from which a consensus tree is derived
+\citep{peel2014detecting}. We use $\beta$ distributions with the
+hyperparameters $\alpha=\beta=1$ to define priors for $p_r$.
 
-% We next test whether the change points occurring in maturing hedgerows
-% were a component of the assembly process or a product of environmental
-% shifts that lead to network reorganizations in all types of
-% communities. We model the number of change points as successes and the
-% total number of years each site was sampled as trials, and use a
-% generalized linear model with Binomial error to test whether the
-% probability of a change point occurring varied by site type
-% \citep{lme4}. We used standard techniques to determine whether the
-% assumptions of the models were met for this and all subsequent
-% models. For the non-assembling hedgerows and weedy field margins, only
-% sites with five or greater survey years were included in this analysis
-% (N=11). All statistical analyses were conducted in R 3.2.3 \citep{R}.
+Once the GHRG model has been fit to the networks, we determine whether
+a change point occurred between two time slices. To detect a change
+point, we use Bayes factors to compare the fit of two models --- one
+where a change point occurred between two networks, and one where no
+change occurred. We chose a sliding window of length, $w$, of four
+years to detect change points. Larger windows allow for more gradual
+changes, and four was the maximum possible with our eight years of
+data. Lastly, to calculate a $p$-value for the Bayes factors, we use
+parametric bootstrapping to numerically estimate the null distribution
+\citep{peel2014detecting}. We employed code published online by
+L.~Peel for the change point analysis. Analyses were conducted in
+Python 3.4.
 
-% \subsubsection*{Characteristics of species that contribute to change
-%   points}
+We next tested whether the change points occurring in maturing
+hedgerows were a component of the assembly process or a product of
+environmental shifts that lead to network reorganizations in all types
+of communities. We modeled the number of change points as successes
+and the total number of sample years at each site as trials, and used
+a generalized linear model with Binomial error to test whether the
+probability of a change point occurrence varied by site type. We used
+standard techniques to determine whether the assumptions of the models
+were met for this and all subsequent models. For the non-assembling
+controls, only sites with five or greater survey years were included
+in this analysis ($N=11$). All statistical analyses were conducted in
+R 3.2.3 \citep{R}.
 
-% To further elucidate the nature of the change points, we examine the
-% characteristics of the species that contributed to interaction
-% reorganization. Some species remain in relatively similar network
-% positions through time, whereas others are more variable in their
-% position and thus contribute more strongly to network
-% reorganization. We test whether the more persistent species with the
-% highest degree (number of different interaction partners) are the
-% most stable in their network positions, as would be expected if the
-% networks were assembling via preferential attachment.
+\subsubsection*{Characteristics of species that contribute to change
+  points}
 
-% We calculate species persistence as the proportion of surveys in which
-% a plant or pollinator is observed. Species observed consistently
-% within and between years are thus maximally persistent. Weighted
-% species degree is calculated from interaction observations from an
-% extensive dataset from Yolo County (approx.~18000 interaction records)
-% that included both the data included in this study and additional data
-% from sites where we collected flower visitors using the same methods
-% \citep{mgonigle-2015-x, ponisio2015farm}. To represent network
-% position variability, we computed the coefficient of variation of
-% weighted closeness centrality \citep{freeman1978centrality} at each
-% site through time. Closeness centrality represents the importance of a
-% space by calcuating the path lengths to other vertices (species) in
-% the network \citep{freeman1978centrality}. The shorter the mean path
-% length to other species, the higher the closeness centrality. We use
-% linear mixed models to test whether the species closeness variability
-% (log) is related to the persistence or degree of that species
-% \citep{lme4, lmetest}. We included random effects for species and
-% site. Because the degree and persistence of pollinators were strongly
-% correlated, ($\rho = 0.071$, $p$-value $<$ $2*10^{-16}$), we include
-% each explanatory variable in separate models. Plant degree and
-% persistence were not significantly correlated, but we use the same
-% models as we did for the pollinators for consistency.  Because an
-% approximately logarithmic increase in closeness centrality, as would
-% be expected with assembly by preferential attachment, would also lead
-% to high variability in closeness scores, we also test whether log
-% closeness centrality increases through time.
+To further elucidate the nature of the change points, we examine the
+characteristics of the species that contributed to interaction
+reorganization. Some species remained in relatively similar network
+positions through time, whereas others were more variable in their
+position and thus contributed more strongly to network
+reorganization. We tested whether the more persistent species with the
+highest degree (number of different interaction partners) were the
+most stable in their network positions, as would be expected if the
+networks were assembling via preferential attachment.
 
-% \subsection*{Species and interaction turnover}
+We calculated species persistence as the proportion of surveys in
+which a plant or pollinator is observed. Species observed consistently
+within and between years were thus maximally persistent. Weighted
+species degree is calculated from interaction observations from an
+extensive dataset from Yolo County (approx.~18000 interaction records)
+that included both the data included in this study and additional data
+from sites where we collected flower visitors using the same methods
+\citep{mgonigle-2015-x, ponisio2015farm}. To represent network
+position variability, we computed the coefficient of variation of
+weighted closeness centrality \citep{freeman1978centrality} at each
+site through time. Closeness centrality represents the importance of a
+space by calcuating the path lengths to other vertices (species) in
+the network \citep{freeman1978centrality}. The shorter the mean path
+length to other species, the higher the closeness centrality. We used
+linear mixed models to test whether the species closeness variability
+(log) is related to the persistence or degree of that species
+\citep{lme4, lmetest}. We included random effects for species and
+site. Because the degree and persistence of pollinators were strongly
+correlated, ($\rho = 0.071$, $p$-value $<$ $2*10^{-16}$), we included
+each explanatory variable in separate models. Plant degree and
+persistence were not significantly correlated, but we used the same
+models as we did for the pollinators for consistency.  Because an
+approximately logarithmic increase in closeness centrality --- as
+would be expected with assembly by preferential attachment --- we also
+tested whether log closeness centrality increases through time.
 
-% %%Lauren I really liked the way you explained this part =]
-% Reorganizations of network structure can be the result of species
-% turnover or species changing their interaction partners (i.e.,
-% re-wiring). To better understand the mechanisms underlying the
-% temporal dynamics of the assembling networks, we examined patterns of
-% species and interaction turnover. For example, assembling networks may
-% have higher rates of pollinator turnover than non-assembling
-% communities because new pollinator species are colonizing and
-% establishing themselves \citep{mgonigle-2015-x}. Similarly, because
-% species are turning over and pollinators are trying to maximize their
-% foraging efficiency based on the species present, interactions may
-% turnover more quickly than in established communities. In addition, at
-% assembling hedgerows, plants that are unvisited in early years may
-% appear to ``colonize'' the networks as they became more attractive
-% resources and establish new interactions with pollinators.
+\subsection*{Species and interaction turnover}
 
-To estimate the temporal species and interaction turnover, we use an
+%%Lauren I really liked the way you explained this part =]
+Reorganizations of network structure can be the result of species
+turnover or species changing their interaction partners (i.e.,
+re-wiring). To better understand the mechanisms underlying the
+temporal dynamics of the assembling networks, we examined patterns of
+species and interaction turnover. For example, assembling networks may
+have higher rates of pollinator turnover than non-assembling
+communities because new pollinator species are colonizing and
+establishing themselves \citep{mgonigle-2015-x}. Similarly, because
+species are turning over and pollinators are trying to maximize their
+foraging efficiency based on the species present, interactions may
+turnover more quickly than in established communities. In addition, at
+assembling hedgerows, plants that are unvisited in early years may
+appear to ``colonize'' the networks as they became more attractive
+resources and establish new interactions with pollinators.
+
+To estimate the temporal species and interaction turnover, we used an
 approach similar to calculating spatial $\beta$-diversity. Instead of
 calculating the variation in community composition across sites within
 a year, we estimated turnover across years at a site. We first
@@ -450,7 +452,7 @@ estimates can be affected by the total number of species and
 individuals sampled at a site \citep[e.g.,][]{ponisio2015farm}. For
 example, the probability that two sites do not share any species is
 higher when there are few individuals at those sites. Following
-\cite{ponisio2015farm}, we use null models that constrained species
+\cite{ponisio2015farm}, we used null models that constrained species
 richness to estimate the deviation of the observed dissimilarity from
 that which would be expected under a random community assembly
 process. With the corrected dissimilarity values, we then calculated
@@ -469,20 +471,21 @@ similar species. At non-assembling communities, species turnover may
 overestimate the temporal changes in the networks if the interactions
 occurring in one year are similar to those in the next year when they
 are weighted by the similarity of their constituent species
-(Fig.~\ref{fig:methods}). We develop a method to examine the temporal
-turnover of interactions with weightings based on their similarity. We
-followed the algorithm of \cite{ahn2010link} to cluster all the
-interactions (edges) hierarchically across sites and years based on
-their similarity, and build a dendrogram. The interaction similarity
-is based how may plants and pollinators (vertices) two edges share
-\citep{ahn2010link, kalinka2011linkcomm}. The more species edges
-shared in common, the shorter the branch length between them on the
-dendrogram.  We next calculated the temporal turnover of interactions
-weighted by their similarity, as approximated by ``phylogenetic''
-distance \citep{graham2008phylogenetic, picante-2010-1463}. We then
-use linear mixed models to test whether the weighted turnover of
-interactions varied between assembling and non-assembling networks,
-including site as a random effect \citep{lme4, lmetest}.
+(Fig.~\ref{fig:methods}). We developed a method to examine the
+temporal turnover of interactions with weightings based on their
+similarity. We followed the algorithm of \cite{ahn2010link} to cluster
+all the interactions (edges) hierarchically across sites and years
+based on their similarity, and build a dendrogram. The interaction
+similarity is based how many plants and pollinators (vertices) two
+edges share \citep{ahn2010link, kalinka2011linkcomm}. The more species
+edges shared in common, the shorter the branch length between them on
+the dendrogram.  We next calculated the temporal turnover of
+interactions weighted by their similarity, as approximated by
+``phylogenetic'' distance \citep{graham2008phylogenetic,
+  picante-2010-1463}. We then used linear mixed models to test whether
+the weighted turnover of interactions varied between assembling and
+non-assembling networks, including site as a random effect
+\citep{lme4, lmetest}.
 
 \section*{Temporal changes in interaction patterns}
 
@@ -503,7 +506,7 @@ generalist base of the network pyramid as would be expected with
 preferential attachment, nestedness would increase through time. The
 connectance --- the proportion of observed out of possible
 interactions --- would decrease as new, specialist species,
-preferentially attach to the core. Lastly, the overall level of
+preferentially attach to the core. Finally, the overall level of
 network specialization may change as the community
 assembles. Network-level specialization will increase if specialist
 species colonize the network or species begin to limit their
@@ -514,7 +517,7 @@ To evaluate network nestedness, we used the estimator weighted NODF
 \citep{almeida-neto-2008-1227}. NODF evaluates whether species with
 fewer partners interact with subsets of partners with which more
 connected species interact \citep{almeida-neto-2008-1227}. To estimate
-modularity, we use a hierarchical clustering algorithm
+modularity, we used a hierarchical clustering algorithm
 \citep{Newman2004, csardi-2006}. We evaluate network specialization with
 the metric H2, which estimates the deviation of the observed
 interaction frequency between plants and pollinators from a null
@@ -532,7 +535,7 @@ of interactions, species and interaction frequency distributions
 \citep{Galeano2009}.
 
 To test whether network modularity, nestedness, connectance or
-specialization changed linearly with assembly, we used linear mixed
+specialization changed linearly with assembly, we usedd linear mixed
 models with the descriptive network metrics as the response variable,
 year of assembly as the explanatory variable, and random effects of
 site and year. The number of species in a network affects the patterns
@@ -547,7 +550,7 @@ Lastly, we tested whether the changes in interaction patterns
 associated with network assembly affect the robustness of the network
 to species loss and cascading perturbations. Following
 \cite{Memmott2004}, we simulated plant species extinction and the
-subsequent extinction cascades of pollinator species. Because the
+subsequent extinction cascades of pollinator species. Becaused the
 reproduction of plant species is facilitated by active restoration
 efforts, it is unlikely the extinction of pollinator species would
 affect plant populations in the hedgerows. However, plants ceasing to
@@ -612,8 +615,8 @@ significantly more changing points than the non-assembling networks
 non-assembling networks, $3.316$, $95\%$ CI $[1.314, 8.572]$,
 $p$-value= $0.0117$). Network assembly following restoration is thus
 punctuated by more interaction reorganizations than would be expected
-by environmental shifts alone that would have affected all networks
-similarly.
+by external factors such as environmental shifts that would have
+affected all networks (assembling or non-assembling) similarly.
 
 \subsubsection*{Characteristics of species that contribute to change
   points}
@@ -636,25 +639,25 @@ The variability of species network position was not the result of
 closeness linearly increasing through time, and, in fact, plant and
 pollinator closeness decreased slightly through time (Fig.~S2,
 estimate of the slope of closeness through time $\pm$ SE, pollinators:
-$-0.082 \pm 0.021$, $p$-value=$0.003$; plants $-0.089 \pm
-0.044$, $p$-value=$0.04$). Though statistically significant,
-the models seems to be a poor fit to the data. 
+$-0.082 \pm 0.021$, $p$-value=$0.003$; plants $-0.089 \pm 0.044$,
+$p$-value=$0.04$).
 
 \subsection*{Species and interaction turnover}
 The rates of plant, pollinator and interaction temporal turnover were
 similar across assembling hedgerows, non-assembling hedgerows and
-field margins, though mature hedgerows has marginally significantly
-less pollinator turnover than field margins (Fig.~\ref{fig:beta},
-estimate $\pm$ SE of the difference in turnover between field margins
-and mature hedgerows, $-0.051 \pm 0.026$, $p$-value=$0.049$). The turnover of plants and interactions was not significantly different between site types. When
-interactions where weighted by their similarity, both assembling and
+field margins, though mature hedgerows had marginally less pollinator
+turnover than field margins (Fig.~\ref{fig:beta}, estimate $\pm$ SE of
+the difference in turnover between field margins and mature hedgerows,
+$-0.051 \pm 0.026$, $p$-value=$0.049$). The turnover of plants and
+interactions was not significantly different between site types. When
+interactions were weighted by their similarity, both assembling and
 mature hedgerows had higher rates of turnover than field margins
 (Fig.~\ref{fig:beta}, estimate $\pm$ SE of the difference in turnover
 between field margins and assembling hedgerows, $0.115 \pm 0.027$,
 $p$-value=$0.0002$; field margins and mature hedgerows, $0.082 \pm
 0.024$, $p$-value=$0.002$). The weighted interaction turnover at
 assembling hedgerows, however, was not significantly higher than in
-non-assembling, mature hedgerows. 
+non-assembling, mature hedgerows.
 
 \section*{Temporal changes in interaction patterns}
 \subsection*{Network structure}
@@ -703,7 +706,7 @@ degree or abundance % (estimate
 % $p$-value=$0.65$)
 In contrast, the sensitivity of networks to cascading perturbations,
 as measured by the algebraic connectivity of the network, increased as
-the network assembled (Fig.~\ref{fig:rob}, estimate of the slope of
+the network assembled (Fig.~S3), estimate of the slope of
 sensitivity to cascading perturbations through time $\pm$ SE, $0.6814
 \pm 0.272$, $p$-value=$0.042$).
 
@@ -711,44 +714,43 @@ sensitivity to cascading perturbations through time $\pm$ SE, $0.6814
 \label{sec:discussion}
 
 We show that the temporal assembly of plant-pollinator networks
-following restoration is a highly dynamic process where interactions
-often undergo significant reorganizations, the so called changing
+following restoration is a highly dynamic process in which
+interactions often undergo significant reorganizations, or changing
 points. If these network reorganizations were a product of
 environmental forces alone, we would expect to observe the same
-changing points at the same periods, consistently across all
+changing points at the same time periods, consistently across all
 sites. However, network changing points in non-assembling communities
-are less frequent, and there are few consistent trends in when change
-points occurred across all sites. Several sites had network changing
-points between years 2009 and 2011 (Fig.~\ref{fig:changePoints}). In
-California, 2011 marked the beginning of a multi-year drought. The
-assembling hedgerows were not sampled in 2010, so disentangling
-whether the changing points are due to skipping a year of monitoring
-the assembly process or the drought is not possible. Interestingly,
-most assembling hedgerows did not undergo a significant interaction
-reorganization immediately after a hedgerow was planted (i.e., the
-transition from weedy field margin to hedgerow). This result is
-consistent with the finding that in our study system, hedgerow
-restoration takes several years to have an impact on the
-plant-pollinator communities, and with the observation that hedgerows
-do not begin to produce many flowers until $3$--$5$ years following
-planting \citep{kremen-2015-602}.
+are less frequent, and there are few consistent trends in the years
+when change points occurred across all sites. Several sites had
+network changing points between years 2009 and 2011
+(Fig.~\ref{fig:changePoints}). In California, 2011 marked the
+beginning of a multi-year drought. The assembling hedgerows were not
+sampled in 2010, so we cannot disentangle whether the point changes
+are due to skipping a year of monitoring or the
+drought. Interestingly, most assembling hedgerows did not undergo a
+significant interaction reorganization immediately after planting
+(i.e., the transition from weedy field margin to hedgerow). This
+result is consistent with the finding that hedgerow restoration takes
+several years to have an impact on the plant-pollinator communities in
+our study system, as well as with the observation that hedgerows do
+not begin to produce many flowers until $3-5$ years following planting
+\citep{kremen-2015-602}.
 
-In addition to finding multiple network organization changing points
-during assembly, the way in which these reorganizations occur was
-different from what would be expected from preferential attachment. In
-a preferential attachment process, we expect that the most persistent
-and high degree species would remain stable in the network core during
+In a preferential attachment process, we expect that the most
+persistent and high degree species (the species with the most unique
+interaction partners) would remain stable in the network core during
 assembly \citep{barabasi1999emergence}. Surprisingly, however, we
 encountered the opposite pattern. For example, the four most
 ubiquitous species in our study landscape --- \textit{Halictus
   ligatus}, \textit{Halictus tripartitus}, \textit{Lasioglossum
   (Dialictus) incompletum}, and \textit{Toxomerus marginatus} --- were
 the only species that changed which module they were a member in
-across years in all the assembling hedgerows. Because species degree
+across years in all the assembling hedgerows. Becaused species degree
 and persistence were strongly correlated, it is difficult to
 disentangle the causal mechanism for why species with those
-characteristics are so variable in their network position. Generalized
-species may be better able to exploit the limited floral resources in
+characteristics are so variable in their network position. Species
+that can interaction with a relativly high number of interaction
+partners may be better able to exploit the limited floral resources in
 the intensively managed agriculture landscape, and thus also be the
 most persistent \citep[in ant-plant mutualisms,
 ][]{diaz2010changes}. More persistent species usually have longer
@@ -774,88 +776,51 @@ hedgerows, unique interactions are turning over as the networks
 continually reorganize. Non-assembling mature hedgerow communities,
 however, had similar rates of weighted interaction turnover as
 assembling hedgerows but also the lowest pollinator
-turnover. Pollinator communities at mature hedgerows may be generally
+turnover. Pollinator communities at mature hedgerows may generally be
 more stable, but rare and/or specialized pollinators could generate
 this pattern if they entered a community, formed unique interactions
 with plants that did not previously share pollinators, but did not
 persist in the networks. These species would not contribute strongly
 to network reorganization or species turnover, but would enhance
-weighted interaction turnover. Mature hedgerows may thus both support
+weighted interaction turnover. Mature hedgerows therefore both support
 more stable pollinator communities, while also providing resources for
 rare and/or specialized species \citep{kremen-2015-602,
   mgonigle-2015-x}.
 
-When we explore the how network-level interaction patterns changed
-through time, we found that nestedness did increase as the community
-assembled, as would be expected if colonizing, specialist species
-preferentially attached to a central, generalist core
-\citep{albrecht2010plant}. In addition, connectance decreased, as
+When we explored how network-level interaction patterns changed
+through time, we found few patterns. The connectance decreased, as
 would be expected if the network is being colonized by specialist
-species and the overall mean number of interactions per species did
-not change. However, the frequent changing points in network
-organization, dynamic nature of species positions in the networks, and
-turnover of species and interactions all point to an assembly
-mechanism other than preferential attachment.  The stable level of
-network-level specialization through the assembly process may be due
-to the increased colonization of specialized species
-\citep{mgonigle-2015-x} accompanied by an increase in the diet breath
-of resident species. This would be expected if resident species were
-able to minimize their foraging time by expanding their diet breath as
-plant diversity increases with hedgerow maturation \citep{Waser1996,
-  pyke1984optimal, Bluthgen2007, albrecht2010plant}. Such a change in
-pollinator behavior would also explain the increase in network
-nestedness. Because so many mechanisms give rise to the same patterns
-of interaction, additional tests are necessary to assess the
-contribution of different mechanisms to community assembly.
+species \citep{mgonigle-2015-x}. Network specialization, however, did
+not change predictably with assembly. Decreasing connectance without
+an accompanying increase in specialization would be possible if the
+increased colonization of specialized species was accompanied by an
+increase in the diet breath of resident species. This would be
+expected if resident species were able to minimize their foraging time
+by expanding their diet breath as plant diversity increases with
+hedgerow maturation \citep{Waser1996, pyke1984optimal, Bluthgen2007,
+  albrecht2010plant}.
 
 Interestingly, however, the changes in network patterns associated
-with assembly did not affect the robustness of hedgerow communities to
-species loss. This is particularly surprising given the observed
-increase in nestedness, which is often associated with an increase in
-robustness to extinction \citep{Memmott2004}. Perhaps assembling
-hedgerows have yet to reach sufficient levels of nestedness to realize
-the benefits nestedness confers. Nestedness of the assembling
-hedgerows, however, did not asymptote within the eight years following
-restoration that the sites were surveyed, so hedgerow networks may
-eventually reach sufficient levels of nestedness to gain the
-robustness advantage.
-
-% Lauren - I changed the first part of this paragraph but I really
-% don't thinks it is that confusing. The problem is that it is indeed
-% very theoretical, but it is impossible to make our point without
-% being too technical.. I tried to decrease the use of jargons.
-Contrary to the general restoration goals, networks' susceptibility to
-cascading perturbations increased as the communities assembled. We
-measured vulnerability to cascading perturbations as the algebraic
-connectivity of the network: the greater the algebraic connectivity,
-the more vulnerable a community is to cascading
-perturbations. Algebraic connectivity is positively related to both
-the number of species and connectance of a network
-\citep{gibert2013spatial}. The increase in and plant and pollinator
-richness following restoration is thus at least partially responsible
-for the increase in response to cascading effects.  Algebraic
-connectivity is also positivly correlated with the number in
-interactions, or connectance of a network \citep{gibert2013spatial},
-We, however, observed a decrease in connectance, suggesting
-topological characteristics of the networks beyond just species
-richness and connectance are needed to explain the increased
-sensitivity to perturbations spreading. These hedgerows were designed
-to provide floral resources to the largest number of pollinators
-across the growing season \citep{menz-2010-4}. The generalized nature
-of the floral community may explain why the networks tended to be more
-generalized than expected if interactions were randomly distributed
-across species (Fig.~\ref{fig:baci}). In addition, the design of the
-hedgerow plantings may have facilitated the emergence of a single,
-highly connected module in all of the networks (see
-\ref{fig:changePoints2} for examples). This network configuration
-results in short path lengths (the distance between species in a
-network based on their shared partners), and thus, a perturbation in
-one species can more easily spread to other species. In order to
-promote more resilient communities, future restoration efforts should
-explore designing floral communities to promote more interaction
-partitioning using, for example, algorithms to optimize different
-network properties based on prior knowledge of pollinator floral
-preferences \citep{mgonigle2016tool}, and on desired network
+with assembly did not affect the hedgerow network robustness to
+species extinction or susceptibility to cascading perturbations. The
+hedgerows were designed to provide floral resources for the largest
+number of pollinators across the growing season
+\citep{menz-2010-4}. The generalized nature of the floral community
+may explain why the networks tended to be more generalized than
+expected if interactions were randomly distributed across species
+(Fig.~\ref{fig:baci}). In addition, the design of the hedgerow
+plantings may have facilitated the emergence of a single, highly
+connected module in all of the networks (see \ref{fig:changePoints2}
+for examples). This network configuration results in short path
+lengths (the distance between species in a network based on their
+shared partners), and thus, a perturbation in one species can more
+easily spread to other species. These networks are also vulnerable to
+the extinction of highly connected species \citep{Burgos2007}. In
+order to promote more resilient communities, future restoration
+efforts should explore designing floral communities to promote more
+interaction partitioning using, for example, algorithms to optimize
+different network properties based on prior knowledge of pollinator
+floral preferences \citep{mgonigle2016tool}, and on desired network
 architectures that renders them more robust both to species loss and
 to cascading effects.
 
@@ -872,9 +837,9 @@ to cascading effects.
 % areas \citep{mgonigle-2015-x, ponisio2015farm,
 %   kremen-2015-602}.
 
-Plant-pollinator networks, in general, are highly dynamic, with high
+In general, plant-pollinator networks are highly dynamic, with high
 turnover of species and interactions both within and between seasons
-\citep{Burkle2011}. Though our non-assembling communities experience
+\citep{Burkle2011}. Though our non-assembling communities experienced
 fewer network reorganizations than the assembling hedgerows, $82\%$ of
 field margins and $40\%$ of mature hedgerows underwent at least one
 changing point in network structure. Pollinators are also highly
@@ -895,10 +860,10 @@ from competitive interactions, leading to inaccurate biological
 assumptions \citep{holland2006comment}. We need further development of
 mechanistic models of mutualistic systems to generate testable
 predictions, along with empirical exploration of network
-assembly. Plant-pollinator communities and mutualisms broadly are
-vital for biodiversity maintenance and essential ecosystem service
-provision. We must therefore understand the processes underlying their
-assembly to facilitate restoration and conservation.
+assembly. Plant-pollinator communities and mutualisms are vital for
+biodiversity maintenance and essential ecosystem service provision. We
+must therefore understand the processes underlying their assembly to
+facilitate restoration and conservation.
 
 \section*{Acknowledgments}
 \label{sec:acknowledge}
@@ -1018,25 +983,6 @@ collaboration.
     the dashed lines are the $95\%$ confidence intervals around the
     estimate.}
   \label{fig:baci}
-\end{figure}
-\clearpage
-
-
-\begin{figure}
-  \centering
-  \includegraphics[width=.5\textwidth]{../analysis/networkLevel/figures/robustness.pdf}
-  \caption{The robustness of networks to species extinction did not
-    change with network assembly, but the sensitivity to cascading
-    perturbations increased. The robustness to species extinction is
-    measured by incrementally removing species by degree, though
-    removing species by abundance did not yield qualitatively
-    different results. The robustness of networks to cascading
-    perturbations is measured as the algebraic connectivity, the
-    second smallest eigenvalue of the Laplacian matrix. Points are the
-    value for each site at each year of assembly. The solid line
-    indicates the mean slope estimate and the dashed lines are the
-    $95\%$ confidence intervals around the estimate.}
-  \label{fig:rob}
 \end{figure}
 \clearpage
 
