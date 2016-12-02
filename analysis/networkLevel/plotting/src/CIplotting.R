@@ -17,7 +17,7 @@ plot.panel <- function(dats,
              y=ys$y,
              pch=16,
              col=col.points,
-             cex=1.2)
+             cex=1.7)
     }
     lines(x=new.dd[,xs],
           y=new.dd[,y1],
@@ -41,7 +41,7 @@ plot.panel <- function(dats,
        xlim=range(new.dd[,xs], na.rm=TRUE),
        ylim=range(c(0, ## new.dd$phi,  new.dd$plo,
          quantile(dats[,y1],
-         na.rm=TRUE, probs=c(0.95, 0.05))[c("95%", "5%")],
+         na.rm=TRUE, probs=c(0.975, 0.025))[c("97.5%", "2.5%")],
          na.rm=TRUE)),
        xlab="",
        ylab="",

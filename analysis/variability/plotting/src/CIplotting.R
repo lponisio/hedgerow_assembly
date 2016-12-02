@@ -60,8 +60,8 @@ plot.panel <- function(dats,
   plot(NA,
        xlim=range(new.dd[,xs], na.rm=TRUE),
        ylim=range(c(new.dd$phi,  new.dd$plo, y2,
-          quantile(dats[,y1],
-         na.rm=TRUE)[c("25%","75%")]),
+         quantile(dats[,y1],
+                  na.rm=TRUE, probs=c(0.04, 0.975))[c("4%","97.5%")]),
          na.rm=TRUE),
        xlab="",
        ylab="",
@@ -70,8 +70,11 @@ plot.panel <- function(dats,
        las=1)
   if(plot.y){
     axis(2,
-         pretty(range(c(new.dd$phi,  new.dd$plo, y2), na.rm=TRUE),
-                       min.n=3),
+         pretty(range(c(new.dd$phi,  new.dd$plo, y2,
+                        quantile(dats[,y1],
+                                 na.rm=TRUE, probs=c(0.04, 0.975))[c("4%","97.5%")]),
+                      na.rm=TRUE),
+                min.n=3),
          las=1)
     mtext(ylabel, 2, line=3, cex=1.5)
   }

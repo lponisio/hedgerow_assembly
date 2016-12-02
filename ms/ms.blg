@@ -1,11 +1,11 @@
-This is BibTeX, Version 0.99d (TeX Live 2016)
+This is BibTeX, Version 0.99d (TeX Live 2015)
 Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
 The top-level auxiliary file: ms.aux
-The style file: ecol_let.bst
+The style file: ecology_let.bst
 Database file #1: refs.bib
 You've used 67 entries,
             2997 wiz_defined-function locations,
-            1038 strings with 17170 characters,
+            1039 strings with 17187 characters,
 and the built_in function-call counts, 42245 in all, are:
 = -- 3390
 > -- 2158

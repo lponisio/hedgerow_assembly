@@ -1,845 +1,178 @@
-library(beeswarm)
-install.pacakges("beeswarm")
-install.packages("beeswarm")
-library(beeswarm)
-?beeswarm
 rm(list=ls())#
+library(RColorBrewer)#
 setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
-binary <- FALSE#
-alpha <- TRUE#
-## int or pols#
-type <- "pols"#
-source('src/initialize_beta.R')#
+source("plotting/src/predictIntervals.R")#
+source("plotting/src/CIplotting.R")#
+source("plotting/src/plotPanels.R")#
+source('../networkLevel/src/misc.R', chdir = TRUE)#
+load('saved/contMods.Rdata')#
 #
 ## ************************************************************#
-## beta diversity as variation between years,#
-## centroid for each site#
+## persistence closeness#
 ## ************************************************************#
-dis <- mapply(function(a, b, c, d)#
-              beta.status(comm= a,#
-                          status= b,#
-                          dis.method,#
-                          nulls=c,#
-                          occ=binary,#
-                          years=d,#
-                          sub=type),#
-              a=comm$comm,#
-              b=comm$status,#
-              c= nulls,#
-              d= comm$comm,#
-              SIMPLIFY=FALSE)#
+dd.occ.pol <- expand.grid(traits=seq(#
+                            from= min(occ.closeness.cv$data$traits,#
+                              na.rm=TRUE),#
+                            to= max(occ.closeness.cv$data$traits,#
+                              na.rm=TRUE),#
+                            length=20),#
+                          SiteStatus="all",#
+                          cv= 0)#
 #
-dats <- data.frame(site=comm$sites,#
-                   status=unlist(comm$status),#
-                   year=unlist(comm$years),#
-                   dist=unlist(sapply(dis, function(x)#
-                     x$distances)))#
-rownames(dats) <- NULL#
+## pols#
+occ.closeness.cv$data$SiteStatus <- "all"#
+occ.pi.close <- predict.int(mod= occ.closeness.cv$lm.nss,#
+                            dd=dd.occ.pol,#
+                            y="cv",#
+                            family="gaussian")#
 #
-save(dats, file= file.path('saved/speciesTurnover',#
-             sprintf('%s.pdf', paste(dis.method, alpha, occ, type,#
-                                     sep='_'))))#
-#
-## invid nulls all not sig, alpha nulls mature marginally sig less,#
-## occurrence nulls all not sig#
-#
-## run model, plot#
-#
-load(file= file.path('saved/speciesTurnover', sprintf('%s.pdf',#
-       paste(dis.method, alpha, occ, type, sep='_'))))#
-mod <- lmer(dist ~ status +  (1|site),#
-            data=dats)#
-summary(mod)#
-#
-plot.beta.div(dis.method =dis.method, dists= dats$dist,#
-              status= dats$status, type= "time",#
-              sub= type, occ=occ, ylabel=ylabel)#
-#
-plot.coeffs(dis.method =dis.method, mod=summary(mod),#
-            status= dats$status, type= "space",#
-            sub= type, occ=occ)#
-plotDistPanels()
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
-binary <- FALSE#
-alpha <- TRUE#
-## int or pols#
-type <- "pols"#
-source('src/initialize_beta.R')#
-#
+## plants#
+dd.occ.plants <- expand.grid(traits=seq(#
+                               from= min(plants.occ.closeness.cv$data$traits,#
+                                 na.rm=TRUE),#
+                               to= max(plants.occ.closeness.cv$data$traits,#
+                                 na.rm=TRUE),#
+                               length=20),#
+                             SiteStatus="all",#
+                             cv= 0)#
+plants.occ.closeness.cv$data$SiteStatus <- "all"#
+plants.occ.pi.close <- predict.int(mod= plants.occ.closeness.cv$lm.nss,#
+                                   dd=dd.occ.plants,#
+                                   y="cv",#
+                                   family="gaussian")#
 ## ************************************************************#
-## beta diversity as variation between years,#
-## centroid for each site#
+## degree closeness#
 ## ************************************************************#
-dis <- mapply(function(a, b, c, d)#
-              beta.status(comm= a,#
-                          status= b,#
-                          dis.method,#
-                          nulls=c,#
-                          occ=binary,#
-                          years=d,#
-                          sub=type),#
-              a=comm$comm,#
-              b=comm$status,#
-              c= nulls,#
-              d= comm$comm,#
-              SIMPLIFY=FALSE)#
-#
-dats <- data.frame(site=comm$sites,#
-                   status=unlist(comm$status),#
-                   year=unlist(comm$years),#
-                   dist=unlist(sapply(dis, function(x)#
-                     x$distances)))#
-rownames(dats) <- NULL#
-#
-save(dats, file= file.path('saved/speciesTurnover',#
-             sprintf('%s.pdf', paste(dis.method, alpha, occ, type,#
-                                     sep='_'))))#
-#
-## invid nulls all not sig, alpha nulls mature marginally sig less,#
-## occurrence nulls all not sig#
-#
-## run model, plot#
-#
-load(file= file.path('saved/speciesTurnover', sprintf('%s.pdf',#
-       paste(dis.method, alpha, occ, type, sep='_'))))#
-mod <- lmer(dist ~ status +  (1|site),#
-            data=dats)#
-summary(mod)#
-#
-plot.beta.div(dis.method =dis.method, dists= dats$dist,#
-              status= dats$status, type= "time",#
-              sub= type, occ=occ, ylabel=ylabel)#
-#
-plot.coeffs(dis.method =dis.method, mod=summary(mod),#
-            status= dats$status, type= "space",#
-            sub= type, occ=occ)#
-plotDistPanels()
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
-binary <- FALSE#
-alpha <- TRUE#
-## int or pols#
-type <- "pols"#
-source('src/initialize_beta.R')#
-#
-## ************************************************************#
-## beta diversity as variation between years,#
-## centroid for each site#
-## ************************************************************#
-dis <- mapply(function(a, b, c, d)#
-              beta.status(comm= a,#
-                          status= b,#
-                          dis.method,#
-                          nulls=c,#
-                          occ=binary,#
-                          years=d,#
-                          sub=type),#
-              a=comm$comm,#
-              b=comm$status,#
-              c= nulls,#
-              d= comm$comm,#
-              SIMPLIFY=FALSE)#
-#
-dats <- data.frame(site=comm$sites,#
-                   status=unlist(comm$status),#
-                   year=unlist(comm$years),#
-                   dist=unlist(sapply(dis, function(x)#
-                     x$distances)))#
-rownames(dats) <- NULL#
-#
-save(dats, file= file.path('saved/speciesTurnover',#
-             sprintf('%s.pdf', paste(dis.method, alpha, occ, type,#
-                                     sep='_'))))#
-#
-## invid nulls all not sig, alpha nulls mature marginally sig less,#
-## occurrence nulls all not sig#
-#
-## run model, plot#
-#
-load(file= file.path('saved/speciesTurnover', sprintf('%s.pdf',#
-       paste(dis.method, alpha, occ, type, sep='_'))))#
-mod <- lmer(dist ~ status +  (1|site),#
-            data=dats)#
-summary(mod)#
-#
-plot.beta.div(dis.method =dis.method, dists= dats$dist,#
-              status= dats$status, type= "time",#
-              sub= type, occ=occ, ylabel=ylabel)#
-#
-plot.coeffs(dis.method =dis.method, mod=summary(mod),#
-            status= dats$status, type= "space",#
-            sub= type, occ=occ)#
-plotDistPanels()
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
-binary <- FALSE#
-alpha <- TRUE#
-## int or pols#
-type <- "pols"#
-source('src/initialize_beta.R')#
-#
-## ************************************************************#
-## beta diversity as variation between years,#
-## centroid for each site#
-## ************************************************************#
-dis <- mapply(function(a, b, c, d)#
-              beta.status(comm= a,#
-                          status= b,#
-                          dis.method,#
-                          nulls=c,#
-                          occ=binary,#
-                          years=d,#
-                          sub=type),#
-              a=comm$comm,#
-              b=comm$status,#
-              c= nulls,#
-              d= comm$comm,#
-              SIMPLIFY=FALSE)#
-#
-dats <- data.frame(site=comm$sites,#
-                   status=unlist(comm$status),#
-                   year=unlist(comm$years),#
-                   dist=unlist(sapply(dis, function(x)#
-                     x$distances)))#
-rownames(dats) <- NULL#
-#
-save(dats, file= file.path('saved/speciesTurnover',#
-             sprintf('%s.pdf', paste(dis.method, alpha, occ, type,#
-                                     sep='_'))))#
-#
-## invid nulls all not sig, alpha nulls mature marginally sig less,#
-## occurrence nulls all not sig#
-#
-## run model, plot#
-#
-load(file= file.path('saved/speciesTurnover', sprintf('%s.pdf',#
-       paste(dis.method, alpha, occ, type, sep='_'))))#
-mod <- lmer(dist ~ status +  (1|site),#
-            data=dats)#
-summary(mod)#
-#
-plot.beta.div(dis.method =dis.method, dists= dats$dist,#
-              status= dats$status, type= "time",#
-              sub= type, occ=occ, ylabel=ylabel)#
-#
-plot.coeffs(dis.method =dis.method, mod=summary(mod),#
-            status= dats$status, type= "space",#
-            sub= type, occ=occ)#
-plotDistPanels()
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
-binary <- FALSE#
-alpha <- TRUE#
-## int or pols#
-type <- "pols"#
-source('src/initialize_beta.R')#
-#
-## ************************************************************#
-## beta diversity as variation between years,#
-## centroid for each site#
-## ************************************************************#
-dis <- mapply(function(a, b, c, d)#
-              beta.status(comm= a,#
-                          status= b,#
-                          dis.method,#
-                          nulls=c,#
-                          occ=binary,#
-                          years=d,#
-                          sub=type),#
-              a=comm$comm,#
-              b=comm$status,#
-              c= nulls,#
-              d= comm$comm,#
-              SIMPLIFY=FALSE)#
-#
-dats <- data.frame(site=comm$sites,#
-                   status=unlist(comm$status),#
-                   year=unlist(comm$years),#
-                   dist=unlist(sapply(dis, function(x)#
-                     x$distances)))#
-rownames(dats) <- NULL#
-#
-save(dats, file= file.path('saved/speciesTurnover',#
-             sprintf('%s.pdf', paste(dis.method, alpha, occ, type,#
-                                     sep='_'))))#
-#
-## invid nulls all not sig, alpha nulls mature marginally sig less,#
-## occurrence nulls all not sig#
-#
-## run model, plot#
-#
-load(file= file.path('saved/speciesTurnover', sprintf('%s.pdf',#
-       paste(dis.method, alpha, occ, type, sep='_'))))#
-mod <- lmer(dist ~ status +  (1|site),#
-            data=dats)#
-summary(mod)#
-#
-plot.beta.div(dis.method =dis.method, dists= dats$dist,#
-              status= dats$status, type= "time",#
-              sub= type, occ=occ, ylabel=ylabel)#
-#
-plot.coeffs(dis.method =dis.method, mod=summary(mod),#
-            status= dats$status, type= "space",#
-            sub= type, occ=occ)#
-plotDistPanels()
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
-binary <- FALSE#
-alpha <- TRUE#
-## int or pols#
-type <- "pols"#
-source('src/initialize_beta.R')#
-#
-## ************************************************************#
-## beta diversity as variation between years,#
-## centroid for each site#
-## ************************************************************#
-dis <- mapply(function(a, b, c, d)#
-              beta.status(comm= a,#
-                          status= b,#
-                          dis.method,#
-                          nulls=c,#
-                          occ=binary,#
-                          years=d,#
-                          sub=type),#
-              a=comm$comm,#
-              b=comm$status,#
-              c= nulls,#
-              d= comm$comm,#
-              SIMPLIFY=FALSE)#
-#
-dats <- data.frame(site=comm$sites,#
-                   status=unlist(comm$status),#
-                   year=unlist(comm$years),#
-                   dist=unlist(sapply(dis, function(x)#
-                     x$distances)))#
-rownames(dats) <- NULL#
-#
-save(dats, file= file.path('saved/speciesTurnover',#
-             sprintf('%s.pdf', paste(dis.method, alpha, occ, type,#
-                                     sep='_'))))#
-#
-## invid nulls all not sig, alpha nulls mature marginally sig less,#
-## occurrence nulls all not sig#
-#
-## run model, plot#
-#
-load(file= file.path('saved/speciesTurnover', sprintf('%s.pdf',#
-       paste(dis.method, alpha, occ, type, sep='_'))))#
-mod <- lmer(dist ~ status +  (1|site),#
-            data=dats)#
-summary(mod)#
-#
-plot.beta.div(dis.method =dis.method, dists= dats$dist,#
-              status= dats$status, type= "time",#
-              sub= type, occ=occ, ylabel=ylabel)#
-#
-plot.coeffs(dis.method =dis.method, mod=summary(mod),#
-            status= dats$status, type= "space",#
-            sub= type, occ=occ)#
-plotDistPanels()
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
-binary <- FALSE#
-alpha <- TRUE#
-## int or pols#
-type <- "pols"#
-source('src/initialize_beta.R')#
-#
-## ************************************************************#
-## beta diversity as variation between years,#
-## centroid for each site#
-## ************************************************************#
-dis <- mapply(function(a, b, c, d)#
-              beta.status(comm= a,#
-                          status= b,#
-                          dis.method,#
-                          nulls=c,#
-                          occ=binary,#
-                          years=d,#
-                          sub=type),#
-              a=comm$comm,#
-              b=comm$status,#
-              c= nulls,#
-              d= comm$comm,#
-              SIMPLIFY=FALSE)#
-#
-dats <- data.frame(site=comm$sites,#
-                   status=unlist(comm$status),#
-                   year=unlist(comm$years),#
-                   dist=unlist(sapply(dis, function(x)#
-                     x$distances)))#
-rownames(dats) <- NULL#
-#
-save(dats, file= file.path('saved/speciesTurnover',#
-             sprintf('%s.pdf', paste(dis.method, alpha, occ, type,#
-                                     sep='_'))))#
-#
-## invid nulls all not sig, alpha nulls mature marginally sig less,#
-## occurrence nulls all not sig#
-#
-## run model, plot#
-#
-load(file= file.path('saved/speciesTurnover', sprintf('%s.pdf',#
-       paste(dis.method, alpha, occ, type, sep='_'))))#
-mod <- lmer(dist ~ status +  (1|site),#
-            data=dats)#
-summary(mod)#
-#
-plot.beta.div(dis.method =dis.method, dists= dats$dist,#
-              status= dats$status, type= "time",#
-              sub= type, occ=occ, ylabel=ylabel)#
-#
-plot.coeffs(dis.method =dis.method, mod=summary(mod),#
-            status= dats$status, type= "space",#
-            sub= type, occ=occ)#
-plotDistPanels()
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
-binary <- FALSE#
-alpha <- TRUE#
-## int or pols#
-type <- "pols"#
-source('src/initialize_beta.R')#
-#
-## ************************************************************#
-## beta diversity as variation between years,#
-## centroid for each site#
-## ************************************************************#
-dis <- mapply(function(a, b, c, d)#
-              beta.status(comm= a,#
-                          status= b,#
-                          dis.method,#
-                          nulls=c,#
-                          occ=binary,#
-                          years=d,#
-                          sub=type),#
-              a=comm$comm,#
-              b=comm$status,#
-              c= nulls,#
-              d= comm$comm,#
-              SIMPLIFY=FALSE)#
-#
-dats <- data.frame(site=comm$sites,#
-                   status=unlist(comm$status),#
-                   year=unlist(comm$years),#
-                   dist=unlist(sapply(dis, function(x)#
-                     x$distances)))#
-rownames(dats) <- NULL#
-#
-save(dats, file= file.path('saved/speciesTurnover',#
-             sprintf('%s.pdf', paste(dis.method, alpha, occ, type,#
-                                     sep='_'))))#
-#
-## invid nulls all not sig, alpha nulls mature marginally sig less,#
-## occurrence nulls all not sig#
-#
-## run model, plot#
-#
-load(file= file.path('saved/speciesTurnover', sprintf('%s.pdf',#
-       paste(dis.method, alpha, occ, type, sep='_'))))#
-mod <- lmer(dist ~ status +  (1|site),#
-            data=dats)#
-summary(mod)#
-#
-plot.beta.div(dis.method =dis.method, dists= dats$dist,#
-              status= dats$status, type= "time",#
-              sub= type, occ=occ, ylabel=ylabel)#
-#
-plot.coeffs(dis.method =dis.method, mod=summary(mod),#
-            status= dats$status, type= "space",#
-            sub= type, occ=occ)#
-plotDistPanels()
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
-binary <- FALSE#
-alpha <- TRUE#
-## int or pols#
-type <- "pols"#
-source('src/initialize_beta.R')#
-#
-## ************************************************************#
-## beta diversity as variation between years,#
-## centroid for each site#
-## ************************************************************#
-dis <- mapply(function(a, b, c, d)#
-              beta.status(comm= a,#
-                          status= b,#
-                          dis.method,#
-                          nulls=c,#
-                          occ=binary,#
-                          years=d,#
-                          sub=type),#
-              a=comm$comm,#
-              b=comm$status,#
-              c= nulls,#
-              d= comm$comm,#
-              SIMPLIFY=FALSE)#
-#
-dats <- data.frame(site=comm$sites,#
-                   status=unlist(comm$status),#
-                   year=unlist(comm$years),#
-                   dist=unlist(sapply(dis, function(x)#
-                     x$distances)))#
-rownames(dats) <- NULL#
-#
-save(dats, file= file.path('saved/speciesTurnover',#
-             sprintf('%s.pdf', paste(dis.method, alpha, occ, type,#
-                                     sep='_'))))#
-#
-## invid nulls all not sig, alpha nulls mature marginally sig less,#
-## occurrence nulls all not sig#
-#
-## run model, plot#
-#
-load(file= file.path('saved/speciesTurnover', sprintf('%s.pdf',#
-       paste(dis.method, alpha, occ, type, sep='_'))))#
-mod <- lmer(dist ~ status +  (1|site),#
-            data=dats)#
-summary(mod)#
-#
-plot.beta.div(dis.method =dis.method, dists= dats$dist,#
-              status= dats$status, type= "time",#
-              sub= type, occ=occ, ylabel=ylabel)#
-#
-plot.coeffs(dis.method =dis.method, mod=summary(mod),#
-            status= dats$status, type= "space",#
-            sub= type, occ=occ)#
-plotDistPanels()
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
-binary <- FALSE#
-alpha <- TRUE#
-## int or pols#
-type <- "pols"#
-source('src/initialize_beta.R')#
-#
-## ************************************************************#
-## beta diversity as variation between years,#
-## centroid for each site#
-## ************************************************************#
-dis <- mapply(function(a, b, c, d)#
-              beta.status(comm= a,#
-                          status= b,#
-                          dis.method,#
-                          nulls=c,#
-                          occ=binary,#
-                          years=d,#
-                          sub=type),#
-              a=comm$comm,#
-              b=comm$status,#
-              c= nulls,#
-              d= comm$comm,#
-              SIMPLIFY=FALSE)#
-#
-dats <- data.frame(site=comm$sites,#
-                   status=unlist(comm$status),#
-                   year=unlist(comm$years),#
-                   dist=unlist(sapply(dis, function(x)#
-                     x$distances)))#
-rownames(dats) <- NULL#
-#
-save(dats, file= file.path('saved/speciesTurnover',#
-             sprintf('%s.pdf', paste(dis.method, alpha, occ, type,#
-                                     sep='_'))))#
-#
-## invid nulls all not sig, alpha nulls mature marginally sig less,#
-## occurrence nulls all not sig#
-#
-## run model, plot#
-#
-load(file= file.path('saved/speciesTurnover', sprintf('%s.pdf',#
-       paste(dis.method, alpha, occ, type, sep='_'))))#
-mod <- lmer(dist ~ status +  (1|site),#
-            data=dats)#
-summary(mod)#
-#
-plot.beta.div(dis.method =dis.method, dists= dats$dist,#
-              status= dats$status, type= "time",#
-              sub= type, occ=occ, ylabel=ylabel)#
-#
-plot.coeffs(dis.method =dis.method, mod=summary(mod),#
-            status= dats$status, type= "space",#
-            sub= type, occ=occ)#
-plotDistPanels()
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
-binary <- FALSE#
-alpha <- TRUE#
-## int or pols#
-type <- "pols"#
-source('src/initialize_beta.R')#
-#
-## ************************************************************#
-## beta diversity as variation between years,#
-## centroid for each site#
-## ************************************************************#
-dis <- mapply(function(a, b, c, d)#
-              beta.status(comm= a,#
-                          status= b,#
-                          dis.method,#
-                          nulls=c,#
-                          occ=binary,#
-                          years=d,#
-                          sub=type),#
-              a=comm$comm,#
-              b=comm$status,#
-              c= nulls,#
-              d= comm$comm,#
-              SIMPLIFY=FALSE)#
-#
-dats <- data.frame(site=comm$sites,#
-                   status=unlist(comm$status),#
-                   year=unlist(comm$years),#
-                   dist=unlist(sapply(dis, function(x)#
-                     x$distances)))#
-rownames(dats) <- NULL#
-#
-save(dats, file= file.path('saved/speciesTurnover',#
-             sprintf('%s.pdf', paste(dis.method, alpha, occ, type,#
-                                     sep='_'))))#
-#
-## invid nulls all not sig, alpha nulls mature marginally sig less,#
-## occurrence nulls all not sig#
-#
-## run model, plot#
-#
-load(file= file.path('saved/speciesTurnover', sprintf('%s.pdf',#
-       paste(dis.method, alpha, occ, type, sep='_'))))#
-mod <- lmer(dist ~ status +  (1|site),#
-            data=dats)#
-summary(mod)#
-#
-plot.beta.div(dis.method =dis.method, dists= dats$dist,#
-              status= dats$status, type= "time",#
-              sub= type, occ=occ, ylabel=ylabel)#
-#
-plot.coeffs(dis.method =dis.method, mod=summary(mod),#
-            status= dats$status, type= "space",#
-            sub= type, occ=occ)#
-plotDistPanels()
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
-binary <- FALSE#
-alpha <- TRUE#
-## int or pols#
-type <- "pols"#
-source('src/initialize_beta.R')#
-#
-## ************************************************************#
-## beta diversity as variation between years,#
-## centroid for each site#
-## ************************************************************#
-dis <- mapply(function(a, b, c, d)#
-              beta.status(comm= a,#
-                          status= b,#
-                          dis.method,#
-                          nulls=c,#
-                          occ=binary,#
-                          years=d,#
-                          sub=type),#
-              a=comm$comm,#
-              b=comm$status,#
-              c= nulls,#
-              d= comm$comm,#
-              SIMPLIFY=FALSE)#
-#
-dats <- data.frame(site=comm$sites,#
-                   status=unlist(comm$status),#
-                   year=unlist(comm$years),#
-                   dist=unlist(sapply(dis, function(x)#
-                     x$distances)))#
-rownames(dats) <- NULL#
-#
-save(dats, file= file.path('saved/speciesTurnover',#
-             sprintf('%s.pdf', paste(dis.method, alpha, occ, type,#
-                                     sep='_'))))#
-#
-## invid nulls all not sig, alpha nulls mature marginally sig less,#
-## occurrence nulls all not sig#
-#
-## run model, plot#
-#
-load(file= file.path('saved/speciesTurnover', sprintf('%s.pdf',#
-       paste(dis.method, alpha, occ, type, sep='_'))))#
-mod <- lmer(dist ~ status +  (1|site),#
-            data=dats)#
-summary(mod)#
-#
-plot.beta.div(dis.method =dis.method, dists= dats$dist,#
-              status= dats$status, type= "time",#
-              sub= type, occ=occ, ylabel=ylabel)#
-#
-plot.coeffs(dis.method =dis.method, mod=summary(mod),#
-            status= dats$status, type= "space",#
-            sub= type, occ=occ)#
-plotDistPanels()
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
-binary <- FALSE#
-alpha <- TRUE#
-## int or pols#
-type <- "pols"#
-source('src/initialize_beta.R')#
-#
-## ************************************************************#
-## beta diversity as variation between years,#
-## centroid for each site#
-## ************************************************************#
-dis <- mapply(function(a, b, c, d)#
-              beta.status(comm= a,#
-                          status= b,#
-                          dis.method,#
-                          nulls=c,#
-                          occ=binary,#
-                          years=d,#
-                          sub=type),#
-              a=comm$comm,#
-              b=comm$status,#
-              c= nulls,#
-              d= comm$comm,#
-              SIMPLIFY=FALSE)#
-#
-dats <- data.frame(site=comm$sites,#
-                   status=unlist(comm$status),#
-                   year=unlist(comm$years),#
-                   dist=unlist(sapply(dis, function(x)#
-                     x$distances)))#
-rownames(dats) <- NULL#
-#
-save(dats, file= file.path('saved/speciesTurnover',#
-             sprintf('%s.pdf', paste(dis.method, alpha, occ, type,#
-                                     sep='_'))))#
-#
-## invid nulls all not sig, alpha nulls mature marginally sig less,#
-## occurrence nulls all not sig#
-#
-## run model, plot#
-#
-load(file= file.path('saved/speciesTurnover', sprintf('%s.pdf',#
-       paste(dis.method, alpha, occ, type, sep='_'))))#
-mod <- lmer(dist ~ status +  (1|site),#
-            data=dats)#
-summary(mod)#
-#
-plot.beta.div(dis.method =dis.method, dists= dats$dist,#
-              status= dats$status, type= "time",#
-              sub= type, occ=occ, ylabel=ylabel)#
-#
-plot.coeffs(dis.method =dis.method, mod=summary(mod),#
-            status= dats$status, type= "space",#
-            sub= type, occ=occ)#
-plotDistPanels()
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
-binary <- FALSE#
-alpha <- TRUE#
-## int or pols#
-type <- "pols"#
-source('src/initialize_beta.R')#
-#
-## ************************************************************#
-## beta diversity as variation between years,#
-## centroid for each site#
-## ************************************************************#
-dis <- mapply(function(a, b, c, d)#
-              beta.status(comm= a,#
-                          status= b,#
-                          dis.method,#
-                          nulls=c,#
-                          occ=binary,#
-                          years=d,#
-                          sub=type),#
-              a=comm$comm,#
-              b=comm$status,#
-              c= nulls,#
-              d= comm$comm,#
-              SIMPLIFY=FALSE)#
-#
-dats <- data.frame(site=comm$sites,#
-                   status=unlist(comm$status),#
-                   year=unlist(comm$years),#
-                   dist=unlist(sapply(dis, function(x)#
-                     x$distances)))#
-rownames(dats) <- NULL#
-#
-save(dats, file= file.path('saved/speciesTurnover',#
-             sprintf('%s.pdf', paste(dis.method, alpha, occ, type,#
-                                     sep='_'))))#
-#
-## invid nulls all not sig, alpha nulls mature marginally sig less,#
-## occurrence nulls all not sig#
-#
-## run model, plot#
-#
-load(file= file.path('saved/speciesTurnover', sprintf('%s.pdf',#
-       paste(dis.method, alpha, occ, type, sep='_'))))#
-mod <- lmer(dist ~ status +  (1|site),#
-            data=dats)#
-summary(mod)#
-#
-plot.beta.div(dis.method =dis.method, dists= dats$dist,#
-              status= dats$status, type= "time",#
-              sub= type, occ=occ, ylabel=ylabel)#
-#
-plot.coeffs(dis.method =dis.method, mod=summary(mod),#
-            status= dats$status, type= "space",#
-            sub= type, occ=occ)#
-plotDistPanels()
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
-binary <- FALSE#
-alpha <- TRUE#
-## int or pols#
-type <- "pols"#
-source('src/initialize_beta.R')#
-#
-## ************************************************************#
-## beta diversity as variation between years,#
-## centroid for each site#
-## ************************************************************#
-dis <- mapply(function(a, b, c, d)#
-              beta.status(comm= a,#
-                          status= b,#
-                          dis.method,#
-                          nulls=c,#
-                          occ=binary,#
-                          years=d,#
-                          sub=type),#
-              a=comm$comm,#
-              b=comm$status,#
-              c= nulls,#
-              d= comm$comm,#
-              SIMPLIFY=FALSE)#
-#
-dats <- data.frame(site=comm$sites,#
-                   status=unlist(comm$status),#
-                   year=unlist(comm$years),#
-                   dist=unlist(sapply(dis, function(x)#
-                     x$distances)))#
-rownames(dats) <- NULL#
-#
-save(dats, file= file.path('saved/speciesTurnover',#
-             sprintf('%s.pdf', paste(dis.method, alpha, occ, type,#
-                                     sep='_'))))#
-#
-## invid nulls all not sig, alpha nulls mature marginally sig less,#
-## occurrence nulls all not sig#
-#
-## run model, plot#
-#
-load(file= file.path('saved/speciesTurnover', sprintf('%s.pdf',#
-       paste(dis.method, alpha, occ, type, sep='_'))))#
-mod <- lmer(dist ~ status +  (1|site),#
-            data=dats)#
-summary(mod)#
-#
-plot.beta.div(dis.method =dis.method, dists= dats$dist,#
-              status= dats$status, type= "time",#
-              sub= type, occ=occ, ylabel=ylabel)#
-#
-plot.coeffs(dis.method =dis.method, mod=summary(mod),#
-            status= dats$status, type= "space",#
-            sub= type, occ=occ)#
-plotDistPanels()
+dd.degree.pol <- expand.grid(traits=seq(#
+                               from=#
+                               min(degree.closeness.cv$data$traits,#
+                                   na.rm=TRUE),#
+                               to=#
+                               max(degree.closeness.cv$data$traits,#
+                                   na.rm=TRUE),#
+                               length=10),#
+                             SiteStatus="all",#
+                             cv= 0)#
+## pols#
+#
+degree.closeness.cv$data$SiteStatus <- "all"#
+#
+degree.pi <- predict.int(mod= degree.closeness.cv$lm.nss,#
+                         dd=dd.degree.pol,#
+                         y="cv",#
+                         family="gaussian")#
+#
+## plants#
+dd.degree.plants <- expand.grid(traits=seq(#
+                           from=#
+                           min(plants.degree.closeness.cv$data$traits,#
+                               na.rm=TRUE),#
+                           to=#
+                           max(plants.degree.closeness.cv$data$traits,#
+                               na.rm=TRUE),#
+                           length=10),#
+                         SiteStatus="all",#
+                         cv= 0)#
+#
+plants.degree.closeness.cv$data$SiteStatus <- "all"#
+#
+plants.degree.pi <- predict.int(mod= plants.degree.closeness.cv$lm.nss,#
+                                dd=dd.degree.plants,#
+                                y="cv",#
+                                family="gaussian")#
+plot.panels()#
+## ## ************************************************************#
+## ## dprime network position - k#
+## ## ************************************************************#
+#
+## dd.dprime <- expand.grid(traits=seq(#
+##                            from= min(dprime$data$traits),#
+##                            to= max(dprime$data$traits),#
+##                            length=10),#
+##                          SiteStatus= c("control", "maturing", "mature"),#
+##                          cv= 0)#
+#
+## dprime.pi <- predict.int(mod= dprime.k.cv$lm,#
+##                          dd=dd.dprime,#
+##                          y="cv",#
+##                          family="gaussian")#
+#
+## plot.predict.div(new.dd=dprime.pi,#
+##                  ylabel="Network position variability",#
+##                  dats=dprime.k.cv$data,#
+##                  xs="traits",#
+##                  y1="cv",#
+##                  xlabel="Specialization",#
+##                  legend.loc="topright",#
+##                  height=5,#
+##                  width=5,#
+##                  x.adj=0.5,#
+##                  f.path='figures/cv')#
+#
+## ## ************************************************************#
+## ## dprime network position - closeness#
+## ## ************************************************************#
+#
+## dprime.pi.cl <- predict.int(mod= dprime.closeness.cv$lm,#
+##                             dd=dd.dprime,#
+##                             y="cv",#
+##                             family="gaussian")#
+#
+## plot.predict.div(new.dd=dprime.pi.cl,#
+##                  ylabel="Closeness variability",#
+##                  dats=dprime.closeness.cv$data,#
+##                  xs="traits",#
+##                  y1="cv",#
+##                  xlabel="Specialization",#
+##                  legend.loc="topright",#
+##                  height=5,#
+##                  width=5,#
+##                  x.adj=0.5,#
+##                  f.path='figures/cv')#
+## ## ************************************************************#
+## ## itd abundance#
+## ## ************************************************************#
+#
+## dd.itd <- expand.grid(traits=seq(#
+##                         from= min(itd$data$traits, na.rm=TRUE),#
+##                         to= max(itd$data$traits, na.rm=TRUE),#
+##                         length=10),#
+##                       SiteStatus= c("control", "maturing", "mature"),#
+##                       cv= 0)#
+#
+## itd.pi <- predict.int(mod= itd$lm,#
+##                       dd=dd.itd,#
+##                       y="cv",#
+##                       family="gaussian")#
+#
+## plot.predict.div(new.dd=itd.pi,#
+##                  ylabel="Coefficient of variation",#
+##                  dats=itd$data,#
+##                  xs="traits",#
+##                  y1="cv",#
+##                  xlabel="Body size",#
+##                  legend.loc="bottomright",#
+##                  height=5,#
+##                  width=5,#
+##                  x.adj=0.5,#
+##                  f.path='figures/cv')#
+## ## ************************************************************#
+## ## dprime abundance#
+## ## ************************************************************#
+#
+## dprime.pi <- predict.int(mod= dprime$lm,#
+##                          dd=dd.dprime,#
+##                          y="cv",#
+##                          family="gaussian")#
+#
+## plot.predict.div(new.dd=dprime.pi,#
+##                  ylabel="Coefficient of variation",#
+##                  dats=dprime$data,#
+##                  xs="traits",#
+##                  y1="cv",#
+##                  xlabel="Specialization",#
+##                  legend.loc="bottomright",#
+##                  height=5,#
+##                  width=5,#
+##                  x.adj=0.5,#
+##                  f.path='figures/cv')
