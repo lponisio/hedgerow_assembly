@@ -10,6 +10,7 @@ source('src/initialize_beta.R')
 ## beta diversity as variation between years,
 ## centroid for each site
 ## ************************************************************
+
 dis <- mapply(function(a, b, c, d)
               beta.status(comm= a,
                           status= b,
@@ -31,7 +32,8 @@ dats <- data.frame(site=comm$sites,
                      x$distances)))
 rownames(dats) <- NULL
 
-save(dats, file= file.path('saved/speciesTurnover',
+
+save(dats, file= file.path('saved/speciesTurnover', 
              sprintf('%s.pdf', paste(dis.method, alpha, occ, type,
                                      sep='_'))))
 

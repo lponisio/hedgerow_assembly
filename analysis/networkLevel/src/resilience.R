@@ -1,6 +1,6 @@
 
 ## calculates the robustness of a network using Memmot et al.'s method
-## takes the adjacency matric, whether to drop species by abundance or
+## takes the adjacency matrix, whether to drop species by abundance or
 ## degree and whther to drop the "higer" or "lower" level of the
 ## network
 ## returns a data frame with the site, robustness score and YPR
