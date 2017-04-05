@@ -9,7 +9,7 @@ load('../../data/networks/all_networks_years.Rdata')
 ## **********************************************************
 ## robustness
 ## **********************************************************
-## simulation plant extinction
+## simulate plant extinction
 
 res <- simExtinction(nets, extinction.method, spec)
 
