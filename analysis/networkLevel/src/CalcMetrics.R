@@ -4,8 +4,8 @@ calc.metric <- function(dat.web, H2_integer=FALSE,
                           "weighted connectance", "niche overlap",
                           "number of species")) {
   ## calculates modularity
-  calc.mod <- function(dat.web){ 
-    ## converts a p-a matrix to a graph for modularity computation 
+  calc.mod <- function(dat.web){
+    ## converts a p-a matrix to a graph for modularity computation
     mut.adj <- function(x) {
       nr <- dim(x)[1]
       nc <- dim(x)[2]
@@ -24,7 +24,7 @@ calc.metric <- function(dat.web, H2_integer=FALSE,
                          membership(fastgreedy.community(graph,
                                                          weights=weights)),
                          weights=weights)
-    
+
     random.walk <-  modularity(graph,
                                membership(walktrap.community(graph,
                                                              weights=weights)),
@@ -37,7 +37,7 @@ calc.metric <- function(dat.web, H2_integer=FALSE,
     return(c(G=greedy,
              R=random.walk,
              D=dendro))
-  } 
+  }
 
   dat.web <- as.matrix(empty(dat.web))
   ## matrix of all the same number
@@ -55,7 +55,7 @@ calc.metric <- function(dat.web, H2_integer=FALSE,
   }
   mod.met <- calc.mod(dat.web)
   return(c(mets, mod.met= mod.met))
-  
+
 }
 
 prob.null <- function(M) {
@@ -63,7 +63,7 @@ prob.null <- function(M) {
     mats <- diag(vdims)
     ## what cell number are the interactions
     posdiag <- 1:vdims + ((1:vdims - 1) * vdims)
-    desp <- matrix(rep(1:vdims, vdims), vdims, vdims, 
+    desp <- matrix(rep(1:vdims, vdims), vdims, vdims,
                    byrow = TRUE) - (1:vdims)
     fdesp <- sample(1:vdims)
     move <- desp[cbind(1:vdims, fdesp)]
@@ -95,11 +95,11 @@ prob.null <- function(M) {
   MR[cbind(pos, sample2)] <- 2
   MRoccupied <- which(MR > 0)
   vleft <- lvalues - vdimb
-  if (vleft > 0) 
-    MRoccupied <- c(MRoccupied, sample((1:lMR)[-MRoccupied], 
+  if (vleft > 0)
+    MRoccupied <- c(MRoccupied, sample((1:lMR)[-MRoccupied],
                                        vleft))
   MR[MRoccupied] <- sample(values)
-  if (dim(MR)[1] != dim(M)[1]) 
+  if (dim(MR)[1] != dim(M)[1])
     MR <- t(MR)
   return(MR)
 }
@@ -170,33 +170,4 @@ prep.dat <- function(cor.stats, spec.dat){
   return(out)
 }
 
-
-
-## ##  function that computes summary statistics on simulated null matrices
-## ##  (nulls simulated from web N times)
-## cor.metrics <- function (true.stat, null.stat, N) {
-##   ## calculate pvalues
-##   pvals <- function(stats, nnull){
-##     colSums(stats >= stats[rep(1, nrow(stats)),])/(nnull + 1)
-##   }
-##   ## calculate zvalues two different ways
-##   zvals <-function(stats){
-##     z.sd <- (stats[1,] -
-##              apply(stats, 2, mean, na.rm = TRUE))/
-##                apply(stats, 2, sd, na.rm = TRUE)
-##     z.sd[is.infinite(z.sd)] <- NA
-##     return(z.sd)
-##   }
-##   out.mets <- rbind(true.stat, null.stat)
-##   ## compute z scores
-##   zvalues <- zvals(out.mets)
-##   ## compute p-values
-##   pvalues <- pvals(out.mets, N)
-##   out <- c(true.stat, zvalues, pvalues)
-##   names(out) <- c("NODF", "H2",
-##                       "modularityG", "modularityR","modularityD",
-##                       "zNODF", "zH2", "zmodG", "zmodR", "zmodD",
-##                       "pNODF", "pH2", "pmodG", "pmodR", "pmodD")
-##   return(out)
-## }
 

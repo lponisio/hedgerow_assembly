@@ -95,26 +95,3 @@ save(baci.no.plant.mod, file='saved/mods/baci_no_plant.Rdata')
 
 
 source('plotting/baci.R')
-
-
-## distribution is niche overlap
-
-## dis.mats <- lapply(lapply(nets, t), vegdist, method="chao")
-
-## layout(matrix(1:6, nrow=2))
-## cols <- rainbow(length(unique(cor.dats$Year)))
-## lapply(unique(cor.dats$Site), function(x){
-##   this.mats <- dis.mats[cor.dats$Site == x]
-##   plot(NA, ylim=c(0,10), xlim=c(0,1.5),
-##        ylab="Frequency",
-##        xlab="Niche Overlap",
-##        main= x)
-##   for(i in 1:length(this.mats)){
-##     points(density(this.mats[[i]]), col=cols[i], type="l", lwd=2)
-##   }
-## })
-
-## plot(NA, ylim=c(0,1), xlim=c(0,1), xaxt="n", yaxt="n", ylab="", xlab="")
-## legend("center", col=cols, lwd="2",
-##        legend=sort(unique(cor.dats$Year)),
-##        bty="n")
