@@ -1,13 +1,19 @@
 rm(list=ls())
+library(MASS)
+library(lme4)
+library(nlme)
+
 setwd("~/Dropbox/hedgerow_assembly/analysis/changePoint")
+
+source('../../dataPrep/src/misc.R')
 load('cptPeel/baci/graphs.Rdata')
 load('../../data/networks/allSpecimens.Rdata')
-library(MASS)
-library(nlme)
+samples <- read.csv("../../data/samples.csv")
 dats <- read.csv('cptPeel/changing_points.csv')
 BACI.site <- c('Barger', 'Butler', 'Hrdy', 'MullerB', 'Sperandio')
+
 ## **********************************************************
-## binomial 
+## binomial tests
 ## **********************************************************
 chpt.trial <- aggregate(spec$Year, list(Site=spec$Site),
                            FUN=function(x) length(unique(x)))
@@ -30,7 +36,7 @@ mod.chpt <- glm(cbind(chpt.trial$chpts, chpt.trial$trial - chpt.trial$chpts) ~
     chpt.trial$status, family="binomial")
 summary(mod.chpt)
 
-exp(cbind(coef(mod.chpt), confint(mod.chpt)))  
+exp(cbind(coef(mod.chpt), confint(mod.chpt)))
 
 # controls with change points
 nrow(chpt.trial[chpt.trial$status == "control" &
@@ -48,9 +54,49 @@ nrow(chpt.trial[chpt.trial$chpts != 0,])/
 ## maturing has more successes than mature and controls, and mature
 ## and controls have about the same
 
+
+## **********************************************************
+## some methodological tests: are years with larger differences in the
+## number of samples more likely to have a change point?
+## **********************************************************
+
+diff.samp <- matrix(NA, nrow=nrow(samples),
+                    ncol=ncol(samples) -2)
+colnames.prep <- character(ncol(diff.samp))
+
+for(i in 3:ncol(samples)){
+    diff.samp[,i -2] <- abs(samples[, i] -  samples[, i -1])
+    colnames.prep[i-2] <- paste(colnames(samples)[i -1], "-",
+                                colnames(samples)[i], sep="")
+}
+
+rownames(diff.samp) <- samples$X
+colnames.prep <- gsub("X", "", colnames.prep)
+
+colnames(diff.samp) <- colnames.prep
+
+diff.dats <- comm.mat2sample(diff.samp)
+
+diff.dats$cp <- match(paste(diff.dats$Site,
+                                        diff.dats$Date),
+                      paste(dats$sites, dats$cp))
+
+diff.dats.cp <- diff.dats[diff.dats$Site %in% chpt.trial$Site,]
+diff.dats.cp <- diff.dats.cp[diff.dats.cp$Samp !=0,]
+
+diff.dats.cp$cp[is.na(diff.dats.cp$cp)] <- 0
+diff.dats.cp$cp[diff.dats.cp$cp > 1] <- 1
+
+mod.samp <- glmer(cp ~ Samp + (1|Site), data=diff.dats.cp, family="binomial")
+summary(mod.samp)
+
+## probability of change point does not increase with the difference
+## in the number of samples between years
+
 ## **********************************************************
 ## poisson likelihood
-## maybe not quite right given the number of trials differs
+## maybe not quite right given the number of trials differs, not
+## included in ms but had similar results
 ## **********************************************************
 counts <- table(dats[,-3])
 

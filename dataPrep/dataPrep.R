@@ -121,8 +121,12 @@ ms.table <- samp2site.spp(site=site.table$Site,
                           spp=site.table$Year,
                           abund=site.table$Samples,
                           FUN=sum)
+
+write.csv(ms.table, file="../data/samples.csv")
+
 ms.table <- cbind(spec$SiteStatus[match(rownames(ms.table),
                                         spec$Site)], ms.table)
+
 colnames(ms.table) <- c("Site type", colnames(ms.table)[-1])
 
 ms.table <- ms.table[order(ms.table[, "Site type"], decreasing=TRUE),]
@@ -136,7 +140,7 @@ ms.table[, "Site type"][ms.table[, "Site type"] == "mature"] <-
 ms.table[, "Site type"][ms.table[, "Site type"] == "control"] <-
   "Non-assembling FM"
 
-write.table(ms.table, file="~/Dropbox/hedgerow_assembly/ms/tables/samples.txt",
+write.table(ms.table, file="~/Dropbox/hedgerow_assembly_ms/ms/tables/samples.txt",
             sep=" & ")
 
 ## *************************************************
@@ -243,7 +247,7 @@ f.path <- '../data/networks'
 save(nets, file=file.path(f.path, 'all_networks_years.Rdata'))
 
 ## *******************************************************************
-## site-species level metric calculation 
+## site-species level metric calculation
 ## *******************************************************************
 specs <- calcSpec(nets, spec, spec.metric = "d", 0.3)
 specs$closeness[specs$closeness == 0] <- 1*10^-6
@@ -282,7 +286,7 @@ veg.sum <- aggregate(list(abundance=veg$NumQuads),
 ## create networks
 ## *******************************************************************
 
-## ## by early/late assembly 
+## ## by early/late assembly
 ## networks <- breakNet(spec, 'Site', 'assem')
 
 ## ## save networks for each site, timeframe
