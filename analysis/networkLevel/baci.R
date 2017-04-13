@@ -3,7 +3,6 @@ setwd('~/Dropbox/hedgerow_assembly/analysis/networkLevel')
 source('src/initialize.R')
 load('../../data/networks/baci_networks_years.Rdata')
 N <- 999
-library(nlme)
 
 ## ************************************************************
 ## calculate metrics and zscores
@@ -66,7 +65,7 @@ formulas.spac <-lapply(ys, function(x) {
 mods.spatial <- lapply(formulas.spac, function(x){
     try(lme(x,
          random = ~ 1 + cYear | Site,
-        correlation=corCAR1(form=~cYear),
+        correlation=corAR1(form=~cYear),
         data=baci,
         method="REML",
         control=list(maxIter=10^6, niterEM=10^6)), silent=TRUE)

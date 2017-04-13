@@ -33,7 +33,7 @@ dats <- data.frame(site=comm$sites,
 rownames(dats) <- NULL
 
 
-save(dats, file= file.path('saved/speciesTurnover', 
+save(dats, file= file.path('saved/speciesTurnover',
              sprintf('%s.pdf', paste(dis.method, alpha, occ, type,
                                      sep='_'))))
 
@@ -44,7 +44,6 @@ save(dats, file= file.path('saved/speciesTurnover',
 
 load(file= file.path('saved/speciesTurnover', sprintf('%s.pdf',
        paste(dis.method, alpha, occ, type, sep='_'))))
-
 
 mod <- lmer(dist ~ status +  (1|site),
             data=dats)
@@ -60,3 +59,15 @@ plot.coeffs(dis.method =dis.method, mod=summary(mod),
 
 
 ## plotDistPanels()
+
+##  temporal autocorrelation
+
+dats$cYear <- as.numeric(dats$year) - min(as.numeric(dats$year))
+
+mod.spatial <- lme(dist ~ status,
+                    random = ~ 1 + cYear | site,
+                    correlation=corAR1(form=~cYear),
+                    data=dats,
+                    control=list(maxIter=10^5, niterEM=10^5))
+
+summary(mod.spatial)
