@@ -27,8 +27,7 @@ baci$cYear <- as.numeric(baci$Year)-min(as.numeric(baci$Year))
 ## ************************************************************
 ## linear models
 
-ys <- c("zNODF", "zmod.met.D", "zH2", "niche.overlap.LL",
-        "niche.overlap.HL", "connectance")
+ys <- c("zNODF", "zmod.met.D", "zH2", "connectance")
 
 formulas <-lapply(ys, function(x) {
     as.formula(paste(x, "~",
@@ -52,6 +51,7 @@ mods <- lapply(formulas, function(x){
 names(mods) <- ys
 ## results
 lapply(mods, summary)
+aic.mods <- sapply(mods, AIC)
 
 ## ************************************************************
 ## standard discrete-time autocorrelation first order model
@@ -63,17 +63,19 @@ formulas.spac <-lapply(ys, function(x) {
 })
 
 mods.spatial <- lapply(formulas.spac, function(x){
-    try(lme(x,
+    lme(x,
          random = ~ 1 + cYear | Site,
         correlation=corAR1(form=~cYear),
         data=baci,
         method="REML",
-        control=list(maxIter=10^6, niterEM=10^6)), silent=TRUE)
+        control=list(maxIter=10^6, niterEM=10^6))
 })
 
 names(mods.spatial) <- ys
 ## results
 lapply(mods.spatial, summary)
+aic.sp.mods <- sapply(mods.spatial, AIC)
+
 
 ## ************************************************************
 ## splines

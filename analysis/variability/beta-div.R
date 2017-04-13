@@ -73,3 +73,8 @@ mod.spatial <- lme(dist ~ status,
                     control=list(maxIter=10^5, niterEM=10^5))
 
 summary(mod.spatial)
+
+AIC(mod.spatial)
+AIC(mod)
+
+## not including spatial auto-correlation wins
