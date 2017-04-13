@@ -33,6 +33,7 @@ mod.plants <- lapply(formulas, function(x){
   lmer(x,
        data=specs[specs$speciesType == "plant",])
 })
+
 names(mod.pols) <- names(mod.plants) <- ys
 
 

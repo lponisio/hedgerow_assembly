@@ -7,6 +7,7 @@ source('plotting/src/CIplotting.R')
 source('plotting/src/plotPanels.R')
 source('src/misc.R')
 load(file='saved/corMets.Rdata')
+load(file='saved/mods/baci_mods.Rdata')
 
 dd <- expand.grid(ypr=seq(from= min(cor.dats$ypr, na.rm=TRUE),
                           to= max(cor.dats$ypr, na.rm=TRUE),
@@ -15,11 +16,8 @@ dd <- expand.grid(ypr=seq(from= min(cor.dats$ypr, na.rm=TRUE),
 ## ************************************************************
 ## nodf
 ## ************************************************************
-load(file='saved/mods/baci_nodf.Rdata')
-
 dd.nodf <- cbind(dd, zNODF=0)
-
-nodf.pi <- predict.int(mod= baci.nodf.mod,
+nodf.pi <- predict.int(mod= mods$zNODF,
                         dd=dd.nodf,
                         y="zNODF",
                        family="gaussian")
@@ -27,11 +25,8 @@ nodf.pi <- predict.int(mod= baci.nodf.mod,
 ## ************************************************************
 ## modularity
 ## ************************************************************
-load(file='saved/mods/baci_mod.Rdata')
-
 dd.mod <- cbind(dd, zmod.met.D=0)
-
-mod.pi <- predict.int(mod= baci.mod.mod,
+mod.pi <- predict.int(mod= mods$zmod.met.D,
                         dd=dd.mod,
                         y="zmod.met.D",
                       family="gaussian")
@@ -39,45 +34,17 @@ mod.pi <- predict.int(mod= baci.mod.mod,
 ## ************************************************************
 ## specialization
 ## ************************************************************
-load(file='saved/mods/baci_h2.Rdata')
-
 dd.h2 <- cbind(dd, zH2=0)
-
-h2.pi <- predict.int(mod= baci.h2.mod,
+h2.pi <- predict.int(mod= mods$zH2,
                         dd=dd.h2,
                         y="zH2",
-                        family="gaussian")
-
-## ************************************************************
-## niche overlap - Plants
-## ************************************************************
-load(file='saved/mods/baci_no_plant.Rdata')
-
-dd.nop <- cbind(dd, niche.overlap.LL =0)
-
-nop.pi <- predict.int(mod= baci.no.plant.mod,
-                        dd=dd.nop,
-                        y="niche.overlap.plants",
-                        family="gaussian")
-                        
-## ************************************************************
-## niche overlap - Polinators
-## ************************************************************
-load(file='saved/mods/baci_no_pol.Rdata')
-
-dd.nopol <- cbind(dd, niche.overlap.HL =0)
-nopol.pi <- predict.int(mod= baci.no.pol.mod,
-                        dd=dd.nopol,
-                        y="niche.overlap.pol",
-                        family="gaussian")
+                     family="gaussian")
 
 ## ************************************************************
 ## connectance
 ## ************************************************************
-load(file='saved/mods/baci_conn.Rdata')
-
 dd.conn <- cbind(dd, connectance =0)
-conn.pi <- predict.int(mod= baci.conn.mod,
+conn.pi <- predict.int(mod= mods$connectance,
                         dd=dd.conn,
                         y="connectance",
                         family="gaussian")
@@ -85,10 +52,8 @@ conn.pi <- predict.int(mod= baci.conn.mod,
 ## ************************************************************
 ## plant richness
 ## ************************************************************
-load(file='saved/mods/baci_rich_ll.Rdata')
-
 dd.rich.ll <- cbind(dd, number.of.species.LL =0)
-rich.ll.pi <- predict.int(mod= baci.rich.ll.mod,
+rich.ll.pi <- predict.int(mod= mods.poi$number.of.species.LL,
                         dd=dd.rich.ll,
                         y="number.of.species.LL",
                         family="poisson")
@@ -98,15 +63,11 @@ rich.ll.pi <- predict.int(mod= baci.rich.ll.mod,
 ## ************************************************************
 ## pol richness
 ## ************************************************************
-load(file='saved/mods/baci_rich_hl.Rdata')
-
 dd.rich.hl <- cbind(dd, number.of.species.HL =0)
-rich.hl.pi <- predict.int(mod= baci.rich.hl.mod,
+rich.hl.pi <- predict.int(mod= mods.poi$number.of.species.HL,
                         dd=dd.rich.hl,
                         y="number.of.species.HL",
                         family="poisson")
-
-
 
 ## ************************************************************
 ## all panels

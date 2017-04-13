@@ -4,112 +4,84 @@ source('src/initialize.R')
 load('../../data/networks/baci_networks_years.Rdata')
 N <- 999
 
-## ## ************************************************************
-## ## calculate metrics and zscores
-## ## ************************************************************
-mets <- lapply(nets, network.metrics, N)
+## ************************************************************
+## calculate metrics and zscores
+## ************************************************************
+## mets <- lapply(nets, network.metrics, N)
 
-cor.dats <- prep.dat(mets,  spec)
+## cor.dats <- prep.dat(mets,  spec)
 
-cor.dats$tot.rich <- cor.dats$number.of.species.LL +
-  cor.dats$number.of.species.HL
+## cor.dats$tot.rich <- cor.dats$number.of.species.LL +
+##     cor.dats$number.of.species.HL
 
-save(cor.dats, file='saved/corMets.Rdata')
+## save(cor.dats, file='saved/corMets.Rdata')
 
 ## ************************************************************
 ## effect of years post restoration
 ## ************************************************************
 load(file='saved/corMets.Rdata')
-
 baci <- cor.dats[!is.na(cor.dats$ypr),]
 
-## nestedness
-baci.nodf.mod <- lmer(zNODF ~ scale(ypr) +
-                 (1|Site) + (1|Year),
-                 data=baci)
-summary(baci.nodf.mod)
-save(baci.nodf.mod, file='saved/mods/baci_nodf.Rdata')
+## ************************************************************
+## linear models
 
-## spline version
-sp.nodf.mod <- sme(baci$zNODF, tme=baci$ypr, ind=baci$Site)
-sp.nodf.mod$info
-plot(sp.nodf.mod)
-## converges but fits a line
+ys <- c("zNODF", "zmod.met.D", "zH2", "niche.overlap.LL",
+        "niche.overlap.HL", "connectance")
 
-## modularity
-baci.mod.mod <- lmer(zmod.met.D ~ scale(ypr) +
-                 (1|Site) + (1|Year),
-                 data=baci)
-summary(baci.mod.mod)
-save(baci.mod.mod, file='saved/mods/baci_mod.Rdata')
+formulas <-lapply(ys, function(x) {
+    as.formula(paste(x, "~",
+                     paste("scale(ypr)",
+                           "(1|Site)",
+                           "(1|Year)",
+                           sep="+")))
+})
 
-## spline version
-sp.mod.mod <- sme(baci$zmod.met.D, tme=baci$ypr, ind=baci$Site)
-sp.mod.mod$info
-plot(sp.mod.mod)
-## converges but fits a line
+mods <- lapply(formulas, function(x){
+    lmer(x,
+         data=baci)
+})
 
-## h2
-baci.h2.mod <- lmer(zH2 ~ scale(ypr) +
-                 (1|Site) + (1|Year),
-                 data=baci)
-summary(baci.h2.mod)
-save(baci.h2.mod, file='saved/mods/baci_h2.Rdata')
+names(mods) <- ys
+## results
+lapply(mods, summary)
 
-## spline version
-sp.h2.mod <- sme(baci$zH2, tme=baci$ypr, ind=baci$Site)
-sp.h2.mod$info
-plot(sp.h2.mod)
-## converges but fits a line
+## ************************************************************
+## splines
 
-## species richness pol
-baci.rich.hl.mod <- glmer(number.of.species.HL ~ scale(ypr) +
-                 (1|Site) + (1|Year), family="poisson",
-                 data=baci)
-summary(baci.rich.hl.mod)
-save(baci.rich.hl.mod, file='saved/mods/baci_rich_hl.Rdata')
+mods.splines <- lapply(ys, calcSpine)
+names(mods.splines) <- ys
 
-## species richness plants
-baci.rich.ll.mod <- glmer(number.of.species.LL ~ scale(ypr) +
-                 (1|Site) + (1|Year), family="poisson",
-                 data=baci)
-summary(baci.rich.ll.mod)
-save(baci.rich.ll.mod, file='saved/mods/baci_rich_ll.Rdata')
+layout(matrix(1:length(ys), nrow=2))
+lapply(mods.splines, plot)
 
-## total species richness
-baci.rich.tot.mod <- glmer(tot.rich ~ scale(ypr) +
-                 (1|Site) + (1|Year), family="poisson",
-                 data=baci)
-summary(baci.rich.tot.mod)
-save(baci.rich.tot.mod, file='saved/mods/baci_rich_tot.Rdata')
+## ************************************************************
+## generalized linear models
+poi.ys <- c("number.of.species.HL", "number.of.species.LL", "tot.rich")
 
-## connectance
-baci.conn.mod <- lmer(connectance ~ scale(ypr) +
-                 (1|Site) + (1|Year),
-                 data=baci)
-summary(baci.conn.mod)
-save(baci.conn.mod, file='saved/mods/baci_conn.Rdata')
+formulas.poi <-lapply(poi.ys, function(x) {
+    as.formula(paste(x, "~",
+                     paste("scale(ypr)",
+                           "(1|Site)",
+                           "(1|Year)",
+                           sep="+")))
+})
 
-## weighted connectance
-baci.wconn.mod <- lmer(weighted.connectance ~ scale(ypr) +
-                 (1|Site) + (1|Year),
-                 data=baci)
-summary(baci.wconn.mod)
-save(baci.wconn.mod, file='saved/mods/baci_wconn.Rdata')
+mods.poi <- lapply(formulas.poi, function(x){
+    glmer(x,
+          data=baci, family="poisson")
+})
+names(mods.poi) <- poi.ys
 
-## niche overlap pollinators
-baci.no.pol.mod <- lmer(niche.overlap.HL ~ scale(ypr) +
-                 (1|Site) + (1|Year),
-                 data=baci)
-summary(baci.no.pol.mod)
-save(baci.no.pol.mod, file='saved/mods/baci_no_pol.Rdata')
+## results
+lapply(mods.poi, summary)
 
-## niche overlap plants
-baci.no.plant.mod <- lmer(niche.overlap.LL ~ scale(ypr) +
-                 (1|Site) + (1|Year),
-                 data=baci)
-summary(baci.no.plant.mod)
-save(baci.no.plant.mod, file='saved/mods/baci_no_plant.Rdata')
+## ************************************************************
+## splines
 
+mods.splines.log <- lapply(poi.ys, calcSpine, calc.log=TRUE)
+names(mods.splines.log) <- poi.ys
 
-source('plotting/baci.R')
+layout(matrix(1:length(poi.ys), nrow=1))
+lapply(mods.splines.log, plot)
+
+save(mods, mods.poi, file="saved/mods/baci_mods.Rdata")

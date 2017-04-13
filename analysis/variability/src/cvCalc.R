@@ -9,8 +9,8 @@ corCv <- function(x){
 
 cv.trait <- function(spec.dat,
                      byType,
-                     trait,
-                     cont=TRUE,
+                     trait1,
+                     trait2,
                      method,
                      time.col,
                      abund.col,
@@ -46,29 +46,36 @@ cv.trait <- function(spec.dat,
     dats$Site <-  sapply(strsplit(rownames(dats), "\\."),
                          function(x) x[2])
     rownames(dats) <- NULL
-    if(cont){
-        dats$traits.ns <- spec.dat[,trait][match(dats$GenusSpecies,
-                                                 spec.dat[,
-                                                          species.type])]
-        ## trying out not scaling... does it break everything?
-        dats$traits <- dats$traits.ns
-    } else{
-        dats$traits <- spec.dat[,trait][match(dats$GenusSpecies,
-                                              spec.dat[, species.type])]
-    }
-    lm.dats <- dats[!is.na(dats$cv) & !is.na(dats$traits),]
-    ## reviwers wanted a quantile model
-    ## can only include one random effect in the quantile mixed
-    ## effects model
-    lm.cv.quant <- lqmm(fixed=cv ~ traits, random=~1, group=
-                     GenusSpecies,
-                        data=lm.dats,
-                     control=list(LP_max_iter=10^3))
-    sum.boot.quant <- summary.boot.lqmm(boot(lm.cv.quant))
-    lm.cv.nss <- lmer(cv ~ traits + (1|Site) + (1|GenusSpecies),
-                      data=lm.dats)
+
+    dats <- cbind(dats, spec.dat[, c(trait1, trait2)][match(dats$GenusSpecies,
+                                                            spec.dat[,
+                                                                     species.type]),])
+   lm.dats <- dats[!is.na(dats$cv) & !is.na(dats[,trait1]) & !is.na(dats[,trait2]),]
     return(list(data=dats,
-                lm.nss=lm.cv.nss,
-                lm.cv.quant=lm.cv.quant,
-                sum.quant=sum.boot.quant))
+           lm.data =lm.dats))
 }
+
+## variance inflation factor
+
+vif.mer <- function (fit) {
+    ## adapted from rms::vif
+    v <- vcov(fit)
+    nam <- names(fixef(fit))
+    ## exclude intercepts
+    ns <- sum(1 * (nam == "Intercept" | nam == "(Intercept)"))
+    if (ns > 0) {
+        v <- v[-(1:ns), -(1:ns), drop = FALSE]
+        nam <- nam[-(1:ns)] }
+    d <- diag(v)^0.5
+    v <- diag(solve(v/(d %o% d)))
+    names(v) <- nam
+    return(v)
+}
+
+
+
+
+formula.cv <- formula(cv ~ occ.date +  degree + (1|Site) + (1|GenusSpecies))
+
+
+formula.plant.cv <- formula(cv ~ occ.plant.date +  plant.degree + (1|Site) + (1|GenusSpecies))

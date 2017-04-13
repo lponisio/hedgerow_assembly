@@ -1,80 +1,6 @@
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
-source('src/initialize.R')#
-#
-## ************************************************************#
-## occurrence#
-## ************************************************************#
-## pollinators and closeness#
-## sig#
-occ.closeness.cv <- cv.trait(spec,#
-                             specs[specs$speciesType =="pollinator",],#
-                             trait="occ.date",#
-                             method= "time", time.col="assem",#
-                             abund.col="weighted.closeness",#
-                             cv.function=cv,#
-                             zero2na=TRUE,#
-                             standard.cv=TRUE,#
-                             na.rm=TRUE)
-summary(lm.cv.quant, R = 100, seed = 52)
-lm.dats <- dats[!is.na(dats$cv) & !is.na(dats$traits),]#
-    lm.cv <- lmer(cv ~ SiteStatus*traits + (1|Site) + (1|GenusSpecies),#
-                  data=lm.dats)#
-    lm.cv.quant <- lqmm(fixed=cv ~ SiteStatus*traits, random=~1, group= Site,#
-                        data=lm.dats,  tau = 0.5, nK = 7, type = "normal")
-summary(lm.cv.quant, R = 100, seed = 52)
-lm.dats
-fit.lqmm <- lqmm(fixed=cv ~ SiteStatus*traits, random=~1, group= Site,#
-                        data=lm.dats,  tau = 0.5, nK = 7, type = "normal")
-lm.dats
-summary(fit.lqmm, R = 100, seed = 52)
-?summary
-summary.lqm(fit.lqmm)
-?summar.lqm
-?summary.lqm
-summary.lqm(fit.lqmm, data=lm.dats)
-class(lm.dats)
-?lqm
-summary.lqm(fit.lqmm, data=lm.dats)
-summary.lqm(fit.lqmm)
-fit.lqmm <- lqmm(fixed=cv ~ SiteStatus*traits, random=~1, group= Site, tau = 0.5, nK = 7, type = "normal")
-fit.lqmm <- lqmm(fixed=cv ~ SiteStatus*traits, random=~1, group= Site,#
-                        data=lm.dats,  tau = 0.5, nK = 7, type = "normal")
-summary(fit.lqmm)
-fit.lqmm
-summary(m.cv.nss)
-summary(lm.cv.nss)
-lm.cv.nss <- lmer(cv ~ traits + (1|Site) + (1|GenusSpecies),#
-                      data=lm.dats)
-summary(lm.cv.nss)
-fit.lqmm
-lm.cv <- lmer(cv ~ traits + (1|Site) + (1|GenusSpecies),#
-                  data=lm.dats)#
-    fit.lqmm <- lqmm(fixed=cv ~ traits, random=~1, group= Site,#
-                        data=lm.dats,  tau = 0.5, nK = 7, type = "normal")
-summary(fit.lqmm)
-?lqmm
-names(fit.lqmm)
-fit.lqmm
-lm.cv.nss <- lmer(cv ~ traits + (1|Site) + (1|GenusSpecies),#
-                      data=lm.dats)
-summary(lm.cv.nss)
-fit.lqmm <- lqmm(fixed=cv ~ traits, random=~1, group= Site,#
-                        data=lm.dats,  tau = 0.5, nK = 7, type = "normal")
-?lqmm
-fit.lqmm <- lqmm(fixed=cv ~ traits, random=~1, group= Site,#
-                        data=lm.dats,  tau = 0.5, nK = 7, type = "normal", control=list(LP_max_iter=10^3))
-fit.lqmm
-summary(lm.cv.nss)
-summary.boot.lqmm(fit.lqmm)
-summary.boot.lqmm(fit.lqmm)
-?summary.boot.lqmm
-boot.lqmm(fit.lqmm)
-try.boot < boot.lqmm(fit.lqmm)
-try.boot <- boot.lqmm(fit.lqmm)
-str(try.boot)
-summary(try.boot)
-Q
+install.packages("qrLMM(")
+install.packages("qrLMM")
+library("qrLMM")
 rm(list=ls())#
 setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
 source('src/initialize.R')#
@@ -95,9 +21,8 @@ occ.closeness.cv <- cv.trait(spec,#
                              na.rm=TRUE)#
 #
 summary(occ.closeness.cv$lm.nss)#
-occ.closeness.cv$lm.cv.quant
-occ.closeness.cv$sum.boot.quant
 occ.closeness.cv$sum.quant
+Q
 rm(list=ls())#
 setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
 source('src/initialize.R')#
@@ -154,63 +79,142 @@ plants.occ.closeness.cv <- cv.trait(spec,#
                                     species.type="PlantGenusSpecies")#
 summary(plants.occ.closeness.cv$lm.nss)#
 plants.occ.closeness.cv$sum.quant
-occ.closeness.cv$sum.quant
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
-source('src/initialize.R')#
-#
 ## ************************************************************#
-## occurrence#
+## degree#
 ## ************************************************************#
 ## pollinators and closeness#
 ## sig#
-occ.closeness.cv <- cv.trait(spec,#
-                             specs[specs$speciesType =="pollinator",],#
-                             trait="occ.date",#
-                             method= "time", time.col="assem",#
-                             abund.col="weighted.closeness",#
-                             cv.function=cv,#
-                             zero2na=TRUE,#
-                             standard.cv=TRUE,#
-                             na.rm=TRUE)#
-#
-summary(occ.closeness.cv$lm.nss)#
-occ.closeness.cv$sum.quant
-?boot
-set.seed(123)#
-n <- 500#
-test <- data.frame(x = runif(n,0,1))#
-test$y <- 30 + test$x + rnorm(n)#
-fit.lqm <- lqm(y ~ x, data = test, tau = 0.5)#
-fit.boot <- boot(fit.lqm)#
-str(fit.boot)
-summary(fit.boot)
-rm(list=ls())#
-setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
-source('src/initialize.R')#
-#
-## ************************************************************#
-## occurrence#
-## ************************************************************#
-## pollinators and closeness#
-## sig#
-occ.closeness.cv <- cv.trait(spec,#
-                             specs[specs$speciesType =="pollinator",],#
-                             trait="occ.date",#
-                             method= "time", time.col="assem",#
-                             abund.col="weighted.closeness",#
-                             cv.function=cv,#
-                             zero2na=TRUE,#
-                             standard.cv=TRUE,#
-                             na.rm=TRUE)#
-#
+degree.closeness.cv <- cv.trait(spec,#
+                                specs[specs$speciesType =="pollinator",],#
+                                trait="degree",#
+                                method= "time", time.col="assem",#
+                                abund.col="weighted.closeness",#
+                                cv.function=cv,#
+                                zero2na=TRUE,#
+                                standard.cv=TRUE,#
+                                na.rm=TRUE)#
+summary(degree.closeness.cv$lm.nss)#
+degree.occ.closeness.cv$sum.quant
+degree.closeness.cv$sum.quantdegree.closeness.cv$sum.quant
+degree.closeness.cv$sum.quant
+## plants and closeness#
+## not sig!#
+plants.degree.closeness.cv <- cv.trait(spec,#
+                                       specs[specs$speciesType =="plant",],#
+                                       trait="plant.degree",#
+                                       method= "time", time.col="assem",#
+                                       abund.col="weighted.closeness",#
+                                       cv.function=cv,#
+                                       zero2na=TRUE,#
+                                       standard.cv=TRUE,#
+                                       na.rm=TRUE,#
+                                       species.type="PlantGenusSpecies")#
+summary(plants.degree.closeness.cv$lm.nss)#
+plants.degree.closeness.cv$sum.quant
+?lqmm
 summary(occ.closeness.cv$lm.nss)
-lm.cv.quant <- lqmm(fixed=cv ~ traits, random=~1, group= GenusSpecies,#
-                        data=lm.dats,#
-                     control=list(LP_max_iter=10^3))
-summary(boot(lm.cv.quant))
-lm.cv.quant
-Q
+summary(degree.closeness.cv$lm.nss)
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
+source('plotting/src/initialize.R')#
+#
+sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
+sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
+all.poss.yrs <- 2006:2015#
+#
+for(i in unique(sites)){#
+  print(i)#
+  net <- nets[sites == i]#
+  yrs <- sapply(strsplit(names(net), "[.]"), function(x) x[2])#
+  names(net) <- yrs#
+  arr <- simplify2array(net)#
+  all.years <-  apply(arr, c(1,2), sum)#
+  plant.sums <- rowSums(all.years)#
+  pol.sums <- colSums(all.years)#
+  this.tree <- tree.graphs[sites.trees == i]#
+  pdf.f(plotNet,#
+        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
+        width=18, height=4)#
+  ## pdf.f(plotDend,#
+  ##       file=file.path(fig.path, sprintf("%s_dend.pdf", i)),#
+  ##       width=10, height=4)#
+}
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
+source('plotting/src/initialize.R')#
+#
+sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
+sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
+all.poss.yrs <- 2006:2015#
+#
+for(i in unique(sites)){#
+  print(i)#
+  net <- nets[sites == i]#
+  yrs <- sapply(strsplit(names(net), "[.]"), function(x) x[2])#
+  names(net) <- yrs#
+  arr <- simplify2array(net)#
+  all.years <-  apply(arr, c(1,2), sum)#
+  plant.sums <- rowSums(all.years)#
+  pol.sums <- colSums(all.years)#
+  this.tree <- tree.graphs[sites.trees == i]#
+  pdf.f(plotNet,#
+        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
+        width=18, height=4)#
+  ## pdf.f(plotDend,#
+  ##       file=file.path(fig.path, sprintf("%s_dend.pdf", i)),#
+  ##       width=10, height=4)#
+}
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
+source('plotting/src/initialize.R')#
+#
+sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
+sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
+all.poss.yrs <- 2006:2015#
+#
+for(i in unique(sites)){#
+  print(i)#
+  net <- nets[sites == i]#
+  yrs <- sapply(strsplit(names(net), "[.]"), function(x) x[2])#
+  names(net) <- yrs#
+  arr <- simplify2array(net)#
+  all.years <-  apply(arr, c(1,2), sum)#
+  plant.sums <- rowSums(all.years)#
+  pol.sums <- colSums(all.years)#
+  this.tree <- tree.graphs[sites.trees == i]#
+  pdf.f(plotNet,#
+        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
+        width=18, height=4)#
+  ## pdf.f(plotDend,#
+  ##       file=file.path(fig.path, sprintf("%s_dend.pdf", i)),#
+  ##       width=10, height=4)#
+}
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')#
+source('plotting/src/initialize.R')#
+#
+sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])#
+sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])#
+all.poss.yrs <- 2006:2015#
+#
+for(i in unique(sites)){#
+  print(i)#
+  net <- nets[sites == i]#
+  yrs <- sapply(strsplit(names(net), "[.]"), function(x) x[2])#
+  names(net) <- yrs#
+  arr <- simplify2array(net)#
+  all.years <-  apply(arr, c(1,2), sum)#
+  plant.sums <- rowSums(all.years)#
+  pol.sums <- colSums(all.years)#
+  this.tree <- tree.graphs[sites.trees == i]#
+  pdf.f(plotNet,#
+        file=file.path(fig.path, sprintf("%s_networks.pdf", i)),#
+        width=18, height=4)#
+  ## pdf.f(plotDend,#
+  ##       file=file.path(fig.path, sprintf("%s_dend.pdf", i)),#
+  ##       width=10, height=4)#
+}
+source("http://www.highstat.com/Book2/HighstatLibV6.R")
 rm(list=ls())#
 setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
 source('src/initialize.R')#
@@ -229,48 +233,586 @@ occ.closeness.cv <- cv.trait(spec,#
                              zero2na=TRUE,#
                              standard.cv=TRUE,#
                              na.rm=TRUE)
-head(lm.dats)
-lm.cv.quant <- lqmm(fixed=cv ~ traits.ns, random=~1, group= GenusSpecies,#
-                        data=lm.dats,#
-                     control=list(LP_max_iter=10^3))#
-    sum.boot.quant <- summary(boot(lm.cv.quant))
-lm.cv.quant <- lqmm(fixed=cv ~ traits, group= GenusSpecies,#
-                        data=lm.dats,#
-                     control=list(LP_max_iter=10^3))
-head(lm.dats)
-coef.lqmm(lm.cv.quant)
-lm.cv.quant <- lqmm(fixed=cv ~ traits, random=~1, group= GenusSpecies,#
-                        data=lm.dats,#
-                     control=list(LP_max_iter=10^3))
-coef.lqmm(lm.cv.quant)
-summary(boot(lm.cv.quant))
-sum.boot.quant <- summary.boot.lqm(boot(lm.cv.quant))
-sum.boot.quant <- summary.boot.lqmm(boot(lm.cv.quant))
-sum.boot.quant <- summary.lqmm(lm.cv.quant)
-install.packages("quantreg.")
-install.packages("quantreg")
-sum.boot.quant <- summary.lqmm(lm.cv.quant)
-sum.boot.quant <- summary.boot.lqmm(boot(lm.cv.quant))
-library("quantreg")
-sum.boot.quant <- summary.lqmm(lm.cv.quant)
-sum.boot.quant <- summary.boot.lqmm(boot(lm.cv.quant))
-data(Orthodont)#
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
+source('src/initialize.R')#
 #
-# Random intercept model#
-fit <- lqmm(distance ~ age, random = ~ 1, group = Subject,#
-	tau = 0.5, data = Orthodont)#
-fit.boot <- boot.lqmm(fit)
-fit.boot
-summary(fit.boot)
-lm.cv.quant <- lqmm(fixed=cv ~ traits, random=~1, group=#
-                     GenusSpecies + Site,#
-                        data=lm.dats,#
-                     control=list(LP_max_iter=10^3))
-lm.cv.quant <- lqmm(fixed=cv ~ traits, random=~1, group=#
-                     c(GenusSpecies, Site),#
-                        data=lm.dats,#
-                     control=list(LP_max_iter=10^3))
+## ************************************************************#
+## occurrence#
+## ************************************************************#
+## pollinators and closeness#
+## sig#
+occ.closeness.cv <- cv.trait(spec,#
+                             specs[specs$speciesType =="pollinator",],#
+                             trait="occ.date",#
+                             method= "time", time.col="assem",#
+                             abund.col="weighted.closeness",#
+                             cv.function=cv,#
+                             zero2na=TRUE,#
+                             standard.cv=TRUE,#
+                             na.rm=TRUE)
+formula.cv <- formula(cv ~ traits + (1|Site) + (1|GenusSpecies))
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
+source('src/initialize.R')#
+#
+## ************************************************************#
+## occurrence#
+## ************************************************************#
+## pollinators and closeness#
+## sig#
+occ.closeness.cv <- cv.trait(spec,#
+                             specs[specs$speciesType =="pollinator",],#
+                             trait1="occ.date",#
+                             trait2="degree",#
+                             method= "time", time.col="assem",#
+                             abund.col="weighted.closeness",#
+                             cv.function=cv,#
+                             zero2na=TRUE,#
+                             standard.cv=TRUE,#
+                             na.rm=TRUE)
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
+source('src/initialize.R')#
+#
+## ************************************************************#
+## occurrence#
+## ************************************************************#
+## pollinators and closeness#
+## sig#
+occ.closeness.cv <- cv.trait(spec,#
+                             specs[specs$speciesType =="pollinator",],#
+                             trait1="occ.date",#
+                             trait2="degree",#
+                             method= "time", time.col="assem",#
+                             abund.col="weighted.closeness",#
+                             cv.function=cv,#
+                             zero2na=TRUE,#
+                             standard.cv=TRUE,#
+                             na.rm=TRUE)
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
+source('src/initialize.R')#
+#
+## ************************************************************#
+## occurrence#
+## ************************************************************#
+## pollinators and closeness#
+## sig#
+occ.closeness.cv <- cv.trait(spec,#
+                             specs[specs$speciesType =="pollinator",],#
+                             trait1="occ.date",#
+                             trait2="degree",#
+                             method= "time", time.col="assem",#
+                             abund.col="weighted.closeness",#
+                             cv.function=cv,#
+                             zero2na=TRUE,#
+                             standard.cv=TRUE,#
+                             na.rm=TRUE)
+spec.dat[, c(trait1, trait2)]
+spec.dat[, c(trait1, trait2)][match(dats$GenusSpecies,#
+                                                 spec.dat[,#
+                                                          species.type])]
+[match(dats$GenusSpecies,#
+                                                 spec.dat[,#
+                                                          species.type])]
+match(dats$GenusSpecies,#
+                                                 spec.dat[,#
+                                                          species.type])
+spec.dat[, c(trait1, trait2)]
+head(spec.dat[, c(trait1, trait2)])
+spec.dat[, c(trait1, trait2)][match(dats$GenusSpecies,#
+                                                 spec.dat[,#
+                                                          species.type]),]
+trait1
+trait2
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
+source('src/initialize.R')#
+#
+## ************************************************************#
+## occurrence#
+## ************************************************************#
+## pollinators and closeness#
+## sig#
+occ.closeness.cv <- cv.trait(spec,#
+                             specs[specs$speciesType =="pollinator",],#
+                             trait1="occ.date",#
+                             trait2="degree",#
+                             method= "time", time.col="assem",#
+                             abund.col="weighted.closeness",#
+                             cv.function=cv,#
+                             zero2na=TRUE,#
+                             standard.cv=TRUE,#
+                             na.rm=TRUE)Q
 Q
-install.packages("QRLMM")
-install.packages("qrLMM")
-library("qrLMM")
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
+source('src/initialize.R')#
+#
+## ************************************************************#
+## occurrence#
+## ************************************************************#
+## pollinators and closeness#
+## sig#
+occ.closeness.cv <- cv.trait(spec,#
+                             specs[specs$speciesType =="pollinator",],#
+                             trait1="occ.date",#
+                             trait2="degree",#
+                             method= "time", time.col="assem",#
+                             abund.col="weighted.closeness",#
+                             cv.function=cv,#
+                             zero2na=TRUE,#
+                             standard.cv=TRUE,#
+                             na.rm=TRUE)
+head(occ.closeness.cv)
+formula.cv <- formula(cv ~ occ.dat +  degree + (1|Site) + (1|GenusSpecies))
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
+source('src/initialize.R')#
+#
+## ************************************************************#
+## occurrence#
+## ************************************************************#
+## pollinators and closeness#
+## sig#
+occ.closeness.cv <- cv.trait(spec,#
+                             specs[specs$speciesType =="pollinator",],#
+                             trait1="occ.date",#
+                             trait2="degree",#
+                             method= "time", time.col="assem",#
+                             abund.col="weighted.closeness",#
+                             cv.function=cv,#
+                             zero2na=TRUE,#
+                             standard.cv=TRUE,#
+                             na.rm=TRUE)
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
+source('src/initialize.R')#
+#
+## ************************************************************#
+## occurrence#
+## ************************************************************#
+## pollinators and closeness#
+## sig#
+occ.closeness.cv <- cv.trait(spec,#
+                             specs[specs$speciesType =="pollinator",],#
+                             trait1="occ.date",#
+                             trait2="degree",#
+                             method= "time", time.col="assem",#
+                             abund.col="weighted.closeness",#
+                             cv.function=cv,#
+                             zero2na=TRUE,#
+                             standard.cv=TRUE,#
+                             na.rm=TRUE)
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
+source('src/initialize.R')#
+#
+## ************************************************************#
+## occurrence#
+## ************************************************************#
+## pollinators and closeness#
+## sig#
+occ.closeness.cv <- cv.trait(spec,#
+                             specs[specs$speciesType =="pollinator",],#
+                             trait1="occ.date",#
+                             trait2="degree",#
+                             method= "time", time.col="assem",#
+                             abund.col="weighted.closeness",#
+                             cv.function=cv,#
+                             zero2na=TRUE,#
+                             standard.cv=TRUE,#
+                             na.rm=TRUE)
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
+source('src/initialize.R')#
+#
+## ************************************************************#
+## occurrence#
+## ************************************************************#
+## pollinators and closeness#
+## sig#
+occ.closeness.cv <- cv.trait(spec,#
+                             specs[specs$speciesType =="pollinator",],#
+                             trait1="occ.date",#
+                             trait2="degree",#
+                             method= "time", time.col="assem",#
+                             abund.col="weighted.closeness",#
+                             cv.function=cv,#
+                             zero2na=TRUE,#
+                             standard.cv=TRUE,#
+                             na.rm=TRUE)
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
+source('src/initialize.R')#
+#
+## ************************************************************#
+## occurrence#
+## ************************************************************#
+## pollinators and closeness#
+## sig#
+occ.closeness.cv <- cv.trait(spec,#
+                             specs[specs$speciesType =="pollinator",],#
+                             trait1="occ.date",#
+                             trait2="degree",#
+                             method= "time", time.col="assem",#
+                             abund.col="weighted.closeness",#
+                             cv.function=cv,#
+                             zero2na=TRUE,#
+                             standard.cv=TRUE,#
+                             na.rm=TRUE)
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
+source('src/initialize.R')#
+#
+## ************************************************************#
+## occurrence#
+## ************************************************************#
+## pollinators and closeness#
+## sig#
+occ.closeness.cv <- cv.trait(spec,#
+                             specs[specs$speciesType =="pollinator",],#
+                             trait1="occ.date",#
+                             trait2="degree",#
+                             method= "time", time.col="assem",#
+                             abund.col="weighted.closeness",#
+                             cv.function=cv,#
+                             zero2na=TRUE,#
+                             standard.cv=TRUE,#
+                             na.rm=TRUE)
+closeness.cv <- cv.trait(spec,#
+                             specs[specs$speciesType =="pollinator",],#
+                             trait1="occ.date",#
+                             trait2="degree",#
+                             method= "time", time.col="assem",#
+                             abund.col="weighted.closeness",#
+                             cv.function=cv,#
+                             zero2na=TRUE,#
+                             standard.cv=TRUE,#
+                             na.rm=TRUE)
+lmer(formula.cv, data=closeness.cv$data.lm)
+formula.cv <- formula(cv ~ occ.date +  degree + (1|Site) + (1|GenusSpecies))
+lmer(formula.cv, data=closeness.cv$data.lm)
+head(closeness.cv$data.lm)
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
+source('src/initialize.R')#
+#
+## ************************************************************#
+## occurrence#
+## ************************************************************#
+## pollinators and closeness#
+#
+closeness.cv <- cv.trait(spec,#
+                             specs[specs$speciesType =="pollinator",],#
+                             trait1="occ.date",#
+                             trait2="degree",#
+                             method= "time", time.col="assem",#
+                             abund.col="weighted.closeness",#
+                             cv.function=cv,#
+                             zero2na=TRUE,#
+                             standard.cv=TRUE,#
+                             na.rm=TRUE)
+Q
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
+source('src/initialize.R')#
+#
+## ************************************************************#
+## occurrence#
+## ************************************************************#
+## pollinators and closeness#
+#
+closeness.cv <- cv.trait(spec,#
+                             specs[specs$speciesType =="pollinator",],#
+                             trait1="occ.date",#
+                             trait2="degree",#
+                             method= "time", time.col="assem",#
+                             abund.col="weighted.closeness",#
+                             cv.function=cv,#
+                             zero2na=TRUE,#
+                             standard.cv=TRUE,#
+                             na.rm=TRUE)
+lm.dats <- dats[!is.na(dats$cv) & !is.na(dats[,trait1]) & !is.na(dats[,trait2]),]
+lm.dats
+Q
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
+source('src/initialize.R')#
+#
+## ************************************************************#
+## occurrence#
+## ************************************************************#
+## pollinators and closeness#
+#
+closeness.cv <- cv.trait(spec,#
+                             specs[specs$speciesType =="pollinator",],#
+                             trait1="occ.date",#
+                             trait2="degree",#
+                             method= "time", time.col="assem",#
+                             abund.col="weighted.closeness",#
+                             cv.function=cv,#
+                             zero2na=TRUE,#
+                             standard.cv=TRUE,#
+                             na.rm=TRUE)
+lmer(formula.cv, data=closeness.cv$data.lm)
+closeness.cv$data.lm
+lmer(formula.cv, data=closeness.cv$lm.data)
+## the reviewers wanted a quantile regression#
+lm.cv.quant <- lqmm(fixed=cv ~ occ.date + degree, random=~1, group=#
+                                                      GenusSpecies,#
+                    data=closeness.cv$lm.data,#
+                    control=list(LP_max_iter=10^3))#
+sum.boot.quant <- summary.boot.lqmm(boot(lm.cv.quant))
+## the reviewers wanted a quantile regression, can only include on#
+## random effect at a time#
+lm.cv.quant <- lqmm(fixed=cv ~ occ.date + degree, random=~1, group=#
+                                                      GenusSpecies,#
+                    data=closeness.cv$lm.data,#
+                    control=list(LP_max_iter=10^3))#
+sum.boot.quant <- summary.boot.lqmm(boot(lm.cv.quant))
+## the reviewers wanted a quantile regression, can only include on#
+## random effect at a time#
+lm.cv.quant <- lqmm(fixed=cv ~ occ.date + degree, random=~1,#
+                    group= Site,#
+                    data=closeness.cv$lm.data,#
+                    control=list(LP_max_iter=10^3))#
+sum.boot.quant <- summary.boot.lqmm(boot(lm.cv.quant))
+?boot
+sum.boot.quant <- summary.boot.lqmm(boot(lm.cv.quant, R=100))
+plants.closeness.cv <- cv.trait(spec,#
+                                    specs[specs$speciesType =="plant",],#
+                                    trait1="occ.plant.date",#
+                                    trait2="plant.degree",#
+                                    method= "time", time.col="assem",#
+                                    abund.col="weighted.closeness",#
+                                    cv.function=cv,#
+                                    zero2na=TRUE,#
+                                    standard.cv=TRUE,#
+                                    na.rm=TRUE,#
+                                    species.type="PlantGenusSpecies")
+## plants and closeness#
+plants.closeness.cv <- cv.trait(spec,#
+                                    specs[specs$speciesType =="plant",],#
+                                    trait1="occ.plant.date",#
+                                    trait2="plant.degree",#
+                                    method= "time", time.col="assem",#
+                                    abund.col="weighted.closeness",#
+                                    cv.function=cv,#
+                                    zero2na=TRUE,#
+                                    standard.cv=TRUE,#
+                                    na.rm=TRUE,#
+                                    species.type="PlantGenusSpecies")#
+#
+plants.closeness.mod <- lmer(formula.cv, data=plants.closeness.cv$lm.data)#
+summary(plants.closeness.mod)
+## plants and closeness#
+plants.closeness.cv <- cv.trait(spec,#
+                                    specs[specs$speciesType =="plant",],#
+                                    trait1="occ.plant.date",#
+                                    trait2="plant.degree",#
+                                    method= "time", time.col="assem",#
+                                    abund.col="weighted.closeness",#
+                                    cv.function=cv,#
+                                    zero2na=TRUE,#
+                                    standard.cv=TRUE,#
+                                    na.rm=TRUE,#
+                                    species.type="PlantGenusSpecies")#
+#
+plants.closeness.mod <- lmer(formula.cv, data=plants.closeness.cv$lm.data)#
+summary(plants.closeness.mod)
+plants.closeness.mod <- lmer(formula.cv.plant, data=plants.closeness.cv$lm.data)#
+summary(plants.closeness.mod)
+formula.cv <- formula(cv ~ occ.date +  degree + (1|Site) + (1|GenusSpecies))#
+formula.plant.cv <- formula(cv ~ occ.plant.date +  plant.degree + (1|Site) + (1|GenusSpecies))
+v
+plants.closeness.mod <- lmer(formula.plant.cv, data=plants.closeness.cv$lm.data)#
+summary(plants.closeness.mod)
+## the reviewers wanted a quantile regression, can only include on#
+## random effect at a time#
+plants.lm.cv.quant <- lqmm(fixed=cv ~ occ.plant.date + plant.degree, random=~1,#
+                    group= Site,#
+                    data=plants.closeness.cv$lm.data,#
+                    control=list(LP_max_iter=10^3))#
+plants.sum.boot.quant <- summary.boot.lqmm(boot(plants.lm.cv.quant, R=100))
+## the reviewers wanted a quantile regression, can only include on#
+## random effect at a time#
+plants.lm.cv.quant <- lqmm(fixed=cv ~ occ.plant.date + plant.degree, random=~1,#
+                    group= GenusSpecies,#
+                    data=plants.closeness.cv$lm.data,#
+                    control=list(LP_max_iter=10^3))#
+plants.sum.boot.quant <- summary.boot.lqmm(boot(plants.lm.cv.quant, R=100))
+## the reviewers wanted a quantile regression, can only include on#
+## random effect at a time#
+lm.cv.quant <- lqmm(fixed=cv ~ occ.date + degree, random=~1,#
+                    group= GenusSpecies,#
+                    data=closeness.cv$lm.data,#
+                    control=list(LP_max_iter=10^3))#
+sum.boot.quant <- summary.boot.lqmm(boot(lm.cv.quant, R=100))
+## the reviewers wanted a quantile regression, can only include on#
+## random effect at a time#
+lm.cv.quant <- lqmm(fixed=cv ~ occ.date + degree, random=~1,#
+                    group= GenusSpecies,#
+                    data=closeness.cv$lm.data,#
+                    control=list(LP_max_iter=10^3))#
+sum.boot.quant <- summary.boot.lqmm(boot(lm.cv.quant, R=1000))
+## the reviewers wanted a quantile regression, can only include on#
+## random effect at a time#
+lm.cv.quant <- lqmm(fixed=cv ~ occ.date + degree, random=~1,#
+                    group= GenusSpecies,#
+                    data=closeness.cv$lm.data,#
+                    control=list(LP_max_iter=10^4))#
+sum.boot.quant <- summary.boot.lqmm(boot(lm.cv.quant, R=100))
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
+source('src/initialize.R')#
+#
+## ************************************************************#
+## occurrence#
+## ************************************************************#
+## pollinators and closeness#
+#
+pol.cv <- cv.trait(spec,#
+                             specs[specs$speciesType =="pollinator",],#
+                             trait1="occ.date",#
+                             trait2="degree",#
+                             method= "time", time.col="assem",#
+                             abund.col="weighted.closeness",#
+                             cv.function=cv,#
+                             zero2na=TRUE,#
+                             standard.cv=TRUE,#
+                             na.rm=TRUE)#
+#
+pol.mod <- lmer(formula.cv, data=pol.cv$lm.data)#
+summary(pol.mod)#
+#
+## the reviewers wanted a quantile regression, can only include on#
+## random effect at a time#
+pol.lm.cv.quant <- lqmm(fixed=cv ~ occ.date + degree, random=~1,#
+                    group= GenusSpecies,#
+                    data=pol.cv$lm.data,#
+                    control=list(LP_max_iter=10^4))#
+pol.sum.boot.quant <- summary.boot.lqmm(boot(pol.lm.cv.quant, R=100))#
+## plants and closeness#
+plants.cv <- cv.trait(spec,#
+                                    specs[specs$speciesType =="plant",],#
+                                    trait1="occ.plant.date",#
+                                    trait2="plant.degree",#
+                                    method= "time", time.col="assem",#
+                                    abund.col="weighted.closeness",#
+                                    cv.function=cv,#
+                                    zero2na=TRUE,#
+                                    standard.cv=TRUE,#
+                                    na.rm=TRUE,#
+                                    species.type="PlantGenusSpecies")#
+#
+plants.mod <- lmer(formula.plant.cv, data=plants.cv$lm.data)#
+summary(plants.mod)#
+#
+## the reviewers wanted a quantile regression, can only include on#
+## random effect at a time#
+plants.lm.cv.quant <- lqmm(fixed=cv ~ occ.plant.date + plant.degree, random=~1,#
+                    group= GenusSpecies,#
+                    data=plants.closeness.cv$lm.data,#
+                    control=list(LP_max_iter=10^3))#
+plants.sum.boot.quant <- summary.boot.lqmm(boot(plants.lm.cv.quant, R=100))
+## the reviewers wanted a quantile regression, can only include on#
+## random effect at a time#
+plants.lm.cv.quant <- lqmm(fixed=cv ~ occ.plant.date + plant.degree, random=~1,#
+                    group= GenusSpecies,#
+                    data=plants.cv$lm.data,#
+                    control=list(LP_max_iter=10^3))#
+plants.sum.boot.quant <- summary.boot.lqmm(boot(plants.lm.cv.quant, R=100))
+corvif(pol.mod)
+pol.mod <- lme4::lmer(formula.cv, data=pol.cv$lm.data)#
+summary(pol.mod)
+corvif(pol.mod)
+?corvif
+vif.mer(pol.mod)
+vif.mer <- function (fit) {#
+    ## adapted from rms::vif#
+#
+    v <- vcov(fit)#
+    nam <- names(fixef(fit))#
+#
+    ## exclude intercepts#
+    ns 0) {#
+        v <- v[-(1:ns), -(1:ns), drop = FALSE]#
+        nam <- nam[-(1:ns)]#
+    }#
+#
+d <- diag(v)^0.5#
+v <- diag(solve(v/(d %o% d)))#
+names(v) <- nam#
+v#
+}
+vif.mer(pol.mod)
+vif.mer <- function (fit) {#
+    ## adapted from rms::vif#
+    v <- vcov(fit)#
+    nam <- names(fixef(fit))#
+    ## exclude intercepts#
+    ns <- sum(1 * (nam == "Intercept" | nam == "(Intercept)"))#
+    if (ns > 0) {#
+        v <- v[-(1:ns), -(1:ns), drop = FALSE]#
+        nam <- nam[-(1:ns)] }#
+    d <- diag(v)^0.5#
+    v <- diag(solve(v/(d %o% d)))#
+    names(v) <- nam v#
+}
+vif.mer <- function (fit) {#
+    ## adapted from rms::vif#
+    v <- vcov(fit)#
+    nam <- names(fixef(fit))#
+    ## exclude intercepts#
+    ns <- sum(1 * (nam == "Intercept" | nam == "(Intercept)"))#
+    if (ns > 0) {#
+        v <- v[-(1:ns), -(1:ns), drop = FALSE]#
+        nam <- nam[-(1:ns)] }#
+    d <- diag(v)^0.5#
+    v <- diag(solve(v/(d %o% d)))#
+    names(v) <- nam#
+    return(v)#
+}
+vif.mer(pol.mod)
+rm(list=ls())#
+setwd('~/Dropbox/hedgerow_assembly/analysis/variability')#
+source('src/initialize.R')#
+#
+## ************************************************************#
+## occurrence#
+## ************************************************************#
+## pollinators and closeness#
+#
+pol.cv <- cv.trait(spec,#
+                   specs[specs$speciesType =="pollinator",],#
+                   trait1="occ.date",#
+                   trait2="degree",#
+                   method= "time", time.col="assem",#
+                   abund.col="weighted.closeness",#
+                   cv.function=cv,#
+                   zero2na=TRUE,#
+                   standard.cv=TRUE,#
+                   na.rm=TRUE)#
+#
+pol.mod <- lme4::lmer(formula.cv, data=pol.cv$lm.data)#
+summary(pol.mod)#
+vif.mer(pol.mod)
+## plants and closeness#
+plants.cv <- cv.trait(spec,#
+                      specs[specs$speciesType =="plant",],#
+                      trait1="occ.plant.date",#
+                      trait2="plant.degree",#
+                      method= "time", time.col="assem",#
+                      abund.col="weighted.closeness",#
+                      cv.function=cv,#
+                      zero2na=TRUE,#
+                      standard.cv=TRUE,#
+                      na.rm=TRUE,#
+                      species.type="PlantGenusSpecies")#
+#
+plants.mod <- lmer(formula.plant.cv, data=plants.cv$lm.data)#
+#
+summary(plants.mod)#
+vif.mer(plants.mod)
