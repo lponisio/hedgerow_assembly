@@ -3,6 +3,7 @@ setwd('~/Dropbox/hedgerow_assembly/analysis/networkLevel')
 source('src/initialize.R')
 load('../../data/networks/baci_networks_years.Rdata')
 N <- 999
+library(nlme)
 
 ## ************************************************************
 ## calculate metrics and zscores
@@ -22,6 +23,7 @@ save(cor.dats, file='saved/corMets.Rdata')
 
 load(file='saved/corMets.Rdata')
 baci <- cor.dats[!is.na(cor.dats$ypr),]
+baci$cYear <- as.numeric(baci$Year)-min(as.numeric(baci$Year))
 
 ## ************************************************************
 ## linear models
@@ -37,6 +39,12 @@ formulas <-lapply(ys, function(x) {
                            sep="+")))
 })
 
+formulas.spac <-lapply(ys, function(x) {
+    as.formula(paste(x, "~",
+                     paste("scale(ypr)",
+                           sep="+")))
+})
+
 mods <- lapply(formulas, function(x){
     lmer(x,
          data=baci)
@@ -45,6 +53,28 @@ mods <- lapply(formulas, function(x){
 names(mods) <- ys
 ## results
 lapply(mods, summary)
+
+## ************************************************************
+## standard discrete-time autocorrelation first order model
+
+formulas.spac <-lapply(ys, function(x) {
+    as.formula(paste(x, "~",
+                     paste("scale(ypr)",
+                           sep="+")))
+})
+
+mods.spatial <- lapply(formulas.spac, function(x){
+    try(lme(x,
+         random = ~ 1 + cYear | Site,
+        correlation=corCAR1(form=~cYear),
+        data=baci,
+        method="REML",
+        control=list(maxIter=10^6, niterEM=10^6)), silent=TRUE)
+})
+
+names(mods.spatial) <- ys
+## results
+lapply(mods.spatial, summary)
 
 ## ************************************************************
 ## splines
