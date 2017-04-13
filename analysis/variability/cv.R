@@ -16,7 +16,9 @@ occ.closeness.cv <- cv.trait(spec,
                              zero2na=TRUE,
                              standard.cv=TRUE,
                              na.rm=TRUE)
+
 summary(occ.closeness.cv$lm.nss)
+occ.closeness.cv$sum.quant
 
 
 ## plants and closeness
@@ -32,6 +34,7 @@ plants.occ.closeness.cv <- cv.trait(spec,
                                     na.rm=TRUE,
                                     species.type="PlantGenusSpecies")
 summary(plants.occ.closeness.cv$lm.nss)
+plants.occ.closeness.cv$sum.quant
 
 ## ************************************************************
 ## degree
@@ -48,6 +51,7 @@ degree.closeness.cv <- cv.trait(spec,
                                 standard.cv=TRUE,
                                 na.rm=TRUE)
 summary(degree.closeness.cv$lm.nss)
+degree.closeness.cv$sum.quant
 
 ## plants and closeness
 ## not sig!
@@ -62,7 +66,7 @@ plants.degree.closeness.cv <- cv.trait(spec,
                                        na.rm=TRUE,
                                        species.type="PlantGenusSpecies")
 summary(plants.degree.closeness.cv$lm.nss)
-
+plants.degree.closeness.cv$sum.quant
 
 ## check correlation of degree and occ
 ## pollinators

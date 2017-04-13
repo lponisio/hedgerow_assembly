@@ -1,3 +1,6 @@
+library(lme4)
+library(lqmm)
+
 ## regresses coefficent of variation against traits
 
 corCv <- function(x){
@@ -53,9 +56,19 @@ cv.trait <- function(spec.dat,
         dats$traits <- spec.dat[,trait][match(dats$GenusSpecies,
                                               spec.dat[, species.type])]
     }
-    lm.cv <- lmer(cv ~ SiteStatus*traits + (1|Site) + (1|GenusSpecies),
-                  data=dats[!is.na(dats$cv),])
+    lm.dats <- dats[!is.na(dats$cv) & !is.na(dats$traits),]
+    ## reviwers wanted a quantile model
+    ## can only include one random effect in the quantile mixed
+    ## effects model
+    lm.cv.quant <- lqmm(fixed=cv ~ traits, random=~1, group=
+                     GenusSpecies,
+                        data=lm.dats,
+                     control=list(LP_max_iter=10^3))
+    sum.boot.quant <- summary.boot.lqmm(boot(lm.cv.quant))
     lm.cv.nss <- lmer(cv ~ traits + (1|Site) + (1|GenusSpecies),
-                      data=dats[!is.na(dats$cv),])
-    return(list(data=dats, lm=lm.cv, lm.nss=lm.cv.nss))
+                      data=lm.dats)
+    return(list(data=dats,
+                lm.nss=lm.cv.nss,
+                lm.cv.quant=lm.cv.quant,
+                sum.quant=sum.boot.quant))
 }

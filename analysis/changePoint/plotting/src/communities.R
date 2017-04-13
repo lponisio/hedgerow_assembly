@@ -2,10 +2,10 @@ require(googleVis)
 
 ## add transparency to named colors
 add.alpha <- function(col, alpha=0.2){
-  apply(sapply(col, col2rgb)/255, 2, 
-        function(x) 
+  apply(sapply(col, col2rgb)/255, 2,
+        function(x)
         rgb(x[1], x[2], x[3],
-            alpha=alpha))  
+            alpha=alpha))
 }
 
 plotNet <- function(){
@@ -26,11 +26,10 @@ plotNet <- function(){
       V(gs)$size <- importance
       v.boarders <- rep("black", length(importance))
       v.boarders[importance == min(importance)] <- col.white
-      ## E(gs)$width <- (E(gs)$weight/sum(E(gs)$weight))*40
+      E(gs)$width <- (E(gs)$weight/sum(E(gs)$weight))*40
       gs$layout <- layout_in_circle
-      plot.igraph(gs, vertex.label="", vertex.frame.color=v.boarders)
-      ## ## vertex.label.cex=importance/10,
-      ## vertex.label=v.labs)
+      plot.igraph(gs, vertex.label="", vertex.frame.color=v.boarders,
+       vertex.label.cex=importance/10, vertex.label=v.labs)
     } else{
       plot(NA,
            ylim=c(0,1),xlim=c(0,1),
@@ -67,7 +66,7 @@ plotDend <- function(){
     else{
       out <- merge(out, id.memb[[k]], by="label", all=TRUE)
       out[, ncol(out)] <- out[, ncol(out)] + k*20
-    }    
+    }
   }
 
   save(out, file=sprintf('plotting/saved/nodes_%s.Rdata', i))
@@ -83,16 +82,6 @@ plotDend <- function(){
   }
   links <- links[!links$value == 0,]
   save(links, file=sprintf('plotting/saved/links_%s.Rdata', i))
-  ## nodes <-
-  ## data.frame(name=paste("n", 1:length(unique(c(links$target,
-  ##              links$source))), sep=""))
-  ## nodes$name <- as.character(nodes$name)
-
-  ## sankeyNetwork(Links = links,
-  ##               Nodes = nodes,
-  ##               Source = 'source', Target = 'target',
-  ##               Value = 'value', NodeID = 'name',
-  ##               fontSize = 12,  nodeWidth = 30, units = 'TWh')
   colors_link <- c('green', 'blue')
   colors_link_array <- paste0("[", paste0("'", colors_link,"'",
                                           collapse = ','), "]")
@@ -101,13 +90,13 @@ plotDend <- function(){
   colors_node_array <- paste0("[", paste0("'", colors_node,"'",
                                           collapse = ','), "]")
 
-  plot(gvisSankey(links, from="source", 
+  plot(gvisSankey(links, from="source",
                   to="target", weight="value",
                   options=list(
                     height=250,
                     sankey="{link: {colors: { fill: ['#a6cee3', '#1f78b4',    '#b2df8a',     '#33a02c'] },
     colorMode: 'gradient'},
-                        node: { width: 4, 
+                        node: { width: 4,
                                 colors: { fill:  ['#a6cee3', '#1f78b4',    '#b2df8a',     '#33a02c'] },
                                 label: { fontName: 'Times-Roman',
                                          fontSize: 1,
@@ -140,58 +129,3 @@ plotDend <- function(){
          layout=l, palette=colors)
   }
 }
-## ap <- c(rep("P", length(rownames(nets1))),rep("A", length(colnames(nets1))))
-## V(g1)$type <- ap
-## colrs <- c(rep("tomato", length(rownames(nets1))),
-##            rep("gold", length(colnames(nets1))))
-## V(g1)$color <- colrs
-
-
-
-## tree.hrg <- lapply(hrgs, hrg_tree)
-
-## dendro.hrg <- lapply(hrgs, hrg.dendrogram)
-
-## ihrgs <- lapply(hrgs, as.igraph)
-
-##  dendPlot(hrgs[[1]])
-
-
-
-
-
-
-
-## ## hrgs
-## hrgs <- mclapply(graphs, fit_hrg)
-## ## hrg.trees <- mapply(function(a, b)
-## ##                     consensus_tree(graph = a,
-## ##                                    hrg = b,
-## ##                                    num.samples = 10000),
-## ##                     a =graphs,
-## ##                     b = hrgs,
-## ##                     SIMPLIFY = FALSE)
-
-## save(hrgs, file=file.path(f.path, "hrgs.Rdata"))
-
-## ## ## community clusters
-## ## clust.gs <- mclapply(graphs, function(g){
-## ##   optcom <- cluster_optimal(g)
-## ##   V(g)$comm <- membership(optcom)
-## ##   return(optcom)
-## ## })
-
-## clust.gs <- mclapply(graphs,  cluster_optimal)
-
-## save(clust.gs, file=file.path(f.path, "clusts.Rdata"))                 
-
-## ihrgs <- lapply(hrgs, as.igraph)
-
-
-## plotDend<- function(){
-##   par(mar=c(0,0.5,0,0))
-##   layout(matrix(1:length(hrg), nrow=1))
-##   for(j in 1:length(hrg)){
-##     plot_dendrogram(hrg[[j]])
-##   }
-## }
