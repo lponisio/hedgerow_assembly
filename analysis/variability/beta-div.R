@@ -37,6 +37,7 @@ save(dats, file= file.path('saved/speciesTurnover',
              sprintf('%s.pdf', paste(dis.method, alpha, occ, type,
                                      sep='_'))))
 
+## ************************************************************
 ## invid nulls all not sig, alpha nulls mature marginally sig less,
 ## occurrence nulls all not sig
 
@@ -60,6 +61,7 @@ plot.coeffs(dis.method =dis.method, mod=summary(mod),
 
 ## plotDistPanels()
 
+## ************************************************************
 ##  temporal autocorrelation
 
 dats$cYear <- as.numeric(dats$year) - min(as.numeric(dats$year))
