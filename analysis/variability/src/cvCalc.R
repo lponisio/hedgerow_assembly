@@ -3,7 +3,7 @@ library(lqmm)
 
 ## regresses coefficent of variation against traits
 
-corCv <- function(x){
+corCv <- function(x,...){
     cv(x)*(1 + (1/4*length(x)))
 }
 
@@ -59,13 +59,17 @@ cv.trait <- function(spec.dat,
 
 vif.mer <- function (fit) {
     ## adapted from rms::vif
+
     v <- vcov(fit)
     nam <- names(fixef(fit))
+
     ## exclude intercepts
     ns <- sum(1 * (nam == "Intercept" | nam == "(Intercept)"))
     if (ns > 0) {
         v <- v[-(1:ns), -(1:ns), drop = FALSE]
-        nam <- nam[-(1:ns)] }
+        nam <- nam[-(1:ns)]
+    }
+
     d <- diag(v)^0.5
     v <- diag(solve(v/(d %o% d)))
     names(v) <- nam
@@ -73,9 +77,9 @@ vif.mer <- function (fit) {
 }
 
 
+formula.cv <- formula(cv ~ occ.date +  degree + (1|Site) +
+                          (1|GenusSpecies))
 
 
-formula.cv <- formula(cv ~ occ.date +  degree + (1|Site) + (1|GenusSpecies))
-
-
-formula.plant.cv <- formula(cv ~ occ.plant.date +  plant.degree + (1|Site) + (1|GenusSpecies))
+formula.plant.cv <- formula(cv ~ occ.plant.date +  plant.degree +
+                                (1|Site) + (1|GenusSpecies))

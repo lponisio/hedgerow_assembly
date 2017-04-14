@@ -1,3 +1,4 @@
+library(lmerTest)
 library(lme4)
 library(vegan)
 library(fields)

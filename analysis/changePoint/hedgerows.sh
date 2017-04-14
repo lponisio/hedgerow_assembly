@@ -1,8 +1,8 @@
 
 ## if this were in R I would list all the files then divide by using
-## grep on the names.... then loop over the name groups 
+## grep on the names.... then loop over the name groups
 
-import glob 
+import glob
 from subprocess import call
 
 
@@ -22,7 +22,7 @@ python runNetworkChangePoint.py graph-names.lut 4 'Butler_2006.pairs Butler_2007
 
 python runNetworkChangePoint.py graph-names.lut 4 'Hrdy_2007.pairs Hrdy_2008.pairs Hrdy_2009.pairs Hrdy_2011.pairs Hrdy_2012.pairs Hrdy_2013.pairs Hrdy_2014.pairs' -p 'baci/'
 
-python runNetworkChangePoint.py graph-names.lut 4 'MullerB_2006.pairs MullerB_2007.pairs MullerB_2008.pairs MullerB_2009.pairs MullerB_2011.pairs MullerB_2012.pairs MullerB_2013.pairs MullerB_2014.pairs MullerB_2015.pairs' -p baci/
+python runNetworkChangePoint.py graph-names.lut 4 'MullerB_2006.pairs MullerB_2007.pairs MullerB_2008.pairs MullerB_2009.pairs MullerB_2011.pairs MullerB_2012.pairs MullerB_2013.pairs MullerB_2014.pairs MullerB_2015.pairs' -p 'baci/'
 
 python runNetworkChangePoint.py graph-names.lut 4 'Sperandio_2007.pairs Sperandio_2008.pairs Sperandio_2009.pairs Sperandio_2011.pairs Sperandio_2012.pairs Sperandio_2013.pairs Sperandio_2014.pairs' -p 'baci/'
 
@@ -30,7 +30,7 @@ python runNetworkChangePoint.py graph-names.lut 4 'Sperandio_2007.pairs Sperandi
 python runNetworkChangePoint.py graph-names.lut 4 'BC2_2007.pairs BC2_2008.pairs BC2_2009.pairs BC2_2011.pairs BC2_2012.pairs BC2_2013.pairs BC2_2014.pairs' -p 'baci/'
 
 python runNetworkChangePoint.py graph-names.lut 4 'Chamberlain_2007.pairs Chamberlain_2008.pairs Chamberlain_2011.pairs Chamberlain_2012.pairs Chamberlain_2013.pairs Chamberlain_2014.pairs' -p 'baci/'
- 
+
 python runNetworkChangePoint.py graph-names.lut 4 'DQU_2006.pairs DQU_2007.pairs DQU_2008.pairs DQU_2009.pairs DQU_2011.pairs DQU_2012.pairs DQU_2013.pairs DQU_2014.pairs' -p 'baci/'
 
 python runNetworkChangePoint.py graph-names.lut 4 'Turkovich_2006.pairs Turkovich_2007.pairs Turkovich_2008.pairs Turkovich_2009.pairs Turkovich_2011.pairs Turkovich_2012.pairs Turkovich_2013.pairs Turkovich_2014.pairs' -p 'baci/'
@@ -39,7 +39,7 @@ python runNetworkChangePoint.py graph-names.lut 4 'USS_2006.pairs USS_2007.pairs
 
 python runNetworkChangePoint.py graph-names.lut 4 'H16_2006.pairs H16_2007.pairs H16_2008.pairs H16_2009.pairs H16_2011.pairs H16_2013.pairs H16_2014.pairs' -p 'baci/'
 
-## 
+##
 python runNetworkChangePoint.py graph-names.lut 4 'Gregory_2007.pairs Gregory_2009.pairs Gregory_2011.pairs Gregory_2012.pairs Gregory_2013.pairs Gregory_2014.pairs' -p 'baci/'
 
 python runNetworkChangePoint.py graph-names.lut 4 'Spiva_2007.pairs Spiva_2008.pairs Spiva_2011.pairs Spiva_2012.pairs Spiva_2013.pairs Spiva_2014.pairs' -p 'baci/'
