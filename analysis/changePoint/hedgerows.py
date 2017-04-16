@@ -47,63 +47,9 @@ ncores = 2
 l = glob.glob("baci/*_*.pairs")
 l = [os.path.basename(f) for f in l]
 
-# prefixes = [f.split('_')[0] for f in l]
-# prefixes = set(prefixes)
-
-
-prefixes = {'Anderson',
-            'BC1',
-            'BC2',
-            'Barger',
-            'Barn',
-            'Berm',
-            'Best',
-            'Bobcat',
-            'Butler',
-            'CLBL',
-            'CR101',
-            'CR101Control',
-            'CR29',
-            'Chamberlain',
-            'CircleG',
-            'DQU',
-            'Fong',
-            'FongWest',
-            'GC1',
-            'Gilmer',
-            'Gregory',
-            'H16',
-            'HC1',
-            'Harlan',
-            'Hatanaka',
-            'Hays',
-            'Hrdy',
-            'Joe',
-            'Johnston',
-            'Joost',
-            'Loop',
-            'MC1',
-            'Maria',
-            'Martinez',
-            'MullerB',
-            'MullerM',
-            'Oakdale',
-            'PutahCreek',
-            'RLong',
-            'RSlough',
-            'Rominger',
-            'Sperandio',
-            'Spiva',
-            'Tractor',
-            'Turkovich',
-            'USS',
-            'Voelz',
-            'YoloAirport',
-            'Zamora'}
-
-prefixes = {
-    'MullerB',
-    'MullerM'}
+prefixes = [f.split('_')[0] for f in l]
+prefixes = [p for p in prefixes if prefixes.count(p) >=5]
+prefixes = set(prefixes)
 
 ## run change point analysis for each site
 jobs = [(runNetworkChangePoint, [f for f in l if prefix in f]) for prefix in prefixes]

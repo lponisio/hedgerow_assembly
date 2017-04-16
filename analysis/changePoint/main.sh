@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 python hedegrows.py
-Rscrips thing
+RScript prepCptOutput.R
 python postChangePoint.py paradigms.txt

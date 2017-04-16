@@ -9,7 +9,7 @@ source('../../dataPrep/src/misc.R')
 load('cptPeel/baci/graphs.Rdata')
 load('../../data/networks/allSpecimens.Rdata')
 samples <- read.csv("../../data/samples.csv")
-dats <- read.csv('cptPeel/changing_points.csv')
+dats <- read.csv('saved/changing_points.csv')
 BACI.site <- c('Barger', 'Butler', 'Hrdy', 'MullerB', 'Sperandio')
 
 ## **********************************************************
