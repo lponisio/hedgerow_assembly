@@ -4,8 +4,8 @@
 
 import os
 import glob
-import subprocess as sp
-#from subprocess import call
+# import subprocess as sp
+from subprocess import call
 from multiprocessing import Pool
 
 def runNetworkChangePoint(queries):
@@ -39,6 +39,7 @@ def star_func(arglist):
 
 ## --
 
+
 os.chdir(os.path.expanduser('~/Dropbox/hedgerow_assembly/analysis/changePoint/cptPeel'))
 
 ncores = 2
@@ -47,7 +48,9 @@ ncores = 2
 l = glob.glob("baci/*_*.pairs")
 l = [os.path.basename(f) for f in l]
 
+## the site names
 prefixes = [f.split('_')[0] for f in l]
+## only those with enough data to run the change point analysis on
 prefixes = [p for p in prefixes if prefixes.count(p) >=5]
 prefixes = set(prefixes)
 
