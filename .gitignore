@@ -1,4 +1,6 @@
 .DS_Store
+.Rapp.history
+.Rhistory
 ms/SI.log ms/ms.log ms/ms_diff.log
 ms/SI.pdf ms/ms.pdf ms/ms_diff.pdf
 ms/SI.aux ms/ms.aux ms/ms_diff.aux
