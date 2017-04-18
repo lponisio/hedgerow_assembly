@@ -7,59 +7,60 @@ plot.panels <- function(){
     layout(matrix(1:4, nrow=2, byrow=TRUE))
     par(oma=c(2, 6.5, 0.5, 1),
         mar=c(2.5, 0, 0, 1), cex.axis=1.2)
+
     ## persistence pollinators
-    plot.panel(new.dd=occ.pi.close,
-               dats=occ.closeness.cv$data,
+    plot.panel(new.dd=pol.occ.pi.close,
+               dats=pol.cv$lm.data,
                y1="cv",
-               y2= range(c(degree.pi$plo, degree.pi$phi)),
-               xs="traits",
+               y2= range(c(pol.degree.pi.close$plo, pol.degree.pi.close $phi)),
+               xs="occ.date",
                col.fill=col.fill,
                col.lines=col.lines,
                plot.y=TRUE,
                plot.x=TRUE,
                treatments="all")
     mtext("Pollinators", 2, line=5, cex=1.2)
-    
+
     ## degree pollinators
-    plot.panel(new.dd=degree.pi,
-               dats=degree.closeness.cv$data,
+    plot.panel(new.dd=pol.degree.pi.close,
+               dats=pol.cv$lm.data,
                y1="cv",
-               y2=range(c(occ.pi.close$plo, occ.pi.close$phi)),
-               xs="traits",
-               col.fill=col.fill,
-               col.lines=col.lines,
+               y2=range(c(pol.occ.pi.close$plo, pol.occ.pi.close$phi)),
+               xs="r.degree",
+               col.fill=col.white,
+               col.lines=col.white,
+               col.points=col.fill,
                plot.y=FALSE,
                plot.x=TRUE,
                treatments="all",
                dec=0)
-
     ## persistence plants
-    plot.panel(new.dd=plants.occ.pi.close,
-               dats=plants.occ.closeness.cv$data,
+    plot.panel(new.dd=plant.occ.pi.close,
+               dats=plant.cv$lm.data,
                y1="cv",
-               y2= range(c(plants.degree.pi$plo, plants.degree.pi$phi)
+               y2= range(c(plant.degree.pi.close$plo, plant.degree.pi.close$phi)
     + c(-0.2,0.2)),
-               xs="traits",
+               xs="occ.plant.date",
                col.fill=col.white,
                col.lines=col.white,
                col.points=col.fill,
                plot.y=TRUE,
                treatments="all")
-    
+
     mtext("Plants", 2, line=5, cex=1.2)
-    
+
     mtext("Persistence", 1, line=3, cex=1.2)
     mtext("Closeness variability (log)", 2,
           line=3.2, cex=1.2, adj=-0.75)
 
 
     ## degree plants
-    plot.panel(new.dd=plants.degree.pi,
-               dats=plants.degree.closeness.cv$data,
-               y2=range(c(plants.occ.pi.close$plo,
-    plants.occ.pi.close$phi)) + c(-0.2, 0.1),
+    plot.panel(new.dd=plant.degree.pi.close,
+               dats=plant.cv$lm.data,
+               y2=range(c(plant.occ.pi.close$plo,
+    plant.occ.pi.close$phi)) + c(-0.2, 0.1),
                y1="cv",
-               xs="traits",
+               xs="plant.r.degree",
                col.fill=col.white,
                col.lines=col.white,
                col.points=col.fill,
