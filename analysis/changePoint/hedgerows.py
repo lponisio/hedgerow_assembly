@@ -4,7 +4,9 @@
 
 import os
 import glob
-# import subprocess as sp
+import traceback
+import sys
+import subprocess as sp
 from subprocess import call
 from multiprocessing import Pool
 
@@ -14,7 +16,8 @@ def runNetworkChangePoint(queries):
     job.wait()
 
 def mapPool(threads, args):
-    # args = [(function, (arg1, arg2), {keyword1:arg1, keyword2:arg2}), nextjob, ...]
+    # args = [(function, (arg1, arg2), {keyword1:arg1, keyword2:arg2}),
+    #        nextjob]
     p = Pool(threads)
     output = p.map(star_func, args)
     p.close()
@@ -55,7 +58,7 @@ prefixes = [p for p in prefixes if prefixes.count(p) >=5]
 prefixes = set(prefixes)
 
 ## run change point analysis for each site
-jobs = [(runNetworkChangePoint, [f for f in l if prefix in f]) for prefix in prefixes]
+jobs = [(runNetworkChangePoint, [[f for f in l if prefix in f]]) for prefix in prefixes]
 mapPool(ncores, jobs)
 
 

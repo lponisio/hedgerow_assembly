@@ -9,7 +9,7 @@ source('src/initialize.R')
 pol.cv <- cv.trait(spec,
                    specs[specs$speciesType =="pollinator",],
                    trait1="occ.date",
-                   trait2="degree",
+                   trait2="r.degree",
                    method= "time", time.col="assem",
                    abund.col="weighted.closeness",
                    cv.function=cv,
@@ -21,24 +21,14 @@ pol.mod <- lmer(formula.cv, data=pol.cv$lm.data)
 summary(pol.mod)
 vif.mer(pol.mod)
 
-## variance inflation factors > 2, so not great (Zurr et al. 2010)
-
-## models with each explanatory variable
-pol.mod.degree <- lmer(cv ~ degree + (1|Site) +
-                           (1|GenusSpecies),
-                       data=pol.cv$lm.data)
-summary(pol.mod.degree)
-
-pol.mod.occ <- lmer(cv ~ occ.date + (1|Site) +
-                        (1|GenusSpecies),
-                    data=pol.cv$lm.data)
-summary(pol.mod.occ)
+## variance inflation factors < 2, so okay!!! (Zurr et al. 2010)
 
 ## ************************************************************
 ## the reviewers wanted a quantile regression, can only include on
 ## random effect at a time
 
-pol.lm.cv.quant <- lqmm(fixed=cv ~ occ.date + degree, random=~1,
+## occ.date is significant
+pol.lm.cv.quant <- lqmm(fixed=cv ~ occ.date + r.degree, random=~1,
                         group= GenusSpecies,
                         data=pol.cv$lm.data,
                         control=list(LP_max_iter=10^4))
@@ -51,7 +41,7 @@ pol.sum.boot.quant <- summary.boot.lqmm(boot(pol.lm.cv.quant,
 plant.cv <- cv.trait(spec,
                      specs[specs$speciesType =="plant",],
                      trait1="occ.plant.date",
-                     trait2="plant.degree",
+                     trait2="plant.r.degree",
                      method= "time", time.col="assem",
                      abund.col="weighted.closeness",
                      cv.function=cv,
@@ -63,22 +53,14 @@ plant.cv <- cv.trait(spec,
 plant.mod <- lmer(formula.plant.cv, data=plant.cv$lm.data)
 summary(plant.mod)
 vif.mer(plant.mod)
-## variance inflation factors > 2, so not great (Zurr et al. 2010)
-
-plant.mod.degree <- lmer(cv ~ plant.degree + (1|Site) +
-                             (1|GenusSpecies),
-                         data=plant.cv$lm.data)
-
-plant.mod.occ <- lmer(cv ~ occ.plant.date + (1|Site) +
-                          (1|GenusSpecies),
-                      data=plant.cv$lm.data)
+## variance inflation factors <1, so okay (Zurr et al. 2010)
 
 
 ## ************************************************************
 ## the reviewers wanted a quantile regression, can only include on
 ## random effect at a time
 
-plant.lm.cv.quant <- lqmm(fixed=cv ~ occ.plant.date + plant.degree,
+plant.lm.cv.quant <- lqmm(fixed=cv ~ occ.plant.date + plant.r.degree,
                           random=~1,
                           group= GenusSpecies,
                           data=plant.cv$lm.data,
@@ -89,8 +71,8 @@ plant.sum.boot.quant <- summary.boot.lqmm(boot(plant.lm.cv.quant,
 ## ************************************************************
 ## correlation betwen degree and persistence
 
-cor.test(pol.cv$lm.data$degree, pol.cv$lm.data$occ.date)
-cor.test(plant.cv$lm.data$plant.degree,
+cor.test(pol.cv$lm.data$r.degree, pol.cv$lm.data$occ.date)
+cor.test(plant.cv$lm.data$plant.r.degree,
          plant.cv$lm.data$occ.plant.date)
 
 ## ************************************************************
@@ -121,7 +103,7 @@ resid.plot <- function(){
     plot(density(residuals(plant.mod)))
 }
 
-
+## not amazing, but not terrible
 resid.plot()
 
 ## save

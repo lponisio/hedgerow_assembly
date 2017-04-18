@@ -7,6 +7,8 @@ makeChangepointData <- function(results, logs,
     ## from the output of the change point detection analysis
     ## split the year and creates an extra table with year 1 and
     ## period
+    results <- results[sort(results$V1),]
+    logs <- logs[sort(logs$V1),]
     results$V1 <- as.character(results$V1)
     results$V2 <- as.character(results$V2)
     years1  <-  as.numeric(sapply(strsplit(results$V1, '_'),
@@ -95,7 +97,9 @@ makeConsensusTable <- function(changing.points,
         this.site <- this.site[order(this.site$min),]
         clusters[[j]] <- list()
         for(i in 1:nrow(this.site)){
-            clusters[[j]][[i]] <- 2006:this.site$min[i]
+            clusters[[j]][[i]] <- try(2006:this.site$min[i],
+                                      silent=TRUE)
+            if(inherits(clusters[[j]][[i]], "try-error")) browser()
             if(i >= 2){
                 clusters[[j]][[i]] <-
                     clusters[[j]][[i]][!clusters[[j]][[i]] %in%

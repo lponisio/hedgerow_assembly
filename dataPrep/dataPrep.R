@@ -6,6 +6,7 @@ source('src/misc.R')
 source('src/prepNets.R')
 source('src/specialization.R')
 library(bipartite)
+library(fossil)
 
 trait.dir <- '~/Dropbox/hedgerow/data_sets/traditional/functional_traits'
 bee.trait <-
@@ -79,10 +80,21 @@ all.specializations <- specieslevel(nets.all,
                                     index=c("proportional generality",
                                       "degree",
                                       "d"))
+## calculate rarified plant.pol degree
+rare.plants.degree <- apply(nets.all, 1, chao1)
+rare.pols.degree <- apply(nets.all, 2, chao1)
 
 traits <- data.frame(GenusSpecies= unlist(sapply(all.specializations,
                        rownames)),
                      do.call(rbind, all.specializations))
+
+traits$r.degree <-  rare.pols.degree[match(traits$GenusSpecies,
+                                           names(rare.pols.degree))]
+
+traits$r.degree[is.na(traits$r.degree)] <-
+    rare.plants.degree[match(traits$GenusSpecies[is.na(traits$r.degree)],
+                             names(rare.plants.degree))]
+
 rownames(traits) <- NULL
 
 ## *************************************************
@@ -150,7 +162,11 @@ write.table(ms.table, file="~/Dropbox/hedgerow_assembly_ms/ms/tables/samples.txt
 spec$d <- traits$d[match(spec$GenusSpecies, traits$GenusSpecies)]
 spec$degree <- traits$degree[match(spec$GenusSpecies,
                                    traits$GenusSpecies)]
+spec$r.degree <- traits$r.degree[match(spec$GenusSpecies,
+                                   traits$GenusSpecies)]
 spec$plant.degree <- traits$degree[match(spec$PlantGenusSpecies,
+                                         traits$GenusSpecies)]
+spec$plant.r.degree <- traits$r.degree[match(spec$PlantGenusSpecies,
                                          traits$GenusSpecies)]
 
 ## occurence

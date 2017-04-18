@@ -77,9 +77,9 @@ vif.mer <- function (fit) {
 }
 
 
-formula.cv <- formula(cv ~ occ.date +  degree + (1|Site) +
+formula.cv <- formula(cv ~ occ.date +  r.degree + (1|Site) +
                           (1|GenusSpecies))
 
 
-formula.plant.cv <- formula(cv ~ occ.plant.date +  plant.degree +
+formula.plant.cv <- formula(cv ~ occ.plant.date +  plant.r.degree +
                                 (1|Site) + (1|GenusSpecies))
