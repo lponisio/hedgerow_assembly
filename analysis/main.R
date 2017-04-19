@@ -7,7 +7,7 @@ rm(list=ls())
 ## 4) add trait data to specimen data
 analysis.dir <- "~/Dropbox/hedgerow_assembly/"
 
-source("file.path(analysis.dir, dataPrep/dataPrep.R"))
+source(file.path(analysis.dir, "dataPrep/dataPrep.R"))
 
 ##***************************************************************
 ## change points
@@ -23,7 +23,11 @@ source(file.path(analysis.dir,
                  'analysis/changePoint/plotting/networks.R'))
 
 ## binomial analysis in comparisons.R, no resulting plots
-## exploratory analysis in  core.R
+source(file.path(analysis.dir,
+                 'analysis/changePoint/comparisons.R'))
+
+
+## exploratory analysis in  src/core.R
 
 ##***************************************************************
 ## species level metrics

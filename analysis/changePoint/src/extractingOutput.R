@@ -7,6 +7,7 @@ makeChangepointData <- function(results, logs,
     ## from the output of the change point detection analysis
     ## split the year and creates an extra table with year 1 and
     ## period
+
     results <- results[sort(results$V1),]
     logs <- logs[sort(logs$V1),]
     results$V1 <- as.character(results$V1)
@@ -23,7 +24,6 @@ makeChangepointData <- function(results, logs,
     for(n in 1:(length(anos)-1)){
         years[n,2] <- paste(anos[n], anos[n+1], sep='-')
     }
-
     years[,1] <- anos[-length(anos)]
     colnames(years) <- c('first', 'period')
 
@@ -46,7 +46,6 @@ makeChangepointData <- function(results, logs,
                                             results$max[row])[1]
         }
     }
-
     sigs <- results[results$max > 0.949,]
     cp <- rep(NA, dim(sigs)[1])
     value <- rep(NA, dim(sigs)[1])
@@ -58,7 +57,6 @@ makeChangepointData <- function(results, logs,
         sigs$cp[i] <- years$period[y1+(sigs$max.index[i]-1)]
         sigs$value[i] <- sigs[i,c(3:5)][sigs$max.index[i]]
     }
-
     sigs$value <- unlist(sigs$value)
     changing.points <- sigs[,c(6,11,12)]
 
