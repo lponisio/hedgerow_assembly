@@ -1,4 +1,4 @@
-rm(list=ls())
+## rm(list=ls())
 setwd('~/Dropbox/hedgerow_assembly/analysis/variability')
 source('src/initialize.R')
 
@@ -18,7 +18,7 @@ pol.cv <- cv.trait(spec,
                    na.rm=TRUE)
 
 pol.mod <- lmer(formula.cv, data=pol.cv$lm.data)
-summary(pol.mod)
+print(summary(pol.mod))
 vif.mer(pol.mod)
 
 ## variance inflation factors < 2, so okay!!! (Zurr et al. 2010)
@@ -51,7 +51,7 @@ plant.cv <- cv.trait(spec,
                      species.type="PlantGenusSpecies")
 
 plant.mod <- lmer(formula.plant.cv, data=plant.cv$lm.data)
-summary(plant.mod)
+print(summary(plant.mod))
 vif.mer(plant.mod)
 ## variance inflation factors <1, so okay (Zurr et al. 2010)
 

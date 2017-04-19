@@ -1,4 +1,4 @@
-rm(list=ls())
+## rm(list=ls())
 setwd('~/Dropbox/hedgerow_assembly/dataPrep')
 load('~/Dropbox/hedgerow/data_sets/traditional/specimens-complete.RData')
 load("/Users/lcp/Dropbox/hedgerow_network/data/veg/veg.Rdata")

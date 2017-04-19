@@ -1,20 +1,20 @@
-rm(list=ls())
+# rm(list=ls())
 setwd('~/Dropbox/hedgerow_assembly/analysis/networkLevel')
 source('src/initialize.R')
 load('../../data/networks/baci_networks_years.Rdata')
 N <- 999
 
 ## ************************************************************
-## calculate metrics and zscores
+## calculate metrics and zscores ## beware this takes a while!
 ## ************************************************************
-mets <- lapply(nets, network.metrics, N)
+## mets <- lapply(nets, network.metrics, N)
 
-cor.dats <- prep.dat(mets,  spec)
+## cor.dats <- prep.dat(mets,  spec)
 
-cor.dats$tot.rich <- cor.dats$number.of.species.LL +
-    cor.dats$number.of.species.HL
+## cor.dats$tot.rich <- cor.dats$number.of.species.LL +
+##     cor.dats$number.of.species.HL
 
-save(cor.dats, file='saved/corMets.Rdata')
+## save(cor.dats, file='saved/corMets.Rdata')
 
 ## ************************************************************
 ## effect of years post restoration
@@ -55,6 +55,7 @@ aic.mods <- sapply(mods, AIC)
 
 ## ************************************************************
 ## standard discrete-time autocorrelation first order model
+## takes a while to optimize
 
 formulas.spac <-lapply(ys, function(x) {
     as.formula(paste(x, "~",
@@ -76,6 +77,7 @@ names(mods.spatial) <- ys
 lapply(mods.spatial, summary)
 aic.sp.mods <- sapply(mods.spatial, AIC)
 
+aic.mods-aic.sp.mods
 
 ## ************************************************************
 ## splines

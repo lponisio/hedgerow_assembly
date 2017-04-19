@@ -1,4 +1,4 @@
-rm(list=ls())
+## rm(list=ls())
 setwd('~/Dropbox/hedgerow_assembly/analysis/variability')
 source('src/initialize.R')
 source('src/phyloIntBeta.R')
@@ -33,7 +33,7 @@ load(file="saved/phyloInt.Rdata")
 phylo.int.mod <- lmer(PhyloInt ~ SiteStatus +
                       (1|Site),
                       data=phylo.int$phylo.int)
-summary(phylo.int.mod)
+print(summary(phylo.int.mod))
 
 ## ## for comparing maturing and mature
 ## ## mature and maturing are not sig different
@@ -44,7 +44,7 @@ phylo.int$phylo.int$SiteStatus <-
 phylo.int.mod <- lmer(PhyloInt ~ SiteStatus +
                       (1|Site),
                       data=phylo.int$phylo.int)
-summary(phylo.int.mod)
+print(summary(phylo.int.mod))
 
 
 plot.node.box(ylabel="Weighted interaction turnover",

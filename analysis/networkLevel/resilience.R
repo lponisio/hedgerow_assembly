@@ -4,7 +4,7 @@ source('src/initialize.R')
 load('../../data/networks/all_networks_years.Rdata')
 
 ## either "abund" or "degree"
-## extinction.method <- "degree"
+ extinction.method <- "degree"
 
 ## **********************************************************
 ## robustness
@@ -18,6 +18,7 @@ save(res, file=file.path(save.path,
                     extinction.method)))
 
 ## no change in robustness by site status
+## not included in ms jsut interesting
 mod.status <- lmer(Robustness ~ SiteStatus
              + (1|Site) + (1|Year),
              data=res)

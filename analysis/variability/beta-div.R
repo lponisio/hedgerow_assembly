@@ -3,7 +3,7 @@ setwd('~/Dropbox/hedgerow_assembly/analysis/variability')
 binary <- FALSE
 alpha <- TRUE
 ## int or pols
-## type <- "plants"
+## type <- "pols"
 source('src/initialize_beta.R')
 
 ## ************************************************************

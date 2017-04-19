@@ -30,6 +30,16 @@ source(file.path(analysis.dir,
 ## exploratory analysis in  src/core.R
 
 ##***************************************************************
+## closeness CV
+##***************************************************************
+
+## coefficient of variation
+source(file.path(analysis.dir,
+                 'analysis/variability/cv.R'))
+source(file.path(analysis.dir,
+                 'analysis/variability/plotting/cv.R'))
+
+##***************************************************************
 ## species level metrics
 ##***************************************************************
 
@@ -40,41 +50,10 @@ source(file.path(analysis.dir,
 source(file.path(analysis.dir,
                  'analysis/speciesLevel/plotting/specMets.R'))
 
-##***************************************************************
-## network level metrics
-##***************************************************************
-
-## network metrics through time
-source(file.path(analysis.dir,
-                 'analysis/networkLevel/baci.R'))
-
-## robustness
-## either "abund" or "degree"
-extinction.method <- "degree"
-source(file.path(analysis.dir,
-                 'analysis/networkLevel/resilience.R'))
-extinction.method <- "abund"
-source(file.path(analysis.dir,
-                 'analysis/networkLevel/resilience.R'))
-
-## sensitivity to perturbation
-source(file.path(analysis.dir,
-                 'analysis/networkLevel/laplacian.R'))
-
-## plotting
-source(file.path(analysis.dir,
-                 'analysis/networkLevel/plotting/baci.R'))
-source(file.path(analysis.dir,
-                 'analysis/networkLevel/plotting/resilience.R'))
 
 ##***************************************************************
 ## turnover metrics
 ##***************************************************************
-## coefficient of variation
-source(file.path(analysis.dir,
-                 'analysis/variability/cv.R'))
-source(file.path(analysis.dir,
-                 'analysis/variability/plotting/cv.R'))
 
 ## nulls for computing stats
 ## pols, int or plants
@@ -111,3 +90,30 @@ source(file.path(analysis.dir,
 ## plotting
 source(file.path(analysis.dir,
                  'analysis/variability/plotting/beta-int.R'))
+
+
+##***************************************************************
+## network level metrics
+##***************************************************************
+## network metrics through time
+source(file.path(analysis.dir,
+                 'analysis/networkLevel/baci.R'))
+
+## robustness
+## either "abund" or "degree"
+extinction.method <- "degree"
+source(file.path(analysis.dir,
+                 'analysis/networkLevel/resilience.R'))
+extinction.method <- "abund"
+source(file.path(analysis.dir,
+                 'analysis/networkLevel/resilience.R'))
+
+## sensitivity to perturbation
+source(file.path(analysis.dir,
+                 'analysis/networkLevel/laplacian.R'))
+
+## plotting
+source(file.path(analysis.dir,
+                 'analysis/networkLevel/plotting/baci.R'))
+source(file.path(analysis.dir,
+                 'analysis/networkLevel/plotting/resilience.R'))
