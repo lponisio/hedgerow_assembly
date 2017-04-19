@@ -3,7 +3,7 @@ setwd('~/Dropbox/hedgerow_assembly/analysis/variability')
 binary <- FALSE
 alpha <- TRUE
 ## int or pols
-## type <- "pols"
+ type <- "pol"
 source('src/initialize_beta.R')
 
 ## ************************************************************
@@ -59,10 +59,12 @@ plot.coeffs(dis.method =dis.method, mod=summary(mod),
             sub= type, occ=occ)
 
 
-## plotDistPanels()
+ plotDistPanels()
 
 ## ************************************************************
 ##  temporal autocorrelation
+## invid nulls all not sig, alpha nulls mature marginally sig less,
+## occurrence nulls all not sig
 
 dats$cYear <- as.numeric(dats$year) - min(as.numeric(dats$year))
 
@@ -74,7 +76,6 @@ mod.spatial <- lme(dist ~ status,
 
 summary(mod.spatial)
 
-AIC(mod.spatial)
-AIC(mod)
+AIC(mod) -AIC(mod.spatial)
 
-## not including spatial auto-correlation wins
+## spatial auto-correlation has a less good fit

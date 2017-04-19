@@ -1,31 +1,16 @@
 rm(list=ls())
-## prep data
-## 1) drop non bee/syrphid data
-## 2) create networks with mean taken over sampling rounds in each
-## year
-## 3) calculate network metrics for whole landscape
-## 4) add trait data to specimen data
 analysis.dir <- "~/Dropbox/hedgerow_assembly/"
-
-source(file.path(analysis.dir, "dataPrep/dataPrep.R"))
 
 ##***************************************************************
 ## change points
 ##***************************************************************
 
-## create graphs for change point analysis
-source(file.path(analysis.dir,
-                 'analysis/changePoint/dataPrep.R'))
-
-## run python code for calculating network change points
-## plot networks and network communities
-source(file.path(analysis.dir,
-                 'analysis/changePoint/plotting/networks.R'))
+## data is preped and change point analysis is run through the bash
+## script mainChangePoint.sh
 
 ## binomial analysis in comparisons.R, no resulting plots
 source(file.path(analysis.dir,
                  'analysis/changePoint/comparisons.R'))
-
 
 ## exploratory analysis in  src/core.R
 

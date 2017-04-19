@@ -1,0 +1,72 @@
+\begin{thebibliography}{12}
+\providecommand{\natexlab}[1]{#1}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi:\discretionary{}{}{}#1}\else
+  \providecommand{\doi}{doi:\discretionary{}{}{}\begingroup
+  \urlstyle{rm}\Url}\fi
+
+\bibitem[{Stanhill(1990)}]{Stanhill1990}
+Stanhill, G. 1990 The comparative productivity of organic agriculture.
+\newblock \emph{Agriculture, Ecosystems \& Environment}, \textbf{30}, 1--26.
+
+\bibitem[{Badgley \emph{et~al.}(2007)Badgley, Moghtader, Quintero, Zakem,
+  Chappell, Aviles-Vazquez, Samulon \& Perfecto}]{Badgley2007}
+Badgley, C., Moghtader, J., Quintero, E., Zakem, E., Chappell, M.~J.,
+  Aviles-Vazquez, K., Samulon, A. \& Perfecto, I. 2007 Organic agriculture and
+  the global food supply.
+\newblock \emph{Renewable agriculture and food systems}, \textbf{22}(2),
+  86--108.
+
+\bibitem[{de~Ponti \emph{et~al.}(2012)de~Ponti, Rijk \& van
+  Ittersum}]{dePonti2012}
+de~Ponti, T., Rijk, B. \& van Ittersum, M. 2012 The crop yield gap between
+  organic and conventional agriculture.
+\newblock \emph{Agricultural Systems}, \textbf{108}, 1--9.
+
+\bibitem[{Seufert \emph{et~al.}(2012)Seufert, Ramankutty \&
+  Foley}]{Seufert2012}
+Seufert, V., Ramankutty, N. \& Foley, J.~A. 2012 Comparing the yields of
+  organic and conventional agriculture.
+\newblock \emph{Nature}, \textbf{485}(7397), 229--232.
+
+\bibitem[{Denison \emph{et~al.}(2004)Denison, Bryant \&
+  Kearney}]{denison2004crop}
+Denison, R.~F., Bryant, D.~C. \& Kearney, T.~E. 2004 Crop yields over the first
+  nine years of {LTRAS}, a long-term comparison of field crop systems in a
+  {Mediterranean climate}.
+\newblock \emph{Field Crops Research}, \textbf{86}(2), 267--277.
+
+\bibitem[{Viechtbauer(2010)}]{metafor}
+Viechtbauer, W. 2010 Conducting meta-analyses in r with the metafor package.
+\newblock \emph{Journal of Statistical Software}, \textbf{36}(3), 1--48.
+
+\bibitem[{Gurevitch \& Hedges(1999)}]{Gurevitch1999}
+Gurevitch, J. \& Hedges, L.~V. 1999 Statistical issues in ecological
+  meta-analyses.
+\newblock \emph{Ecology}, \textbf{80}(4), 1142--1149.
+
+\bibitem[{Hedges \emph{et~al.}(1999)Hedges, Gurevitch \& Curtis}]{Hedges1999}
+Hedges, L., Gurevitch, J. \& Curtis, P. 1999 The meta-analysis of response
+  ratios in experimental ecology.
+\newblock \emph{Ecology}, \textbf{80}, 1150--1156.
+
+\bibitem[{Hedges \& Olkin(1985)}]{Hedges1985}
+Hedges, L.~V. \& Olkin, I. 1985 \emph{Statistical methods for meta-analysis}.
+\newblock New York: Academic Press.
+
+\bibitem[{Lajeunesse(2011)}]{Lajeunesse2011}
+Lajeunesse, M.~J. 2011 On the meta-analysis of response ratios for studies with
+  correlated and multi-group designs.
+\newblock \emph{Ecology}, \textbf{92}(11), 2049--2055.
+
+\bibitem[{Gelman \& Hill(2006)}]{gelman2006data}
+Gelman, A. \& Hill, J. 2006 \emph{Data analysis using regression and
+  multilevel/hierarchical models}.
+\newblock Cambridge University Press.
+
+\bibitem[{K{\'e}ry \& Schaub(2012)}]{kery2012bayesian}
+K{\'e}ry, M. \& Schaub, M. 2012 \emph{Bayesian population analysis using
+  WinBUGS: a hierarchical perspective}.
+\newblock Academic Press.
+
+\end{thebibliography}

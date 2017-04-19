@@ -6,41 +6,8 @@ source("plotting/src/CIplotting.R")
 source('../networkLevel/src/misc.R', chdir = TRUE)
 load('saved/dissMods.Rdata')
 
-## ************************************************************
-## interaction dispersion, k, plants
-## ************************************************************
 plants$SiteStatus <- "all"
 pols$SiteStatus <- "all"
-
-dd.plants.k <- expand.grid(k=seq(
-                             from= min(plants$k),
-                             to= max(plants$k),
-                             length=10),
-                           ## SiteStatus= c("control", "maturing",
-                           ## "mature"),
-                           SiteStatus= c("all"),
-                           Dist= 0)
-
-plants.k.pi <- predict.int(mod= mod.plants,
-                           dd=dd.plants.k,
-                           y="Dist",
-                           family="gaussian")
-
-## plot.predict.div(new.dd=plants.k.pi,
-##                  ylabel="Interaction dispersion",
-##                  dats=plants,
-##                  xs="k",
-##                  y1="Dist",
-##                  xlabel="Plant network position (k)",
-##                  legend.loc="topright",
-##                  height=5,
-##                  width=5,
-##                  x.adj=0.5,
-##                  scaled=FALSE,
-##                  treatments="all",
-##                  col.lines="black",
-##                  f.path = 'figures/intdisper')
-
 
 ## ************************************************************
 ## interaction dispersion, closeness, plants
@@ -57,21 +24,6 @@ plants.closeness.pi <- predict.int(mod= mod.plants.close,
                                    dd=dd.plants.closeness,
                                    y="Dist",
                                    family="gaussian")
-
-## plot.predict.div(new.dd=plants.closeness.pi,
-##                  ylabel="Interaction dispersion",
-##                  dats=plants,
-##                  xs="closeness",
-##                  y1="Dist",
-##                  xlabel="Plant closeness",
-##                  legend.loc="topright",
-##                  height=5,
-##                  width=5,
-##                  x.adj=0.5,
-##                  scaled=FALSE,
-##                  treatments="all",
-##                  col.lines="black",
-##                  f.path = 'figures/intdisper')
 
 
 ## ************************************************************

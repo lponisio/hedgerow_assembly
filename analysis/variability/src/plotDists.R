@@ -49,12 +49,12 @@ plot.beta.div <- function(dis.method, ## dissmiliarity method for file name
 
 plot.coeffs <- function(dis.method, ## dissmiliarity method for file name
                         mod, ## model object
-                        status, ## vector of site statuses 
+                        status, ## vector of site statuses
                         type,  ## time or space for ylab
                         sub, ## bees/syrphids for file name
                         occ, ## occ data? TRUE/FALSE
                         fig.path = 'figures/betadisper',
-                        add.labels=TRUE){  
+                        add.labels=TRUE){
   ## cols <-brewer.pal(6, 'Dark2')[c(6,2,1)]
   cols <- brewer.pal(4, "Greys")[c(2,3,4)]
   f <- function(){
@@ -120,7 +120,7 @@ plot.node.box <- function(ylabel,
                          gsub(" ", "", ylabel),
                          "box", sep="_"))),
         width=6, height=6)
-  
+
 }
 
 
@@ -131,7 +131,6 @@ plotDistPanels <- function(){
         mar=c(1, 1, 2, 1), cex.axis=1.5)
     cols <- brewer.pal(4, "Greys")[c(2,3,4)]
     cols.fills <- add.alpha(cols, alpha=0.5)
-
     ## pollinator species turnover
     load(file= file.path('saved/speciesTurnover', sprintf('%s.pdf',
            paste(dis.method, alpha, occ, type="pols", sep='_'))))
@@ -144,6 +143,7 @@ plotDistPanels <- function(){
             xlab='', ylab='', ylim=c(0,1),
             names=c("","",""),
             las=1, xaxt="n")
+    text(x=1:3, y=0.9, c("a", "a", "b"))
     beeswarm(dists ~ status, col = cols.fills,
              add = TRUE, method="hex", corral="gutter")
     mtext("Pollinators",
@@ -165,7 +165,7 @@ plotDistPanels <- function(){
              method="hex", corral="gutter")
     mtext("Plants",
           3, line=0.9, cex=1.5)
-    
+
     ## interaction turnover
     load(file= file.path('saved/speciesTurnover', sprintf('%s.pdf',
            paste(dis.method, alpha, occ, type="ints", sep='_'))))
@@ -187,7 +187,7 @@ plotDistPanels <- function(){
             "Non-assembling \n hedgerow"),
           side = 1, line= 2, at = 1:3, cex=0.9)
     mtext("Turnover", 2, line=4, cex=2, adj=1.35)
-    
+
     ## weighted link turnover
     load(file="saved/phyloInt.Rdata")
     dats <- phylo.int$phylo.int
@@ -200,6 +200,7 @@ plotDistPanels <- function(){
             "Assembling \n  hedgerow",
             "Non-assembling \n hedgerow"),
           side = 1, line= 2, at = 1:3, cex=0.9)
+    text(x=1:3, y=0.2, c("a", "b", "b"))
     beeswarm(dats[,y1]~ dats$SiteStatus, col = cols.fills, add = TRUE,
              method="hex", corral="gutter")
     mtext("Weighted interactions", 3, line=0.9, cex=1.5)

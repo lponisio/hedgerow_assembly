@@ -37,8 +37,9 @@ spec <- spec[!spec$SiteStatus %in% to.drop.status,]
 
 
 tot.spec <- nrow(spec)
-
+print("proportion syrphids")
 nrow(spec[spec$Family == 'Syrphidae',])/tot.spec
+print("proprotion bee")
 nrow(spec[spec$BeeNonbee == 'bee',])/tot.spec
 
 ## subset to just bees and syrphids
@@ -50,19 +51,25 @@ spec$SiteStatus[spec$SiteStatus == "restored"] <- "maturing"
 
 
 ## total specimens
+print("total specimens")
 nrow(spec)
 
 ## total species
+print("total species")
 length(unique(spec$GenusSpecies))
 
 ## sampling dates
+print("sampling dates")
 length(unique(paste(spec$Site, spec$Date)))
 
 ## families and genera
+print("total families")
 length(unique(spec$Family))
+print("total genera")
 length(unique(spec$Genus))
 
 ## interactions
+print("total interactions")
 length(unique(paste(spec$GenusSpecies, spec$PlantGenusSpecies)))
 
 ## *************************************************

@@ -1,0 +1,509 @@
+\documentclass{article}
+\usepackage{natbib}
+\usepackage[unicode=true]{hyperref}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{color}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{verbatim}
+\usepackage{mathpazo}
+\usepackage{setspace}
+\usepackage{multirow}
+\usepackage{fullpage}
+\usepackage{lscape}
+\usepackage{fancyhdr}
+\usepackage{wrapfig,lipsum,booktabs}
+\usepackage[normalem]{ulem}
+\usepackage[parfill]{parskip}
+\usepackage{multirow}
+\geometry{tmargin=1in,bmargin=1in,lmargin=1in,rmargin=1in}
+
+\bibliographystyle{rspublicnatsort}
+
+%% for inline R code: if the inline code is not correctly parsed, you will see a message
+\newcommand{\rinline}[1]{SOMETHING WRONG WITH knitr}
+%% begin.rcode setup, include=FALSE
+%library(rjags)
+%library(R2jags)
+%library(runjags)
+%library(ggmcmc)
+%source('src/prep.R')
+%source('src/poolRR.R')
+%source('src/lajeunesse.R')
+%source('src/make_data_three_level.R')
+%source('src/models/study_obs_study.R')
+%load(file="saved/no_covars.Rdata")
+%load('data/metadat.RData')
+%
+% library(knitr)
+% read_chunk('main.R')
+%% end.rcode
+
+
+\begin{document}
+\title{Diversification practices reduce organic to conventional yield
+gap: A walkthrough of the anlaysis}
+\author{Lauren Ponisio}
+
+\maketitle
+\section{Overview}
+\label{sec:overview}
+
+
+In our study
+\href{http://nature.berkeley.edu/~lponisio/wp-content/uploads/2014/08/Ponisio2014.pdf}{\textcolor{blue}
+{Ponisio
+et al.~2015}} we compared the yields or organic and conventional
+agriculture using a custom-build meta-analytic model. Here I explain
+the analytic differences between our study and others, example our
+modeling decisions, and walk through our code. Below is the output of
+the final meta-analytic model, which will be described in detail in
+this document.
+
+%% begin.rcode external_chunk_1
+%% end.rcode
+
+\section{Where it all began, Seufert et al.~2011}
+\label{sec:beginning}
+
+How organic agriculture may contribute to world food production has
+been subject to vigorous debate over the past decade. Early reviews
+comparing organic to conventional agriculture found yield gaps of
+$8-9$\% in developed countries \citep{Stanhill1990, Badgley2007} but
+yield gains of as much as $180$\% in developing countries. Two recent
+meta-analyses, however, found organic yields to be $20-25$\% lower
+than conventional yields \citep{dePonti2012, Seufert2012}. These
+studies used different criteria for selecting the data to be included,
+but importantly each of the above studies used different analytical
+methods to combine the data across the different sub-studies. The
+studies comparing organic and conventional yields systems often
+reported yields from multiple crops across several years. In addition,
+they tended to compare multiple treatments (usually organic) to one
+control treatment (usually conventional). For example from
+\cite{denison2004crop}:
+
+%% begin.rcode data_preview
+%% end.rcode
+
+Using the organic to conventional yield comparisons without taking
+into account the underlying data structure can lead to potential
+pseudo-replication and an understated Type 1 error rate. We used a
+randomization test to estimate the Type I error rate of the Seufert et
+al.~analysis.  We forced the null hypothesis to be true by randomly
+re-assigning the 'organic' and 'conventional' labels for each study
+and then using the R package {\tt Metafor} \citep{metafor} to
+implement a random effects meta-analysis on each randomized dataset.
+Repeating this procedure $10^5$ times enabled us to determine the Type
+I error rate (false rejection) resulting from not accounting for the
+hierarchical structure of the data.  In over $50\%$ of simulations,
+the null hypothesis was rejected using a nominal Type I error rate of
+0.05 (Fig.~\ref{fig:permutation}).  In other words, even if organic
+and conventional yields are known not to be different, applying the
+model used by \cite{Seufert2012} for these data would lead to the
+conclusion that they are significantly different in over $50\%$ of
+cases. This means that the actual Type I error rate is inflated
+relative to what was reported, leading to the following related
+statements: the significance levels were overstated; the confidence
+intervals were underestimated; the uncertainty was not fully accounted
+for.
+
+\begin{figure} \centering
+\includegraphics[width=0.5\textwidth]{figure/permutation.pdf}
+\caption{The distribution of $p$-values when the null hypothesis was
+forced to be true using the data and analysis type present in
+Seufert et al.\  \cite{Seufert2012}.  If the analysis procedure was
+valid for these data, the distribution of P-values should be
+uniform between 0 and 1.  Instead it is sharply shifted toward low
+P-values.  In over $50\%$ of simulations, the null hypothesis was
+rejected using a nominal Type I error rate of 0.05 (red region
+above).}
+\label{fig:permutation}
+\end{figure}
+
+The de Ponti et al.\ \citep{dePonti2012} study had similar issues with
+pseudo-replication. Additionally they did not account for the sampling
+variance within studies, which is the recommended practice to deal
+with unequal variances in the sample of studies \citep{Gurevitch1999}.
+
+Given these methodological and data-related critiques, a new study was
+needed to produce a more robust estimate of the gap between organic
+and conventional yields.  We developed a hierarchical meta-analytic
+framework that overcomes the methodological pitfalls of previous
+studies by accounting for both the multi-level nature of the data and
+the yield variation within studies.  Furthermore, via a literature
+search we compiled a more extensive and up-to-date meta-dataset,
+comprising 1071 organic to conventional yield comparisons from 115
+studies --- over three times the number of observations of any of the
+previous analyses. Our meta-dataset includes studies from 38 countries
+and 52 crop species over a span of 35 years.
+
+\section{Building our meta-analytic model}
+\label{sec:model-building}
+
+We built a hierarchical meta-analytic model to generate an estimate of
+the yield gap. Following standard practice, we compared the natural
+log of the ratios between organic and conventional yields (the
+``response ratio'') across studies \citep{Hedges1999,
+Seufert2012}. The response ratio is more normally distributed than the
+raw ratio and independent of the units of measurement used within a
+study and, thus, comparable across studies \citep{Hedges1999}.
+
+%% begin.rcode RR_density, fig.height = 4, fig.width = 4
+%% end.rcode
+
+We constructed a hierarchical regression model to account for
+the dependencies in the yield data. We expanded on the traditional
+random effects model \citep{Hedges1985} by considering three
+additional sources of random variation (i.e., random effects): 1)
+between studies, 2) within a study between years, and 3) within a year
+between response ratios (e.g., across replicated trials of a crop
+planted at different times in the season). We also considered whether
+the variances of the random effect distributions for 2) and 3) were
+shared across studies, or study-specific.
+
+The full possible model, prior to model selection, with all sources of
+random variation is
+
+\begin{equation}
+  \begin{split}
+    \label{eq:fullModel}
+    y_{ijk} &= \mu + \alpha_i + \beta_{ij} +  \eta_{ijk} +
+    \epsilon_{ijk}  \\
+    \alpha_{i} &\sim N(0, \sigma^2_{\alpha})\\
+    \beta_{ij} &\sim N(0, \sigma^2_{\beta}[i])\\
+    \eta_{ijk} &\sim N(0, \sigma^2_{\eta}[i])\\
+    \epsilon_{ijk} &\sim N(0, S_{ijk}])\\
+    \sigma^2_{\beta}[i] &\sim \Gamma(CV_\beta, scale_\beta)\\
+    \sigma^2_{\eta}[i] &\sim \Gamma(CV_\eta, scale_\eta)
+  \end{split}
+\end{equation}
+% where $y_{ijk}$ is the observed magnitude of the $k^{\mathrm{th}}$
+response ratio from the $j^{\mathrm{th}}$ year of the
+$i^{\mathrm{th}}$ study, $\mu$ is the mean response ratio across
+studies, $\alpha_{i}$ is the effect of $i^{\mathrm{th}}$ study,
+$\beta_{ij}$ is the effect of $j^{\mathrm{th}}$ year of the
+$i^{\mathrm{th}}$ study, $\eta_{ijk}$ is the effect of the
+$k^{\mathrm{th}}$ response ratio of the $j^{\mathrm{th}}$ year of
+$i^{\mathrm{th}}$ study, and $\epsilon_{ijk}$ is the
+residual. $\sigma^2_{\alpha}$ is the between study variance,
+$\sigma^2_{\beta}[i]$ is the between year variance of study $i$,
+$\sigma^2_{\eta}[i]$ is the within year, between response ratio
+variance of study $i$, and $S_{ijk}$ is the variance of response ratio
+$ijk$ as reported by its study. $CV_\beta$ and $CV_\eta$ and
+$scale_\beta$ and $scale_\eta$ are the coefficient of variation and
+scale parameters of the gamma distributions of the study-specific
+between- and within-year variances.  When response ratios that shared
+a common control were combined, $y_{ijk}$ corresponds to the aggregate
+within-study response ratio \citep[Eq.~3,][]{Lajeunesse2011} and
+$S_{ijk}$ is its pooled variance \citep[Eq.~8,][]{Lajeunesse2011}.
+
+\subsection{Parameter inclusion}
+To determine the levels of hierarchy supported by the data, we
+sequentially added random effects and examined the posteriors of the
+parameters to determine the support for their inclusion. We also
+confirmed our selection with Deviance Information Criterion (DIC). The
+DIC can be problematic for hierarchical models because the effective
+number of parameters is not clearly defined \citep{gelman2006data,
+kery2012bayesian}. The DIC was therefore used in combination with a
+visual examination of the posterior distributions of the parameters to
+select the best supported model.
+
+For the variance within and between year random effect distributions,
+we considered two parameterizations: 1) the variance terms, denoted
+$\sigma^2_{\eta}$ and $\sigma^2_{\beta}$, respectively, were shared
+across all studies each with a Uniform(0,100) prior, and 2) the
+variance terms were study-specific (i.e., $\sigma^2_{\eta}[i]$ and
+$\sigma^2_{\beta}[i]$). In the latter case, the study-specific
+precision terms (1/variance) were assumed to be distributed according
+to a gamma distribution whose parameters were
+estimated. Uniform(0,100) priors were used for the coefficient of
+variation ($1/\sqrt{shape}$) and the square root of the scale.
+
+We first added a random effect of study and examined the posterior for
+$\sigma_{\alpha}$ (the standard deviation of the common distribution
+from which the study effects are drawn). The posterior was clearly
+differentiated from zero (Fig.~\ref{fig:posteriors}a). We next added
+random variation within a year and examined $\sigma_{\eta}$. We found
+it was also clearly different from zero
+(Fig.~\ref{fig:posteriors}b). The DIC was also smaller than when only
+a random effect of study was included (Tab.~\ref{table:params}). Next
+we allowed the within-year precisions to be study-specific and follow
+a gamma distribution. We examined the coefficient of variation of the
+gamma distribution and found it was clearly differentiated from zero
+(Fig.~\ref{fig:posteriors}c). The DIC was also smaller than when a
+single within year effect was shared across studies
+(Tab.~\ref{table:params}). Lastly, we added a between year random
+effect and examined $\sigma_{\beta}$. The posterior was concentrated
+at zero (Fig.~\ref{fig:posteriors}d) so we concluded there was
+insufficient support for including it in the model. The estimate of
+the yield gap and its uncertainty did not differ substantially from
+when no between year effect was included
+(Fig.~\ref{fig:model_selection}), the DIC, however, was marginally
+smaller then when no between year random effect was included
+(Tab.~\ref{table:params}).
+
+\clearpage
+
+\begin{figure}
+\centering
+\includegraphics[width=0.8\textwidth]{figure/posteriors.pdf}
+\caption{The posterior distributions for the random effect of a)
+study ($\sigma_{\alpha}$); b) response ratios within a year
+($\sigma_{\eta}$); c) response ratios within a year where the
+within year variance is study-specific, $CV_{\sigma_{\eta}}$ is
+the coefficient of variation ($1/\sqrt{shape}$) of the gamma
+distribution (this model is most supported by the data); and d)
+between year ($\sigma_{\beta}$). Including a between-year variance
+term was not supported by the data (the posterior for
+($\sigma_{\beta}$ is not differentiated from zero ).}
+\label{fig:posteriors}
+\end{figure}
+\clearpage
+
+\begin{figure}
+\centering
+\includegraphics[width=0.8\textwidth]{figure/model_selection.pdf}
+\caption{The sensitivity of the yield gap to including different
+levels of hierarchy in the model. The random effects included in
+the model are: a) study ($\sigma_{\alpha}$); b) study and response
+ratios within a year ($\sigma_{\eta}$); c) study and response
+ratios within a year where the within year variance is
+study-specific ($\sigma_{\eta}[i]$) (this model is most supported
+by the data); and d) study, study-specific within-year variance,
+and between year ($\sigma_{\beta}$). Including a between-year
+variance term was not supported by the data (the posterior for
+($\sigma_{\beta}$ is not differentiated from zero ). Values are
+the posterior mean with 95\% credible intervals.}
+\label{fig:model_selection}
+\end{figure}
+\clearpage
+
+\begin{table}
+  \renewcommand*\arraystretch{1.25}
+  \centering
+  \caption{Parameter posteriors for models without explanatory
+    variables. $\mu$ is the true mean response ratio across years and
+    studies, $\sigma_{\alpha}$ is the standard deviation of the
+    distribution from which the study random effects are drawn;
+    $\sigma_{\eta}$ is the standard deviation of the distribution from
+    which the within year random effects are drawn; $CV_{\sigma_\eta}$ is the
+    coefficient of variation of the gamma from which the
+    study-specific within-year variance are drawn; and $\sigma_\beta$
+    is the standard deviation of the distribution of random between year
+    effects. Values of Rhat $< 1.1$ indicate convergence. Lower
+    Deviance Information Criterion (DIC) indicates better model fit to
+    the data.}
+
+  \vspace{20pt}
+  \label{table:params}
+  \begin{tabular}{|c|c|c|c|c|} \hline
+    Parameter & Posterior mean & Posterior standard deviation
+    & 95\% CI & Rhat \\ \hline
+    \multicolumn{5}{|l|}{Study random effect, DIC=1684.8} \\ \hline
+    \multirow{1}{*}{$\mu$} &
+    $0.795$ & $0.027$ & $0.742 - 0.848$ & $1.001$ \\ \hline
+    \multirow{1}{*}{$\sigma_{\alpha}$} &
+    $0.341$ & $0.026$ & $0.294 - 0.396$ & $1.001$ \\ \hline
+
+    \multicolumn{5}{|l|}{Study and within year random effects,
+      DIC= -565.9} \\ \hline
+    \multirow{1}{*}{$\mu$} &
+    $0.788$ & $0.021$ & $0.749 - 0.829$ & $1.001$ \\ \hline
+    \multirow{1}{*}{$\sigma_{\alpha}$} &
+    $0.188$ & $0.024$ & $0.144 - 0.239$ & $1.001$ \\ \hline
+    \multirow{1}{*}{$\sigma_{\eta}$} &
+    $0.312$ & $0.011$ & $0.291 - 0.333$ & $1.001$ \\ \hline
+
+    \multicolumn{5}{|l|}{Study and study-specific within year random
+      effects, DIC= -618.0} \\ \hline
+    \multirow{1}{*}{$\mu$} &
+    $0.808$ & $0.019$ & $0.771 - 0.845$ & $1.001$ \\ \hline
+    \multirow{1}{*}{$\sigma_{\alpha}$} &
+    $0.189$ & $0.023$ & $0.145 - 0.237$ & $1.001$ \\ \hline
+   \multirow{1}{*}{$CV_{\sigma_\eta}$} &
+    $1.155$ & $0.135$ & $0.907 - 1.436$ & $1.001$ \\ \hline
+
+    \multicolumn{5}{|l|}{Study, study-specific within year,
+      and between year random effects, DIC= -621.2} \\ \hline
+     \multirow{1}{*}{$\mu$} &
+    $0.808$ & $0.019$ & $0.770 - 0.846$ & $1.001$ \\ \hline
+    \multirow{1}{*}{$\sigma_{\alpha}$} &
+    $0.186$ & $0.024$ & $0.142 - 0.234$ & $1.001$ \\ \hline
+   \multirow{1}{*}{$CV_{\sigma_\eta}$} &
+    $1.157$ & $0.136$ & $0.907 - 1.440$ & $1.001$ \\ \hline
+   \multirow{1}{*}{$\sigma_{\beta}$} &
+    $0.041$ & $0.027$ & $0.002 - 0.098$ & $1.001$ \\ \hline
+
+  \end{tabular}
+\end{table}
+\clearpage
+
+The best supported model, coded in JAGS, is
+
+%% begin.rcode full_model, echo, echo=FALSE
+% cat('model {
+%     for(study in 1:Nstudy) {
+%       for(year in 1:Nyear[study]) {
+%         for(obs in 1:Nobs[study,year]) {
+%           P[study,year,obs] <- 1/V[study,year,obs]
+%           RR[study,year,obs] ~ dnorm(mu.RR[study,year,obs],
+%                                      P[study,year,obs])
+%           mu.RR[study,year,obs] ~ dnorm(mu.study[study],
+%                                     tau.yr.obs[study])
+%         }
+%       }
+%       mu.study[study] ~ dnorm(mu, tau)
+%       tau.yr.obs[study] ~ dgamma(shape.obs, scale.obs)
+%     }
+
+%     mu ~ dnorm(0, 1e-4)
+%     exp.mu <- exp(mu)
+%     tau <- 1 / (sigma * sigma)
+%     sigma ~ dunif(0, 100)
+
+%     shape.obs <- (1/cv.obs)^2
+%     cv.obs ~ dunif(0, 100)
+%     scale.obs <- (1/in.scale.obs)^2
+%     in.scale.obs ~ dunif(0, 100)
+%   }', fill = TRUE)
+%% end.rcode
+
+Where the parameters names match the notation in
+Equ. \ref{eq:fullModel}.
+
+\section{Analysis}
+\label{sec:analysis}
+
+After deciding on the model parameterization, the most difficult part
+of running a model in JAGS in getting tha data in the right format (in
+my opinion). Our situation was particularly difficult because we
+needed to build in flexibility to pool different combinations of
+response ratios using the method presented in Lajeunesse
+\cite{Lajeunesse2011} depending on the explanatory variable being
+considered (when response ratios that share a control split between
+different levels of an explanatory variable, they can be left
+un-pooled). Below I focus on the best supported model without
+explanatory variables.
+
+First we have a function to calculate pooled RR and their variances
+%% begin.rcode laj
+%% end.rcode
+
+Which is called by this function which combines the meta-data based on
+keys
+
+%% begin.rcode poolRR
+%% end.rcode
+
+This is all brought together by this long, unwieldy function that
+returns the data structure necessary for the JAGS model including the
+indexes for looping and arrays of RR, variances and covariates is
+applicable
+
+%% begin.rcode makeData
+%% end.rcode
+
+We then pacakges everything up in a function that also passes the JAGS
+parameters (init values, thinning rate etc.) and runs the model.
+
+%% begin.rcode prep
+%% end.rcode
+
+%% begin.rcode external_chunk_1
+%% end.rcode
+
+exp.mu is the mean ratio of organic and conventional yields, which is
+around $80.1\%$ with $95\%$ credible intervals ranging from around
+$77--85\%$
+
+Sigma is the between study variance, and cv.obs is the coefficient of
+variation of $\gamma$ distribution the within-study variance
+parameters are drawn from.
+
+
+Values of Rhat < 1.1 indicate convergence, whcih we We can see from
+inspecting the posteriors
+
+%% begin.rcode densityPlots
+%% end.rcode
+
+The chains look wonderfully grassy
+
+%% begin.rcode traceplots
+%% end.rcode
+
+
+
+\section{Explanatory variables}
+\label{sec:variables}
+We also extended this model in order to accommodate analyses of study
+characteristics such as crop type and management practices. We analyze
+these additional explanatory variables one at a time because not all
+studies reported all explanatory variables. In these analyses, for
+cases where multiple organic treatments represented different
+categories for a specific explanatory variable, they could not be
+combined using Lajeunesse's method \citep{Lajeunesse2011}. The
+potential bias resulting from non-independence of the response ratios
+in these cases, however, would be minimized by the fact that they are
+not pooled together in the analysis \citep{Lajeunesse2011}.
+
+Letting $h$ index the categories for a particular explanatory variable
+(e.g., crop species), we then have:
+%
+\begin{equation}
+  \begin{split}
+    \label{eq:fullModel_cov}
+    y_{hijk} &=
+    \mu + \gamma_h + \alpha_i + \eta_{ijk} +  \beta_{ij} + \epsilon_{ijk}\\
+  \end{split}
+\end{equation}
+%
+
+where $\gamma_h$ is the effect of the $h^{\mathrm{th}}$ category, and
+the rest of the model parallels that given in Eq.~\ref{eq:fullModel}.
+
+The model including explanatory variables in JAGS is
+
+%% begin.rcode covar_model, echo, echo=FALSE
+ cat('model {
+    for(study in 1:Nstudy) {
+      for(year in 1:Nyear[study]) {
+        for(obs in 1:Nobs[study,year]) {
+          P[study,year,obs] <- 1/V[study,year,obs]
+          RR[study,year,obs] ~ dnorm(mu.RR[study,year,obs], P[study,year,obs])
+          mu.RR[study,year,obs] ~ dnorm(mu.study[study,year,obs],
+                                        tau.obs[study])
+          mu.study[study,year,obs] ~ dnorm(mu[cov[study,year,obs]], tau)
+        }
+      }
+      tau.obs[study] ~ dgamma(shape.obs, scale.obs)
+    }
+
+    ## set priors on covariates
+    for(covs in 1:Ncov) {
+      mu[covs] ~ dnorm(0, 1E-3)
+      exp.mu[covs] <- exp(mu[covs])
+    }
+    tau <- 1 / (sigma * sigma)
+    sigma ~ dunif(0, 100)
+
+    shape.obs <- (1/cv)^2
+    cv ~ dunif(0, 100)
+    scale.obs <- (1/in.scale)^2
+    in.scale ~ dunif(0, 100)
+
+  }', fill = TRUE)
+%% end.rcode
+
+Where the parameters names match the notation in
+Equ.~\ref{eq:fullModel} and cov is a matrix of explanatory variables
+assiciated with each response ratio.
+
+To re-run the models with explanatory variables, we just added each
+variable one-by-one to the covariates argument of the makeData()
+function.
+
+\bibliography{org_v_conv} \clearpage
+
+\end{document}
