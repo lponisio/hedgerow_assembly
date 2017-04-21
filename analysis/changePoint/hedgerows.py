@@ -40,12 +40,8 @@ def star_func(arglist):
         except:
             raise Exception("".join(traceback.format_exception(*sys.exc_info())))
 
-## --
 
-
-os.chdir(os.path.expanduser('~/Dropbox/hedgerow_assembly/analysis/changePoint/cptPeel'))
-
-ncores = 2
+os.chdir('cptPeel')
 
 ## find .pair files
 l = glob.glob("baci/*_*.pairs")
@@ -58,6 +54,8 @@ prefixes = [p for p in prefixes if prefixes.count(p) >=5]
 prefixes = set(prefixes)
 
 ## run change point analysis for each site
+ncores = 2
+
 jobs = [(runNetworkChangePoint, [[f for f in l if prefix in f]]) for prefix in prefixes]
 mapPool(ncores, jobs)
 

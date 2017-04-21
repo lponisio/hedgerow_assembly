@@ -109,30 +109,46 @@ makeConsensusTable <- function(changing.points,
         }
     }
     names(clusters) <- names(split.ch.yrs)
+    clusters.pairs <- clusters
 
-    for(i in 1:length(clusters)){
-        for(j in 1:length(clusters[[i]])){
-            clusters[[i]][[j]] <- paste(names(split.ch.yrs)[i], '_',
-                                        clusters[[i]][[j]], '.pairs', sep='')
+    for(i in 1:length(clusters.pairs)){
+        for(j in 1:length(clusters.pairs[[i]])){
+            clusters.pairs[[i]][[j]] <- paste(names(split.ch.yrs)[i], '_',
+                                              clusters.pairs[[i]][[j]],
+                                              '.pairs', sep='')
         }
     }
 
-    clusters <- lapply(clusters, function(x){
+    clusters.pairs <- lapply(clusters.pairs, function(x){
         lapply(x, function(y){
             y <- y[y %in% files]
         })
     })
-
     pasteComma <- function(...){
         paste(..., sep=', ')
     }
 
-    prep.table <- unlist(lapply(clusters,
+    ## create table for consensus function
+    prep.table <- unlist(lapply(clusters.pairs,
                                 function(x) do.call(pasteComma, x)))
 
+    ## create table to convert consensus trees to something useable
+    last.yr <- rapply(clusters, max, how="unlist")
+    names.yr <- substr(names(last.yr), 1, nchar(names(last.yr))-1)
+
+    out <- character(length(last.yr))
+    for(i in 1:length(last.yr)){
+        out[i] <- sprintf("baci/%s_%s_joint_s1-consensus.tree",
+                          names.yr[i], last.yr[i])
+    }
 
     write.table(prep.table, file=file.path(save.path, 'consensus.txt'),
-                col.names=FALSE)
+                col.names=FALSE,
+                row.names=FALSE)
+
+    write.table(out, file=file.path(save.path, 'lastyr_consensus.txt'),
+                col.names=FALSE,
+                row.names=FALSE)
 
 
 }

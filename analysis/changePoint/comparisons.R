@@ -32,7 +32,11 @@ chpt.trial$status <- spec$SiteStatus[match(chpt.trial$Site, spec$Site)]
 chpt.trial$status[chpt.trial$Site %in% BACI.site] <- "maturing"
 
 ## binomial model with change points as successes
-mod.chpt <- glm(cbind(chpt.trial$chpts, chpt.trial$trial - chpt.trial$chpts) ~
+chpt.trial$status <- factor(chpt.trial$status,
+                            levels=c("maturing", "mature", "control"))
+
+mod.chpt <- glm(cbind(chpt.trial$chpts,
+                      chpt.trial$trial - chpt.trial$chpts) ~
     chpt.trial$status, family="binomial")
 print(summary(mod.chpt))
 
