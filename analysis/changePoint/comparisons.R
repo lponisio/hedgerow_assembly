@@ -31,6 +31,13 @@ colnames(chpt.trial) <- c("Site", "trial", "chpts")
 chpt.trial$status <- spec$SiteStatus[match(chpt.trial$Site, spec$Site)]
 chpt.trial$status[chpt.trial$Site %in% BACI.site] <- "maturing"
 
+chpt.trial <- chpt.trial[order(chpt.trial$status),]
+
+## write.table(chpt.trial,
+##             file='~/Dropbox/hedgerow_assembly_ms/ms/tables/changingPoints.txt',
+##             row.names=FALSE,
+##             sep="&")
+
 ## binomial model with change points as successes
 chpt.trial$status <- factor(chpt.trial$status,
                             levels=c("maturing", "mature", "control"))
@@ -51,6 +58,12 @@ nrow(chpt.trial[chpt.trial$status == "mature" &
                 chpt.trial$chpts != 0,])/
   nrow(chpt.trial[chpt.trial$status == "mature",])
 
+
+nrow(chpt.trial[chpt.trial$status != "maturing" &
+                chpt.trial$chpts != 0,])/
+  nrow(chpt.trial[chpt.trial$status != "maturing",])
+
+
 nrow(chpt.trial[chpt.trial$chpts != 0,])/
   nrow(chpt.trial)
 
@@ -61,6 +74,7 @@ nrow(chpt.trial[chpt.trial$chpts != 0,])/
 chpt.trial$prop <- chpt.trial$chpts/chpt.trial$trial
 tapply(chpt.trial$prop, chpt.trial$status, mean)
 
+tapply(chpt.trial$trial, chpt.trial$status, sum)
 
 ## **********************************************************
 ## some methodological tests: are years with larger differences in the
