@@ -1,22 +1,55 @@
 library(reshape)
 library(tidyr)
 
-makeChangepointData <- function(results, logs,
+#The change point analysis (cp) results gives a table with five columns: the first two represents the first and last years, and the other three the probabilities that a cp occured, for each interval. For example, if the first two collumns are 2006 and 2009, the three values represent the cp values for intervals 2006-2007, 2007-2008, 2008-2009. A cp occures when there is a value=1.00.
+#When you have more than four years, there is more than one line for that site, and thus, it can have more than one value per period. When that happens, you have to check in the logs file to see which one has the greater likelihood. 
+
+#The code below is to identify the years that were sampled in order to create the channging points table from a samples table that has the sites in the rows and the number of times each year was sampled in the columns, for all years. The output is a list in which each dimension is a sample site, and there is a dataframe with the year the sample started and the period that follows. 
+samples <- read.csv("~/Dropbox/hedgerow_assembly/data/samples.csv")                    
+years<-as.numeric(sapply(strsplit(colnames(samples), 'X'),
+                         function(x) x[2]))
+#create a vector of the periods
+periods<-apply(samples, 1, function(x) which(x!=0))
+names(periods)<-samples[,1]
+periods2<-list()
+#for each site checks if there is more than one year sampled.
+for(p in 1: length(periods)){
+  anos<-years[periods[[p]]]
+  anos<-anos[!is.na(anos)]
+  if(length(anos)!=1){
+    years2 <- as.data.frame(matrix(NA, (length(anos)-1),2))
+    for(n in 1:(length(anos)-1)){
+      years2[n,2] <- paste(anos[n], anos[n+1], sep='-')
+    }
+    years2[,1] <- anos[-length(anos)]
+    colnames(years2) <- c('first', 'period')
+    periods2[[p]]<-years2
+  }else{
+    periods2[p]<-anos}
+}
+
+names(periods2)<-samples[,1]
+
+makeChangepointData <- function(results, logs, value,
                                 save.path="../saved/"){
     ## makes a useful data set with the change points at each site
     ## from the output of the change point detection analysis
     ## split the year and creates an extra table with year 1 and
     ## period
-
+    #browser()
     results <- results[sort(results$V1),]
     logs <- logs[sort(logs$V1),]
-    results$V1 <- as.character(results$V1)
-    results$V2 <- as.character(results$V2)
+    #checking to make sure it is the same order
+    if("FALSE" %in% (results[,1:2]==logs[,1:2])){print("Stop! Names in files don't match")}
+    
+    # #The code below is just to create the periods between years
+     results$V1 <- as.character(results$V1)
+     results$V2 <- as.character(results$V2)
     years1  <-  as.numeric(sapply(strsplit(results$V1, '_'),
-                                  function(x) x[2]))
-    years2  <-  as.numeric(sapply(strsplit(results$V2, '_'),
-                                  function(x) x[2]))
-    anos <- min(years1):max(years2)
+                                   function(x) x[2]))
+     years2  <-  as.numeric(sapply(strsplit(results$V2, '_'),
+                                   function(x) x[2]))
+     anos <- min(years1):max(years2)
     anos.unique <- unique(c(years1, years2))
     anos <- anos[anos %in% anos.unique]
 
@@ -27,39 +60,44 @@ makeChangepointData <- function(results, logs,
     years[,1] <- anos[-length(anos)]
     colnames(years) <- c('first', 'period')
 
-    ## creates other variables for results
-    sites  <- sapply(strsplit(results$V1, '_'), function(x) x[1])
+    ## Identifyes the sites' name
+    sites  <- sapply(strsplit(results$V1, "_"), function(x) x[1])
+    ## Return the maximum values per line
     max <- apply(results[,c(3:5)], 1, max)
+    ## Return the number of ones (i.e. number of changing points) values per line
     numberOfOnes <- apply(results[,c(3:5)], 1,
                           function(x) length(which(x==1)))
+    #creating a dummy column to identify the period, which will be the year that specific period (line) started, plus the column number.
     max.index <- rep(NA, dim(results)[1])
     results <- cbind(results,  sites, years1, max, numberOfOnes, max.index)
 
+    #Separating only the lines that have values of 1.00 (changing points idetified) for the results and the logs
+    sigs <- results[results$max >value,]
+    logs.sigs <- logs[results$max >value,]
     ## checking if there is more than 1 value, and if yes, returns the
-    ## index with the maxlog
-    for(row in 1:dim(results)[1]){
-        if(results$numberOfOnes[row] > 1){
-            results$max.index[row] <- which.max(logs[row,c(3:5)])
+    ## index with the maxlog (log table)
+    for(row in 1:dim(sigs)[1]){
+        if(sigs$numberOfOnes[row] > 1){
+          sigs$max.index[row] <- which.max(logs.sigs[row,c(3:5)])
         }
         else {## return the position of the max
-            results$max.index[row] <- which(results[row,c(3:5)] ==
-                                            results$max[row])[1]
+          sigs$max.index[row] <- which(sigs[row,c(3:5)] ==
+                                         sigs$max[row])[1]
         }
     }
-    sigs <- results[results$max > 0.949,]
-    cp <- rep(NA, dim(sigs)[1])
-    value <- rep(NA, dim(sigs)[1])
-    sigs <- cbind(sigs, cp, value)
+    
+    #aadding the period
+    period <- rep(NA, dim(sigs)[1])
+    sigs <- cbind(sigs, period)
 
-    ## cp is always the year + next year
+    ## cp occurs between two years, indicated by the first year of the line plus the column where the 1.0 is found
     for(i in 1:dim(sigs)[1]){
-        y1 <- which(years$first %in% sigs$years1[i] == TRUE)
-        sigs$cp[i] <- years$period[y1+(sigs$max.index[i]-1)]
-        sigs$value[i] <- sigs[i,c(3:5)][sigs$max.index[i]]
+      local<-which(sigs$sites[i]==names(periods2))
+      y1 <- which(periods2[[local]][,1] ==sigs$years1[i])
+        sigs$period[i] <- periods2[[local]][y1,2]
     }
-    sigs$value <- unlist(sigs$value)
-    changing.points <- sigs[,c(6,11,12)]
-
+    changing.points <- sigs[,c(6,8,11)]
+    colnames(changing.points)<-c("sites", "value", "cp")
     write.csv(changing.points,
               file=file.path(save.path, 'changing_points.csv'),
               row.names=FALSE)
@@ -109,46 +147,30 @@ makeConsensusTable <- function(changing.points,
         }
     }
     names(clusters) <- names(split.ch.yrs)
-    clusters.pairs <- clusters
 
-    for(i in 1:length(clusters.pairs)){
-        for(j in 1:length(clusters.pairs[[i]])){
-            clusters.pairs[[i]][[j]] <- paste(names(split.ch.yrs)[i], '_',
-                                              clusters.pairs[[i]][[j]],
-                                              '.pairs', sep='')
+    for(i in 1:length(clusters)){
+        for(j in 1:length(clusters[[i]])){
+            clusters[[i]][[j]] <- paste(names(split.ch.yrs)[i], '_',
+                                        clusters[[i]][[j]], '.pairs', sep='')
         }
     }
 
-    clusters.pairs <- lapply(clusters.pairs, function(x){
+    clusters <- lapply(clusters, function(x){
         lapply(x, function(y){
             y <- y[y %in% files]
         })
     })
+
     pasteComma <- function(...){
         paste(..., sep=', ')
     }
 
-    ## create table for consensus function
-    prep.table <- unlist(lapply(clusters.pairs,
+    prep.table <- unlist(lapply(clusters,
                                 function(x) do.call(pasteComma, x)))
 
-    ## create table to convert consensus trees to something useable
-    last.yr <- rapply(clusters, max, how="unlist")
-    names.yr <- substr(names(last.yr), 1, nchar(names(last.yr))-1)
-
-    out <- character(length(last.yr))
-    for(i in 1:length(last.yr)){
-        out[i] <- sprintf("baci/%s_%s_joint_s1-consensus.tree",
-                          names.yr[i], last.yr[i])
-    }
 
     write.table(prep.table, file=file.path(save.path, 'consensus.txt'),
-                col.names=FALSE,
-                row.names=FALSE)
-
-    write.table(out, file=file.path(save.path, 'lastyr_consensus.txt'),
-                col.names=FALSE,
-                row.names=FALSE)
+                col.names=FALSE)
 
 
 }
