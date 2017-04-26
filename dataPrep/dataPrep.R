@@ -23,6 +23,40 @@ spec <- dd
 
 spec <-  spec[spec$Year != "2015",]
 
+## *************************************************
+## sampling table for manuscript
+## *************************************************
+
+site.table <- aggregate(list(Samples=spec$Date),
+                        list(Year=spec$Year, Site=spec$Site),
+                        function(x) length(unique(x)))
+
+ms.table <- samp2site.spp(site=site.table$Site,
+                          spp=site.table$Year,
+                          abund=site.table$Samples,
+                          FUN=sum)
+
+write.csv(ms.table, file="../data/samples.csv")
+
+ms.table <- cbind(spec$SiteStatus[match(rownames(ms.table),
+                                        spec$Site)], ms.table)
+
+colnames(ms.table) <- c("Site type", colnames(ms.table)[-1])
+
+ms.table <- ms.table[order(ms.table[, "Site type"], decreasing=TRUE),]
+
+ms.table[, "Site type"][ms.table[, "Site type"] == "maturing"] <-
+  "Assembling HR"
+
+ms.table[, "Site type"][ms.table[, "Site type"] == "mature"] <-
+  "Non-assembling HR"
+
+ms.table[, "Site type"][ms.table[, "Site type"] == "control"] <-
+  "Non-assembling FM"
+
+write.table(ms.table, file="~/Dropbox/hedgerow_assembly_ms/ms/tables/samples.txt",
+            sep=" & ")
+
 ## subset to net specimens
 spec <- spec[spec$NetPan == 'net',]
 ## create species column
@@ -128,39 +162,6 @@ rownames(temp.tol) <- NULL
 
 traits <- merge(traits, temp.tol, all.x=TRUE)
 
-## *************************************************
-## sampling table for manuscript
-## *************************************************
-
-site.table <- aggregate(list(Samples=spec$Date),
-                        list(Year=spec$Year, Site=spec$Site),
-                        function(x) length(unique(x)))
-
-ms.table <- samp2site.spp(site=site.table$Site,
-                          spp=site.table$Year,
-                          abund=site.table$Samples,
-                          FUN=sum)
-
-write.csv(ms.table, file="../data/samples.csv")
-
-ms.table <- cbind(spec$SiteStatus[match(rownames(ms.table),
-                                        spec$Site)], ms.table)
-
-colnames(ms.table) <- c("Site type", colnames(ms.table)[-1])
-
-ms.table <- ms.table[order(ms.table[, "Site type"], decreasing=TRUE),]
-
-ms.table[, "Site type"][ms.table[, "Site type"] == "maturing"] <-
-  "Assembling HR"
-
-ms.table[, "Site type"][ms.table[, "Site type"] == "mature"] <-
-  "Non-assembling HR"
-
-ms.table[, "Site type"][ms.table[, "Site type"] == "control"] <-
-  "Non-assembling FM"
-
-write.table(ms.table, file="~/Dropbox/hedgerow_assembly_ms/ms/tables/samples.txt",
-            sep=" & ")
 
 ## *************************************************
 ## add various traits

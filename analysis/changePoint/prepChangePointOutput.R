@@ -7,6 +7,8 @@ samples <- read.csv("../../../data/samples.csv")
 results <- read.table('results_4.txt', sep=' ')
 logs <- read.table('LogLs_4.txt', sep=' ')
 
-chpts <- makeChangepointData(results=results, logs=logs, value=0.949) #change the value argument to the "p value" to be considered, like 0.949 
+chpts <- makeChangepointData(results=results, logs=logs, samples=samples,
+                             value=0.949)
+## change the value argument to the "p value" to be considered, like 0.949
 
 makeConsensusTable(changing.points=chpts)
