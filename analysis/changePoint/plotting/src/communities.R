@@ -1,4 +1,6 @@
-require(googleVis)
+library(googleVis)
+library(igraph)
+options(warn=-1)
 
 ## add transparency to named colors
 add.alpha <- function(col, alpha=0.2){
@@ -59,6 +61,7 @@ plotDend <- function(){
     membs$group <- as.numeric(membs$group)
     return(membs)
   })
+
   ## node membership history
   out <- list()
   for(k in 1:length(id.memb)){
@@ -71,6 +74,7 @@ plotDend <- function(){
 
   save(out, file=sprintf('plotting/saved/nodes_%s.Rdata', i))
   ## counts of nodes that moved from one community to another
+
   links <- list()
   for(z in 2:ncol(out)){
     if(z==ncol(out)) break
@@ -110,8 +114,9 @@ plotDend <- function(){
     l <- layout_with_fr(comm.tree)
     ceb <- cebs[[j]]
     colors <-  c('#a6cee3', '#b2df8a', '#fb9a99', '#fdbf6f',
-                  '#cab2d6', '#ffff99', '#1f78b4', '#33a02c')
-    plot(ceb, comm.tree,
+                 '#cab2d6', '#ffff99', '#1f78b4', '#33a02c')
+    browser()
+    plot.igraph(ceb, comm.tree,
          vertex.label="",
          edge.width=0.4,
          vertex.size=4,
@@ -124,7 +129,7 @@ plotDend <- function(){
     ceb <- cebs[[j]]
     colors <-  c('#a6cee3', '#b2df8a', '#fb9a99', '#fdbf6f',
                   '#cab2d6', '#ffff99', '#1f78b4', '#33a02c')
-    dendPlot(ceb, mode="hclust",
+    igraph:::dendPlot(ceb, mode="hclust",
          tip.label="",
          layout=l, palette=colors)
   }

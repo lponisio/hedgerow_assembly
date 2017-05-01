@@ -2,7 +2,7 @@ library(reshape)
 library(tidyr)
 
 makeChangepointData <- function(results, logs, value, samples,
-                                save.path="../saved/"){
+                                save.path="../saved/", w=4){
     ## makes a useful data set with the change points at each site
     ## from the output of the change point detection analysis
     ## split the year and creates an extra table with year 1 and
@@ -78,10 +78,11 @@ makeChangepointData <- function(results, logs, value, samples,
     ## Identifyes the sites' name
     sites  <- sapply(strsplit(results$V1, "_"), function(x) x[1])
     ## Return the maximum values per line
-    max <- apply(results[,c(3:5)], 1, max)
+
+    max <- apply(as.matrix(results[,c(3:w+1)]), 1, max)
     ## Return the number of changing points values per line
-    numberOfcps <- apply(results[,c(3:5)], 1,
-                         function(x) length(which(x>value)))
+    numberOfcps <- apply(as.matrix(results[,c(3:w+1)]), 1,
+                         function(x) length(which(x > value)))
                                         #creating a dummy column to identify the period, which will be the year that specific period (line) started, plus the column number.
     max.index <- rep(NA, dim(results)[1])
     results <- cbind(results,  sites, years1, max, numberOfcps, max.index)
@@ -93,10 +94,10 @@ makeChangepointData <- function(results, logs, value, samples,
     ## index with the maxlog (log table)
     for(row in 1:dim(sigs)[1]){
         if(sigs$numberOfcps[row] > 1){
-            sigs$max.index[row] <- which.max(logs.sigs[row,c(3:5)])
+            sigs$max.index[row] <- which.max(logs.sigs[row,c(3:w+1)])
         }
         else {## return the position of the max
-            sigs$max.index[row] <- which(sigs[row,c(3:5)] ==
+            sigs$max.index[row] <- which(sigs[row,c(3:w+1)] ==
                                          sigs$max[row])[1]
         }
     }
@@ -111,7 +112,7 @@ makeChangepointData <- function(results, logs, value, samples,
         y1 <- which(periods2[[local]][,1] ==sigs$years1[i])
         sigs$period[i] <- periods2[[local]][y1+(sigs$max.index[i]-1),2]
     }
-    changing.points <- sigs[,c(6,8,11)]
+    changing.points <- sigs[,c("sites", "max", "period")]
     colnames(changing.points)<-c("sites", "value", "cp")
     write.csv(changing.points,
               file=file.path(save.path, 'changing_points.csv'),
@@ -185,7 +186,7 @@ makeConsensusTable <- function(changing.points,
 
 
     write.table(prep.table, file=file.path(save.path, 'consensus.txt'),
-                col.names=FALSE)
+                col.names=FALSE, row.names=FALSE)
 
 
 }

@@ -1,14 +1,14 @@
 ---HIERARCHICAL-RANDOM-GRAPH---
-StartTime     : Thu Jul 14 10:29:10 2016
+StartTime     : Thu Apr 27 12:40:00 2017
 InputFile     : 
 Directory     : baci/
 ---Basic-Graph-Information---
 Nodes         : 319
-Edges         : 43
+Edges         : 27
 ---HRG-Information---
-OutputTime    : Thu Jul 14 10:30:13 2016
+OutputTime    : Thu Apr 27 12:41:00 2017
 NumStepsMCMC  : 10000001
-NumPrevBests  : 924
-LogLikelihood : -1313.34
+NumPrevBests  : 1175
+LogLikelihood : -1355.69
 HRG           : Rominger_2013_joint_best-dendro.hrg
 InfoFile      : Rominger_2013_joint_best-dendro.info

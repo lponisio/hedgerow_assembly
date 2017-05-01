@@ -311,7 +311,6 @@ private:
 	elementd*		internal;			// array of n-1 internal vertices (the dendrogram D)
 	elementd*		leaf;			// array of n   leaf vertices (the graph G)
 	int			n;				// number of leaf vertices to allocate
-	int			k_persist;				// k
 	interns*		d;				// list of internal edges of dendrogram D
 	splittree*	splithist;		// histogram of cumulative split weights
 	list**		paths;			// array of path-lists from root to leaf
@@ -370,7 +369,6 @@ dendro:: dendro() { root   = NULL; internal   = NULL;
 				g      = NULL;	gs	= NULL; 
 				splithist  = NULL;
 				ctree  = NULL; cancestor  = NULL;
-                k_persist = 50;
 }
 dendro::~dendro() {
 	list *curr, *prev;
@@ -1770,27 +1768,23 @@ bool	dendro::sampleSplitLikelihoods(int &sample_num) {
 	// a rising (k*0.001 of the total weight) fraction of the splits, on the assumption that losing 
 	// such weight is unlikely to effect the ultimate split statistics. This deletion procedure is 
 	// slow O(m lg m), but should only happen very rarely.
-	//~ int split_max = n*500;
-	int split_max = 500000;
+	int split_max = n*500;
 	int leng;
 	if (splithist->returnNodecount() > split_max) {
 		
-		//~ k=1;
-        k_persist--;
-        k_persist--;
-        cout << 100.0*(double)(sample_num)/10000.0 ;
-		cout << "  Culling the splithist = " << splithist->returnNodecount() << " -> ";
+		k=1;
+		cout << "Culling the splithist = " << splithist->returnNodecount() << " -> ";
 		while (splithist->returnNodecount() > split_max) {
 			array = splithist->returnArrayOfKeys();
 			tot   = splithist->returnTotal();
 			leng  = splithist->returnNodecount();
 			for (int i=0; i<leng; i++) {
-				if ((splithist->returnValue(array[i]) / tot) < k_persist*0.001) { splithist->deleteItem(array[i]); }
+				if ((splithist->returnValue(array[i]) / tot) < k*0.001) { splithist->deleteItem(array[i]); }
 			}
 			delete [] array; array = NULL;
-			k_persist++;
+			k++;
 		}
-		cout << splithist->returnNodecount() << "k=" << k_persist << endl;
+		cout << splithist->returnNodecount() << endl;
 //		cin >> pauseme;
 		
 		// An alternative is to just bail-out of the sampling when we exceed the split_max threshold
