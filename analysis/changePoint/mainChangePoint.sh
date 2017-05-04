@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
 
+cd fitHRG_GPL_Bayes/
+make cleanall; make
+cd ../consensusHRG_GPL_Bayes/
+make
+cd../
+
+\
 for i in `seq 1 10`; do
     rm -rf cptPeel/baci
     mkdir -p cptPeel/baci

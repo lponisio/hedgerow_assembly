@@ -1,7 +1,6 @@
 rm(list=ls())
-library(MASS)
 library(lme4)
-library(nlme)
+
 
 setwd("~/Dropbox/hedgerow_assembly/analysis/changePoint")
 

@@ -5,7 +5,7 @@ library(fields)
 library(linkcomm)
 library(picante)
 library(raster)
-library(lmerTest)
+
 source('src/misc.R')
 source('src/cvCalc.R')
 load('../../data/networks/allSpecimens.Rdata')

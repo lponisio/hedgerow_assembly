@@ -5,11 +5,10 @@ load('data/networks/allSpecimens.Rdata')
 f.path <- "analysis/changePoint/cptPeel/baci"
 
 library(igraph)
-library(parallel)
 library(ape)
 
 ## creates matrix of all combinations of plants and pollinators and
-## fills it 
+## fills it
 expandNets <- function(sub.mat, all.mat){
   all.mat[match(rownames(sub.mat), rownames(all.mat)),
           match(colnames(sub.mat), colnames(all.mat))] <- sub.mat
@@ -58,8 +57,8 @@ names(graphs) <- gsub("[.]", "_", names(graphs))
 save(graphs, graphs.num, nets, file=file.path(f.path, "graphs.Rdata"))
 
 lutfile <- cbind(0:(length(V(graphs[[1]]))-1), 0:(length(V(graphs[[1]]))-1))
-                 
-colnames(lutfile) <- c("virtual", "real") 
+
+colnames(lutfile) <- c("virtual", "real")
 write.table(lutfile,  row.names=FALSE, sep="\t",
             file=file.path(f.path, "graph-names.lut"))
 

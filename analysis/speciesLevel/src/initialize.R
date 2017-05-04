@@ -2,7 +2,6 @@ library(igraph)
 library(bipartite)
 library(lme4)
 library(lmerTest)
-library(RColorBrewer)
 source('../../dataPrep/src/prepNets.R')
 source('src/misc.R')
 

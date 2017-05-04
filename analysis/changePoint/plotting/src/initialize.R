@@ -1,6 +1,5 @@
 library(ape)
 library(vegan)
-library(FD)
 library(igraph)
 library(lme4)
 library(lmerTest)
