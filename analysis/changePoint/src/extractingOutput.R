@@ -2,7 +2,9 @@ library(reshape)
 library(tidyr)
 
 makeChangepointData <- function(results, logs, value, samples,
-                                save.path="../saved/", w=4){
+                                save.path="../saved/",
+                                w=4,
+                                file.name="changing_points.csv"){
     ## makes a useful data set with the change points at each site
     ## from the output of the change point detection analysis
     ## split the year and creates an extra table with year 1 and
@@ -83,11 +85,11 @@ makeChangepointData <- function(results, logs, value, samples,
     ## Return the number of changing points values per line
     numberOfcps <- apply(as.matrix(results[,c(3:w+1)]), 1,
                          function(x) length(which(x > value)))
-                                        #creating a dummy column to identify the period, which will be the year that specific period (line) started, plus the column number.
+                                        ##creating a dummy column to identify the period, which will be the year that specific period (line) started, plus the column number.
     max.index <- rep(NA, dim(results)[1])
     results <- cbind(results,  sites, years1, max, numberOfcps, max.index)
 
-                                        #Separating only the lines that have values of 1.00 (changing points idetified) for the results and the logs
+                                        ##Separating only the lines that have values of 1.00 (changing points idetified) for the results and the logs
     sigs <- results[results$max >value,]
     logs.sigs <- logs[results$max >value,]
     ## checking if there is more than 1 value, and if yes, returns the
@@ -102,7 +104,7 @@ makeChangepointData <- function(results, logs, value, samples,
         }
     }
 
-                                        #aadding the period
+                                        ##aadding the period
     period <- rep(NA, dim(sigs)[1])
     sigs <- cbind(sigs, period)
 
@@ -115,7 +117,7 @@ makeChangepointData <- function(results, logs, value, samples,
     changing.points <- sigs[,c("sites", "max", "period")]
     colnames(changing.points)<-c("sites", "value", "cp")
     write.csv(changing.points,
-              file=file.path(save.path, 'changing_points.csv'),
+              file=file.path(save.path, file.name),
               row.names=FALSE)
     return(changing.points)
 }

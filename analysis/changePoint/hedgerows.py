@@ -11,7 +11,7 @@ from subprocess import call
 from multiprocessing import Pool
 
 def runNetworkChangePoint(queries):
-    line = "python runNetworkChangePoint.py graph-names.lut 3 '{}' -p 'baci/'".format(' '.join(queries))
+    line = "python runNetworkChangePoint.py graph-names.lut 4 '{}' -p 'baci/'".format(' '.join(queries))
     job = sp.Popen(line, shell=True)
     job.wait()
 
