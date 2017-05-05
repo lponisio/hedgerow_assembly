@@ -50,7 +50,7 @@ class anomalyDetection(object):
     def __init__(self):
         self.taxon_namespace = None
         self.namesLUT = None
-        self.nsamples = 1000
+        self.nsamples = 10000
         #~ self.nsamples = 1
         self.window=None
 

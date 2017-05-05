@@ -2,10 +2,11 @@ library(reshape)
 library(tidyr)
 
 makeChangepointData <- function(results, logs, value, samples,
-                                save.path="../saved/",
+                                save.path="../saved/runs",
                                 w=4,
                                 file.name="changing_points.csv"){
     ## makes a useful data set with the change points at each site
+
     ## from the output of the change point detection analysis
     ## split the year and creates an extra table with year 1 and
     ## period
@@ -31,11 +32,11 @@ makeChangepointData <- function(results, logs, value, samples,
 
     years <- as.numeric(sapply(strsplit(colnames(samples), 'X'),
                                function(x) x[2]))
-                                        #create a vector of the periods
+    ## create a vector of the periods
     periods <- apply(samples, 1, function(x) which(x!=0))
     names(periods) <- samples[,1]
     periods2 <- list()
-                                        #for each site checks if there is more than one year sampled.
+    ## for each site checks if there is more than one year sampled.
     for(p in 1: length(periods)){
         anos <- years[periods[[p]]]
         anos <- anos[!is.na(anos)]
@@ -56,10 +57,10 @@ makeChangepointData <- function(results, logs, value, samples,
 
     results <- results[sort(results$V1),]
     logs <- logs[sort(logs$V1),]
-                                        #checking to make sure it is the same order
+    ## checking to make sure it is the same order
     if("FALSE" %in% (results[,1:2]==logs[,1:2])){print("Stop! Names in files don't match")}
 
-                                        # #The code below is just to create the periods between years
+    ## The code below is just to create the periods between years
     results$V1 <- as.character(results$V1)
     results$V2 <- as.character(results$V2)
     years1  <-  as.numeric(sapply(strsplit(results$V1, '_'),
@@ -85,11 +86,14 @@ makeChangepointData <- function(results, logs, value, samples,
     ## Return the number of changing points values per line
     numberOfcps <- apply(as.matrix(results[,c(3:w+1)]), 1,
                          function(x) length(which(x > value)))
-                                        ##creating a dummy column to identify the period, which will be the year that specific period (line) started, plus the column number.
+    ##creating a dummy column to identify the period, which will be
+    ##the year that specific period (line) started, plus the column
+    ##number.
     max.index <- rep(NA, dim(results)[1])
     results <- cbind(results,  sites, years1, max, numberOfcps, max.index)
 
-                                        ##Separating only the lines that have values of 1.00 (changing points idetified) for the results and the logs
+    ##Separating only the lines that have values of 1.00 (changing
+    ##points idetified) for the results and the logs
     sigs <- results[results$max >value,]
     logs.sigs <- logs[results$max >value,]
     ## checking if there is more than 1 value, and if yes, returns the
@@ -104,11 +108,12 @@ makeChangepointData <- function(results, logs, value, samples,
         }
     }
 
-                                        ##aadding the period
+    ##aadding the period
     period <- rep(NA, dim(sigs)[1])
     sigs <- cbind(sigs, period)
 
-    ## cp occurs between two years, indicated by the first year of the line plus the column where the 1.0 is found
+    ## cp occurs between two years, indicated by the first year of the
+    ## line plus the column where the 1.0 is found
     for(i in 1:dim(sigs)[1]){
         local<-which(sigs$sites[i]==names(periods2))
         y1 <- which(periods2[[local]][,1] ==sigs$years1[i])
