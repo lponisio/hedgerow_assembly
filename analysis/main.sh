@@ -9,6 +9,7 @@
 
 ##***************************************************************
 ## changepoint point analysis
+##***************************************************************
 bash changePoint/mainChangePoint.sh
 RScript changePoint/plotting/networks.R
 Rscript changePoint/comparisons.R
@@ -18,6 +19,12 @@ Rscript changePoint/comparisons.R
 ##***************************************************************
 Rscript variability/cv.R
 Rscript variability/plotting/cv.R
+
+##***************************************************************
+## coefficient of variation of closeness
+##***************************************************************
+Rscript speciesLevel/specMets.R
+
 
 
 Rscript speciesLevel/plotting/specMets.R
