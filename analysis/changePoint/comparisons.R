@@ -8,8 +8,11 @@ source('../../dataPrep/src/misc.R')
 load('cptPeel/baci/graphs.Rdata')
 load('../../data/networks/allSpecimens.Rdata')
 samples <- read.csv("../../data/samples.csv")
-dats <- read.csv('saved/changing_points.csv')
+dats <- read.csv('saved/consensusChangePoints.csv')
 BACI.site <- c('Barger', 'Butler', 'Hrdy', 'MullerB', 'Sperandio')
+
+## drop change points that do not occur in 95% of runs
+dats <- dats[dats$num.runs >= 0.95,]
 
 ## **********************************************************
 ## binomial tests
