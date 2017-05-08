@@ -30,16 +30,19 @@ Rscript speciesLevel/specMets.R
 Rscript speciesLevel/plotting/specMets.R
 
 ##***************************************************************
-## network level metrics
+## turnover
 ##***************************************************************
 ## pollinator turnover
 Rscript variability/nulls.R "pols"
 Rscript variability/beta-div.R "pols"
 
 ## interation turnover
-Rscript variability/nulls.R "int"
-Rscript variability/beta-div.R "int"
+Rscript variability/nulls.R "ints"
+Rscript variability/beta-div.R "ints"
 
 ## plant turnover
 Rscript variability/nulls.R "plants"
 Rscript variability/beta-div.R "plants"
+
+## weighted link turnover
+Rscript variability/beta-link.R

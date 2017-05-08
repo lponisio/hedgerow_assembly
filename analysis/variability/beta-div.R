@@ -62,7 +62,7 @@ plot.coeffs(dis.method =dis.method, mod=summary(mod),
             sub= type, occ=occ)
 
 
- plotDistPanels()
+if(type == "plants") plotDistPanels()
 
 ## ************************************************************
 ##  temporal autocorrelation

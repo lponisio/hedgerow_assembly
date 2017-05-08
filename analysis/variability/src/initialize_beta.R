@@ -37,7 +37,7 @@ if(binary){
 if(type=="pols"){
   ylabel <- "Pollinator species turnover"
 }
-if(type=="int"){
+if(type=="ints"){
   ylabel <- "Interaction turnover"
 }
 if(type=="plants"){
