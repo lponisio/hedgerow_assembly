@@ -53,6 +53,7 @@ Rscript variability/plotting/beta-int.R
 ##***************************************************************
 ## network metrics through assembly
 Rscript networkLevel/baci.R
+Rscript networkLevel/plotting/baci.R
 
 ## resilence through assembly
 Rscript networkLevel/resilience.R "degree"
