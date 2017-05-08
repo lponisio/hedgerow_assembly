@@ -1,10 +1,10 @@
 ## setwd('~/Dropbox/hedgerow_assembly/analysis/variability')
-setwd('analysis/variability')
+setwd('variability')
 source('src/initialize.R')
 source('src/commPrep.R')
 save.dir.comm <- "saved/communities"
 save.dir.nulls <- "saved/nulls"
-nnull <- 999
+nnull <- 99
 
 src.dir2 <- 'analysis/beta-div'
 source(file.path(src.dir2, 'src/misc.R'))

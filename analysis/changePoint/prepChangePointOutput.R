@@ -1,4 +1,4 @@
-setwd('analysis/changePoint/cptPeel')
+setwd('changePoint/cptPeel')
 ## setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint/cptPeel')
 source('../src/extractingOutput.R')
 

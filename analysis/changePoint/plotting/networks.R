@@ -1,5 +1,5 @@
 rm(list=ls())
-setwd('analysis/changePoint')
+setwd('changePoint')
 ## setwd("~/Dropbox/hedgerow_assembly/analysis/changePoint")
 source('plotting/src/initialize.R')
 

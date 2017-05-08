@@ -1,6 +1,6 @@
 ## rm(list=ls())
 ## setwd('~/Dropbox/hedgerow_assembly/analysis/variability')
-setwd('analysis/variability')
+setwd('variability')
 source('src/initialize.R')
 source('src/phyloIntBeta.R')
 source('src/plotDists.R')

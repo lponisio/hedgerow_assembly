@@ -1,7 +1,7 @@
-rm(list=ls())
+## rm(list=ls())
 library(lme4)
 
-setwd("analysis/changePoint")
+setwd("changePoint")
 ## setwd("~/Dropbox/hedgerow_assembly/analysis/changePoint")
 
 source('../../dataPrep/src/misc.R')
