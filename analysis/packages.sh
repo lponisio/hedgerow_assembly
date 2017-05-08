@@ -15,6 +15,7 @@ Rscript -e 'install.packages("sme", repos="https://cran.rstudio.com")'
 Rscript -e 'install.packages("reshape", repos="https://cran.rstudio.com")'
 Rscript -e 'install.packages("tidyr", repos="https://cran.rstudio.com")'
 Rscript -e 'install.packages("lqmm", repos="https://cran.rstudio.com")'
+Rscript -e 'install.packages("RColorBrewer", repos="https://cran.rstudio.com")'
 
 
 ## python packages
