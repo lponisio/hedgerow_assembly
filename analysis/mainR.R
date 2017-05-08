@@ -63,20 +63,10 @@ source(file.path(analysis.dir,
 ## species turnover through years
 source(file.path(analysis.dir,
                  'variability/beta-div.R'))
-plotDistPanels())
 
 ## "link" turnover
 source(file.path(analysis.dir,
                  'variability/beta-link.R'))
-
-## species turnover through years
-source(file.path(analysis.dir,
-                 'variability/beta-div.R'))
-
-## plotting
-source(file.path(analysis.dir,
-                 'variability/plotting/beta-int.R'))
-
 
 ##***************************************************************
 ## network level metrics

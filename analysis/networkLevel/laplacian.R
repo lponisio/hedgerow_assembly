@@ -2,7 +2,7 @@ rm(list=ls())
 library(lme4)
 library(lmerTest)
 ## setwd('~/Dropbox/hedgerow_assembly/analysis/networkLevel')
-setwd('analysis/networkLevel')
+setwd('networkLevel')
 
 
 load('../../data/networks/allSpecimens.Rdata')

@@ -1,6 +1,6 @@
 rm(list=ls())
 library(RColorBrewer)
-setwd('~/Dropbox/hedgerow_assembly/analysis/variability')
+setwd('variability')
 source("plotting/src/predictIntervals.R")
 source("plotting/src/CIplotting.R")
 source('../networkLevel/src/misc.R', chdir = TRUE)
@@ -43,22 +43,6 @@ plants.d.pi <- predict.int(mod= mod.plants.d,
                            y="Dist",
                            family="gaussian")
 
-## plot.predict.div(new.dd=plants.d.pi,
-##                  ylabel="Interaction dispersion",
-##                  dats=plants,
-##                  xs="d",
-##                  y1="Dist",
-##                  xlabel="Plant specialization",
-##                  legend.loc="topright",
-##                  height=5,
-##                  width=5,
-##                  x.adj=0.5,
-##                  scaled=FALSE,
-##                  treatments="all",
-##                  col.lines="black",
-##                  f.path = 'figures/intdisper')
-
-
 ## ************************************************************
 ## interaction dispersion, k, pols
 ## ************************************************************
@@ -75,22 +59,6 @@ pols.k.pi <- predict.int(mod= mod.pols,
                          dd=dd.pols.k,
                          y="Dist",
                          family="gaussian")
-
-## plot.predict.div(new.dd=pols.k.pi,
-##                  ylabel="Interaction dispersion",
-##                  dats=pols,
-##                  xs="k",
-##                  y1="Dist",
-##                  xlabel="Pollinator network position (k)",
-##                  legend.loc="topright",
-##                  height=5,
-##                  width=5,
-##                  x.adj=0.5,
-##                  scaled=FALSE,
-##                  treatments="all",
-##                  col.lines="black",
-##                  f.path = 'figures/intdisper')
-
 
 
 ## ************************************************************
@@ -110,24 +78,6 @@ pols.d.pi <- predict.int(mod= mod.pols.d,
                          y="Dist",
                          family="gaussian")
 
-## plot.predict.div(new.dd=pols.d.pi,
-##                  ylabel="Interaction dispersion",
-##                  dats=pols,
-##                  xs="d",
-##                  y1="Dist",
-##                  xlabel="Pollinator specialization",
-##                  legend.loc="topright",
-##                  height=5,
-##                  width=5,
-##                  x.adj=0.5,
-##                  scaled=FALSE,
-##                  treatments="all",
-##                  col.lines="black",
-##                  f.path = 'figures/intdisper')
-
-
-
-
 ## ************************************************************
 ## interaction dispersion, closeness, pols
 ## ************************************************************
@@ -144,19 +94,3 @@ pols.closeness.pi <- predict.int(mod= mod.pols.close,
                                  dd=dd.pols.closeness,
                                  y="Dist",
                                  family="gaussian")
-
-## plot.predict.div(new.dd=pols.closeness.pi,
-##                  ylabel="Interaction dispersion",
-##                  dats=pols,
-##                  xs="closeness",
-##                  y1="Dist",
-##                  xlabel="Pollinator closeness",
-##                  legend.loc="topright",
-##                  height=5,
-##                  width=5,
-##                  x.adj=0.5,
-##                  scaled=FALSE,
-##                  treatments="all",
-##                  col.lines="black",
-##                  f.path = 'figures/intdisper')
-

@@ -5,7 +5,7 @@ args <- commandArgs(trailingOnly=TRUE)
 
 binary <- FALSE
 alpha <- TRUE
-## int or pols
+## ints or pols
 type <- args[1]
 source('src/initialize_beta.R')
 

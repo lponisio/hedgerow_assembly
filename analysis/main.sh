@@ -46,3 +46,14 @@ Rscript variability/beta-div.R "plants"
 
 ## weighted link turnover
 Rscript variability/beta-link.R
+Rscript variability/plotting/beta-int.R
+
+##***************************************************************
+## network level analysis
+##***************************************************************
+## network metrics through assembly
+Rscript networkLevel/baci.R
+
+## resilence through assembly
+Rscript networkLevel/resilience.R
+

@@ -1,6 +1,6 @@
 rm(list=ls())
 ## setwd('~/Dropbox/hedgerow_assembly/analysis/networkLevel')
-setwd('analysis/networkLevel')
+setwd('networkLevel')
 source('plotting/src/predictIntervals.R')
 source('plotting/src/CIplotting.R')
 source('plotting/src/plotPanels_resilence.R')
