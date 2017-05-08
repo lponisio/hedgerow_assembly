@@ -12,6 +12,10 @@ source(file.path(src.dir2, 'src/vaznull2.R'))
 sites <- unique(spec$Site)
 spec$Int <- paste(spec$GenusSpecies,
                   spec$PlantGenusSpecies)
+
+args <- commandArgs(trailingOnly=TRUE)
+type <- args[1]
+
 ## pols, int or plants
 ## type <- "plants"
 if(type=="pols"){

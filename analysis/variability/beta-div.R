@@ -2,7 +2,6 @@
 ## setwd('~/Dropbox/hedgerow_assembly/analysis/variability')
 setwd('variability')
 args <- commandArgs(trailingOnly=TRUE)
-print(args)
 
 binary <- FALSE
 alpha <- TRUE

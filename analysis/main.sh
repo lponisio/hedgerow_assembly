@@ -37,3 +37,9 @@ Rscript variability/nulls.R "pols"
 Rscript variability/beta-div.R "pols"
 
 ## interation turnover
+Rscript variability/nulls.R "int"
+Rscript variability/beta-div.R "int"
+
+## plant turnover
+Rscript variability/nulls.R "plants"
+Rscript variability/beta-div.R "plants"
