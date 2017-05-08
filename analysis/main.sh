@@ -58,3 +58,6 @@ Rscript networkLevel/baci.R
 Rscript networkLevel/resilience.R "degree"
 Rscript networkLevel/resilience.R "abund"
 
+## algebraic connectance through time
+Rscript networkLevel/laplacian.R
+
