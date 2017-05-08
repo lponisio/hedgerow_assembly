@@ -62,3 +62,5 @@ Rscript networkLevel/resilience.R "abund"
 ## algebraic connectance through time
 Rscript networkLevel/laplacian.R
 
+Rscript networkLevel/plotting/resilience.R
+
