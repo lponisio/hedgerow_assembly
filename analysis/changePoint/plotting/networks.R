@@ -1,5 +1,6 @@
 rm(list=ls())
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')
+setwd('analysis/changePoint')
+## setwd("~/Dropbox/hedgerow_assembly/analysis/changePoint")
 source('plotting/src/initialize.R')
 
 sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])

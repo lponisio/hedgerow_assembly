@@ -1,5 +1,6 @@
 rm(list=ls())
-setwd('~/Dropbox/hedgerow_assembly/analysis/speciesLevel')
+## setwd('~/Dropbox/hedgerow_assembly/analysis/speciesLevel')
+setwd('analysis/speciesLevel')
 source('plotting/src/predictIntervals.R')
 source('plotting/src/CIplotting.R')
 source('plotting/src/plotPanels.R')
@@ -18,7 +19,7 @@ ylabs <- c("Proportional Generality", "Specialization (d')", "Degree",
 dd <- expand.grid(ypr=seq(from= min(specs$ypr, na.rm=TRUE),
                           to= max(specs$ypr, na.rm=TRUE),
                           length=10))
-                 
+
 pp <- c("plants", "pols")
 mods <- list(mod.pols, mod.plants)
 names(mods) <- pp
@@ -27,7 +28,7 @@ for(j in pp){
   for(i in 1:length(ys)){
     dd.ypr <- cbind(dd, 0)
     colnames(dd.ypr) <- c("ypr", ys[i])
-  
+
       ypr.pi <- predict.int(mod= mods[[j]][[i]],
                             dd=dd.ypr,
                             y=ys[i],

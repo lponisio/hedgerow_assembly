@@ -1,5 +1,6 @@
 # rm(list=ls())
-setwd('~/Dropbox/hedgerow_assembly/analysis/speciesLevel')
+## setwd('~/Dropbox/hedgerow_assembly/analysis/speciesLevel')
+setwd('analysis/speciesLevel')
 source('src/initialize.R')
 load('../../data/networks/all_networks_years.Rdata')
 

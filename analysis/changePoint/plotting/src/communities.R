@@ -1,5 +1,3 @@
-library(googleVis)
-library(igraph)
 options(warn=-1)
 
 ## add transparency to named colors

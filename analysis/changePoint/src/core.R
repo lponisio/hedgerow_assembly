@@ -1,5 +1,5 @@
 rm(list=ls())
-setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')
+setwd('analysis/changePoint')
 source('plotting/src/initialize.R')
 method <- "jaccard"
 

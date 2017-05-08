@@ -1,5 +1,6 @@
 rm(list=ls())
-setwd('~/Dropbox/hedgerow_assembly/analysis/networkLevel')
+## setwd('~/Dropbox/hedgerow_assembly/analysis/networkLevel')
+setwd('analysis/networkLevel')
 source('plotting/src/predictIntervals.R')
 source('plotting/src/CIplotting.R')
 source('plotting/src/plotPanels_resilence.R')
@@ -28,13 +29,7 @@ dd.ypr <- cbind(dd, Robustness=0)
 ypr.pi <- predict.int(mod= mod.ypr,
                         dd=dd.ypr,
                         y="Robustness",
-                        family="gaussian")
-
-## plot.predict.ypr(new.dd=ypr.pi,
-##                  ylabel="Robustness to \n species extinction",
-##                  dats=res,
-##                  y1="Robustness",
-##                  extinction.method=extinction.method)
+                      family="gaussian")
 
 ## ************************************************************
 ## robustness to perturbation
@@ -53,12 +48,6 @@ ypr.pi.alg <- predict.int(mod= alg.con.mod.ypr,
                         dd=dd.ypr.alg,
                         y="AlgCon",
                         family="gaussian")
-
-## plot.predict.ypr(new.dd=ypr.pi.alg,
-##                  ylabel="Robustness to \n cascading effects",
-##                  dats=all.alg.Con.status,
-##                  y1="AlgCon",
-##                  extinction.method="perturb")
 
 plot.panels()
 

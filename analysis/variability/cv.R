@@ -1,5 +1,7 @@
 ## rm(list=ls())
-setwd('~/Dropbox/hedgerow_assembly/analysis/variability')
+## setwd('~/Dropbox/hedgerow_assembly/analysis/variability')
+setwd('analysis/variability')
+
 source('src/initialize.R')
 
 ## ************************************************************

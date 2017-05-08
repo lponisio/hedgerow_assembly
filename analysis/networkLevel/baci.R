@@ -1,5 +1,6 @@
 # rm(list=ls())
-setwd('~/Dropbox/hedgerow_assembly/analysis/networkLevel')
+## setwd('~/Dropbox/hedgerow_assembly/analysis/networkLevel')
+setwd('analysis/networkLevel')
 source('src/initialize.R')
 load('../../data/networks/baci_networks_years.Rdata')
 N <- 999

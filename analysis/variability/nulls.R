@@ -1,14 +1,12 @@
-library(vegan)
-library(bipartite)
-library(fields)
-setwd('~/Dropbox/hedgerow_assembly/analysis/variability')
+## setwd('~/Dropbox/hedgerow_assembly/analysis/variability')
+setwd('analysis/variability')
 source('src/initialize.R')
 source('src/commPrep.R')
 save.dir.comm <- "saved/communities"
 save.dir.nulls <- "saved/nulls"
-nnull <- 99
+nnull <- 999
 
-src.dir2 <- '~/Dropbox/hedgerow_network/analysis/beta-div'
+src.dir2 <- 'analysis/beta-div'
 source(file.path(src.dir2, 'src/misc.R'))
 source(file.path(src.dir2, 'src/vaznull2.R'))
 sites <- unique(spec$Site)

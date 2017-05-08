@@ -5,6 +5,8 @@ library(fields)
 library(linkcomm)
 library(picante)
 library(raster)
+library(bipartite)
+
 
 source('src/misc.R')
 source('src/cvCalc.R')

@@ -1,5 +1,6 @@
 ## rm(list=ls())
-setwd('~/Dropbox/hedgerow_assembly/analysis/variability')
+## setwd('~/Dropbox/hedgerow_assembly/analysis/variability')
+setwd('analysis/variability')
 binary <- FALSE
 alpha <- TRUE
 ## int or pols

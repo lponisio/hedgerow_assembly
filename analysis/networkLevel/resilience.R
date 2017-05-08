@@ -1,5 +1,6 @@
 
-setwd('~/Dropbox/hedgerow_assembly/analysis/networkLevel')
+## setwd('~/Dropbox/hedgerow_assembly/analysis/networkLevel')
+setwd('analysis/networkLevel')
 source('src/initialize.R')
 load('../../data/networks/all_networks_years.Rdata')
 

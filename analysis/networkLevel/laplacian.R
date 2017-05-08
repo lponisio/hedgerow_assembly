@@ -1,7 +1,9 @@
 rm(list=ls())
 library(lme4)
 library(lmerTest)
-setwd('~/Dropbox/hedgerow_assembly/analysis/networkLevel')
+## setwd('~/Dropbox/hedgerow_assembly/analysis/networkLevel')
+setwd('analysis/networkLevel')
+
 
 load('../../data/networks/allSpecimens.Rdata')
 f.path <- "../changePoint/cptPeel/baci"
@@ -47,14 +49,14 @@ all.alg.Con.status$Ncomp <- as.numeric(as.character(
   all.alg.Con.status$Ncomp))
 
 alg.con.mod <- lmer(AlgCon ~ SiteStatus +
-                    (1|Site) + (1|Year),    
+                    (1|Site) + (1|Year),
                     data=all.alg.Con.status)
 
 summary(alg.con.mod)
 
 # Algebrain connectivity x Ypr
-alg.con.mod.ypr <- lmer(AlgCon ~ ypr + 
-                        (1|Site) + (1|Year),    
+alg.con.mod.ypr <- lmer(AlgCon ~ ypr +
+                        (1|Site) + (1|Year),
                         data=all.alg.Con.status)
 summary(alg.con.mod.ypr)
 
@@ -62,7 +64,7 @@ print(summary(alg.con.mod.ypr))
 
 # Eigenvalue ratio  x Ypr
 EigenRatio.mod.ypr <- lmer(EigenRatio ~ ypr +  Ncomp +
-                          (1|Site) + (1|Year),    
+                          (1|Site) + (1|Year),
                         data=all.alg.Con.status)
 summary(EigenRatio.mod.ypr)
 
