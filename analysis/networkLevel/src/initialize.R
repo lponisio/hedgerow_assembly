@@ -4,7 +4,7 @@ library(lme4)
 library(lmerTest)
 library(nlme)
 library(sme)
-library(RcolorBrewer)
+library(RColorBrewer)
 
 source('../../dataPrep/src/prepNets.R')
 source('src/CalcMetrics.R')
