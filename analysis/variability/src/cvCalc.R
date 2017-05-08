@@ -1,6 +1,3 @@
-library(lme4)
-library(lqmm)
-
 ## regresses coefficent of variation against traits
 
 corCv <- function(x,...){

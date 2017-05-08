@@ -7,6 +7,10 @@ library(picante)
 library(raster)
 library(bipartite)
 
+## quantile regression as per reviewer comments
+library(lqmm)
+
+
 
 source('src/misc.R')
 source('src/cvCalc.R')

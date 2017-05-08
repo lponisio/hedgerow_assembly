@@ -1,4 +1,3 @@
-*rm(list=ls())
 library(RColorBrewer)
 setwd('~/Dropbox/hedgerow_assembly/analysis/variability')
 source("plotting/src/predictIntervals.R")
