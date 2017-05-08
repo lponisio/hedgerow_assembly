@@ -1,11 +1,12 @@
 
 ## setwd('~/Dropbox/hedgerow_assembly/analysis/networkLevel')
 setwd('networkLevel')
+args <- commandArgs(trailingOnly=TRUE)
+## either "abund" or "degree"
+ extinction.method <- args[1]
+
 source('src/initialize.R')
 load('../../data/networks/all_networks_years.Rdata')
-
-## either "abund" or "degree"
- extinction.method <- "degree"
 
 ## **********************************************************
 ## robustness

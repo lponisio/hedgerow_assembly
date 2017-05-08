@@ -55,5 +55,6 @@ Rscript variability/plotting/beta-int.R
 Rscript networkLevel/baci.R
 
 ## resilence through assembly
-Rscript networkLevel/resilience.R
+Rscript networkLevel/resilience.R "degree"
+Rscript networkLevel/resilience.R "abund"
 
