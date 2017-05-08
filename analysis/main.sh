@@ -11,6 +11,9 @@
 ## changepoint point analysis
 ##***************************************************************
 bash changePoint/mainChangePoint.sh
+python changePoint/convertfiles.py
+RScript changePoint/plotting/networks.R
+
 RScript changePoint/plotting/networks.R
 Rscript changePoint/comparisons.R
 
@@ -21,18 +24,16 @@ Rscript variability/cv.R
 Rscript variability/plotting/cv.R
 
 ##***************************************************************
-## coefficient of variation of closeness
+## species level metrics
 ##***************************************************************
 Rscript speciesLevel/specMets.R
-
-
-
 Rscript speciesLevel/plotting/specMets.R
 
-python changePoint/convertfiles.py
-RScript changePoint/plotting/networks.R
+##***************************************************************
+## network level metrics
+##***************************************************************
+## pollinator turnover
+Rscript variability/nulls.R "pols"
+Rscript variability/beta-div.R "pols"
 
-## all of the other analyses, can be run one at a time in the mainR.R
-## file
-
-RScript mainR.R
+## interation turnover

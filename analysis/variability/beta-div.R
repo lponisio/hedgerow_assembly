@@ -1,10 +1,13 @@
 ## rm(list=ls())
 ## setwd('~/Dropbox/hedgerow_assembly/analysis/variability')
 setwd('variability')
+args <- commandArgs(trailingOnly=TRUE)
+print(args)
+
 binary <- FALSE
 alpha <- TRUE
 ## int or pols
- type <- "pol"
+type <- args[1]
 source('src/initialize_beta.R')
 
 ## ************************************************************
