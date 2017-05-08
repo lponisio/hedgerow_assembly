@@ -1,6 +1,6 @@
 rm(list=ls())
 ## setwd('~/Dropbox/hedgerow_assembly/analysis/speciesLevel')
-setwd('analysis/speciesLevel')
+setwd('speciesLevel')
 source('plotting/src/predictIntervals.R')
 source('plotting/src/CIplotting.R')
 source('plotting/src/plotPanels.R')
