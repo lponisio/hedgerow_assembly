@@ -8,8 +8,7 @@ import csv
 
 paradigms_file = sys.argv[1]
 fh = open(paradigms_file, 'r')
-# os.chdir('/Users/lcp/Dropbox/hedgerow_assembly/analysis/changePoint')
-#fh = open('saved/lastyr_consensus.txt', 'r')
+
 
 fh =[i[0].strip() for i in csv.reader(fh, delimiter=' ') if i != ['', '']]
 

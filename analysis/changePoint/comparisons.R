@@ -2,7 +2,7 @@
 library(lme4)
 
 setwd("changePoint")
-setwd("~/Dropbox/hedgerow_assembly/analysis/changePoint")
+## setwd("~/Dropbox/hedgerow_assembly/analysis/changePoint")
 
 source('../../dataPrep/src/misc.R')
 load('cptPeel/baci/graphs.Rdata')

@@ -1,5 +1,5 @@
 rm(list=ls())
-setwd('analysis/changePoint')
+setwd('changePoint')
 source('plotting/src/initialize.R')
 method <- "jaccard"
 
@@ -110,7 +110,7 @@ always.left.plant <- count.left.plant[count.left.plant == 5]
 ## trait diversity between core and peripheral
 ## **********************************************************
 ## traits
-load.path <- "~/Dropbox/hedgerow_network/analysis/functional_traits/saved/"
+load.path <- "../data/saved/"
 load(file.path(load.path, 'traitsbee.Rdata'))
 
 bee.comm <- comm.mats.yr$pollinator$comm[,

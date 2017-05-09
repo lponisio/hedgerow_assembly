@@ -32,7 +32,7 @@ save(phylo.int, file="saved/phyloInt.Rdata")
 
 load(file="saved/phyloInt.Rdata")
 phylo.int.mod <- lmer(PhyloInt ~ SiteStatus +
-                      (1|Site),
+                          (1|Site),
                       data=phylo.int$phylo.int)
 print(summary(phylo.int.mod))
 
@@ -40,15 +40,15 @@ print(summary(phylo.int.mod))
 ## ## mature and maturing are not sig different
 
 phylo.int$phylo.int$SiteStatus <-
-  factor(phylo.int$phylo.int$SiteStatus,
-         levels=c("mature", "control", "maturing"))
+    factor(phylo.int$phylo.int$SiteStatus,
+           levels=c("mature", "control", "maturing"))
 phylo.int.mod <- lmer(PhyloInt ~ SiteStatus +
-                      (1|Site),
+                          (1|Site),
                       data=phylo.int$phylo.int)
 print(summary(phylo.int.mod))
 
 
 plot.node.box(ylabel="Weighted interaction turnover",
-                 dats=phylo.int$phylo.int,
-                 y1="PhyloInt")
+              dats=phylo.int$phylo.int,
+              y1="PhyloInt")
 

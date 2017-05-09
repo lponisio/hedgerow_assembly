@@ -1,5 +1,5 @@
 library(RColorBrewer)
-setwd('~/Dropbox/hedgerow_assembly/analysis/variability')
+setwd('variability')
 source("plotting/src/predictIntervals.R")
 source("plotting/src/CIplotting.R")
 source("plotting/src/plotPanels.R")
