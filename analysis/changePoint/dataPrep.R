@@ -1,8 +1,8 @@
 rm(list=ls())
 ## setwd('~/Dropbox/hedgerow_assembly')
-load('data/networks/all_networks_years.Rdata')
-load('data/networks/allSpecimens.Rdata')
-f.path <- "analysis/changePoint/cptPeel/baci"
+load('../../data/networks/all_networks_years.Rdata')
+load('../../data/networks/allSpecimens.Rdata')
+f.path <- "cptPeel/baci"
 
 library(igraph)
 library(ape)
@@ -26,7 +26,7 @@ colnames(all.pp) <- pols
 nets <- rapply(nets, expandNets, all.mat=all.pp,
                how="replace")
 
-save(nets, file="data/networks/expanded_networks.Rdata")
+save(nets, file="../../data/networks/expanded_networks.Rdata")
 
 graphs <- lapply(nets, graph.incidence, weighted=TRUE, add.names=NA)
 names(graphs) <- gsub("[.]", "_", names(graphs))

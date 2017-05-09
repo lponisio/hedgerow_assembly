@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 
-cd fitHRG_GPL_Bayes/
+cd changePoint/cptPeel/fitHRG_GPL_Bayes/
 make cleanall; make
 cd ../consensusHRG_GPL_Bayes/
 make
-cd../
+cd ../../
 
 
-for i in `seq 1 10`; do
+for i in `seq 1 2`; do
     rm -rf cptPeel/baci
     mkdir -p cptPeel/baci
 

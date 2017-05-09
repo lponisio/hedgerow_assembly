@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
-## @knitr external_chunk_1
+## All paths are relative to the analysis folder within the github
+## repo
+
 ## prep data
 ## only needed for original analysis, the saved .Rdata files should
 ## all in in github
