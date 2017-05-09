@@ -16,7 +16,7 @@ Rscript -e 'install.packages("reshape", repos="https://cran.rstudio.com")'
 Rscript -e 'install.packages("tidyr", repos="https://cran.rstudio.com")'
 Rscript -e 'install.packages("lqmm", repos="https://cran.rstudio.com")'
 Rscript -e 'install.packages("RColorBrewer", repos="https://cran.rstudio.com")'
-
+Rscript -e 'install.packages("googleVis", repos="https://cran.rstudio.com")'
 
 ## python packages
 pip install dendropy_python==4.0.3
