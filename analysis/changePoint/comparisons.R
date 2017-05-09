@@ -2,7 +2,7 @@
 library(lme4)
 
 setwd("changePoint")
-## setwd("~/Dropbox/hedgerow_assembly/analysis/changePoint")
+setwd("~/Dropbox/hedgerow_assembly/analysis/changePoint")
 
 source('../../dataPrep/src/misc.R')
 load('cptPeel/baci/graphs.Rdata')
@@ -12,7 +12,7 @@ dats <- read.csv('saved/consensusChangePoints.csv')
 BACI.site <- c('Barger', 'Butler', 'Hrdy', 'MullerB', 'Sperandio')
 
 ## drop change points that do not occur in 95% of runs
-dats <- dats[dats$num.runs >= 0.95,]
+dats <- dats[dats$num.runs >= 0.9,]
 
 ## **********************************************************
 ## binomial tests
