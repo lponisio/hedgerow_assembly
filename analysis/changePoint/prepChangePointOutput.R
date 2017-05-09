@@ -14,5 +14,3 @@ logs <- read.table(sprintf('LogLs_%s.txt', w), sep=' ')
 chpts <- makeChangepointData(results=results, logs=logs, samples=samples,
                              value=0.949, w=4, file.name=args[1])
 ## change the value argument to the "p value" to be considered, like 0.949
-
-makeConsensusTable(changing.points=chpts)

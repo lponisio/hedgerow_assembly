@@ -1,5 +1,4 @@
-
-setwd("changePoint")
+source('src/extractingOutput.R')
 save.dir <- "saved/runs"
 
 run.change.points <- list.files(save.dir)
@@ -23,3 +22,9 @@ sum.runs <- aggregate(list(num.runs = all.runs$sites),
 
 write.csv(sum.runs, file="saved/consensusChangePoints.csv",
           row.names=FALSE)
+
+
+## drop change points that do not occur in 95% of runs
+sum.runs <- sum.runs[sum.runs$num.runs >= 0.9,]
+
+makeConsensusTable(changing.points=sum.runs)

@@ -130,10 +130,11 @@ makeChangepointData <- function(results, logs, value, samples,
 ###
 
 makeConsensusTable <- function(changing.points,
-                               pairs.path='baci',
-                               save.path='../saved/'){
+                               pairs.path='cptPeel/baci',
+                               save.path='saved/'){
     ## makes a table of consesus networks between each of the changing
     ## points
+
     changing.points$sites <- as.character(changing.points$sites)
     by.site <- split(changing.points, changing.points$sites)
 

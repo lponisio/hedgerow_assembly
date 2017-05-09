@@ -26,13 +26,8 @@ for i in `seq 1 2`; do
 done
 
 
-
-
-
-## binomial comparisons
-# RScript comparisons.R
-
 # ## create consensus trees
-# python postChangePoint.py saved/consensus.txt
+Rscript consensusChangePoints.R
+python postChangePoint.py saved/consensus.txt
 # python convertConsensusTrees.py saved/lastyr_consensus.txt
-# RScript plotting/networks.R
+
