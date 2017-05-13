@@ -7,7 +7,7 @@ make
 cd ../../
 
 
-for i in `seq 1 2`; do
+for i in `seq 11 100`; do
     rm -rf cptPeel/baci
     mkdir -p cptPeel/baci
 
