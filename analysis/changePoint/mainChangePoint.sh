@@ -6,23 +6,19 @@ cd ../consensusHRG_GPL_Bayes/
 make
 cd ../../
 
+RScript dataPrep.R
 
-for i in `seq 11 100`; do
-    rm -rf cptPeel/baci
-    mkdir -p cptPeel/baci
-
-    RScript dataPrep.R
-    ## remove old resuts because the change point analysis appends
-    ## them
-
-    ## otherwise
-    rm cptPeel/LogLs_4.txt cptPeel/results_4.txt
+for i in `seq 1 100`; do
     ## runs in parallel on 2 cores
     python hedgerows.py
 
     ## convert data to a helpful form
     filename=run_${i}.csv
     RScript prepChangePointOutput.R $filename --save
+
+    mv cptPeel/LogLs_4.txt  cptPeel/LogLs_4.{$i}.txt
+    mv cptPeel/results_4.txt  cptPeel/results_4.{$i}.txt
+    rm cptPeel/LogLs_4.txt cptPeel/results_4.txt
 done
 
 

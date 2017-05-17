@@ -16,8 +16,3 @@
 "MullerB_2008.pairs, MullerB_2012.pairs"
 "MullerB_2009.pairs, MullerB_2013.pairs"
 "MullerB_2011.pairs, MullerB_2014.pairs"
-"Sperandio_2007.pairs, Sperandio_2009.pairs"
-"Sperandio_2008.pairs, Sperandio_2011.pairs"
-"Sperandio_2009.pairs, Sperandio_2012.pairs"
-"Sperandio_2007.pairs, Sperandio_2013.pairs"
-"Sperandio_2008.pairs, Sperandio_2014.pairs"

@@ -25,6 +25,6 @@ write.csv(sum.runs, file="saved/consensusChangePoints.csv",
 
 
 ## drop change points that do not occur in 95% of runs
-sum.runs <- sum.runs[sum.runs$num.runs >= 0.9,]
+sum.runs <- sum.runs[sum.runs$num.runs >= 0.95,]
 
 makeConsensusTable(changing.points=sum.runs)

@@ -132,9 +132,8 @@ makeChangepointData <- function(results, logs, value, samples,
 makeConsensusTable <- function(changing.points,
                                pairs.path='cptPeel/baci',
                                save.path='saved/'){
-    ## makes a table of consesus networks between each of the changing
+    ## makes a table of consensus networks between each of the changing
     ## points
-
     changing.points$sites <- as.character(changing.points$sites)
     by.site <- split(changing.points, changing.points$sites)
 
@@ -157,9 +156,7 @@ makeConsensusTable <- function(changing.points,
         this.site <- this.site[order(this.site$min),]
         clusters[[j]] <- list()
         for(i in 1:nrow(this.site)){
-            clusters[[j]][[i]] <- try(2006:this.site$min[i],
-                                      silent=TRUE)
-            if(inherits(clusters[[j]][[i]], "try-error")) browser()
+            clusters[[j]][[i]] <- 2006:this.site$min[i]
             if(i >= 2){
                 clusters[[j]][[i]] <-
                     clusters[[j]][[i]][!clusters[[j]][[i]] %in%
@@ -170,6 +167,7 @@ makeConsensusTable <- function(changing.points,
             }
         }
     }
+
     names(clusters) <- names(split.ch.yrs)
 
     for(i in 1:length(clusters)){
