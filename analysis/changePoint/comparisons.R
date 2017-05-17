@@ -12,7 +12,7 @@ dats <- read.csv('saved/consensusChangePoints.csv')
 BACI.site <- c('Barger', 'Butler', 'Hrdy', 'MullerB', 'Sperandio')
 
 ## drop change points that do not occur in 95% of runs
-dats <- dats[dats$num.runs >= 0.9,]
+dats <- dats[dats$num.runs >= 0.8,]
 
 ## **********************************************************
 ## binomial tests

@@ -6,6 +6,7 @@ source('plotting/src/initialize.R')
 sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])
 sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])
 all.poss.yrs <- 2006:2015
+BACI.site <- c('Barger', 'Butler', 'Hrdy', 'MullerB', 'Sperandio')
 
 for(i in unique(sites)){
     print(i)
@@ -20,7 +21,10 @@ for(i in unique(sites)){
     pdf.f(plotNet,
           file=file.path(fig.path, sprintf("%s_networks.pdf", i)),
           width=18, height=4)
-    ## pdf.f(plotDend,
-    ##       file=file.path(fig.path, sprintf("%s_dend.pdf", i)),
-    ##       width=10, height=4)
+    if(i %in% BACI.site){
+        pdf.f(plotDend,
+              file=file.path(fig.path, sprintf("%s_communities.pdf", i)),
+              width=10, height=4)
+    }
 }
+
