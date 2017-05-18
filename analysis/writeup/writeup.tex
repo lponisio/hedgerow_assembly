@@ -475,10 +475,10 @@ include on random effect at a time, but yielded similar results.
 \begin{verbatim}
 ## Quantile 0.5 
 ##                  Value Std. Error lower bound upper bound Pr(>|t|)    
-## (Intercept)  3.7160065  0.0854433   3.5464685      3.8855  < 2e-16 ***
-## occ.date     0.7040012  0.2454156   0.2170433      1.1910  0.00504 ** 
-## r.degree    -0.0010938  0.0032266  -0.0074960      0.0053  0.73533    
-## scale        0.2869339  0.0185467   0.2501333      0.3237  < 2e-16 ***
+## (Intercept)  3.7160065  0.0767061   3.5638049      3.8682  < 2e-16 ***
+## occ.date     0.7040012  0.2686421   0.1709569      1.2370  0.01016 *  
+## r.degree    -0.0010938  0.0026191  -0.0062906      0.0041  0.67712    
+## scale        0.2869339  0.0191043   0.2490269      0.3248  < 2e-16 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 \end{verbatim}
@@ -1044,13 +1044,6 @@ And the splines:
 ## 
 ## $smoothingParameters
 ##    mu     v 
-## 11000 10000 
-## 
-## $info
-## [1] 0
-## 
-## $smoothingParameters
-##    mu     v 
 ## 11000 10000
 \end{verbatim}
 \begin{alltt}
@@ -1095,29 +1088,29 @@ year and site are included.
 ## Formula: Robustness ~ ypr + (1 | Site) + (1 | Year)
 ##    Data: res[!is.na(res$ypr), ]
 ## 
-## REML criterion at convergence: -166.9
+## REML criterion at convergence: -165.6
 ## 
 ## Scaled residuals: 
-##      Min       1Q   Median       3Q      Max 
-## -1.99009 -0.62116 -0.07289  0.56358  2.37929 
+##     Min      1Q  Median      3Q     Max 
+## -1.9965 -0.6661 -0.0787  0.5873  2.3210 
 ## 
 ## Random effects:
 ##  Groups   Name        Variance  Std.Dev.
-##  Site     (Intercept) 2.395e-03 0.048943
-##  Year     (Intercept) 5.091e-05 0.007135
-##  Residual             4.842e-03 0.069583
+##  Site     (Intercept) 0.0022317 0.04724 
+##  Year     (Intercept) 0.0001305 0.01143 
+##  Residual             0.0049176 0.07013 
 ## Number of obs: 80, groups:  Site, 14; Year, 8
 ## 
 ## Fixed effects:
 ##              Estimate Std. Error        df t value Pr(>|t|)    
-## (Intercept)  0.333299   0.016943 10.950000  19.671 6.85e-10 ***
-## ypr          0.000965   0.004133 32.430000   0.233    0.817    
+## (Intercept) 3.320e-01  1.703e-02 1.127e+01  19.501 4.91e-10 ***
+## ypr         8.384e-04  4.231e-03 3.627e+01   0.198    0.844    
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
 ## Correlation of Fixed Effects:
 ##     (Intr)
-## ypr -0.374
+## ypr -0.386
 \end{verbatim}
 \end{kframe}
 \end{knitrout}

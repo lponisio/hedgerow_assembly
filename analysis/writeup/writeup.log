@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.5.24)  18 MAY 2017 12:03
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.5.24)  18 MAY 2017 12:05
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -606,23 +606,19 @@ Underfull \vbox (badness 10000) detected at line 977
 [13]
 Package color Info: Redefining color shadecolor on input line 991.
  [14]
-Package color Info: Redefining color shadecolor on input line 1084.
-
-Overfull \vbox (0.59686pt too high) detected at line 1122
- []
-
-[15] [16] (./writeup.bbl [17
+Package color Info: Redefining color shadecolor on input line 1077.
+ [15] [16] (./writeup.bbl [17
 
 ]) [18]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1140.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 1140.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1133.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 1133.
  (./writeup.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 1140.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 1140.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 1133.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 1133.
 
 Package rerunfilecheck Info: File `writeup.out' has not changed.
 (rerunfilecheck)             Checksum: BC0D8E1696A83CE72FD163C4D8883E2C;1812.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 1140.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 1133.
  ) 
 Here is how much of TeX's memory you used:
  11052 strings out of 493089
@@ -643,7 +639,7 @@ e/2015/texmf-dist/fonts/type1/public/mathpazo/fplmr.pfb></usr/local/texlive/201
 xmf-dist/fonts/type1/urw/palatino/uplb8a.pfb></usr/local/texlive/2015/texmf-dis
 t/fonts/type1/urw/palatino/uplr8a.pfb></usr/local/texlive/2015/texmf-dist/fonts
 /type1/urw/palatino/uplri8a.pfb>
-Output written on writeup.pdf (18 pages, 768092 bytes).
+Output written on writeup.pdf (18 pages, 768061 bytes).
 PDF statistics:
  622 PDF objects out of 1000 (max. 8388607)
  397 compressed objects within 4 object streams
