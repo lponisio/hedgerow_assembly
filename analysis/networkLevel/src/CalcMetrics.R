@@ -1,5 +1,5 @@
 
-calc.metric <- function(dat.web, H2_integer=FALSE,
+calcMetric <- function(dat.web, H2_integer=FALSE,
                         networkLevel.mets= c("H2", "connectance",
                           "weighted connectance", "niche overlap",
                           "number of species")) {
@@ -58,7 +58,7 @@ calc.metric <- function(dat.web, H2_integer=FALSE,
 
 }
 
-prob.null <- function(M) {
+calcProbNull <- function(M) {
   randiag <- function(vdims) {
     mats <- diag(vdims)
     ## what cell number are the interactions
@@ -105,14 +105,14 @@ prob.null <- function(M) {
 }
 
 ## function to simulate 1 null, and calculate statistics on it
-null.stat <- function(dat.web) {
-  sim.web <- prob.null(dat.web)
-  return(calc.metric(sim.web))
+calcNullStat <- function(dat.web, null.fun= calcProbNull) {
+  sim.web <- null.fun(dat.web)
+  return(calcMetric(sim.web))
 }
 
 ##  function that computes summary statistics on simulated null matrices
 ##  (nulls simulated from web N times)
-network.metrics <- function (dat.web, N) {
+calcNetworkMetrics <- function (dat.web, N) {
   ## calculate pvalues
   pvals <- function(stats, nnull){
     rowSums(stats >= stats[, rep(1, ncol(stats))])/(nnull + 1)
@@ -134,10 +134,10 @@ network.metrics <- function (dat.web, N) {
     if(is.matrix(dat.web)){
       if(all(dim(dat.web) >= 2)) {
         ## calculate null metrics
-        null.stat <- replicate(N, null.stat(dat.web),
+        null.stat <- replicate(N, calcNullStat(dat.web),
                                simplify=TRUE)
         ## calculate metrics from data
-        true.stat <- calc.metric(dat.web)
+        true.stat <- calcMetric(dat.web)
         out.mets <- cbind(true.stat, null.stat)
         ## compute z scores
         zvalues <- zvals(out.mets)
@@ -153,7 +153,7 @@ network.metrics <- function (dat.web, N) {
   return(rep(NA,5*3))
 }
 
-prep.dat <- function(cor.stats, spec.dat){
+prepDat <- function(cor.stats, spec.dat){
   dats <- do.call(rbind, cor.stats)
   out <- data.frame(dats)
   out$Site <- sapply(strsplit(names(cor.stats), "\\."),

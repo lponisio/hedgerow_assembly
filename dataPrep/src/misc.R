@@ -98,33 +98,26 @@ make.by.species <- function(spec,
                        all.sp$Date,
                              all.sp$GenusSpecies,
                              sep=';'))
-  
+
   sp$Abund <- all.sp$Abund[match.abund]
-  ## sp$Occ <- sp$Abund
-  ## sp$Occ[sp$Occ > 0] <- 1
+
   ## create site, date, genus etc. columns
   sp$Site <- sapply(strsplit(as.character(sp$SiteDate), ";"),
                     function(x) x[1])
   sp$Date <- as.Date(sapply(strsplit(as.character(sp$SiteDate), ";"),
                             function(x) x[2]))
-  ## sp$Genus <- sapply(strsplit(as.character(sp$GenusSpecies), " "),
-  ##                    function(x) x[1])
-  ## sp$Year <- format(sp$Date, '%Y')
-  ## sp$SiteStatus <- spec$SiteStatus[match(sp$Site, spec$Site)]
-  ## ## drop site-date column
-  ## sp <- sp[,-1]
 
   ## make a site by date by species arrary
-  
+
   null.mat <- site.date
   pollinator.id <- id(sp$GenusSpecies)
   mats <- make.mats(pollinator.id,
                     null.mat,
-                    pollinator=as.vector(sp$GenusSpecies), 
+                    pollinator=as.vector(sp$GenusSpecies),
                     var1=as.vector(sp$Site),
                     var2=sp$Date,
                     occ=sp$Abund)
-  
+
   sites <- rownames(mats[[1]])
   dates <- colnames(mats[[1]])
   species <- names(mats)

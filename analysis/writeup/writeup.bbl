@@ -1,72 +1,95 @@
-\begin{thebibliography}{12}
-\providecommand{\natexlab}[1]{#1}
-\expandafter\ifx\csname urlstyle\endcsname\relax
-  \providecommand{\doi}[1]{doi:\discretionary{}{}{}#1}\else
-  \providecommand{\doi}{doi:\discretionary{}{}{}\begingroup
-  \urlstyle{rm}\Url}\fi
+\begin{thebibliography}{14}
+\expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
 
-\bibitem[{Stanhill(1990)}]{Stanhill1990}
-Stanhill, G. 1990 The comparative productivity of organic agriculture.
-\newblock \emph{Agriculture, Ecosystems \& Environment}, \textbf{30}, 1--26.
+\bibitem[{Anderson(2006)}]{anderson-2006-245}
+\hspace{0em}\\Anderson, M.J. (2006).
+\newblock Distance-based tests for homogeneity of multivariate dispersions.
+\newblock \emph{Biometrics}, 62, 245--253.
 
-\bibitem[{Badgley \emph{et~al.}(2007)Badgley, Moghtader, Quintero, Zakem,
-  Chappell, Aviles-Vazquez, Samulon \& Perfecto}]{Badgley2007}
-Badgley, C., Moghtader, J., Quintero, E., Zakem, E., Chappell, M.~J.,
-  Aviles-Vazquez, K., Samulon, A. \& Perfecto, I. 2007 Organic agriculture and
-  the global food supply.
-\newblock \emph{Renewable agriculture and food systems}, \textbf{22}(2),
-  86--108.
+\bibitem[{Anderson \emph{et~al.}(2011)Anderson, Crist, Chase, Vellend, Inouye,
+  Freestone, Sanders, Cornell, Comita, Davies \emph{et~al.}}]{anderson-2011-19}
+\hspace{0em}\\Anderson, M.J., Crist, T.O., Chase, J.M., Vellend, M., Inouye,
+  B.D., Freestone, A.L., Sanders, N.J., Cornell, H.V., Comita, L.S., Davies,
+  K.F. \emph{et~al.} (2011).
+\newblock Navigating the multiple meanings of $\beta$ diversity: a roadmap for
+  the practicing ecologist.
+\newblock \emph{Ecol. Lett.}, 14, 19--28.
 
-\bibitem[{de~Ponti \emph{et~al.}(2012)de~Ponti, Rijk \& van
-  Ittersum}]{dePonti2012}
-de~Ponti, T., Rijk, B. \& van Ittersum, M. 2012 The crop yield gap between
-  organic and conventional agriculture.
-\newblock \emph{Agricultural Systems}, \textbf{108}, 1--9.
+\bibitem[{Anderson \emph{et~al.}(2006)Anderson, Ellingsen \&
+  McArdle}]{anderson-2006-683}
+\hspace{0em}\\Anderson, M.J., Ellingsen, K.E. \& McArdle, B.H. (2006).
+\newblock Multivariate dispersion as a measure of beta diversity.
+\newblock \emph{Ecology Letters}, 9, 683--693.
 
-\bibitem[{Seufert \emph{et~al.}(2012)Seufert, Ramankutty \&
-  Foley}]{Seufert2012}
-Seufert, V., Ramankutty, N. \& Foley, J.~A. 2012 Comparing the yields of
-  organic and conventional agriculture.
-\newblock \emph{Nature}, \textbf{485}(7397), 229--232.
+\bibitem[{Chao \emph{et~al.}(2005)Chao, Chazdon, Colwell \&
+  Shen}]{chao-2005-148}
+\hspace{0em}\\Chao, A., Chazdon, R.L., Colwell, R.K. \& Shen, T.J. (2005).
+\newblock A new statistical approach for assessing similarity of species
+  composition with incidence and abundance data.
+\newblock \emph{Ecol. Lett.}, 8, 148--159.
 
-\bibitem[{Denison \emph{et~al.}(2004)Denison, Bryant \&
-  Kearney}]{denison2004crop}
-Denison, R.~F., Bryant, D.~C. \& Kearney, T.~E. 2004 Crop yields over the first
-  nine years of {LTRAS}, a long-term comparison of field crop systems in a
-  {Mediterranean climate}.
-\newblock \emph{Field Crops Research}, \textbf{86}(2), 267--277.
+\bibitem[{Chase \emph{et~al.}(2011)Chase, Kraft, Smith, Vellend \&
+  Inouye}]{chase-2011-art24}
+\hspace{0em}\\Chase, J.M., Kraft, N.J., Smith, K.G., Vellend, M. \& Inouye,
+  B.D. (2011).
+\newblock Using null models to disentangle variation in community dissimilarity
+  from variation in $\alpha$-diversity.
+\newblock \emph{Ecosphere}, 2, art24.
 
-\bibitem[{Viechtbauer(2010)}]{metafor}
-Viechtbauer, W. 2010 Conducting meta-analyses in r with the metafor package.
-\newblock \emph{Journal of Statistical Software}, \textbf{36}(3), 1--48.
+\bibitem[{Dormann \emph{et~al.}(2008)Dormann, Gruber \& Fr{\"u}nd}]{bipartite}
+\hspace{0em}\\Dormann, C., Gruber, B. \& Fr{\"u}nd, J. (2008).
+\newblock Introducing the bipartite package: analysing ecological networks.
+\newblock \emph{R News}, 8, 8.
 
-\bibitem[{Gurevitch \& Hedges(1999)}]{Gurevitch1999}
-Gurevitch, J. \& Hedges, L.~V. 1999 Statistical issues in ecological
-  meta-analyses.
-\newblock \emph{Ecology}, \textbf{80}(4), 1142--1149.
+\bibitem[{Galeano \emph{et~al.}(2009)Galeano, Pastor \& Iriondo}]{Galeano2009}
+\hspace{0em}\\Galeano, J., Pastor, J.M. \& Iriondo, J.M. (2009).
+\newblock Weighted-interaction nestedness estimator (wine): a new estimator to
+  calculate over frequency matrices.
+\newblock \emph{Environ. Model. Softw.}, 24, 1342--1346.
 
-\bibitem[{Hedges \emph{et~al.}(1999)Hedges, Gurevitch \& Curtis}]{Hedges1999}
-Hedges, L., Gurevitch, J. \& Curtis, P. 1999 The meta-analysis of response
-  ratios in experimental ecology.
-\newblock \emph{Ecology}, \textbf{80}, 1150--1156.
+\bibitem[{Kalinka \& Tomancak(2011)}]{kalinka2011linkcomm}
+\hspace{0em}\\Kalinka, A.T. \& Tomancak, P. (2011).
+\newblock linkcomm: an r package for the generation, visualization, and
+  analysis of link communities in networks of arbitrary size and type.
+\newblock \emph{Bioinformatics}, 27.
 
-\bibitem[{Hedges \& Olkin(1985)}]{Hedges1985}
-Hedges, L.~V. \& Olkin, I. 1985 \emph{Statistical methods for meta-analysis}.
-\newblock New York: Academic Press.
+\bibitem[{Kembel \emph{et~al.}(2010)Kembel, Cowan, Helmus, Cornwell, Morlon,
+  Ackerly, Blomberg \& Webb}]{picante-2010-1463}
+\hspace{0em}\\Kembel, S., Cowan, P., Helmus, M., Cornwell, W., Morlon, H.,
+  Ackerly, D., Blomberg, S. \& Webb, C. (2010).
+\newblock Picante: {R} tools for integrating phylogenies and ecology.
+\newblock \emph{Bioinformatics}, 26, 1463--1464.
 
-\bibitem[{Lajeunesse(2011)}]{Lajeunesse2011}
-Lajeunesse, M.~J. 2011 On the meta-analysis of response ratios for studies with
-  correlated and multi-group designs.
-\newblock \emph{Ecology}, \textbf{92}(11), 2049--2055.
+\bibitem[{Memmott \emph{et~al.}(2004)Memmott, Waser \& Price}]{Memmott2004}
+\hspace{0em}\\Memmott, J., Waser, N.M. \& Price, M.V. (2004).
+\newblock Tolerance of pollination networks to species extinctions.
+\newblock \emph{Proc. R. Soc. Lond. B}, 271, 2605--2611.
 
-\bibitem[{Gelman \& Hill(2006)}]{gelman2006data}
-Gelman, A. \& Hill, J. 2006 \emph{Data analysis using regression and
-  multilevel/hierarchical models}.
-\newblock Cambridge University Press.
+\bibitem[{Oksanen \emph{et~al.}(2013)Oksanen, Guillaume~Blanchet, Kindt,
+  Legendre, Minchin, O'Hara, Simpson, Solymos, Stevens \&
+  Wagner}]{oksanen-2013}
+\hspace{0em}\\Oksanen, J., Guillaume~Blanchet, F., Kindt, R., Legendre, P.,
+  Minchin, P., O'Hara, R., Simpson, G., Solymos, P., Stevens, M. \& Wagner, H.
+  (2013).
+\newblock \emph{vegan: Community Ecology Package}.
 
-\bibitem[{K{\'e}ry \& Schaub(2012)}]{kery2012bayesian}
-K{\'e}ry, M. \& Schaub, M. 2012 \emph{Bayesian population analysis using
-  WinBUGS: a hierarchical perspective}.
-\newblock Academic Press.
+\bibitem[{Ponisio \emph{et~al.}(2016)Ponisio, M'Gonigle \&
+  Kremen}]{ponisio2015farm}
+\hspace{0em}\\Ponisio, L.C., M'Gonigle, L.K. \& Kremen, C. (2016).
+\newblock On-farm habitat restoration counters biotic homogenization in
+  intensively managed agriculture.
+\newblock \emph{Global Change Biol.}, 22, 704--715.
+
+\bibitem[{Winfree \emph{et~al.}(2014)Winfree, Williams, Dushoff \&
+  Kremen}]{winfree2014species}
+\hspace{0em}\\Winfree, R., Williams, N.M., Dushoff, J. \& Kremen, C. (2014).
+\newblock Species abundance, not diet breadth, drives the persistence of the
+  most linked pollinators as plant-pollinator networks disassemble.
+\newblock \emph{The American Naturalist}, 183, 600--611.
+
+\bibitem[{Zuur \emph{et~al.}(2010)Zuur, Ieno \& Elphick}]{zuur2010protocol}
+\hspace{0em}\\Zuur, A.F., Ieno, E.N. \& Elphick, C.S. (2010).
+\newblock A protocol for data exploration to avoid common statistical problems.
+\newblock \emph{Methods in Ecology and Evolution}, 1, 3--14.
 
 \end{thebibliography}

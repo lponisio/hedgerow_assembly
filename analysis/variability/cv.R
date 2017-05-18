@@ -3,26 +3,34 @@ setwd('variability')
 
 source('src/initialize.R')
 
+## @knitr external_cv
 ## ************************************************************
 ## pollinators
 ## ************************************************************
 
-pol.cv <- cv.trait(spec,
-                   specs[specs$speciesType =="pollinator",],
-                   trait1="occ.date",
-                   trait2="r.degree",
-                   method= "time", time.col="assem",
-                   abund.col="weighted.closeness",
-                   cv.function=cv,
-                   zero2na=TRUE,
-                   standard.cv=TRUE,
-                   na.rm=TRUE)
+pol.cv <- calcCvTrait(spec, ## specimen data
+                   specs[specs$speciesType =="pollinator",], ## network metrics
+                   trait1="occ.date", ## first trait of interest, persistence
+                   trait2="r.degree", ## second trait of interest
+                   ## rarefied degree
+                   time.col="assem", ## name of the time column
+                   abund.col="weighted.closeness", ## network metric
+                   ## of interest
+                   cv.function=cv, ## function to use for calculating cv
+                   zero2na=TRUE, ## don't convert NAs to zeros in cv calc
+                   standard.cv=TRUE, ## log the cv
+                   na.rm=TRUE,
+                   species.type="GenusSpecies")
+
+## @knitr external_cv_lm
 
 pol.mod <- lmer(formula.cv, data=pol.cv$lm.data)
 print(summary(pol.mod))
 vif.mer(pol.mod)
 
 ## variance inflation factors < 2, so okay!!! (Zurr et al. 2010)
+
+## @knitr external_cv_quantreg
 
 ## ************************************************************
 ## the reviewers wanted a quantile regression, can only include on
@@ -36,16 +44,18 @@ pol.lm.cv.quant <- lqmm(fixed=cv ~ occ.date + r.degree, random=~1,
 pol.sum.boot.quant <- summary.boot.lqmm(boot(pol.lm.cv.quant,
                                              R=100))
 
+## @knitr external_cv_plants
 ## ************************************************************
-## plant
+## plants
 ## ************************************************************
-plant.cv <- cv.trait(spec,
+
+plant.cv <- calcCvTrait(spec,
                      specs[specs$speciesType =="plant",],
                      trait1="occ.plant.date",
                      trait2="plant.r.degree",
-                     method= "time", time.col="assem",
+                     time.col="assem",
                      abund.col="weighted.closeness",
-                     cv.function=cv,
+                     cv.function=corCv,
                      zero2na=TRUE,
                      standard.cv=TRUE,
                      na.rm=TRUE,
@@ -54,12 +64,14 @@ plant.cv <- cv.trait(spec,
 plant.mod <- lmer(formula.plant.cv, data=plant.cv$lm.data)
 print(summary(plant.mod))
 vif.mer(plant.mod)
-## variance inflation factors <1, so okay (Zurr et al. 2010)
 
+## variance inflation factors <1, so okay (Zurr et al. 2010)
 
 ## ************************************************************
 ## the reviewers wanted a quantile regression, can only include on
 ## random effect at a time
+
+## @knitr external_cv_plants_quantreg
 
 plant.lm.cv.quant <- lqmm(fixed=cv ~ occ.plant.date + plant.r.degree,
                           random=~1,
@@ -71,12 +83,14 @@ plant.sum.boot.quant <- summary.boot.lqmm(boot(plant.lm.cv.quant,
 
 ## ************************************************************
 ## correlation betwen degree and persistence
+## @knitr external_cv_cor
 
 cor.test(pol.cv$lm.data$r.degree, pol.cv$lm.data$occ.date)
 cor.test(plant.cv$lm.data$plant.r.degree,
          plant.cv$lm.data$occ.plant.date)
 
 ## ************************************************************
+## @knitr external_cv_resids
 ## residual plots
 
 resid.plot <- function(){
@@ -104,7 +118,7 @@ resid.plot <- function(){
     plot(density(residuals(plant.mod)))
 }
 
-## not amazing, but not terrible
+## passable
 resid.plot()
 
 ## save

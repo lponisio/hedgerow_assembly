@@ -181,8 +181,11 @@ spec$plant.r.degree <- traits$r.degree[match(spec$PlantGenusSpecies,
                                          traits$GenusSpecies)]
 
 ## occurence
+## load site by sample by species array
 load('~/Dropbox/hedgerow/data_sets/matrices/net/bee.syr.RData')
 
+## calculate the proportion of samples a species was present at for
+## each site
 occ <- apply(mat, c(3,1), calcOccArray)
 spec$occ.date <- apply(spec, 1, findOcc)
 traits$occ.date <- spec$occ.date[match(traits$GenusSpecies,

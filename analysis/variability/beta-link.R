@@ -24,17 +24,24 @@ edges.com <- aggregate(list(abund=spec$GenusSpecies),
 load(file="saved/lc.Rdata")
 spec$Int <- paste(spec$GenusSpecies,
                   spec$PlantGenusSpecies)
+
+## @knitr external_beta_link
 phylo.int <- calcCommDis(spec, "Int", lc, abund.w=TRUE)
+## @knitr external_beta_link_end
+
 save(phylo.int, file="saved/phyloInt.Rdata")
 
 ## linear model of phylo int by years between samples mature and
 ## maturing hedgerows have more intearction turnover between years
 
 load(file="saved/phyloInt.Rdata")
+
+## @knitr external_beta_link_lm
 phylo.int.mod <- lmer(PhyloInt ~ SiteStatus +
                           (1|Site),
                       data=phylo.int$phylo.int)
 print(summary(phylo.int.mod))
+## @knitr external_beta_link_end
 
 ## ## for comparing maturing and mature
 ## ## mature and maturing are not sig different

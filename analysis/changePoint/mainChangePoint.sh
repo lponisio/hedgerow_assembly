@@ -1,11 +1,14 @@
 #!/usr/bin/env bash
 
+## compile the python functions for the change point analysis
 cd changePoint/cptPeel/fitHRG_GPL_Bayes/
 make cleanall; make
 cd ../consensusHRG_GPL_Bayes/
 make
 cd ../../
 
+
+##
 RScript dataPrep.R
 
 for i in `seq 1 100`; do

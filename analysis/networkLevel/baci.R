@@ -1,16 +1,17 @@
-# rm(list=ls())
+## rm(list=ls())
 ## setwd('~/Dropbox/hedgerow_assembly/analysis/networkLevel')
 setwd('networkLevel')
 source('src/initialize.R')
 load('../../data/networks/baci_networks_years.Rdata')
+
+## number of null communities
 N <- 999
 
 ## ************************************************************
 ## calculate metrics and zscores ## beware this takes a while!
 ## ************************************************************
-## mets <- lapply(nets, network.metrics, N)
-
-## cor.dats <- prep.dat(mets,  spec)
+## mets <- lapply(nets, calcNetworkMetrics, N)
+## cor.dats <- prepDat(mets,  spec)
 
 ## cor.dats$tot.rich <- cor.dats$number.of.species.LL +
 ##     cor.dats$number.of.species.HL
@@ -51,7 +52,9 @@ mods <- lapply(formulas, function(x){
 
 names(mods) <- ys
 ## results
+## @knitr external_mets_lm
 lapply(mods, summary)
+## @knitr external_mets_lm_end
 aic.mods <- sapply(mods, AIC)
 
 ## ************************************************************
@@ -66,7 +69,7 @@ formulas.spac <-lapply(ys, function(x) {
 
 mods.spatial <- lapply(formulas.spac, function(x){
     lme(x,
-         random = ~ 1 + cYear | Site,
+        random = ~ 1 + cYear | Site,
         correlation=corAR1(form=~cYear),
         data=baci,
         method="REML",

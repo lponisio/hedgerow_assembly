@@ -4,7 +4,7 @@ source('src/initialize.R')
 source('src/commPrep.R')
 save.dir.comm <- "saved/communities"
 save.dir.nulls <- "saved/nulls"
-nnull <- 99
+nnull <- 999
 
 src.dir2 <- 'analysis/beta-div'
 source(file.path(src.dir2, 'src/misc.R'))

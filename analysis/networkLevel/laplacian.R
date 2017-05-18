@@ -80,6 +80,3 @@ all.alg.Con.status$tot.rich <- net.mets[match(names(net.mets),
                                                     sep="."))]
 
 cor.test(all.alg.Con.status$tot.rich, all.alg.Con.status$AlgCon)
-
-cor.test(all.alg.Con.status$tot.rich[!is.na(all.alg.Con.status$ypr)],
-         all.alg.Con.status$AlgCon[!is.na(all.alg.Con.status$ypr)])

@@ -4,11 +4,10 @@ corCv <- function(x,...){
     cv(x)*(1 + (1/4*length(x)))
 }
 
-cv.trait <- function(spec.dat,
+calcCvTrait <- function(spec.dat,
                      byType,
                      trait1,
                      trait2,
-                     method,
                      time.col,
                      abund.col,
                      status.order=c("control", "maturing", "mature"),
@@ -16,9 +15,20 @@ cv.trait <- function(spec.dat,
                      zero2na =FALSE,
                      standard.cv=TRUE,
                      species.type="GenusSpecies",...){
-    ## cv.function can be corCv, cv, or sd
-    ## standard cv devides cv by 100 to avoid too large of numbers for the
-    ## lm
+    ##spec.dat: specimens data
+    ## byType: table of species level network metrics
+    ## trait1: first trait of interest (to regress cv
+    ## against)
+    ## trait2: second trait of interest
+    ## time.col: name of the time column
+    ## abund.col: network metric column name
+    ## cv.function: function to use for calculating cv. cv.function
+    ## can be corCv, cv, or sd
+
+    ## zero2na: converts NAs to zeros, but NAs are not
+    ## inclcued in the cv calculations whereas zeros are, so
+    ## recommended to keep as FALSE
+    ## standard cv logs the cv
     byStatus <- split(byType, byType$SiteStatus)
     bySite <- lapply(byStatus, function(x) {split(x, x$Site)})
     bySite <- unlist(bySite, recursive=FALSE)
@@ -47,9 +57,9 @@ cv.trait <- function(spec.dat,
     dats <- cbind(dats, spec.dat[, c(trait1, trait2)][match(dats$GenusSpecies,
                                                             spec.dat[,
                                                                      species.type]),])
-   lm.dats <- dats[!is.na(dats$cv) & !is.na(dats[,trait1]) & !is.na(dats[,trait2]),]
+    lm.dats <- dats[!is.na(dats$cv) & !is.na(dats[,trait1]) & !is.na(dats[,trait2]),]
     return(list(data=dats,
-           lm.data =lm.dats))
+                lm.data =lm.dats))
 }
 
 ## variance inflation factor

@@ -1,12 +1,12 @@
 
-beta.status <- function(comm,
+calcBetaStatus <- function(comm,
                         status,
                         dis.method,
                         nulls,
                         sub= "pol",
                         occ= FALSE,
                         years,
-                        zscore=FALSE){
+                        zscore=FALSE){ ## calculate zscores?
     ## computes dispersion of community matrices, returns output of
     ## vegan function betadisper
 

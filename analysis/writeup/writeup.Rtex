@@ -19,56 +19,447 @@
 \usepackage{multirow}
 \geometry{tmargin=1in,bmargin=1in,lmargin=1in,rmargin=1in}
 
+\bibliographystyle{ecology_let}
 
 %% for inline R code: if the inline code is not correctly parsed, you will see a message
 \newcommand{\rinline}[1]{SOMETHING WRONG WITH knitr}
 %% begin.rcode setup, include=FALSE
+%library(lme4)
+%library(lmerTest)
+%library(vegan)
+%library(bipartite)
+%library(igraph)
 % library(knitr)
+% library(highr)
 %% end.rcode
 
 \begin{document}
-\title{Opportunistic attachment assembles plant-pollinator networks: A walkthrough of the anlaysis}
+\title{Opportunistic attachment assembles plant-pollinator networks: A walk through of the analysis}
 \author{Lauren Ponisio}
 
 \maketitle
+
+\begin{figure}[h!]
+  \centering
+  \includegraphics[width=1.1\textwidth]{figure/SankeyIDb303b2e99ce.pdf}
+  \label{fig:methods}
+\end{figure}
+\clearpage
+
 \section{Overview}
 \label{sec:overview}
 
-In our study we examing the temporal dynamcis of plant-pollinator
-network assembly using vareity of different methods include 1) network
+In our study we examining the temporal dynamics of plant-pollinator
+network assembly using variety of different methods include 1) network
 change point detection 2) node/species-level position variation, 3)
 species and interaction turnover 4) network-level metrics and 5)
-extinction simulations. We are commited to reproducible science and
+extinction simulations. We are committed to reproducible science and
 all analytical code will be maintained on github, along with this
-write up (as included as a supplment to the publication).
+write up.
 
-The entire analysis is executable from the main.sh file
+The entire analysis is executable from the main.sh file. All of the
+packages needed to run the analyses are listed in the packages.sh
+file, including the specific versions of the python dendropy library,
+which is very finicky. We have had no problems with back compatibility
+for the R scripts (in terms of R versions from v.~2-3.3 or packages)
+but the change point analysis must be run in python2 (not easily
+convertible to python3, though this is potentially in progress).
 
-The change point analysis which is a mix of python and R. hedgerows.py
-(the meat of the change point analysis) runs in paralell on two cores
-(which can be modified in the script if needed), but will likely take
-a few hours, depending on your machine.
-
-%% begin.rcode bash-chunk1, engine='bash', eval=FALSE
-% RScript changePoint/dataPrep.R
-% python changePoint/hedgerows.py
-% RScript changePoint/prepChangePointOutput.R
-% python changePoint/postChangePoint.py saved/consensus.txt
-% python changePoint/convertfiles.py
-% RScript changePoint/plotting/networks.R
-%% end.rcode
-
-And all of the subsequent R analyses (takes several hours, mostly for
-building null communities for standardizing the network level metrics)
+Navigate to the analysis folder within the github repo
+(hedgerow\_assembly) then the main.sh file can be selected and
+run. I would not recommend doing this unless you are prepared to have two
+cores of your machine running for days to weeks (depending on how many
+of iterations of the change point analysis specific in
+mainChangePoint.sh loop), but you could run of the analyses in the
+study by running this line in BASH.
 
 %% begin.rcode bash-chunk2, engine='bash', eval=FALSE
-% RScript mainR.R
+% bash main.sh
 %% end.rcode
+
+This will somewhat helpfully print the results of each analysis
+and re-create any accompanying figures.
 
 We will walk through each analysis individually.
 
-\section{Change point analysis}
 
-install dendropy v4.0.3
+\section{Change Point Analysis}
+
+The change point analysis which is a mix of python and R. hedgerows.py
+(the meat of the change point analysis) runs in parallel on two cores
+(which can be modified in the hedgerows.py script by toggling the
+ncores object), but will likely take a many hours (a day on running on
+my 2.5 GHz Intel Core i7 mac pro) depending on your machine.
+
+There is some stochasticity in the change point analysis in the
+hypothesis testing step where samples are drawn from the null
+distribution and the likelihood of a change point occurring is
+calculated from those samples. Because of this, we re-ran the change
+point detection analysis 1000 times (this was done on a cluster) and
+used the change points that were identified in 95\% of runs in
+subsequent analyses.
+
+mainChangePoint.sh compiles the python code, then creates the .pairs
+files needed for the change point analysis (dataPrep.R). Nodes names
+need to be consistent across years within a site, and for simplicity
+we made them consistent across all sites as well. This enabled us to
+provide a single .lut master list of the nodes to the analysis.
+
+Next, the change point detection loop is run. This function begins by
+fitting the generalized hierarchical random graph model (GHRG) which
+outputs consensus trees that are used by the change point detection
+algorithm. There is only slight variability in the fitting of the
+GHRG between runs, so once the first loop is run, the consensus trees
+are used in subsequent runs.
+
+The output of the change point analysis is saved as a list of the
+change points identified and like likelihood scores (formatted by
+prepChangePointOutput.R).
+
+After the loop, consensusChangePoints.R drops the change points that
+were not identified by $95\%$ of the runs and then creates consensus
+trees for each chunk of years between change point in python
+(postChangePoint.py). The outputs of the change point analysis were
+very specialized to that analysis, so we had to convert them to .glm
+files for plotting and further exploration in R
+(convertConsensusTrees.py)
+
+The plotting and statistical analyses are in R in different
+scripts. The plotting function will create the network, community and
+flow plots (networks.R). The binomial linear mixed models are run in
+the comparison.R script, along with addition statistical analysis
+requested by the reviewers testing whether change points tended to
+occur between years with a larger difference in samples.
+
+%% begin.rcode setupchangepoint, include=FALSE
+% setwd('../')
+% source('changePoint/comparisons.R')
+% setwd('../')
+% read_chunk('changePoint/comparisons.R')
+%% end.rcode
+
+
+%% begin.rcode external_binomialreg
+%% end.rcode
+
+In the data, site status "maturing" corresponds to the assembling
+hedgerows (i.e., they are maturing). "Mature" corresponds to the
+non-assembling hedgerows $>$ 10 years old, and "control" corresponds
+to the non-assembling, weedy field margins.
+
+In this analysis the assembling hedgerows are set as the intercept, to
+weedy field margins ("control") have significantly less change points
+than assembling hedgerows ("maturing"). Mature and maturing are about
+the same.
+
+\section{Characteristics of species that contribute to change
+points}
+
+The degree of each species was calculated from a larger dataset
+including observations across the northern central valley
+(approx.~18000 interaction records). These scores were rarefied by
+treating plants like sites in a traditional rarefaction
+\citep{winfree2014species}. This helped to disentangle degree with the
+number of observations of each species. The number of observations of
+a species/the total number of samples at each site was then calculated
+as an estimate of persistence. For each species, its weighted closeness
+in the network is also calculated. All of these calculations were done
+from the dataPrep/dataPrep.R file which needs access to some
+non-publically available data, though the data needed for these
+analysis are all in github.
+
+cv.R calculates the cv of closeness for each species at each site, and
+appends the values for persistence and rarefied degree. For the
+pollinators:
+
+%% begin.rcode setupcv, include=FALSE
+% setwd('../')
+% source('variability/cv.R')
+% setwd('../')
+% read_chunk('variability/cv.R')
+%% end.rcode
+
+%% begin.rcode external_cv
+%% end.rcode
+
+We can then use a linear mixed model to regress the cv of weighted
+closeness by rarefied degree and persistence. Random effects of site
+and species are also included.
+
+%% begin.rcode external_cv_lm
+%% end.rcode
+
+There is a significant position relationship between cv of closeness
+and persistence ("occ.date") but not rarified degree ("r.degree"). The
+variance inflation factors are both before 2, which
+\cite{zuur2010protocol} suggests is acceptable.
+
+We see the same pattern in the plant data.
+
+%% begin.rcode external_cv_plants
+%% end.rcode
+
+You can play with using different network metrics to calculate the cv
+of. You can also change the function used for calculating the cv, or
+whatever function you would like to calculate between years.
+
+%% begin.rcode r-chunk1
+% ## network metric options
+% colnames(specs)[1:24]
+%% end.rcode
+
+The reviewers suggested we also do quantile regressions, which can only
+include on random effect at a time, but yielded similar results.
+
+%% begin.rcode external_cv_quantreg
+%% end.rcode
+
+\section{Species and interaction turnover}
+\subsection{Pollinators, plants and interactions}
+% begin.rcode setupbeta, include=FALSE
+% setwd('../')
+% source('variability/beta-div.R')
+% setwd('../')
+% read_chunk('variability/beta-div.R')
+%% end.rcode
+
+
+To calculate species and interaction turnover over, we borrow methods
+from the $\beta$-diversity world \citep{ponisio2015farm,
+chase-2011-art24, anderson-2006-683, anderson-2011-19,
+anderson-2006-245}.  The goal is to calculate the pairwise
+dissimilarity between years within each site of the dataset using a
+dissimilarity estimator that incorporates species abundances, while
+also accounting for unobserved species \citep{chao-2005-148}, and then
+following \citep{chase-2011-art24}, correct our estimates of
+$\beta$-diversity using null models.
+
+The nulls.R script prepares null communities in variety of ways to
+calculate an expected distribution by generating randomized
+communities and calculating the dissimilarity of these communities.
+To do this, we defined the species pool within each site as the
+species and number of individuals present across all samples from that
+site.  We then generated $999$ random communities by constraining
+either 1) the total number of individuals caught at each site
+(individual nulls) or 2) the species richness at each site (alpha div
+nulls). We also had a binary option that constrained but marginal
+sums (occurrence nulls).
+
+
+Next, in the function calcBetaStatus.R executed by beta-div.R, for the
+observed and nulls communities, we calculated the pair-wise
+dissimilarity between sites.  We then used the null community
+dissimilarities to calculate the expected $\beta$-diversity when
+communities are randomly assembled but constrained so that they have
+either the same 1) number of individuals or 2) species richness as the
+observed communities and with species drawn from a meta-community with
+the same species abundance distributions.  In order to do this, we
+followed \cite{chase-2011-art24}.  Specifically, we calculated the
+fraction of randomly assembled communities with dissimilarity values
+less than (and half of those equal to) that of the observed community.
+We used this fraction as a ``corrected dissimilarity score'' for our
+observed data.  Corrected dissimilarity values near one indicate that
+our observed communities exhibit more species turnover between sites
+than expected under a random assembly process while values near $0.5$
+indicate that our observed communities exhibit levels of turnover more
+in line with the null expectation. We calculated the corrected
+dissimilarities for each type of randomized community. We then
+generated principle coordinate axes (PCoA) based on the corrected
+pair-wise dissimilarities \citep{oksanen-2013, anderson-2006-683,
+anderson-2011-19, anderson-2006-245}.  We calculated dispersion for
+each site type by finding the centroid in PCoA space for that site
+type and then calculating the distances from sites of that type to
+that centroid. The centroid is the point that minimizes the sum of
+these distances.
+
+%% begin.rcode external_beta_div
+%% end.rcode
+
+Changing zscore to TRUE calculates dissimilarity zscores instead of
+\cite{chase-2011-art24}'s pvalue-like method.
+
+Toggling alpha and beta in the beta-div.R script changes between the
+null model options. When binary is TRUE, the binary null models are
+used and the dissimilarity method is "jaccard" (all set up in the
+initialize\_beta.R). When alpha is TRUE, species richness but not
+individual abundances are constrained, and the reverse when alpha is
+FALSE. The chao dissimilarity measure is used in both
+abundance-weighted cases.
+
+
+%% begin.rcode r-chunk2
+% binary <- FALSE
+% alpha <- TRUE
+%% end.rcode
+
+The dispersion values were then used in linear mixed-effect models to
+investigate the effect of different site types on
+"$\beta$-diversity". Site is included as a random effect. For
+pollinators:
+
+%% begin.rcode external_beta_div_lm
+%% end.rcode
+
+There is little difference between any of the options, except mature
+sites have significantly less turnover in pollinators with the alpha
+null options, which is likely most appropriate.
+
+Changing "type" to "pols", "plants", or "Ints" calculates turnover of
+pollinators, plants and interactions respectively. All of these are
+executed in the main.sh script.
+
+We also included a linear model that took temporal auto-correlation
+into account, with the same results but not a large gain in fit given
+the additional parameters (tested using AIC)
+
+%% begin.rcode external_beta_div_lm_autocorr
+%% end.rcode
+
+
+\subsection{Weighted interaction turnover}
+
+% begin.rcode setupbeta-link, include=FALSE
+% setwd('../')
+% source('variability/beta-link.R')
+% setwd('../')
+% read_chunk('variability/beta-link.R')
+%% end.rcode
+
+To calculate weighted interaction turnover we borrowed concepts from
+calculating phylogenetic $\beta$-diversity. We began by creating a
+"phylogenetic" tree of interactions based on their position in the
+network using the getLinkCommunities function in the linkcomm package
+\citep{kalinka2011linkcomm}. For bi-partite networks, the set of
+neighbors is used to count nodes for the edge similarity metric
+because node i and node j cannot share an edge in a bi-partite
+network. The partition density for bi-partite networks is calculated
+as:
+
+
+\begin{equation}
+ (2/M)*\sum_c m_c*(m_c + 1-n_c)/(2*n_{c_0}*n_{c_1} - 2*(n_c - 1))
+\end{equation}
+
+where M is the total number of edges, $m_c$ is the number of edges in
+subset $c$, $n_c$ is the number of nodes in subset c, $n_{c_0}$ is the
+number of nodes in partition 0, and $n_{c_1}$ is the number of nodes
+in partition 1.
+
+Use the resulting dendrogram and interaction dissimilarity matrices,
+we use the comdist function in the picante package
+\citep{picante-2010-1463} to calculate expected "phylogenetic"
+distance separating two interactions drawn randomly from different
+communities. This gives us a measure of interaction turnover weighted
+by how interaction similarity. This is all wrapped up in the function
+CalcCommDis
+
+%% begin.rcode external_beta_link, eval=FALSE
+%% end.rcode
+
+We use a linear mixed model to regress weighted interaction turnover
+and site type and find no statistically significant differences.
+
+%% begin.rcode external_beta_link_lm
+%% end.rcode
+
+
+\section{Temporal changes in interaction patterns}
+\subsection{Network structure}
+
+% begin.rcode setupNetworkMets, include=FALSE
+% setwd('../')
+% source('networkLevel/baci.R')
+% setwd('../')
+% read_chunk('networkLevel/baci.R')
+
+%% end.rcode
+
+The baci.R script (before-after-control-impact, baci, the orginal
+design of the study, vs.~ the word for kisses in Italian) calculates
+various network metrics for the assembling hedgerows, standardizes
+them using null communities, then include then as response variables
+in linear models. The number of null communities can be changed by
+setting N at the top of the script.
+
+Calculate and standardize the network metrics. CalcNetworkMetrics
+takes an argument "networkLevel.mets" which is passed to networkLevel
+within the package bipartite \citep{bipartite} if other metrics are
+desired. Unlike the turnover analysis, the networks include
+non-integers because the mean was taken over sampling rounds within a
+year. We therefore use the null model proposed by \citep{Galeano2009}
+to randomize the communities while fixing the total number of
+interactions, species and interaction frequency distributions (though
+any function that takes a single interaction matrix as an argument can
+be substituted using the null.fun argument of the calcNullStat
+function.
+
+Calculate and pretty network metrics.
+
+%% begin.rcode r-chunk3, eval=FALSE
+% mets <- lapply(nets, calcNetworkMetrics, N)
+% cor.dats <- prepDat(mets,  spec)
+%% end.rcode
+
+
+Then regress the nestedness, modularity, specialization and
+connectance by time ("ypr" in the data, years post restoration).
+
+%% begin.rcode external_mets_lm, eval=FALSE
+%% end.rcode
+
+As per the suggestion of reviewers, we also tested the same hypotheses
+with linear mixed models that included temporal auto-correlation, and
+splines. Like the turnover models, the temporal auto-correlation
+models showed similar results, but the fit was not substantially
+improved by adding the additional parameters. The spline chose to fit
+a line, indicating that the linear models were sufficient. They are
+time consuming to run so the results are not included here.
+
+\subsection{Network robustness}
+
+% begin.rcode setupResil, include=FALSE
+% setwd('../')
+% source('networkLevel/resilience.R')
+% setwd('../')
+% read_chunk('networkLevel/resilience.R')
+% setwd('../')
+% source('networkLevel/laplacian.R')
+% setwd('../')
+% read_chunk('networkLevel/laplacian.R')
+%% end.rcode
+
+
+The resilience.R script calculates resilience to species extinction
+using the method of \citep{Memmott2004}. Species can be dropped by
+abundance ( extinction.method = "abund") or degree (extinction.method
+="degree"). From the helpfile: "The procedure of this function is
+simple. For example imagine the web to represent a pollination web, in
+which pollinators die one by one. Set all entries of a column to zero,
+see how may rows are now also all-zero (i.e., species that are now not
+pollinated any more), and count these as secondary extinctions of the
+primary exterminated pollinator." The area under the curve is then
+calculated.
+
+This area is then regressed against time ("ypr" again).
+
+%% begin.rcode external_resil
+%% end.rcode
+
+
+The next estimate of resilience we use is based on how quickly
+information spreads through a network as estimated by algebraic
+connectivity.
+
+%% begin.rcode external_resil
+%% end.rcode
+
+
+
+
+
+\clearpage
+\bibliography{refs}
+\clearpage
+
 
 \end{document}

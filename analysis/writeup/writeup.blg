@@ -1,0 +1,46 @@
+This is BibTeX, Version 0.99d (TeX Live 2015)
+Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
+The top-level auxiliary file: writeup.aux
+The style file: ecology_let.bst
+Database file #1: refs.bib
+You've used 14 entries,
+            2997 wiz_defined-function locations,
+            718 strings with 7278 characters,
+and the built_in function-call counts, 9261 in all, are:
+= -- 712
+> -- 532
+< -- 2
++ -- 207
+- -- 189
+* -- 786
+:= -- 1524
+add.period$ -- 41
+call.type$ -- 14
+change.case$ -- 131
+chr.to.int$ -- 14
+cite$ -- 14
+duplicate$ -- 605
+empty$ -- 582
+format.name$ -- 231
+if$ -- 1721
+int.to.chr$ -- 1
+int.to.str$ -- 1
+missing$ -- 144
+newline$ -- 73
+num.names$ -- 56
+pop$ -- 251
+preamble$ -- 1
+purify$ -- 118
+quote$ -- 0
+skip$ -- 159
+stack$ -- 0
+substring$ -- 429
+swap$ -- 351
+text.length$ -- 0
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 126
+warning$ -- 0
+while$ -- 64
+width$ -- 0
+write$ -- 182

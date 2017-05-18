@@ -3,7 +3,6 @@ library(lme4)
 
 setwd("changePoint")
 ## setwd("~/Dropbox/hedgerow_assembly/analysis/changePoint")
-
 source('../../dataPrep/src/misc.R')
 load('cptPeel/baci/graphs.Rdata')
 load('../../data/networks/allSpecimens.Rdata')
@@ -17,6 +16,7 @@ dats <- dats[dats$num.runs >= 0.8,]
 ## **********************************************************
 ## binomial tests
 ## **********************************************************
+
 chpt.trial <- aggregate(spec$Year, list(Site=spec$Site),
                            FUN=function(x) length(unique(x)))
 chpt.trial$x <- chpt.trial$x - 1
@@ -43,13 +43,15 @@ chpt.trial <- chpt.trial[order(chpt.trial$status),]
 ## binomial model with change points as successes
 chpt.trial$status <- factor(chpt.trial$status,
                             levels=c("maturing", "mature", "control"))
-
+## @knitr external_binomialreg
 mod.chpt <- glm(cbind(chpt.trial$chpts,
                       chpt.trial$trial - chpt.trial$chpts) ~
     chpt.trial$status, family="binomial")
 print(summary(mod.chpt))
 
 print(exp(cbind(coef(mod.chpt), confint(mod.chpt))))
+
+## @knitr external_otherCalc
 
 # controls with change points
 nrow(chpt.trial[chpt.trial$status == "control" &
@@ -70,8 +72,7 @@ nrow(chpt.trial[chpt.trial$chpts != 0,])/
   nrow(chpt.trial)
 
 
-## maturing has more successes than mature and controls, and mature
-## and controls have about the same
+## proportions
 
 chpt.trial$prop <- chpt.trial$chpts/chpt.trial$trial
 tapply(chpt.trial$prop, chpt.trial$status, mean)

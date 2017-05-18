@@ -7,16 +7,13 @@
 ## only needed for original analysis, the saved .Rdata files should
 ## all in in github
 
-## RScript ../dataPrep/dataPrep.R
+## Rscript ../dataPrep/dataPrep.R
 
 ##***************************************************************
 ## changepoint point analysis
 ##***************************************************************
 bash changePoint/mainChangePoint.sh
-python changePoint/convertfiles.py
-RScript changePoint/plotting/networks.R
-
-RScript changePoint/plotting/networks.R
+Rscript changePoint/plotting/networks.R
 Rscript changePoint/comparisons.R
 
 ##***************************************************************
