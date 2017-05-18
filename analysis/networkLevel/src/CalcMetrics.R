@@ -1,8 +1,5 @@
 
-calcMetric <- function(dat.web, H2_integer=FALSE,
-                        networkLevel.mets= c("H2", "connectance",
-                          "weighted connectance", "niche overlap",
-                          "number of species")) {
+calcMetric <- function(dat.web, ...) {
   ## calculates modularity
   calc.mod <- function(dat.web){
     ## converts a p-a matrix to a graph for modularity computation
@@ -49,9 +46,7 @@ calcMetric <- function(dat.web, H2_integer=FALSE,
                        weighted=TRUE,
                        wbinary=TRUE)$statistic["NODF"]
     mets <-  c(nodf,
-               networklevel(dat.web,
-                            index= networkLevel.mets,
-                            H2_integer=H2_integer))
+               networklevel(dat.web, ...))
   }
   mod.met <- calc.mod(dat.web)
   return(c(mets, mod.met= mod.met))
@@ -105,14 +100,19 @@ calcProbNull <- function(M) {
 }
 
 ## function to simulate 1 null, and calculate statistics on it
-calcNullStat <- function(dat.web, null.fun= calcProbNull) {
+calcNullStat <- function(dat.web,
+                         null.fun= calcProbNull,...) {
   sim.web <- null.fun(dat.web)
-  return(calcMetric(sim.web))
+  return(calcMetric(sim.web, ...))
 }
 
 ##  function that computes summary statistics on simulated null matrices
 ##  (nulls simulated from web N times)
-calcNetworkMetrics <- function (dat.web, N) {
+calcNetworkMetrics <- function (dat.web, N,
+                                H2_integer=FALSE,
+                                index= c("H2", "connectance",
+                          "weighted connectance", "niche overlap",
+                          "number of species")) {
   ## calculate pvalues
   pvals <- function(stats, nnull){
     rowSums(stats >= stats[, rep(1, ncol(stats))])/(nnull + 1)
@@ -137,7 +137,8 @@ calcNetworkMetrics <- function (dat.web, N) {
         null.stat <- replicate(N, calcNullStat(dat.web),
                                simplify=TRUE)
         ## calculate metrics from data
-        true.stat <- calcMetric(dat.web)
+          true.stat <- calcMetric(dat.web, H2_integer=H2_integer,
+                                  index=index)
         out.mets <- cbind(true.stat, null.stat)
         ## compute z scores
         zvalues <- zvals(out.mets)

@@ -1,4 +1,4 @@
-\begin{thebibliography}{14}
+\begin{thebibliography}{15}
 \expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
 
 \bibitem[{Anderson(2006)}]{anderson-2006-245}
@@ -59,6 +59,14 @@
   Ackerly, D., Blomberg, S. \& Webb, C. (2010).
 \newblock Picante: {R} tools for integrating phylogenies and ecology.
 \newblock \emph{Bioinformatics}, 26, 1463--1464.
+
+\bibitem[{Kuznetsova \emph{et~al.}(2014)Kuznetsova, {Bruun Brockhoff} \& {Haubo
+  Bojesen Christensen}}]{lmetest}
+\hspace{0em}\\Kuznetsova, A., {Bruun Brockhoff}, P. \& {Haubo Bojesen
+  Christensen}, R. (2014).
+\newblock \emph{{lmerTest}: Tests for random and fixed effects for linear mixed
+  effect models (lmer objects of lme4 package).}
+\newblock R package version 2.0-11.
 
 \bibitem[{Memmott \emph{et~al.}(2004)Memmott, Waser \& Price}]{Memmott2004}
 \hspace{0em}\\Memmott, J., Waser, N.M. \& Price, M.V. (2004).

@@ -93,8 +93,8 @@
 \section{Overview}
 \label{sec:overview}
 
-In our study we examining the temporal dynamics of plant-pollinator
-network assembly using variety of different methods include 1) network
+In our study we examin the temporal dynamics of plant-pollinator
+network assembly using variety of different methods including 1) network
 change point detection 2) node/species-level position variation, 3)
 species and interaction turnover 4) network-level metrics and 5)
 extinction simulations. We are committed to reproducible science and
@@ -104,10 +104,11 @@ write up.
 The entire analysis is executable from the main.sh file. All of the
 packages needed to run the analyses are listed in the packages.sh
 file, including the specific versions of the python dendropy library,
-which is very finicky. We have had no problems with back compatibility
-for the R scripts (in terms of R versions from v.~2-3.3 or packages)
-but the change point analysis must be run in python2 (not easily
-convertible to python3, though this is potentially in progress).
+which is very finicky. We have had no problems with backward
+compatibility for the R scripts (in terms of R versions from v.~2-3.4
+or packages) but the change point analysis must be run in python2 (not
+easily convertible to python3, though this is potentially in
+progress).
 
 Navigate to the analysis folder within the github repo
 (hedgerow\_assembly) then the main.sh file can be selected and
@@ -130,7 +131,8 @@ study by running this line in BASH.
 This will somewhat helpfully print the results of each analysis
 and re-create any accompanying figures.
 
-We will walk through each analysis individually.
+We will walk through each the main script for each analysis
+individually.
 
 
 \section{Change Point Analysis}
@@ -163,7 +165,7 @@ GHRG between runs, so once the first loop is run, the consensus trees
 are used in subsequent runs.
 
 The output of the change point analysis is saved as a list of the
-change points identified and like likelihood scores (formatted by
+change points identified and likelihood scores (formatted by
 prepChangePointOutput.R).
 
 After the loop, consensusChangePoints.R drops the change points that
@@ -237,7 +239,7 @@ hedgerows (i.e., they are maturing). "Mature" corresponds to the
 non-assembling hedgerows $>$ 10 years old, and "control" corresponds
 to the non-assembling, weedy field margins.
 
-In this analysis the assembling hedgerows are set as the intercept, to
+In this analysis the assembling hedgerows are set as the intercept, so
 weedy field margins ("control") have significantly less change points
 than assembling hedgerows ("maturing"). Mature and maturing are about
 the same.
@@ -290,7 +292,10 @@ pollinators:
 
 We can then use a linear mixed model to regress the cv of weighted
 closeness by rarefied degree and persistence. Random effects of site
-and species are also included.
+and species are included. Because degrees of freedom are not
+well-dinfed for a mixed model Satterthwaite approximations implemented
+in the lmeTest package are used so that p-values can be calculated for
+the linear mixed models \citep{lmetest}.
 
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
@@ -348,7 +353,7 @@ and persistence ("occ.date") but not rarified degree ("r.degree"). The
 variance inflation factors are both before 2, which
 \cite{zuur2010protocol} suggests is acceptable.
 
-We see the same pattern in the plant data.
+We found no statistically significant relationships in the plant data.
 
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
@@ -469,11 +474,11 @@ include on random effect at a time, but yielded similar results.
 \end{alltt}
 \begin{verbatim}
 ## Quantile 0.5 
-##                  Value Std. Error lower bound upper bound  Pr(>|t|)    
-## (Intercept)  3.7160065  0.0920970   3.5332661      3.8987 < 2.2e-16 ***
-## occ.date     0.7040012  0.2676157   0.1729936      1.2350  0.009884 ** 
-## r.degree    -0.0010938  0.0032020  -0.0074472      0.0053  0.733375    
-## scale        0.2869339  0.0191323   0.2489713      0.3249 < 2.2e-16 ***
+##                  Value Std. Error lower bound upper bound Pr(>|t|)    
+## (Intercept)  3.7160065  0.0854433   3.5464685      3.8855  < 2e-16 ***
+## occ.date     0.7040012  0.2454156   0.2170433      1.1910  0.00504 ** 
+## r.degree    -0.0010938  0.0032266  -0.0074960      0.0053  0.73533    
+## scale        0.2869339  0.0185467   0.2501333      0.3237  < 2e-16 ***
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 \end{verbatim}
@@ -530,8 +535,9 @@ pair-wise dissimilarities \citep{oksanen-2013, anderson-2006-683,
 anderson-2011-19, anderson-2006-245}.  We calculated dispersion for
 each site type by finding the centroid in PCoA space for that site
 type and then calculating the distances from sites of that type to
-that centroid. The centroid is the point that minimizes the sum of
-these distances.
+that centroid using the betadisper function in the vegan packages
+\citep{oksanen-2013}. The centroid is the point that minimizes the sum
+of these distances.
 
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
@@ -563,8 +569,10 @@ used and the dissimilarity method is "jaccard" (all set up in the
 initialize\_beta.R). When alpha is TRUE, species richness but not
 individual abundances are constrained, and the reverse when alpha is
 FALSE. The chao dissimilarity measure is used in both
-abundance-weighted cases.
-
+abundance-weighted cases. There is little difference between any of
+the options, except mature sites have significantly less turnover in
+pollinators with the alpha null options, which is likely most
+appropriate.
 
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
@@ -574,6 +582,10 @@ abundance-weighted cases.
 \end{alltt}
 \end{kframe}
 \end{knitrout}
+
+Changing "type" to "pols", "plants", or "Ints" calculates turnover of
+pollinators, plants and interactions respectively. All of these
+options are executed in the main.sh script.
 
 The dispersion values were then used in linear mixed-effect models to
 investigate the effect of different site types on
@@ -621,17 +633,10 @@ pollinators:
 \end{kframe}
 \end{knitrout}
 
-There is little difference between any of the options, except mature
-sites have significantly less turnover in pollinators with the alpha
-null options, which is likely most appropriate.
-
-Changing "type" to "pols", "plants", or "Ints" calculates turnover of
-pollinators, plants and interactions respectively. All of these are
-executed in the main.sh script.
-
-We also included a linear model that took temporal auto-correlation
-into account, with the same results but not a large gain in fit given
-the additional parameters (tested using AIC)
+Follow a reviwer's suggestion, we also included a linear model that
+took temporal auto-correlation into account, with the same results but
+not a large gain in fit given the additional parameters (tested using
+AIC)
 
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
@@ -701,10 +706,10 @@ To calculate weighted interaction turnover we borrowed concepts from
 calculating phylogenetic $\beta$-diversity. We began by creating a
 "phylogenetic" tree of interactions based on their position in the
 network using the getLinkCommunities function in the linkcomm package
-\citep{kalinka2011linkcomm}. For bi-partite networks, the set of
+\citep{kalinka2011linkcomm}. For bipartite networks, the set of
 neighbors is used to count nodes for the edge similarity metric
-because node i and node j cannot share an edge in a bi-partite
-network. The partition density for bi-partite networks is calculated
+because node i and node j cannot share an edge in a bipartite
+network. The partition density for bipartite networks is calculated
 as:
 
 
@@ -715,9 +720,9 @@ as:
 where M is the total number of edges, $m_c$ is the number of edges in
 subset $c$, $n_c$ is the number of nodes in subset c, $n_{c_0}$ is the
 number of nodes in partition 0, and $n_{c_1}$ is the number of nodes
-in partition 1.
+in partition 1 (from the getLinkCommunities helpfile).
 
-Use the resulting dendrogram and interaction dissimilarity matrices,
+With the resulting dendrogram and interaction dissimilarity matrices,
 we use the comdist function in the picante package
 \citep{picante-2010-1463} to calculate expected "phylogenetic"
 distance separating two interactions drawn randomly from different
@@ -733,8 +738,11 @@ CalcCommDis
 \end{kframe}
 \end{knitrout}
 
-We use a linear mixed model to regress weighted interaction turnover
-and site type and find no statistically significant differences.
+abund.w = TRUE weighted dissimilarity scores by species abundances.
+
+We use a linear mixed model to regress weighted interaction turnover. When
+interactions were weighted by their similarity, both assembling and
+mature hedgerows had higher rates of turnover than field margins.
 
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
@@ -763,17 +771,17 @@ and site type and find no statistically significant differences.
 ## Number of obs: 459, groups:  Site, 38
 ## 
 ## Fixed effects:
-##                    Estimate Std. Error       df t value Pr(>|t|)    
-## (Intercept)         0.90778    0.01965 37.00000  46.198  < 2e-16 ***
-## SiteStatuscontrol  -0.08206    0.02414 35.13000  -3.400  0.00169 ** 
-## SiteStatusmaturing  0.03339    0.03065 33.20000   1.089  0.28385    
+##                   Estimate Std. Error       df t value Pr(>|t|)    
+## (Intercept)        0.94117    0.02352 30.88000  40.014  < 2e-16 ***
+## SiteStatuscontrol -0.11545    0.02738 31.12000  -4.216 0.000198 ***
+## SiteStatusmature  -0.03339    0.03065 33.20000  -1.089 0.283853    
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
 ## Correlation of Fixed Effects:
 ##             (Intr) StSttsc
-## StSttscntrl -0.814        
-## StSttsmtrng -0.641  0.522
+## StSttscntrl -0.859        
+## SiteSttsmtr -0.767  0.659
 \end{verbatim}
 \end{kframe}
 \end{knitrout}
@@ -785,25 +793,22 @@ and site type and find no statistically significant differences.
 
 
 The baci.R script (before-after-control-impact, baci, the orginal
-design of the study, vs.~ the word for kisses in Italian) calculates
+design of the study, vs.~the word for kisses in Italian) calculates
 various network metrics for the assembling hedgerows, standardizes
 them using null communities, then include then as response variables
 in linear models. The number of null communities can be changed by
 setting N at the top of the script.
 
-Calculate and standardize the network metrics. CalcNetworkMetrics
-takes an argument "networkLevel.mets" which is passed to networkLevel
-within the package bipartite \citep{bipartite} if other metrics are
-desired. Unlike the turnover analysis, the networks include
-non-integers because the mean was taken over sampling rounds within a
-year. We therefore use the null model proposed by \citep{Galeano2009}
-to randomize the communities while fixing the total number of
-interactions, species and interaction frequency distributions (though
-any function that takes a single interaction matrix as an argument can
-be substituted using the null.fun argument of the calcNullStat
-function.
-
-Calculate and pretty network metrics.
+CalcNetworkMetrics takes an argument "index" which is passed to
+networkLevel within the package bipartite \citep{bipartite} if other
+metrics are desired. Unlike the turnover analysis, the networks
+include non-integers because the mean was taken over sampling rounds
+within a year. We therefore use the null model proposed by
+\citep{Galeano2009} to randomize the communities while fixing the
+total number of interactions, species and interaction frequency
+distributions (though any function that takes a single interaction
+matrix as an argument can be substituted using the null.fun argument
+of the calcNullStat function.
 
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
@@ -814,15 +819,161 @@ Calculate and pretty network metrics.
 \end{kframe}
 \end{knitrout}
 
-
 Then regress the nestedness, modularity, specialization and
-connectance by time ("ypr" in the data, years post restoration).
+connectance, plant/pollinator species richness by time ("ypr" in the
+data, years post restoration).
 
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
 \begin{alltt}
+\hlcom{## ************************************************************}
+\hlcom{## linear mixed models}
+\hlstd{ys} \hlkwb{<-} \hlkwd{c}\hlstd{(}\hlstr{"zNODF"}\hlstd{,} \hlstr{"zmod.met.D"}\hlstd{,} \hlstr{"zH2"}\hlstd{,} \hlstr{"connectance"}\hlstd{)}
+
+\hlstd{formulas} \hlkwb{<-}\hlkwd{lapply}\hlstd{(ys,} \hlkwa{function}\hlstd{(}\hlkwc{x}\hlstd{) \{}
+    \hlkwd{as.formula}\hlstd{(}\hlkwd{paste}\hlstd{(x,} \hlstr{"~"}\hlstd{,}
+                     \hlkwd{paste}\hlstd{(}\hlstr{"scale(ypr)"}\hlstd{,}
+                           \hlstr{"(1|Site)"}\hlstd{,}
+                           \hlstr{"(1|Year)"}\hlstd{,}
+                           \hlkwc{sep}\hlstd{=}\hlstr{"+"}\hlstd{)))}
+\hlstd{\})}
+
+\hlstd{formulas.spac} \hlkwb{<-}\hlkwd{lapply}\hlstd{(ys,} \hlkwa{function}\hlstd{(}\hlkwc{x}\hlstd{) \{}
+    \hlkwd{as.formula}\hlstd{(}\hlkwd{paste}\hlstd{(x,} \hlstr{"~"}\hlstd{,}
+                     \hlkwd{paste}\hlstd{(}\hlstr{"scale(ypr)"}\hlstd{,}
+                           \hlkwc{sep}\hlstd{=}\hlstr{"+"}\hlstd{)))}
+\hlstd{\})}
+
+\hlstd{mods} \hlkwb{<-} \hlkwd{lapply}\hlstd{(formulas,} \hlkwa{function}\hlstd{(}\hlkwc{x}\hlstd{)\{}
+    \hlkwd{lmer}\hlstd{(x,}
+         \hlkwc{data}\hlstd{=baci)}
+\hlstd{\})}
+
+\hlkwd{names}\hlstd{(mods)} \hlkwb{<-} \hlstd{ys}
+\hlcom{## results}
 \hlkwd{lapply}\hlstd{(mods, summary)}
 \end{alltt}
+\begin{verbatim}
+## $zNODF
+## Linear mixed model fit by REML t-tests use Satterthwaite approximations
+##   to degrees of freedom [lmerMod]
+## Formula: zNODF ~ scale(ypr) + (1 | Site) + (1 | Year)
+##    Data: baci
+## 
+## REML criterion at convergence: 186.2
+## 
+## Scaled residuals: 
+##     Min      1Q  Median      3Q     Max 
+## -1.7060 -0.5585 -0.1869  0.4507  2.2506 
+## 
+## Random effects:
+##  Groups   Name        Variance Std.Dev.
+##  Year     (Intercept) 1.477    1.215   
+##  Site     (Intercept) 6.427    2.535   
+##  Residual             8.241    2.871   
+## Number of obs: 36, groups:  Year, 8; Site, 5
+## 
+## Fixed effects:
+##             Estimate Std. Error     df t value Pr(>|t|)   
+## (Intercept)   6.1644     1.3091 4.7280   4.709   0.0061 **
+## scale(ypr)    1.2424     0.6717 6.2160   1.850   0.1121   
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Correlation of Fixed Effects:
+##            (Intr)
+## scale(ypr) 0.008 
+## 
+## $zmod.met.D
+## Linear mixed model fit by REML t-tests use Satterthwaite approximations
+##   to degrees of freedom [lmerMod]
+## Formula: zmod.met.D ~ scale(ypr) + (1 | Site) + (1 | Year)
+##    Data: baci
+## 
+## REML criterion at convergence: 116.8
+## 
+## Scaled residuals: 
+##     Min      1Q  Median      3Q     Max 
+## -1.8149 -0.7167 -0.2496  0.7042  2.8513 
+## 
+## Random effects:
+##  Groups   Name        Variance Std.Dev.
+##  Year     (Intercept) 0.000    0.000   
+##  Site     (Intercept) 0.000    0.000   
+##  Residual             1.471    1.213   
+## Number of obs: 36, groups:  Year, 8; Site, 5
+## 
+## Fixed effects:
+##             Estimate Std. Error      df t value Pr(>|t|)  
+## (Intercept)  -0.4738     0.2022 34.0000  -2.344   0.0251 *
+## scale(ypr)    0.2363     0.2050 34.0000   1.152   0.2572  
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Correlation of Fixed Effects:
+##            (Intr)
+## scale(ypr) 0.000 
+## 
+## $zH2
+## Linear mixed model fit by REML t-tests use Satterthwaite approximations
+##   to degrees of freedom [lmerMod]
+## Formula: zH2 ~ scale(ypr) + (1 | Site) + (1 | Year)
+##    Data: baci
+## 
+## REML criterion at convergence: 189.7
+## 
+## Scaled residuals: 
+##     Min      1Q  Median      3Q     Max 
+## -2.0587 -0.4511 -0.1303  0.5563  2.0243 
+## 
+## Random effects:
+##  Groups   Name        Variance Std.Dev.
+##  Year     (Intercept) 3.509    1.873   
+##  Site     (Intercept) 3.461    1.860   
+##  Residual             9.107    3.018   
+## Number of obs: 36, groups:  Year, 8; Site, 5
+## 
+## Fixed effects:
+##             Estimate Std. Error      df t value Pr(>|t|)   
+## (Intercept)  -5.9515     1.1889  6.2850  -5.006  0.00213 **
+## scale(ypr)   -1.4434     0.8571  6.8770  -1.684  0.13680   
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Correlation of Fixed Effects:
+##            (Intr)
+## scale(ypr) 0.025 
+## 
+## $connectance
+## Linear mixed model fit by REML t-tests use Satterthwaite approximations
+##   to degrees of freedom [lmerMod]
+## Formula: connectance ~ scale(ypr) + (1 | Site) + (1 | Year)
+##    Data: baci
+## 
+## REML criterion at convergence: -99.5
+## 
+## Scaled residuals: 
+##      Min       1Q   Median       3Q      Max 
+## -1.62761 -0.54457 -0.04675  0.38328  2.08088 
+## 
+## Random effects:
+##  Groups   Name        Variance  Std.Dev.
+##  Year     (Intercept) 0.0000000 0.00000 
+##  Site     (Intercept) 0.0009775 0.03126 
+##  Residual             0.0021487 0.04635 
+## Number of obs: 36, groups:  Year, 8; Site, 5
+## 
+## Fixed effects:
+##              Estimate Std. Error        df t value Pr(>|t|)    
+## (Intercept)  0.210108   0.015979  3.937000   13.15 0.000213 ***
+## scale(ypr)  -0.022972   0.008004 30.733000   -2.87 0.007359 ** 
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Correlation of Fixed Effects:
+##            (Intr)
+## scale(ypr) -0.003
+\end{verbatim}
 \end{kframe}
 \end{knitrout}
 
@@ -831,8 +982,84 @@ with linear mixed models that included temporal auto-correlation, and
 splines. Like the turnover models, the temporal auto-correlation
 models showed similar results, but the fit was not substantially
 improved by adding the additional parameters. The spline chose to fit
-a line, indicating that the linear models were sufficient. They are
-time consuming to run so the results are not included here.
+a line, indicating that the linear models were sufficient.
+
+
+
+And the splines:
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
+\begin{alltt}
+\hlcom{## ************************************************************}
+\hlcom{## splines}
+
+\hlcom{## for gaussian models}
+\hlstd{mods.splines} \hlkwb{<-} \hlkwd{lapply}\hlstd{(ys, calcSpine)}
+\end{alltt}
+\begin{verbatim}
+## $info
+## [1] 0
+## 
+## $smoothingParameters
+##    mu     v 
+## 10000 10000 
+## 
+## $info
+## [1] 0
+## 
+## $smoothingParameters
+##    mu     v 
+## 11000 10000 
+## 
+## $info
+## [1] 0
+## 
+## $smoothingParameters
+##    mu     v 
+## 10000 10000 
+## 
+## $info
+## [1] 0
+## 
+## $smoothingParameters
+##    mu     v 
+## 21437  1750
+\end{verbatim}
+\begin{alltt}
+\hlkwd{names}\hlstd{(mods.splines)} \hlkwb{<-} \hlstd{ys}
+
+\hlcom{## for poisson models}
+\hlstd{mods.splines.log} \hlkwb{<-} \hlkwd{lapply}\hlstd{(poi.ys, calcSpine,} \hlkwc{calc.log}\hlstd{=}\hlnum{TRUE}\hlstd{)}
+\end{alltt}
+\begin{verbatim}
+## $info
+## [1] 0
+## 
+## $smoothingParameters
+##    mu     v 
+## 11000 10000 
+## 
+## $info
+## [1] 0
+## 
+## $smoothingParameters
+##    mu     v 
+## 11000 10000 
+## 
+## $info
+## [1] 0
+## 
+## $smoothingParameters
+##    mu     v 
+## 11000 10000
+\end{verbatim}
+\begin{alltt}
+\hlkwd{names}\hlstd{(mods.splines.log)} \hlkwb{<-} \hlstd{poi.ys}
+\end{alltt}
+\end{kframe}
+\end{knitrout}
+
+The smoothing parameters indicate lines were fit.
 
 \subsection{Network robustness}
 
@@ -850,7 +1077,8 @@ pollinated any more), and count these as secondary extinctions of the
 primary exterminated pollinator." The area under the curve is then
 calculated.
 
-This area is then regressed against time ("ypr" again).
+This area is then regressed against time ("ypr") Random effects of
+year and site are included.
 
 \begin{knitrout}
 \definecolor{shadecolor}{rgb}{0.969, 0.969, 0.969}\color{fgcolor}\begin{kframe}
@@ -867,32 +1095,38 @@ This area is then regressed against time ("ypr" again).
 ## Formula: Robustness ~ ypr + (1 | Site) + (1 | Year)
 ##    Data: res[!is.na(res$ypr), ]
 ## 
-## REML criterion at convergence: -167.6
+## REML criterion at convergence: -166.9
 ## 
 ## Scaled residuals: 
 ##      Min       1Q   Median       3Q      Max 
-## -2.03661 -0.73640 -0.02933  0.62103  2.40910 
+## -1.99009 -0.62116 -0.07289  0.56358  2.37929 
 ## 
 ## Random effects:
 ##  Groups   Name        Variance  Std.Dev.
-##  Site     (Intercept) 0.0019852 0.04456 
-##  Year     (Intercept) 0.0001163 0.01078 
-##  Residual             0.0048546 0.06967 
+##  Site     (Intercept) 2.395e-03 0.048943
+##  Year     (Intercept) 5.091e-05 0.007135
+##  Residual             4.842e-03 0.069583
 ## Number of obs: 80, groups:  Site, 14; Year, 8
 ## 
 ## Fixed effects:
 ##              Estimate Std. Error        df t value Pr(>|t|)    
-## (Intercept)  0.331489   0.016356 11.040000  20.267 4.36e-10 ***
-## ypr          0.001166   0.004144 34.880000   0.281     0.78    
+## (Intercept)  0.333299   0.016943 10.950000  19.671 6.85e-10 ***
+## ypr          0.000965   0.004133 32.430000   0.233    0.817    
 ## ---
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 ## 
 ## Correlation of Fixed Effects:
 ##     (Intr)
-## ypr -0.395
+## ypr -0.374
 \end{verbatim}
 \end{kframe}
 \end{knitrout}
+
+
+
+The next estimate of resilience we use is based on how quickly
+information spreads through a network as estimated by algebraic
+connectivity.
 
 
 

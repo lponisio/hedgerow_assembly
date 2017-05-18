@@ -48,7 +48,8 @@ print(summary(phylo.int.mod))
 
 phylo.int$phylo.int$SiteStatus <-
     factor(phylo.int$phylo.int$SiteStatus,
-           levels=c("mature", "control", "maturing"))
+           levels=c("maturing", "control", "mature"))
+
 phylo.int.mod <- lmer(PhyloInt ~ SiteStatus +
                           (1|Site),
                       data=phylo.int$phylo.int)

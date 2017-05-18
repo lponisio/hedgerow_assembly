@@ -88,3 +88,36 @@ plant.degree.pi.close <- predict.int(mod= plant.mod,
 plot.panels()
 
 
+## ************************************************************
+## residual plots
+
+resid.plot <- function(){
+    layout(matrix(1:6, nrow=2, byrow=TRUE))
+    plot(fitted(pol.mod), residuals(pol.mod),
+         xlab = "Fitted Values", ylab = "Residuals",
+         main="Pollinators")
+    abline(h=0, lty=2)
+    lines(smooth.spline(fitted(pol.mod),
+                        residuals(pol.mod)))
+
+    qqnorm(residuals(pol.mod), abline(0,1))
+
+    plot(density(residuals(pol.mod)))
+
+    plot(fitted(plant.mod),
+         residuals(plant.mod),
+         xlab = "Fitted Values", ylab = "Residuals",
+         main="Plants")
+    abline(h=0, lty=2)
+    lines(smooth.spline(fitted(plant.mod),
+                        residuals(plant.mod)))
+    qqnorm(residuals(plant.mod), abline(0,1))
+
+    plot(density(residuals(plant.mod)))
+}
+
+## passable
+resid.plot()
+
+
+
