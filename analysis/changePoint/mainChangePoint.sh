@@ -4,14 +4,14 @@
 cd changePoint/cptPeel/fitHRG_GPL_Bayes/
 make cleanall; make
 cd ../consensusHRG_GPL_Bayes/
-make
+make cleanall; make
 cd ../../
 
 
 ##
 RScript dataPrep.R
 
-for i in `seq 1 100`; do
+for i in `seq 18 100`; do
     ## runs in parallel on 2 cores
     python hedgerows.py
 
