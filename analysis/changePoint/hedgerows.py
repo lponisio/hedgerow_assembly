@@ -59,4 +59,3 @@ ncores = 2
 jobs = [(runNetworkChangePoint, [[f for f in l if prefix in f]]) for prefix in prefixes]
 mapPool(ncores, jobs)
 
-

@@ -162,7 +162,7 @@ graph [
   ]
   node [
     id 32
-    label "95"
+    label "160"
     group 0
   ]
   node [
@@ -193,7 +193,7 @@ graph [
   node [
     id 38
     label "4"
-    group 1
+    group 0
   ]
   node [
     id 39
@@ -852,222 +852,222 @@ graph [
   ]
   node [
     id 170
-    label "205"
-    group 0
-  ]
-  node [
-    id 171
     label "223"
     group 0
   ]
   node [
-    id 172
+    id 171
     label "176"
     group 0
   ]
   node [
-    id 173
+    id 172
     label "60"
     group 0
   ]
   node [
-    id 174
+    id 173
     label "61"
     group 0
   ]
   node [
-    id 175
+    id 174
     label "62"
     group 0
   ]
   node [
-    id 176
+    id 175
     label "63"
     group 0
   ]
   node [
-    id 177
+    id 176
     label "64"
     group 0
   ]
   node [
-    id 178
+    id 177
     label "65"
     group 0
   ]
   node [
-    id 179
+    id 178
     label "66"
     group 0
   ]
   node [
-    id 180
+    id 179
     label "67"
     group 0
   ]
   node [
-    id 181
+    id 180
     label "68"
-    group 3
+    group 2
+  ]
+  node [
+    id 181
+    label "69"
+    group 2
   ]
   node [
     id 182
-    label "69"
-    group 3
-  ]
-  node [
-    id 183
     label "175"
     group 0
   ]
   node [
-    id 184
+    id 183
     label "174"
     group 0
   ]
   node [
-    id 185
+    id 184
     label "173"
     group 0
   ]
   node [
-    id 186
+    id 185
     label "172"
     group 0
   ]
   node [
-    id 187
+    id 186
     label "171"
-    group 0
-  ]
-  node [
-    id 188
-    label "170"
     group 3
   ]
   node [
-    id 189
+    id 187
+    label "170"
+    group 2
+  ]
+  node [
+    id 188
     label "203"
     group 0
   ]
   node [
-    id 190
+    id 189
     label "222"
     group 0
   ]
   node [
-    id 191
+    id 190
     label "288"
     group 0
   ]
   node [
-    id 192
+    id 191
     label "181"
     group 0
   ]
   node [
-    id 193
+    id 192
     label "253"
     group 0
   ]
   node [
-    id 194
+    id 193
     label "248"
     group 0
   ]
   node [
-    id 195
+    id 194
     label "182"
     group 0
   ]
   node [
-    id 196
+    id 195
     label "183"
     group 0
   ]
   node [
-    id 197
+    id 196
     label "180"
     group 0
   ]
   node [
-    id 198
+    id 197
     label "2"
     group 0
   ]
   node [
-    id 199
+    id 198
     label "162"
     group 0
   ]
   node [
-    id 200
+    id 199
     label "187"
     group 0
   ]
   node [
-    id 201
+    id 200
     label "184"
     group 0
   ]
   node [
-    id 202
+    id 201
     label "6"
     group 0
   ]
   node [
-    id 203
+    id 202
     label "220"
     group 0
   ]
   node [
-    id 204
+    id 203
     label "186"
     group 0
   ]
   node [
-    id 205
+    id 204
     label "188"
     group 0
   ]
   node [
-    id 206
+    id 205
     label "189"
     group 0
   ]
   node [
-    id 207
+    id 206
     label "311"
     group 0
   ]
   node [
-    id 208
+    id 207
     label "202"
     group 0
   ]
   node [
-    id 209
+    id 208
     label "313"
     group 0
   ]
   node [
-    id 210
+    id 209
     label "196"
     group 0
   ]
   node [
-    id 211
+    id 210
     label "221"
     group 0
   ]
   node [
-    id 212
+    id 211
     label "317"
     group 0
   ]
   node [
-    id 213
+    id 212
     label "185"
+    group 0
+  ]
+  node [
+    id 213
+    label "142"
     group 0
   ]
   node [
@@ -1132,8 +1132,8 @@ graph [
   ]
   node [
     id 226
-    label "160"
-    group 4
+    label "95"
+    group 0
   ]
   node [
     id 227
@@ -1153,7 +1153,7 @@ graph [
   node [
     id 230
     label "11"
-    group 1
+    group 0
   ]
   node [
     id 231
@@ -1262,7 +1262,7 @@ graph [
   node [
     id 252
     label "155"
-    group 4
+    group 0
   ]
   node [
     id 253
@@ -1277,7 +1277,7 @@ graph [
   node [
     id 255
     label "156"
-    group 4
+    group 0
   ]
   node [
     id 256
@@ -1332,7 +1332,7 @@ graph [
   node [
     id 266
     label "237"
-    group 2
+    group 1
   ]
   node [
     id 267
@@ -1402,7 +1402,7 @@ graph [
   node [
     id 280
     label "43"
-    group 2
+    group 1
   ]
   node [
     id 281
@@ -1437,12 +1437,12 @@ graph [
   node [
     id 287
     label "146"
-    group 3
+    group 2
   ]
   node [
     id 288
     label "147"
-    group 4
+    group 0
   ]
   node [
     id 289
@@ -1456,8 +1456,8 @@ graph [
   ]
   node [
     id 291
-    label "142"
-    group 0
+    label "205"
+    group 3
   ]
   node [
     id 292
@@ -1532,7 +1532,7 @@ graph [
   node [
     id 306
     label "70"
-    group 0
+    group 3
   ]
   node [
     id 307
@@ -1601,22 +1601,14 @@ graph [
   ]
   node [
     id 320
-    label "D4"
-  ]
-  node [
-    id 321
     label "D2"
   ]
   node [
-    id 322
-    label "D3"
-  ]
-  node [
-    id 323
+    id 321
     label "D0"
   ]
   node [
-    id 324
+    id 322
     label "D1"
   ]
   edge [
@@ -1749,7 +1741,7 @@ graph [
   ]
   edge [
     source 246
-    target 171
+    target 32
   ]
   edge [
     source 246
@@ -1773,7 +1765,7 @@ graph [
   ]
   edge [
     source 246
-    target 199
+    target 38
   ]
   edge [
     source 246
@@ -1810,6 +1802,10 @@ graph [
   edge [
     source 246
     target 47
+  ]
+  edge [
+    source 246
+    target 48
   ]
   edge [
     source 246
@@ -1865,7 +1861,7 @@ graph [
   ]
   edge [
     source 246
-    target 203
+    target 62
   ]
   edge [
     source 246
@@ -1974,6 +1970,10 @@ graph [
   edge [
     source 246
     target 90
+  ]
+  edge [
+    source 246
+    target 91
   ]
   edge [
     source 246
@@ -2102,10 +2102,6 @@ graph [
   edge [
     source 246
     target 123
-  ]
-  edge [
-    source 246
-    target 125
   ]
   edge [
     source 246
@@ -2289,7 +2285,7 @@ graph [
   ]
   edge [
     source 246
-    target 48
+    target 172
   ]
   edge [
     source 246
@@ -2321,15 +2317,15 @@ graph [
   ]
   edge [
     source 246
-    target 180
-  ]
-  edge [
-    source 246
     target 124
   ]
   edge [
     source 246
-    target 172
+    target 171
+  ]
+  edge [
+    source 246
+    target 182
   ]
   edge [
     source 246
@@ -2345,15 +2341,15 @@ graph [
   ]
   edge [
     source 246
-    target 186
-  ]
-  edge [
-    source 246
-    target 187
+    target 125
   ]
   edge [
     source 246
     target 118
+  ]
+  edge [
+    source 246
+    target 188
   ]
   edge [
     source 246
@@ -2397,7 +2393,7 @@ graph [
   ]
   edge [
     source 246
-    target 62
+    target 199
   ]
   edge [
     source 246
@@ -2410,6 +2406,10 @@ graph [
   edge [
     source 246
     target 202
+  ]
+  edge [
+    source 246
+    target 203
   ]
   edge [
     source 246
@@ -2446,10 +2446,6 @@ graph [
   edge [
     source 246
     target 212
-  ]
-  edge [
-    source 246
-    target 213
   ]
   edge [
     source 246
@@ -2501,7 +2497,7 @@ graph [
   ]
   edge [
     source 246
-    target 32
+    target 226
   ]
   edge [
     source 246
@@ -2514,6 +2510,10 @@ graph [
   edge [
     source 246
     target 229
+  ]
+  edge [
+    source 246
+    target 230
   ]
   edge [
     source 246
@@ -2597,7 +2597,7 @@ graph [
   ]
   edge [
     source 246
-    target 318
+    target 252
   ]
   edge [
     source 246
@@ -2606,6 +2606,10 @@ graph [
   edge [
     source 246
     target 254
+  ]
+  edge [
+    source 246
+    target 255
   ]
   edge [
     source 246
@@ -2729,7 +2733,7 @@ graph [
   ]
   edge [
     source 246
-    target 91
+    target 288
   ]
   edge [
     source 246
@@ -2741,7 +2745,7 @@ graph [
   ]
   edge [
     source 246
-    target 291
+    target 213
   ]
   edge [
     source 246
@@ -2801,10 +2805,6 @@ graph [
   ]
   edge [
     source 246
-    target 306
-  ]
-  edge [
-    source 246
     target 308
   ]
   edge [
@@ -2833,11 +2833,19 @@ graph [
   ]
   edge [
     source 246
+    target 315
+  ]
+  edge [
+    source 246
     target 316
   ]
   edge [
     source 246
     target 317
+  ]
+  edge [
+    source 246
+    target 318
   ]
   edge [
     source 246
@@ -2853,66 +2861,42 @@ graph [
   ]
   edge [
     source 246
-    target 323
-  ]
-  edge [
-    source 246
-    target 315
-  ]
-  edge [
-    source 320
     target 322
   ]
   edge [
     source 320
-    target 324
+    target 180
   ]
   edge [
-    source 321
+    source 320
     target 181
   ]
   edge [
-    source 321
-    target 182
-  ]
-  edge [
-    source 321
+    source 320
     target 287
   ]
   edge [
+    source 320
+    target 187
+  ]
+  edge [
     source 321
-    target 188
-  ]
-  edge [
-    source 322
-    target 226
-  ]
-  edge [
-    source 322
-    target 288
-  ]
-  edge [
-    source 322
-    target 252
-  ]
-  edge [
-    source 322
-    target 255
-  ]
-  edge [
-    source 323
     target 266
   ]
   edge [
-    source 323
+    source 321
     target 280
   ]
   edge [
-    source 324
-    target 230
+    source 322
+    target 291
   ]
   edge [
-    source 324
-    target 38
+    source 322
+    target 186
+  ]
+  edge [
+    source 322
+    target 306
   ]
 ]

@@ -28,8 +28,7 @@ makeChangepointData <- function(results, logs, value, samples,
     ##the columns, for all years. The output is a list in which each
     ##dimension is a sample site, and there is a dataframe with the year
     ##the sample started and the period that follows.
-
-
+    print(file.name)
     years <- as.numeric(sapply(strsplit(colnames(samples), 'X'),
                                function(x) x[2]))
     ## create a vector of the periods
@@ -52,7 +51,7 @@ makeChangepointData <- function(results, logs, value, samples,
             periods2[p]<- anos}
     }
 
-    names(periods2)<-samples[,1]
+    names(periods2) <- samples[,1]
 
 
     results <- results[sort(results$V1),]
@@ -63,10 +62,13 @@ makeChangepointData <- function(results, logs, value, samples,
     ## The code below is just to create the periods between years
     results$V1 <- as.character(results$V1)
     results$V2 <- as.character(results$V2)
-    years1  <-  as.numeric(sapply(strsplit(results$V1, '_'),
-                                  function(x) x[2]))
-    years2  <-  as.numeric(sapply(strsplit(results$V2, '_'),
-                                  function(x) x[2]))
+    ## years1.prep  <-  as.numeric(sapply(strsplit(results$V1, '_'),
+    ##                               function(x) x[2]))
+    ## years2.prep  <-  as.numeric(sapply(strsplit(results$V2, '_'),
+    ##                                    function(x) x[2]))
+    years1 <- apply(cbind(years1.prep, years2.prep), 1, min)
+    years2 <- apply(cbind(years1.prep, years2.prep), 1, max)
+
     anos <- min(years1):max(years2)
     anos.unique <- unique(c(years1, years2))
     anos <- anos[anos %in% anos.unique]
@@ -75,14 +77,14 @@ makeChangepointData <- function(results, logs, value, samples,
     for(n in 1:(length(anos)-1)){
         years[n,2] <- paste(anos[n], anos[n+1], sep='-')
     }
+
     years[,1] <- anos[-length(anos)]
     colnames(years) <- c('first', 'period')
-
     ## Identifyes the sites' name
     sites  <- sapply(strsplit(results$V1, "_"), function(x) x[1])
     ## Return the maximum values per line
 
-    max <- apply(as.matrix(results[,c(3:w+1)]), 1, max)
+    maxs <- apply(as.matrix(results[,c(3:w + 1)]), 1, max)
     ## Return the number of changing points values per line
     numberOfcps <- apply(as.matrix(results[,c(3:w+1)]), 1,
                          function(x) length(which(x > value)))
@@ -90,24 +92,24 @@ makeChangepointData <- function(results, logs, value, samples,
     ##the year that specific period (line) started, plus the column
     ##number.
     max.index <- rep(NA, dim(results)[1])
-    results <- cbind(results,  sites, years1, max, numberOfcps, max.index)
+    results <- cbind(results,  sites, years1, maxs, numberOfcps, max.index)
 
     ##Separating only the lines that have values of 1.00 (changing
     ##points idetified) for the results and the logs
-    sigs <- results[results$max >value,]
-    logs.sigs <- logs[results$max >value,]
+    sigs <- results[results$maxs > value,]
+    logs.sigs <- logs[results$maxs > value,]
     ## checking if there is more than 1 value, and if yes, returns the
     ## index with the maxlog (log table)
+
     for(row in 1:dim(sigs)[1]){
         if(sigs$numberOfcps[row] > 1){
             sigs$max.index[row] <- which.max(logs.sigs[row,c(3:w+1)])
         }
         else {## return the position of the max
             sigs$max.index[row] <- which(sigs[row,c(3:w+1)] ==
-                                         sigs$max[row])[1]
+                                         sigs$maxs[row])[1]
         }
     }
-
     ##aadding the period
     period <- rep(NA, dim(sigs)[1])
     sigs <- cbind(sigs, period)
@@ -115,11 +117,12 @@ makeChangepointData <- function(results, logs, value, samples,
     ## cp occurs between two years, indicated by the first year of the
     ## line plus the column where the 1.0 is found
     for(i in 1:dim(sigs)[1]){
-        local<-which(sigs$sites[i]==names(periods2))
-        y1 <- which(periods2[[local]][,1] ==sigs$years1[i])
+        local <- which(sigs$sites[i] == names(periods2))
+        y1 <- which(periods2[[local]][,1] == sigs$years1[i])
         sigs$period[i] <- periods2[[local]][y1+(sigs$max.index[i]-1),2]
     }
-    changing.points <- sigs[,c("sites", "max", "period")]
+
+    changing.points <- sigs[,c("sites", "maxs", "period")]
     colnames(changing.points)<-c("sites", "value", "cp")
     write.csv(changing.points,
               file=file.path(save.path, file.name),

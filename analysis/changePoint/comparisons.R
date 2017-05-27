@@ -11,7 +11,8 @@ dats <- read.csv('saved/consensusChangePoints.csv')
 BACI.site <- c('Barger', 'Butler', 'Hrdy', 'MullerB', 'Sperandio')
 
 ## drop change points that do not occur in 95% of runs
-dats <- dats[dats$num.runs >= 0.8,]
+dats <- dats[dats$num.runs >= 0.95,]
+dats$occ <- 1
 
 ## **********************************************************
 ## binomial tests
@@ -71,6 +72,17 @@ nrow(chpt.trial[chpt.trial$status != "maturing" &
 nrow(chpt.trial[chpt.trial$chpts != 0,])/
   nrow(chpt.trial)
 
+## **********************************************************
+
+lg.chpts <- data.frame(sites=rep(chpt.trial$Site, (chpt.trial$trial -
+                                             chpt.trial$chpts)),
+                       occ=0,
+                       num.runs=1)
+lg.chpts <- rbind(lg.chpts, dats[ ,c("sites" , "occ", "num.runs")])
+lg.chpts$status <- spec$SiteStatus[match(lg.chpts$sites, spec$Site)]
+
+mod.lg <- glm(occ ~ status, family=binomial("logit"),
+                weights=lg.chpts$num.runs, data=lg.chpts)
 
 ## proportions
 
