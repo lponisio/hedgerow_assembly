@@ -11,7 +11,7 @@ cd ../../
 ##
 RScript dataPrep.R
 
-for i in `seq 18 100`; do
+for i in `seq 100 120`; do
     ## runs in parallel on 2 cores
     python hedgerows.py
 
