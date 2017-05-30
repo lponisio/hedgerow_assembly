@@ -13,7 +13,8 @@ source('src/initialize.R')
 extinction.method <- "degree"
 
 load(file=file.path(save.path,
-            sprintf('resilience_%s.Rdata', extinction.method)))
+                    sprintf('resilience_%s.Rdata', extinction.method)))
+res <- res[res$SiteStatus =="maturing",]
 
 dd <- expand.grid(ypr=seq(from= min(res$ypr, na.rm=TRUE),
                           to= max(res$ypr, na.rm=TRUE),
@@ -36,6 +37,7 @@ ypr.pi <- predict.int(mod= mod.ypr,
 ## ************************************************************
 
 load(file=file.path(save.path, 'mods/AlgCon.Rdata'))
+all.alg.Con.status <- all.alg.Con.status[all.alg.Con.status$SiteStatus =="maturing",]
 
 dd.ypr.alg <- expand.grid(ypr=seq(from= min(all.alg.Con.status$ypr,
                                     na.rm=TRUE),

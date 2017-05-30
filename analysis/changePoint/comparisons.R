@@ -36,10 +36,12 @@ chpt.trial$status[chpt.trial$Site %in% BACI.site] <- "maturing"
 
 chpt.trial <- chpt.trial[order(chpt.trial$status),]
 
-write.table(chpt.trial,
-            file='~/Dropbox/hedgerow_assembly_ms/ms/tables/changingPoints.txt',
-            row.names=FALSE,
-            sep="&")
+chpt.trial <- chpt.trial[order(chpt.trial$status),]
+
+## write.table(chpt.trial,
+##             file='~/Dropbox/hedgerow_assembly_ms/ms/tables/changingPoints.txt',
+##             row.names=FALSE,
+##             sep="&")
 
 ## binomial model with change points as successes
 chpt.trial$status <- factor(chpt.trial$status,
@@ -54,7 +56,7 @@ print(exp(cbind(coef(mod.chpt), confint(mod.chpt))))
 
 ## @knitr external_otherCalc
 
-                                        # controls with change points
+## controls with change points
 nrow(chpt.trial[chpt.trial$status == "control" &
                 chpt.trial$chpts != 0,])/
     nrow(chpt.trial[chpt.trial$status == "control",])
@@ -64,26 +66,17 @@ nrow(chpt.trial[chpt.trial$status == "mature" &
     nrow(chpt.trial[chpt.trial$status == "mature",])
 
 
+## non assembling sites
 nrow(chpt.trial[chpt.trial$status != "maturing" &
                 chpt.trial$chpts != 0,])/
     nrow(chpt.trial[chpt.trial$status != "maturing",])
 
 
+## prop of all sites with change points
 nrow(chpt.trial[chpt.trial$chpts != 0,])/
     nrow(chpt.trial)
 
 ## **********************************************************
-
-lg.chpts <- data.frame(sites=rep(chpt.trial$Site, (chpt.trial$trial -
-                                                   chpt.trial$chpts)),
-                       occ=0,
-                       num.runs=1)
-lg.chpts <- rbind(lg.chpts, dats[ ,c("sites" , "occ", "num.runs")])
-lg.chpts$status <- spec$SiteStatus[match(lg.chpts$sites, spec$Site)]
-
-mod.lg <- glm(occ ~ status, family=binomial("logit"),
-              weights=lg.chpts$num.runs, data=lg.chpts)
-
 ## proportions
 
 chpt.trial$prop <- chpt.trial$chpts/chpt.trial$trial
@@ -123,7 +116,8 @@ diff.dats.cp <- diff.dats.cp[diff.dats.cp$Samp !=0,]
 diff.dats.cp$cp[is.na(diff.dats.cp$cp)] <- 0
 diff.dats.cp$cp[diff.dats.cp$cp > 1] <- 1
 
-mod.samp <- glmer(cp ~ Samp + (1|Site), data=diff.dats.cp, family="binomial")
+mod.samp <- glmer(cp ~ Samp + (1|Site), data=diff.dats.cp,
+                  family="binomial")
 summary(mod.samp)
 
 

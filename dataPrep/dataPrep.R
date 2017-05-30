@@ -49,7 +49,8 @@ spec <- spec[spec$Family == 'Syrphidae' |
 
 spec <-  spec[spec$Species != '',]
 spec$SiteStatus[spec$SiteStatus == "restored"] <- "maturing"
-
+BACI.site <- c('Barger', 'Butler', 'Hrdy', 'MullerB', 'Sperandio')
+spec$SiteStatus[spec$SiteStatus %in% BACI.site] <- "maturing"
 
 ## total specimens
 print("total specimens")
