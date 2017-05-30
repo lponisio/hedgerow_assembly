@@ -44,7 +44,7 @@ def star_func(arglist):
 os.chdir('cptPeel')
 
 ## find .pair files
-l = glob.glob("baci/*_*.pairs")
+l = sorted(glob.glob("baci/*_*.pairs"))
 l = [os.path.basename(f) for f in l]
 
 ## the site names

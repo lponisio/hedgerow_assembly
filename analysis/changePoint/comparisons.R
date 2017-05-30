@@ -1,8 +1,8 @@
 ## rm(list=ls())
 library(lme4)
 
-setwd("changePoint")
-## setwd("~/Dropbox/hedgerow_assembly/analysis/changePoint")
+## setwd("changePoint")
+setwd("~/Dropbox/hedgerow_assembly/analysis/changePoint")
 source('../../dataPrep/src/misc.R')
 load('cptPeel/baci/graphs.Rdata')
 load('../../data/networks/allSpecimens.Rdata')
@@ -19,7 +19,7 @@ dats$occ <- 1
 ## **********************************************************
 
 chpt.trial <- aggregate(spec$Year, list(Site=spec$Site),
-                           FUN=function(x) length(unique(x)))
+                        FUN=function(x) length(unique(x)))
 chpt.trial$x <- chpt.trial$x - 1
 
 chpt.trial <- chpt.trial[chpt.trial$x >= 4,]
@@ -27,7 +27,7 @@ chpt.trial <- chpt.trial[chpt.trial$x >= 4,]
 change.points.site <- tapply(dats$cp, dats$sites, length)
 
 chpt.trial$chpts <- change.points.site[match(chpt.trial$Site,
-                                                rownames(change.points.site))]
+                                             rownames(change.points.site))]
 chpt.trial$chpts[is.na(chpt.trial$chpts)] <- 0
 colnames(chpt.trial) <- c("Site", "trial", "chpts")
 
@@ -36,10 +36,10 @@ chpt.trial$status[chpt.trial$Site %in% BACI.site] <- "maturing"
 
 chpt.trial <- chpt.trial[order(chpt.trial$status),]
 
-## write.table(chpt.trial,
-##             file='~/Dropbox/hedgerow_assembly_ms/ms/tables/changingPoints.txt',
-##             row.names=FALSE,
-##             sep="&")
+write.table(chpt.trial,
+            file='~/Dropbox/hedgerow_assembly_ms/ms/tables/changingPoints.txt',
+            row.names=FALSE,
+            sep="&")
 
 ## binomial model with change points as successes
 chpt.trial$status <- factor(chpt.trial$status,
@@ -47,42 +47,42 @@ chpt.trial$status <- factor(chpt.trial$status,
 ## @knitr external_binomialreg
 mod.chpt <- glm(cbind(chpt.trial$chpts,
                       chpt.trial$trial - chpt.trial$chpts) ~
-    chpt.trial$status, family="binomial")
+                    chpt.trial$status, family="binomial")
 print(summary(mod.chpt))
 
 print(exp(cbind(coef(mod.chpt), confint(mod.chpt))))
 
 ## @knitr external_otherCalc
 
-# controls with change points
+                                        # controls with change points
 nrow(chpt.trial[chpt.trial$status == "control" &
                 chpt.trial$chpts != 0,])/
-  nrow(chpt.trial[chpt.trial$status == "control",])
+    nrow(chpt.trial[chpt.trial$status == "control",])
 
 nrow(chpt.trial[chpt.trial$status == "mature" &
                 chpt.trial$chpts != 0,])/
-  nrow(chpt.trial[chpt.trial$status == "mature",])
+    nrow(chpt.trial[chpt.trial$status == "mature",])
 
 
 nrow(chpt.trial[chpt.trial$status != "maturing" &
                 chpt.trial$chpts != 0,])/
-  nrow(chpt.trial[chpt.trial$status != "maturing",])
+    nrow(chpt.trial[chpt.trial$status != "maturing",])
 
 
 nrow(chpt.trial[chpt.trial$chpts != 0,])/
-  nrow(chpt.trial)
+    nrow(chpt.trial)
 
 ## **********************************************************
 
 lg.chpts <- data.frame(sites=rep(chpt.trial$Site, (chpt.trial$trial -
-                                             chpt.trial$chpts)),
+                                                   chpt.trial$chpts)),
                        occ=0,
                        num.runs=1)
 lg.chpts <- rbind(lg.chpts, dats[ ,c("sites" , "occ", "num.runs")])
 lg.chpts$status <- spec$SiteStatus[match(lg.chpts$sites, spec$Site)]
 
 mod.lg <- glm(occ ~ status, family=binomial("logit"),
-                weights=lg.chpts$num.runs, data=lg.chpts)
+              weights=lg.chpts$num.runs, data=lg.chpts)
 
 ## proportions
 
@@ -114,7 +114,7 @@ colnames(diff.samp) <- colnames.prep
 diff.dats <- comm.mat2sample(diff.samp)
 
 diff.dats$cp <- match(paste(diff.dats$Site,
-                                        diff.dats$Date),
+                            diff.dats$Date),
                       paste(dats$sites, dats$cp))
 
 diff.dats.cp <- diff.dats[diff.dats$Site %in% chpt.trial$Site,]

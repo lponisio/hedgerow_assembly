@@ -5,9 +5,8 @@ import sys
 import subprocess as sp
 import csv
 
-paradigms_file = sys.argv[1]
-
-## paradigms_file = "saved/lastyr_consensus.txt"
+# paradigms_file = sys.argv[1]
+paradigms_file = "saved/lastyr_consensus.txt"
 fh = open(paradigms_file, 'r')
 
 

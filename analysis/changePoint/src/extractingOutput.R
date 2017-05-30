@@ -62,12 +62,10 @@ makeChangepointData <- function(results, logs, value, samples,
     ## The code below is just to create the periods between years
     results$V1 <- as.character(results$V1)
     results$V2 <- as.character(results$V2)
-    ## years1.prep  <-  as.numeric(sapply(strsplit(results$V1, '_'),
-    ##                               function(x) x[2]))
-    ## years2.prep  <-  as.numeric(sapply(strsplit(results$V2, '_'),
-    ##                                    function(x) x[2]))
-    years1 <- apply(cbind(years1.prep, years2.prep), 1, min)
-    years2 <- apply(cbind(years1.prep, years2.prep), 1, max)
+    years1  <-  as.numeric(sapply(strsplit(results$V1, '_'),
+                                  function(x) x[2]))
+    years2  <-  as.numeric(sapply(strsplit(results$V2, '_'),
+                                  function(x) x[2]))
 
     anos <- min(years1):max(years2)
     anos.unique <- unique(c(years1, years2))
@@ -166,7 +164,7 @@ makeConsensusTable <- function(changing.points,
                                        clusters[[j]][[i - 1]]]
             }
             if(i == nrow(this.site)){
-                clusters[[j]][[i + 1]] <- this.site$min[i]:2014
+                clusters[[j]][[i + 1]] <- (as.numeric(this.site$min[i])+1):2014
             }
         }
     }
@@ -180,7 +178,7 @@ makeConsensusTable <- function(changing.points,
         }
     }
 
-    clusters <- lapply(clusters, function(x){
+    obs.clusters <- lapply(clusters, function(x){
         lapply(x, function(y){
             y <- y[y %in% files]
         })
@@ -190,8 +188,11 @@ makeConsensusTable <- function(changing.points,
         paste(..., sep=', ')
     }
 
-    prep.table <- unlist(lapply(clusters,
-                                function(x) do.call(pasteComma, x)))
+    prep.table <- rapply(obs.clusters, function(x){
+        paste(x, collapse=",")
+    },
+    how="unlist")
+    names(prep.table) <- NULL
 
 
     write.table(prep.table, file=file.path(save.path, 'consensus.txt'),
