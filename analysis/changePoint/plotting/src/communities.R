@@ -63,8 +63,10 @@ plotDend <- function(){
     ## node membership history
     out <- list()
     for(k in 1:length(id.memb)){
+        print(k)
         if(k == 1) out <- id.memb[[k]]
         else{
+            ## browser()
             out <- merge(out, id.memb[[k]], by="label", all=TRUE)
             out[, ncol(out)] <- out[, ncol(out)] + k*20
         }

@@ -1,0 +1,14 @@
+---HIERARCHICAL-RANDOM-GRAPH---
+StartTime     : Wed May 31 17:48:26 2017
+InputFile     : 
+Directory     : baci/
+---Basic-Graph-Information---
+Nodes         : 319
+Edges         : 0
+---HRG-Information---
+OutputTime    : Wed May 31 17:49:21 2017
+NumStepsMCMC  : 10000001
+NumPrevBests  : 375
+LogLikelihood : -920.671
+HRG           : H16_2014_joint_best-dendro.hrg
+InfoFile      : H16_2014_joint_best-dendro.info

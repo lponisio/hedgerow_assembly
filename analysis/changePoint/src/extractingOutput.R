@@ -189,12 +189,20 @@ makeConsensusTable <- function(changing.points,
     }
 
     prep.table <- rapply(obs.clusters, function(x){
-        paste(x, collapse=",")
+        paste(x, collapse=", ")
     },
     how="unlist")
     names(prep.table) <- NULL
 
+    last.year <- rapply(obs.clusters, function(x){
+        x[length(x)]
+    }, how="unlist")
+    names(last.year) <- NULL
+    last.year <- gsub(".pairs", "_joint_s1-consensus.tree", last.year)
+    last.year <- paste0("baci/", last.year)
 
+    write.table(last.year, file=file.path(save.path, 'lastyr_consensus.txt'),
+                col.names=FALSE, row.names=FALSE)
     write.table(prep.table, file=file.path(save.path, 'consensus.txt'),
                 col.names=FALSE, row.names=FALSE)
 
