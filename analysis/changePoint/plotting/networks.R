@@ -5,7 +5,7 @@ source('plotting/src/initialize.R')
 
 sites <- sapply(strsplit(names(graphs), "_"), function(x) x[1])
 sites.trees <- sapply(strsplit(temp, "_"), function(x) x[1])
-all.poss.yrs <- 2006:2014
+all.poss.yrs <- 2006:2015
 chpts <- read.csv("saved/consensusChangePoints.csv")
 chpts <- chpts[chpts$num.runs >= 0.95,]
 

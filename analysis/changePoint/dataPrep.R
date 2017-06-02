@@ -1,5 +1,5 @@
 rm(list=ls())
-## setwd('~/Dropbox/hedgerow_assembly')
+## setwd('~/Dropbox/hedgerow_assembly/analysis/changePoint')
 load('../../data/networks/all_networks_years.Rdata')
 load('../../data/networks/allSpecimens.Rdata')
 f.path <- "cptPeel/baci"
