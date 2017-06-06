@@ -11,7 +11,7 @@ cd ../../
 ##
 RScript dataPrep.R
 
-for i in `seq 1 2`; do
+for i in `seq 1 100`; do
     ## runs in parallel on 2 cores
     python hedgerows.py
 
@@ -28,7 +28,7 @@ done
 ## create consensus trees
 Rscript consensusChangePoints.R
 python postChangePoint.py saved/consensus.txt
-# python convertConsensusTrees.py saved/lastyr_consensus.txt
+python convertConsensusTrees.py saved/lastyr_consensus.txt
 
 ## *************************************************************
 ## the above works for running on a single computer, for the cluster
