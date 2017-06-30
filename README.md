@@ -1,2 +1,1 @@
-analysis code for "Major network reorganizations punctuate the assembly
-of plant-pollinator communities" Ponisio, Gariarsa, and Kremen
+analysis code for "Opportunistic attachment assembles plant-pollinator networks" Ponisio, Gariarsa, and Kremen
