@@ -11,6 +11,9 @@ chpts <- chpts[chpts$num.runs >= 0.95,]
 
 chpts.site <- as.character(unique(chpts$sites))
 
+## weight the edges, yes judge me for sloppy scoping...
+weighted <- TRUE
+
 for(i in unique(sites)){
     print(i)
     net <- nets[sites == i]

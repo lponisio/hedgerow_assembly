@@ -31,9 +31,10 @@ python postChangePoint.py saved/consensus.txt
 python convertConsensusTrees.py saved/lastyr_consensus.txt
 
 ## *************************************************************
-## the above works for running on a single computer, for the cluster
-## we had trouble with the file processing so is in done in a batch
-## here
+
+## the above works for running on a single computer, for the
+## cluster. we had trouble with the file processing so is in done in a
+## batch here
 
 # Rscript prepChangePointOutput_cluster.R
 

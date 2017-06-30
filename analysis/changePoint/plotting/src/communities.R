@@ -26,7 +26,10 @@ plotNet <- function(){
             V(gs)$size <- importance
             v.boarders <- rep("black", length(importance))
             v.boarders[importance == min(importance)] <- col.white
-            ## E(gs)$width <- (E(gs)$weight/sum(E(gs)$weight))*40
+            if(weighted){
+                ## *40 just seems to look nice
+                E(gs)$width <- (E(gs)$weight/sum(E(gs)$weight))*40
+            }
             gs$layout <- layout_in_circle
             plot.igraph(gs, vertex.label="", vertex.frame.color=v.boarders,
                         vertex.label.cex=importance/10, vertex.label=v.labs)
