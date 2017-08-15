@@ -1,1 +1,1 @@
-analysis code for "Opportunistic attachment assembles plant-pollinator networks" Ponisio, Gariarsa, and Kremen
+analysis code for "Opportunistic attachment assembles plant-pollinator networks" Ponisio, Gariarsa, and Kremen. See write up within analysis folder for details on repository organization and purpose of each script. 
