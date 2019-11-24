@@ -1,4 +1,4 @@
-analysis code for "Opportunistic attachment assembles plant-pollinator networks" Ponisio, Gaiarsa, and Kremen. See write up within analysis folder for details on repository organization and purpose of each script. 
+analysis code for "Opportunistic attachment assembles plant-pollinator networks" Ponisio, Gaiarsa, and Kremen. See write up within analysis folder for details on repository organization and purpose of each script. The data accompanies the code for reproducibility, but we ask to be contacted (lponisio@gmail.com and ckremen@zoology.ubc.ca) if authors wish to use the data for a publication.
 
 In our study we examin the temporal dynamics of plant-pollinator network assembly using variety of different methods including 1) network change point detection 2) node/species-level position variation, 3) species and interaction turnover 4) network-level metrics and 5) extinction simulations. We are committed to reproducible science and all analytical code will be maintained on github, along with the write up.
 
